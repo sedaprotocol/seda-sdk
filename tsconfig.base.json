@@ -12,6 +12,7 @@
     "module": "ES2022",
     "lib": ["ES2022", "dom"],
     "baseUrl": ".",
+    "allowJs": true,
     "paths": {
       "@seda/vm": ["libs/vm/src/index.ts"]
     }
