@@ -1,0 +1,21 @@
+{
+  "name": "@org/source",
+  "version": "0.0.0",
+  "license": "MIT",
+  "scripts": {
+    "build": "nx run-many --all --target=build"
+  },
+  "private": true,
+  "devDependencies": {
+    "@nx/esbuild": "^16.5.5",
+    "@nx/js": "16.5.5",
+    "@nx/workspace": "16.5.5",
+    "@tsconfig/node18": "^18.2.0",
+    "@types/node": "^18.16.19",
+    "esbuild": "^0.17.17",
+    "nx": "16.5.5",
+    "parcel": "^2.9.3",
+    "prettier": "^2.6.2",
+    "typescript": "~5.1.3"
+  }
+}
