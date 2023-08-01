@@ -5,7 +5,7 @@
   "scripts": {
     "start": "npm run build && node dist/vm/index.mjs",
     "build": "nx run-many --all --target=build",
-    "test": "nx run-many --all --target=test"
+    "test": "npm run build && NODE_OPTIONS=--experimental-vm-modules nx run-many --all --target=test"
   },
   "private": true,
   "devDependencies": {
@@ -19,6 +19,7 @@
     "esbuild": "^0.17.17",
     "jest": "^29.4.1",
     "jest-environment-jsdom": "^29.4.1",
+    "node-fetch": "^3.3.2",
     "nx": "16.5.5",
     "parcel": "^2.9.3",
     "prettier": "^2.6.2",

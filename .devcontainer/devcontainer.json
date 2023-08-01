@@ -10,11 +10,12 @@
     "vscode": {
       "settings": {},
       "extensions": [
-        "EditorConfig.EditorConfig",
-        "dbaeumer.vscode-eslint",
-        "esbenp.prettier-vscode",
-        "nrwl.angular-console"
-      ]
+		"EditorConfig.EditorConfig",
+		"dbaeumer.vscode-eslint",
+		"esbenp.prettier-vscode",
+		"nrwl.angular-console",
+		"Orta.vscode-jest"
+	]
     }
   },
   "postCreateCommand": "npm install"
