@@ -1,8 +1,12 @@
-import { parentPort, workerData } from "node:worker_threads";
-import { executeVm } from "./vm";
-import { VmResultWorkerMessage, WorkerMessage, WorkerMessageType } from "./types/worker-messages";
+import { parentPort, isMainThread } from 'node:worker_threads';
+import { executeVm } from './vm.js';
+import {
+  VmResultWorkerMessage,
+  WorkerMessage,
+  WorkerMessageType,
+} from './types/worker-messages.js';
 
-parentPort?.on("message", async (event) => {
+parentPort?.on('message', async function (event) {
   let message: WorkerMessage = JSON.parse(event);
 
   if (message.type === WorkerMessageType.VmCall) {

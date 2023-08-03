@@ -12,10 +12,15 @@
       }
     },
     "build": {
-      "executor": "nx:run-commands",
+      "executor": "@nx/js:swc",
       "options": {
-        "commands": ["node tools/esbuild-inline-worker.mjs"]
-      }
+        "clean": true,
+        "main": "libs/vm/src/index.ts",
+        "outputPath": "dist/libs/vm",
+        "tsConfig": "libs/vm/tsconfig.json",
+        "thirdParty": true
+      },
+      "outputs": ["{options.outputPath}"]
     },
     "test": {
       "executor": "@nx/jest:jest",

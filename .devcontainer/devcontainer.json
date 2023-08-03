@@ -14,7 +14,7 @@
 		"dbaeumer.vscode-eslint",
 		"esbenp.prettier-vscode",
 		"nrwl.angular-console",
-		"Orta.vscode-jest"
+		"dtsvet.vscode-wasm"
 	]
     }
   },

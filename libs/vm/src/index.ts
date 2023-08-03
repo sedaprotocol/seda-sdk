@@ -1,14 +1,18 @@
 import { Worker } from "node:worker_threads";
-// @ts-expect-error
-import workerSrc from "inline-worker:./worker.ts";
-import { VmCallData, VmResult } from "./vm";
-import { VmCallWorkerMessage, WorkerMessage, WorkerMessageType } from "./types/worker-messages";
+import type { VmCallData, VmResult } from "./vm";
+import { VmCallWorkerMessage, WorkerMessage, WorkerMessageType } from "./types/worker-messages.js";
+import type { VmAdapter } from "./types/vm-adapter.js";
+import DefaultVmAdapter from "./default-vm-adapter.js";
+import { parse, format } from "node:path";
 
-export function callVm(callData: VmCallData): Promise<VmResult> {
-  return new Promise(async (resolve, reject) => {
+const CURRENT_FILE_PATH = parse(import.meta.url);
+CURRENT_FILE_PATH.base = 'worker.js';
+const DEFAULT_WORKER_PATH = format(CURRENT_FILE_PATH);
 
-    let worker = new Worker(workerSrc, { eval: true });
-    let workerMessage: VmCallWorkerMessage = {
+export function callVm(callData: VmCallData, workerUrl = DEFAULT_WORKER_PATH, vmAdapter: VmAdapter = new DefaultVmAdapter()): Promise<VmResult> {
+  return new Promise((resolve) => {
+    const worker = new Worker(new URL(workerUrl));
+    const workerMessage: VmCallWorkerMessage = {
       processId: Math.random().toString(),
       callData: {
         ...callData,
@@ -18,7 +22,7 @@ export function callVm(callData: VmCallData): Promise<VmResult> {
     };
 
     worker.on("message", (event) => {
-      let message: WorkerMessage = JSON.parse(event);
+      const message: WorkerMessage = JSON.parse(event);
 
       if (message.type === WorkerMessageType.VmResult && message.processId === workerMessage.processId) {
         resolve(message.result);
@@ -28,3 +32,15 @@ export function callVm(callData: VmCallData): Promise<VmResult> {
     worker.postMessage(JSON.stringify(workerMessage));
   });
 }
+
+async function main() {
+  const result = await callVm({
+    args: [],
+    binary: new Uint8Array(),
+    envs: {},
+  });
+
+  console.log(result);
+}
+
+main();

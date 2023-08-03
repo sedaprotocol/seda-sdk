@@ -1,4 +1,5 @@
 import { init, WASI } from '@wasmer/wasi';
+import VmImports from './vm-imports.js';
 
 export interface VmCallData {
   binary: Uint8Array | number[];
@@ -24,9 +25,15 @@ export async function executeVm(callData: VmCallData): Promise<VmResult> {
       env: callData.envs,
     });
 
-    wasi.instantiate(module, {});
+    const wasiImports = wasi.getImports(module);
+    const vmImports = new VmImports();
+    const finalImports = vmImports.getImports(wasiImports);
 
-    const exitCode = wasi.start();
+    const instance = await WebAssembly.instantiate(module, finalImports);
+    const memory = instance.exports.memory;
+    vmImports.setMemory(memory as WebAssembly.Memory);
+
+    const exitCode = wasi.start(instance);
 
     return {
       exitCode,
