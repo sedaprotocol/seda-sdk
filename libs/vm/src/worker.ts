@@ -1,4 +1,4 @@
-import { parentPort, isMainThread } from 'node:worker_threads';
+import { parentPort } from 'node:worker_threads';
 import { executeVm } from './vm.js';
 import {
   VmResultWorkerMessage,
@@ -7,16 +7,15 @@ import {
 } from './types/worker-messages.js';
 
 parentPort?.on('message', async function (event) {
-  let message: WorkerMessage = JSON.parse(event);
+  const message: WorkerMessage = event;
 
   if (message.type === WorkerMessageType.VmCall) {
-    let result = await executeVm(message.callData);
-    let response: VmResultWorkerMessage = {
-      processId: message.processId,
+    const result = await executeVm(message.callData, message.notifierBuffer);
+    const response: VmResultWorkerMessage = {
       result,
       type: WorkerMessageType.VmResult,
     };
 
-    parentPort?.postMessage(JSON.stringify(response));
+    parentPort?.postMessage(response);
   }
 });

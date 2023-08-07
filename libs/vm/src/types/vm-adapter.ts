@@ -1,26 +1,7 @@
-enum HttpFetchMethod {
-    Options,
-    Get,
-    Post,
-    Put,
-    Delete,
-    Head,
-    Trace,
-    Connect,
-    Patch,
-}
+import type { HttpFetchAction, HttpFetchResponse } from "./vm-actions";
+import { PromiseStatus } from "./vm-promise.js";
 
-export interface HttpFetchOptions {
-  method: HttpFetchMethod,
-  headers: Map<string, string>,
-  body?: Uint8Array,
-}
-
-export interface HttpFetchAction {
-  url: string,
-  options: HttpFetchOptions,
-}
 
 export interface VmAdapter {
-  http_fetch(action: HttpFetchAction): Promise<Response>;
+  httpFetch(action: HttpFetchAction): Promise<PromiseStatus<HttpFetchResponse>>;
 }
