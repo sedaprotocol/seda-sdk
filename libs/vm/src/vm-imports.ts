@@ -20,10 +20,17 @@ export default class VmImports {
       this.memory?.buffer.slice(action, action + actionLength) ?? []
     );
     const messageRaw = Buffer.from(rawAction).toString('utf-8');
-    const message: HttpFetchAction = JSON.parse(messageRaw);
-    this.callResult = this.workerToHost.callActionOnHost(message);
 
-    return this.callResult.length;
+    try {
+      const message: HttpFetchAction = JSON.parse(messageRaw);
+      this.callResult = this.workerToHost.callActionOnHost(message);
+      return this.callResult.length;
+    } catch (error) {
+      console.error(`@httpFetch: ${messageRaw}`, error);
+      this.callResult = new Uint8Array();
+
+      return 0;
+    }
   }
 
   callResultWrite(ptr: number, length: number) {

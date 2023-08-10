@@ -1,0 +1,23 @@
+{
+  "extends": "../../node_modules/@assemblyscript/wasi-shim/asconfig.json",
+  "targets": {
+    "debug": {
+      "outFile": "../../dist/libs/as-sdk/debug.wasm",
+      "textFile": "../../dist/libs/as-sdk/debug.wat",
+      "sourceMap": true,
+      "debug": true
+    },
+    "release": {
+      "outFile": "../../dist/libs/as-sdk/release.wasm",
+      "textFile": "../../dist/libs/as-sdk/release.wat",
+      "sourceMap": true,
+      "optimizeLevel": 3,
+      "shrinkLevel": 0,
+      "converge": false,
+      "noAssert": false
+    }
+  },
+  "options": {
+    "bindings": "esm"
+  }
+}

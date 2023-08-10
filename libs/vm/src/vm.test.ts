@@ -127,8 +127,6 @@ describe("vm", () => {
       new TestVmAdapter()
     );
 
-    console.log(result);
-
     expect(result.stdout).toBe(
       `We've done it HttpFetchResponse { status: 200, headers: {}, bytes: [1], url: "http://example.com", content_length: 1 } "\\u{1}"\n`
     );

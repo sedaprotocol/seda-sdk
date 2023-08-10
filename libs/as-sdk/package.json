@@ -1,0 +1,5 @@
+{
+  "name": "@seda/as-sdk",
+  "type": "module",
+  "types": "./assembly/index.ts"
+}

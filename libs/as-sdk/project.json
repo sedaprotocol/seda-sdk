@@ -1,0 +1,16 @@
+{
+  "name": "as-sdk",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/as-sdk/assembly",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "asc ./assembly/index.ts --target debug",
+         "cwd": "libs/as-sdk"
+      }
+    }
+  },
+  "tags": []
+}
