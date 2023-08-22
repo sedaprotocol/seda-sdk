@@ -35,7 +35,7 @@ describe("vm", () => {
       binary: new Uint8Array(wasmBinary),
     });
 
-    expect(result).toEqual({ exitCode: 0, stderr: '', stdout: 'hello world\n', result: new Uint8Array() });
+    expect(result).toEqual({ exitCode: 0, stderr: '', stdout: 'hello world\n', result: new Uint8Array(), resultAsString: '' });
   });
 
   it("should exit when an invalid WASM binary is given", async ()  => {
@@ -45,7 +45,7 @@ describe("vm", () => {
       binary: new Uint8Array([0, 97, 115, 109]),
     });
 
-    expect(result).toEqual({ exitCode: 1, stderr: 'CompileError: WebAssembly.compile(): expected 4 bytes, fell off end @+4', stdout: '', result: new Uint8Array() });
+    expect(result).toEqual({ exitCode: 1, stderr: 'CompileError: WebAssembly.compile(): expected 4 bytes, fell off end @+4', stdout: '', result: new Uint8Array(), resultAsString: '' });
   });
 
   it('should be able to call the given adapter', async () => {

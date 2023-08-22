@@ -21,7 +21,7 @@ describe('Http', () => {
     });
 
     expect(result.exitCode).toBe(0);
-    expect(result.result).toEqual(new TextEncoder().encode("ok"));
+    expect(result.result).toEqual(new TextEncoder().encode("rejected"));
   });
 
   it('Test SDK HTTP Success', async () => {

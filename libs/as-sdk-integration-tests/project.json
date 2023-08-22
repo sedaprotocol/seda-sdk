@@ -18,6 +18,7 @@
         "jestConfig": "libs/as-sdk-integration-tests/jest.config.ts",
         "passWithNoTests": true
       },
+      "dependsOn": [{ "target": "build" }],
       "configurations": {
         "ci": {
           "ci": true,

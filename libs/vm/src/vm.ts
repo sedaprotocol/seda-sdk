@@ -12,6 +12,7 @@ export interface VmResult {
   stderr: string;
   exitCode: number;
   result?: Uint8Array;
+  resultAsString?: string;
 }
 
 export async function executeVm(callData: VmCallData, notifierBuffer: SharedArrayBuffer): Promise<VmResult> {
@@ -40,6 +41,7 @@ export async function executeVm(callData: VmCallData, notifierBuffer: SharedArra
       stderr: wasi.getStderrString(),
       stdout: wasi.getStdoutString(),
       result: vmImports.result,
+      resultAsString: new TextDecoder().decode(vmImports.result),
     }
   } catch (err) {
     console.error(`
@@ -56,6 +58,7 @@ export async function executeVm(callData: VmCallData, notifierBuffer: SharedArra
       stderr: stderr !== '' ? stderr : (err + ''),
       stdout: wasi.getStdoutString(),
       result: new Uint8Array(),
+      resultAsString: '',
     };
   }
 }

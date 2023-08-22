@@ -6,6 +6,13 @@ export default class Process {
     return CommandLine.all;
   }
 
+  static exit_with_message(code: u8, message: string): void {
+    const msg = String.UTF8.encode(message);
+    const buffer = Uint8Array.wrap(msg);
+
+    Process.exit_with_result(code, buffer);
+  }
+
   static exit_with_result(code: u8, result: Uint8Array): void {
     const buffer = result.buffer;
     const bufferPtr = changetype<usize>(buffer);

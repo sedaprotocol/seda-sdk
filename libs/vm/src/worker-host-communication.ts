@@ -57,6 +57,11 @@ export class HostToWorker {
       this.actionResult = PromiseStatus.rejected(new EmptyBuffer);
     }
 
+    if (typeof this.actionResult === 'undefined') {
+      console.error('Objects that failed:', this, action);
+      throw Error(`Result was undefined while reading. Action was: ${action}`);
+    }
+
     if (this.actionResult.length > MAX_I32_VALUE) {
       throw Error(`Value ${this.actionResult.length} exceeds max i32 (${MAX_I32_VALUE})`);
     }

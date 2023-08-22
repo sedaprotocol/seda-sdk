@@ -11,14 +11,6 @@ export class PromiseStatus<F, R> {
     public rejected: R | null
   ) {}
 
-  isFulfilled(): bool {
-    return this.fulfilled !== null;
-  }
-
-  isRejected(): bool {
-    return this.rejected !== null;
-  }
-
   static fromStr<F extends FromBuffer<F>, R extends FromBuffer<R>>(promiseStatus: string, fulfilled: F, rejected: R): PromiseStatus<F, R> {
     const value = <JSON.Obj>JSON.parse(promiseStatus);
     let fulfilledResult: F | null = null;
