@@ -1,4 +1,3 @@
-console.log("hey!")
+import { commandInit } from './commands/index.js';
 
-
-// seda-sdk wasm upload 
+commandInit();
