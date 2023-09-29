@@ -46,7 +46,7 @@ export async function executeVm(callData: VmCallData, notifierBuffer: SharedArra
   } catch (err) {
     console.error(`
       @executeWasm
-      Execption threw: ${err}
+      Exception threw: ${err}
       VM StdErr: ${wasi.getStderrString()}
       VM StdOut: ${wasi.getStdoutString()}
     `);
