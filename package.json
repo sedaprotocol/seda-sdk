@@ -47,7 +47,7 @@
     "@wasmer/wasi": "^1.2.2",
     "as-wasi": "^0.6.0",
     "assemblyscript-json": "^1.1.0",
-    "protobufjs": "^7.2.5",
-    "tslib": "^2.3.0"
+    "dotenv": "^16.3.1",
+    "figlet": "^1.6.0",
   }
 }
