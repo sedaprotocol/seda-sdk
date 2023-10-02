@@ -10,6 +10,7 @@ export enum WorkerMessageType {
 
 export interface VmCallWorkerMessage {
   callData: VmCallData,
+  processId: string,
   notifierBuffer: SharedArrayBuffer,
   type: WorkerMessageType.VmCall,
 }

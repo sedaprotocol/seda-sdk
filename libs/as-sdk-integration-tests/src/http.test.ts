@@ -1,4 +1,4 @@
-import { callVm,  } from '../../../dist/libs/vm';
+import { callVm } from '../../../dist/libs/vm';
 import { jest } from '@jest/globals';
 import { readFile } from 'node:fs/promises';
 import { HttpFetchResponse } from '../../../dist/libs/vm/src/types/vm-actions';
@@ -6,13 +6,17 @@ import { PromiseStatus } from '../../../dist/libs/vm/src/types/vm-promise';
 
 const mockHttpFetch = jest.fn();
 
+jest.setTimeout(15_000);
+
 const TestVmAdapter = jest.fn().mockImplementation(() => {
-  return { httpFetch: mockHttpFetch };
+  return {
+    setProcessId: () => {},
+    httpFetch: mockHttpFetch
+  };
 });
 
 describe('Http', () => {
   it('Test SDK HTTP Rejection', async () => {
-
     const wasmBinary = await readFile('dist/libs/as-sdk-integration-tests/debug.wasm');
     const result = await callVm({
       args: ['testHttpRejection'],

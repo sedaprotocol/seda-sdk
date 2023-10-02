@@ -15,7 +15,7 @@ export interface VmResult {
   resultAsString?: string;
 }
 
-export async function executeVm(callData: VmCallData, notifierBuffer: SharedArrayBuffer): Promise<VmResult> {
+export async function executeVm(callData: VmCallData, notifierBuffer: SharedArrayBuffer, processId: string): Promise<VmResult> {
   await init();
   const wasi = new WASI({
     args: callData.args,
@@ -27,7 +27,7 @@ export async function executeVm(callData: VmCallData, notifierBuffer: SharedArra
     const module = await WebAssembly.compile(binary);
 
     const wasiImports = wasi.getImports(module);
-    const vmImports = new VmImports(notifierBuffer);
+    const vmImports = new VmImports(notifierBuffer, processId);
     const finalImports = vmImports.getImports(wasiImports);
 
     const instance = await WebAssembly.instantiate(module, finalImports);
@@ -44,7 +44,7 @@ export async function executeVm(callData: VmCallData, notifierBuffer: SharedArra
       resultAsString: new TextDecoder().decode(vmImports.result),
     }
   } catch (err) {
-    console.error(`
+    console.error(`[${processId}] -
       @executeWasm
       Exception threw: ${err}
       VM StdErr: ${wasi.getStderrString()}
@@ -62,3 +62,4 @@ export async function executeVm(callData: VmCallData, notifierBuffer: SharedArra
     };
   }
 }
+

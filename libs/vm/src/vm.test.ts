@@ -7,8 +7,13 @@ import { PromiseStatus } from "../../../dist/libs/vm/src/types/vm-promise";
 
 const mockHttpFetch = jest.fn();
 
+jest.setTimeout(10_000);
+
 const TestVmAdapter = jest.fn().mockImplementation(() => {
-  return { httpFetch: mockHttpFetch };
+  return {
+    setProcessId: () => {},
+    httpFetch: mockHttpFetch
+  };
 });
 
 describe("vm", () => {

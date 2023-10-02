@@ -11,10 +11,11 @@ const MAX_I32_VALUE = 2_147_483_647;
 const NOTIFIER_INDEX = 0;
 
 enum AtomicState {
-  RequestResultLength = 0,
-  ResponseResultLength = 1,
-  RequestResult = 2,
-  ResponseResult = 3,
+  Initial = 0,
+  RequestResultLength = 1,
+  ResponseResultLength = 2,
+  RequestResult = 3,
+  ResponseResult = 4,
 }
 
 class EmptyBuffer implements ToBuffer {
@@ -28,7 +29,21 @@ function updateNotifierState(buffer: Int32Array, state: AtomicState) {
   Atomics.notify(buffer, NOTIFIER_INDEX);
 }
 
+function resetNotifierState(
+  buffer: Int32Array,
+) {
+  Atomics.store(buffer, NOTIFIER_INDEX, AtomicState.Initial);
+}
+
 function waitForNotifierStateChange(buffer: Int32Array, initialState: AtomicState) {
+  const currentState = Atomics.load(buffer, NOTIFIER_INDEX);
+
+  // If work has already been executed don't freeze the thread and wait
+  // There is a case where the PostMessage fires and completes before a wait could be called causing a deadlock
+  if (currentState > initialState) {
+    return;
+  }
+
   Atomics.store(buffer, NOTIFIER_INDEX, initialState);
   Atomics.wait(buffer, NOTIFIER_INDEX, initialState);
 }
@@ -45,7 +60,8 @@ export class HostToWorker {
 
   constructor(
     private adapter: VmAdapter,
-    private notifierBuffer: SharedArrayBuffer
+    private notifierBuffer: SharedArrayBuffer,
+    private processId: string,
   ) {}
 
   async executeAction(action: VmAction) {
@@ -53,17 +69,17 @@ export class HostToWorker {
       const actionResult = await this.adapter.httpFetch(action);
       this.actionResult = actionResult;
     } catch (error) {
-      console.error('Error @executeAction: ', error);
+      console.error(`[${this.processId}] - Error @executeAction: ${error}`);
       this.actionResult = PromiseStatus.rejected(new EmptyBuffer);
     }
 
     if (typeof this.actionResult === 'undefined') {
-      console.error('Objects that failed:', this, action);
-      throw Error(`Result was undefined while reading. Action was: ${action}`);
+      console.error(`[${this.processId}] - Objects that failed: ${action}`);
+      throw Error(`[${this.processId}] - Result was undefined while reading. Action was: ${action}`);
     }
 
     if (this.actionResult.length > MAX_I32_VALUE) {
-      throw Error(`Value ${this.actionResult.length} exceeds max i32 (${MAX_I32_VALUE})`);
+      throw Error(`[${this.processId}] - Value ${this.actionResult.length} exceeds max i32 (${MAX_I32_VALUE})`);
     }
 
     const notifierBufferi32 = new Int32Array(this.notifierBuffer);
@@ -75,7 +91,7 @@ export class HostToWorker {
   async sendActionResultToWorker(target: SharedArrayBuffer) {
     if (target.byteLength !== this.actionResult.length) {
       throw new Error(
-        `target buffer does not have a length of ${this.actionResult.length}, received: ${target.byteLength}`
+        `[${this.processId}] - target buffer does not have a length of ${this.actionResult.length}, received: ${target.byteLength}`
       );
     }
 
@@ -88,7 +104,7 @@ export class HostToWorker {
 }
 
 export class WorkerToHost {
-  constructor(private notifierBuffer: SharedArrayBuffer) {}
+  constructor(private notifierBuffer: SharedArrayBuffer, private processId: string) {}
 
   /**
    * Calls the given action on the host machine and sleeps the thread until an answer has been received
@@ -97,13 +113,15 @@ export class WorkerToHost {
    * @returns
    */
   callActionOnHost(action: VmAction): Uint8Array {
+    const notifierBufferi32 = new Int32Array(this.notifierBuffer);
+    resetNotifierState(notifierBufferi32);
+
     const actionMessage: VmActionExecuteMessage = {
       type: WorkerMessageType.VmActionExecute,
       action,
     };
 
     parentPort?.postMessage(actionMessage);
-    const notifierBufferi32 = new Int32Array(this.notifierBuffer);
 
     waitForNotifierStateChange(
       notifierBufferi32,

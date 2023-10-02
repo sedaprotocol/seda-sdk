@@ -5,6 +5,12 @@ import fetch from 'node-fetch';
 import { PromiseStatus } from './types/vm-promise.js';
 
 export default class DefaultVmAdapter implements VmAdapter {
+  private processId?: string;
+
+  setProcessId(processId: string) {
+      this.processId = processId;
+  }
+
   async httpFetch(action: HttpFetchAction): Promise<PromiseStatus<HttpFetchResponse>> {
     try {
       const response = await fetch(new URL(action.url), {
@@ -28,7 +34,7 @@ export default class DefaultVmAdapter implements VmAdapter {
     } catch (error) {
       const stringifiedError = '' + error;
 
-      console.error('@default-vm-adapter: ', stringifiedError);
+      console.error(`[${this.processId}] - @default-vm-adapter: `, stringifiedError);
 
       return PromiseStatus.rejected(new HttpFetchResponse({
         bytes: Array.from(new TextEncoder().encode(stringifiedError)),

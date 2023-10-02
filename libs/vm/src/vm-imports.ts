@@ -6,9 +6,11 @@ export default class VmImports {
   workerToHost: WorkerToHost;
   callResult: Uint8Array = new Uint8Array();
   result: Uint8Array = new Uint8Array();
+  processId: string;
 
-  constructor(notifierBuffer: SharedArrayBuffer) {
-    this.workerToHost = new WorkerToHost(notifierBuffer);
+  constructor(notifierBuffer: SharedArrayBuffer, processId: string) {
+    this.workerToHost = new WorkerToHost(notifierBuffer, processId);
+    this.processId = processId;
   }
 
   setMemory(memory: WebAssembly.Memory) {
@@ -26,7 +28,7 @@ export default class VmImports {
       this.callResult = this.workerToHost.callActionOnHost(message);
       return this.callResult.length;
     } catch (error) {
-      console.error(`@httpFetch: ${messageRaw}`, error);
+      console.error(`[${this.processId}] - @httpFetch: ${messageRaw}`, error);
       this.callResult = new Uint8Array();
 
       return 0;
@@ -38,7 +40,7 @@ export default class VmImports {
       const memory = new Uint8Array(this.memory?.buffer ?? []);
       memory.set(this.callResult.slice(0, length), ptr);
     } catch (err) {
-      console.error('@callResultWrite: ', err);
+      console.error(`[${this.processId}] - @callResultWrite: `, err);
     }
   }
 
