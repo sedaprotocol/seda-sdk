@@ -1,41 +1,46 @@
-import { JSON } from "../../../node_modules/assemblyscript-json/assembly/index";
-import { call_result_write, http_fetch } from "./bindings/env";
-import { jsonArrToUint8Array } from "./json-utils";
-import { PromiseStatus, FromBuffer } from "./promise";
+import { JSON } from 'assemblyscript-json/assembly';
+import { call_result_write, http_fetch } from './bindings/env';
+import { jsonArrToUint8Array } from './json-utils';
+import { PromiseStatus, FromBuffer } from './promise';
 
 export class HttpResponse implements FromBuffer<HttpResponse> {
   public result: Uint8Array | null = null;
   public bytes: Uint8Array = new Uint8Array(0);
   public contentLength: i64 = 0;
-  public url: string = "";
+  public url: string = '';
   public status: i64 = 0;
   public headers: Map<string, string> = new Map();
+
+  json(): JSON.Value {
+    const body = String.UTF8.decode(this.bytes.buffer);
+    return JSON.parse(body);
+  }
 
   fromBuffer(buffer: Uint8Array): HttpResponse {
     const response = new HttpResponse();
     const value = <JSON.Obj>JSON.parse(buffer);
 
-    const rawResponseBytes = value.getArr("bytes");
+    const rawResponseBytes = value.getArr('bytes');
     if (rawResponseBytes) {
       response.bytes = jsonArrToUint8Array(rawResponseBytes);
     }
 
-    const rawContentLength = value.getInteger("content_length");
+    const rawContentLength = value.getInteger('content_length');
     if (rawContentLength) {
       response.contentLength = rawContentLength.valueOf();
     }
 
-    const rawStatus = value.getInteger("status");
+    const rawStatus = value.getInteger('status');
     if (rawStatus) {
       response.status = rawStatus.valueOf();
     }
 
-    const rawUrl = value.getString("url");
+    const rawUrl = value.getString('url');
     if (rawUrl) {
       response.url = rawUrl.valueOf();
     }
 
-    const rawHeaders = value.getObj("headers");
+    const rawHeaders = value.getObj('headers');
     if (rawHeaders) {
       for (let i = 0; i < rawHeaders.keys.length; i++) {
         const key = rawHeaders.keys[i];
@@ -54,11 +59,31 @@ export class HttpResponse implements FromBuffer<HttpResponse> {
 
 export type HttpFetchMethod = string;
 
+/**
+ * HTTP Fetch options
+ */
 export class HttpFetchOptions {
+  /**
+   * HTTP Method (Get, Post, Patch, etc.)
+   */
   method: HttpFetchMethod = 'Get';
+
+  /**
+   * Headers to send along. Key -> Value
+   * ex: headers.set('Content-Type', 'application/json')
+   */
   headers: Map<string, string> = new Map();
+
+  /**
+   * Body encoded in bytes to send along in a POST, PATCH, etc.
+   */
   body: Uint8Array | null = null;
 
+  /**
+   * Converts the class to an object (internal use)
+   *
+   * @returns {JSON.Obj} A JSON object
+   */
   toObject(): JSON.Obj {
     const obj = JSON.Value.Object();
     const headers = JSON.Value.Object();
@@ -94,8 +119,8 @@ class HttpFetch {
   toObject(): JSON.Obj {
     const obj = JSON.Value.Object();
 
-    obj.set("url", this.url);
-    obj.set("options", this.options.toObject());
+    obj.set('url', this.url);
+    obj.set('options', this.options.toObject());
 
     return obj;
   }
@@ -105,7 +130,17 @@ class HttpFetch {
   }
 }
 
-export function httpFetch(url: string, options: HttpFetchOptions = new HttpFetchOptions()): PromiseStatus<HttpResponse, HttpResponse> {
+/**
+ * Executes a HTTP call (similiar to the Fetch API from the Web API)
+ *
+ * @param {string} url The URL which to call
+ * @param {HttpFetchOptions} options Options to modify the behaviour of the HTTP call
+ * @returns {PromiseStatus<HttpResponse, HttpResponse>} Returns a HttpResponse instance for both fulfilled and rejected case with info about the HTTP call
+ */
+export function httpFetch(
+  url: string,
+  options: HttpFetchOptions = new HttpFetchOptions()
+): PromiseStatus<HttpResponse, HttpResponse> {
   const action = new HttpFetch(url, options);
   const actionStr = action.toString();
 
@@ -120,5 +155,9 @@ export function httpFetch(url: string, options: HttpFetchOptions = new HttpFetch
 
   const response = String.UTF8.decode(responseBuffer);
 
-  return PromiseStatus.fromStr(response, new HttpResponse, new HttpResponse);
+  return PromiseStatus.fromStr(
+    response,
+    new HttpResponse(),
+    new HttpResponse()
+  );
 }

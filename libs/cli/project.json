@@ -12,9 +12,19 @@
       }
     },
     "build": {
-      "executor": "@nx/js:swc",
+      "executor": "@nx/esbuild:esbuild",
       "options": {
         "clean": true,
+        "esbuildOptions": {
+          "banner": {
+            "js": "#!/usr/bin/env node"
+          },
+          "outExtension": {
+            ".js": ".mjs"
+          },
+          "sourcemap": true
+        },
+        "format": ["cjs"],
         "main": "libs/cli/src/index.ts",
         "outputPath": "dist/libs/cli",
         "tsConfig": "libs/cli/tsconfig.json",

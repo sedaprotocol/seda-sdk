@@ -1,4 +1,7 @@
 {
-  "name": "@seda/cli",
-  "type": "module"
+  "name": "@seda-protocol/cli",
+  "type": "module",
+  "bin": {
+    "seda-sdk": "./index.cjs"
+  }
 }

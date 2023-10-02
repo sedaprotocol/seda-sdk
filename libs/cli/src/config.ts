@@ -1,6 +1,9 @@
 import { config } from 'dotenv';
 
 config();
+config({
+  path: `${process.cwd()}/.env`,
+});
 
 export const BECH32_ADDRESS_PREFIX = 'seda';
 export const RPC_ENDPOINT = process.env.SEDA_RPC_ENDPOINT;

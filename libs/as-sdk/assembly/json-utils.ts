@@ -1,4 +1,4 @@
-import { JSON } from '../../../node_modules/assemblyscript-json/assembly/index';
+import { JSON } from 'assemblyscript-json/assembly';
 
 export function jsonArrToUint8Array(array: JSON.Arr): Uint8Array {
   const bytes: u8[] = [];

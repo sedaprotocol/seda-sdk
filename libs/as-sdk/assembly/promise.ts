@@ -1,4 +1,4 @@
-import { JSON } from '../../../node_modules/assemblyscript-json/assembly/index';
+import { JSON } from 'assemblyscript-json/assembly';
 import { jsonArrToUint8Array } from './json-utils';
 
 export interface FromBuffer<T> {
