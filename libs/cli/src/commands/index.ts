@@ -5,7 +5,7 @@ import figlet from 'figlet';
 
 export async function commandInit() {
   const program = new Command()
-    .description('SEDA SDK CLI')
+    .description('SEDA SDK Command Line Interface (CLI)')
     .version('0.0.1')
     .addHelpText('before', `${figlet.textSync('SEDA SDK')}\n`)
     .addHelpText('after', '\r')

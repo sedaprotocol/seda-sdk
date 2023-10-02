@@ -7,7 +7,7 @@ import { uploadDataRequestWasm } from '../../services/wasm/tx.js';
 import { MsgStoreDataRequestWasmResponse } from '../../gen/sedachain/wasm_storage/v1/tx.js';
 
 export const upload = new Command('upload');
-
+upload.description('upload a Data Request WASM binary to the SEDA chain');
 upload.argument('<wasm-filepath>', 'File path of the Data Request WASM binary');
 upload.option('-r, --rpc [string]', 'Tendermint/CometBFT RPC Endpoint');
 upload.option(
@@ -20,7 +20,7 @@ upload.option(
 );
 
 upload.action(async () => {
-  updateSpinnerText('Uploading Data Request WASM binary to SEDA network');
+  updateSpinnerText('Uploading Data Request WASM binary to the SEDA network');
 
   // Tendermint/CometBFT RPC endpoint
   if (!upload.opts().rpc && !RPC_ENDPOINT) {
