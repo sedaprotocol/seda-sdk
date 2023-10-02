@@ -4,7 +4,6 @@ import { readFile } from 'node:fs/promises';
 import { ADDRESS, GAS_LIMIT } from '../../config.js';
 import { spinnerSuccess, updateSpinnerText } from '../spinner.js';
 import { uploadDataRequestWasm } from '../../services/wasm/tx.js';
-import { MsgStoreDataRequestWasmResponse } from '../../gen/sedachain/wasm_storage/v1/tx.js';
 import { getRpcOption } from './options.js';
 
 export const upload = new Command('upload');
@@ -44,23 +43,8 @@ upload.action(async () => {
     gas
   );
 
-  // Throw error if transaction failed
-  if (response.code == 1) {
-    throw Error(`${response.rawLog} (txn: ${response.transactionHash})`);
-  }
-
-  // Decode WASM binary hash (used as ID)
-  const wasmHash =
-    response.msgResponses.length > 0
-      ? MsgStoreDataRequestWasmResponse.decode(response.msgResponses[0].value)
-          .hash
-      : '(empty)';
-
   // Display results
   spinnerSuccess();
   console.log();
-  console.table({
-    'txn hash': response.transactionHash,
-    'wasm hash': wasmHash,
-  });
+  console.table(response);
 });

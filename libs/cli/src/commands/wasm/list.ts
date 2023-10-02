@@ -21,5 +21,5 @@ list.action(async () => {
   // Display results
   spinnerSuccess();
   console.log();
-  console.table(queryResult.hashTypePairs);
+  console.table(queryResult);
 });

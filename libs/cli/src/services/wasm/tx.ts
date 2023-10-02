@@ -1,5 +1,8 @@
 import { gzip } from 'node-gzip';
-import { MsgStoreDataRequestWasm } from '../../gen/sedachain/wasm_storage/v1/tx.js';
+import {
+  MsgStoreDataRequestWasm,
+  MsgStoreDataRequestWasmResponse,
+} from '../../gen/sedachain/wasm_storage/v1/tx.js';
 import { WasmType } from '../../gen/sedachain/wasm_storage/v1/wasm_storage.js';
 import { BECH32_ADDRESS_PREFIX, MNEMONIC } from '../../config.js';
 import { DirectSecp256k1HdWallet, Registry } from '@cosmjs/proto-signing';
@@ -55,5 +58,22 @@ export async function uploadDataRequestWasm(
     gas: gas ?? 'auto',
   };
 
-  return await client.signAndBroadcast(address, [message], fee);
+  const response = await client.signAndBroadcast(address, [message], fee);
+
+  // Throw error if transaction failed
+  if (response.code == 1) {
+    throw Error(`${response.rawLog} (txn: ${response.transactionHash})`);
+  }
+
+  // Decode WASM binary hash (used as ID)
+  const wasmHash =
+    response.msgResponses.length > 0
+      ? MsgStoreDataRequestWasmResponse.decode(response.msgResponses[0].value)
+          .hash
+      : '(empty)';
+
+  return {
+    'txn hash': response.transactionHash,
+    'wasm hash': wasmHash,
+  };
 }
