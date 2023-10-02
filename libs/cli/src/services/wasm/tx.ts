@@ -1,7 +1,7 @@
 import { gzip } from 'node-gzip';
 import { MsgStoreDataRequestWasm } from '../../gen/sedachain/wasm_storage/v1/tx.js';
 import { WasmType } from '../../gen/sedachain/wasm_storage/v1/wasm_storage.js';
-import { BECH32_ADDRESS_PREFIX, MNEMONICS } from '../../config.js';
+import { BECH32_ADDRESS_PREFIX, MNEMONIC } from '../../config.js';
 import { DirectSecp256k1HdWallet, Registry } from '@cosmjs/proto-signing';
 import { SigningStargateClient, defaultRegistryTypes } from '@cosmjs/stargate';
 
@@ -11,12 +11,12 @@ export async function uploadDataRequestWasm(
   address?: string,
   gas?: string
 ) {
-  if (!MNEMONICS) {
+  if (!MNEMONIC) {
     throw Error(
-      'Mnemonics need to be defined as environment var `MNEMONICS=<your mnemonics>`'
+      'Mnemonic phrase need to be defined as environment var `SEDA_MNEMONIC=<phrase>`'
     );
   }
-  const mnemonic: string = MNEMONICS;
+  const mnemonic: string = MNEMONIC;
 
   // Setup endpoints for WASM storage module
   const signer = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
