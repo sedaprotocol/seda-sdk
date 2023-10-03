@@ -1,7 +1,13 @@
-import { QueryClient, createProtobufRpcClient } from '@cosmjs/stargate';
+import {
+  ProtobufRpcClient,
+  QueryClient,
+  createProtobufRpcClient,
+} from '@cosmjs/stargate';
 import { QueryClientImpl } from '../../gen/sedachain/wasm_storage/v1/query.js';
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import { WasmType } from '../../gen/sedachain/wasm_storage/v1/wasm_storage.js';
+
+import { toHexString } from './utils.js';
 
 export async function queryDataRequestWasms(endpoint: string) {
   const queryService = await buildQueryService(endpoint);
@@ -43,18 +49,12 @@ async function buildQueryService(endpoint: string) {
   // Tendermint RPC endpoint
   const tendermintClient = await Tendermint34Client.connect(endpoint);
 
-  // Use the Tendermint client to submit unverified ABCI queries
+  // Tendermint client to submit unverified ABCI queries
   const queryClient = new QueryClient(tendermintClient);
 
   // Helper function wraps the generic Stargate query client for use by the specific generated query client
-  const rpcClient = createProtobufRpcClient(queryClient);
+  const rpcClient: ProtobufRpcClient = createProtobufRpcClient(queryClient);
 
   // Instantiate a specific query client which will have the custom methods defined in the .proto file
   return new QueryClientImpl(rpcClient);
-}
-
-function toHexString(byteArray: Uint8Array) {
-  return Array.from(byteArray, function (byte) {
-    return ('0' + (byte & 0xff).toString(16)).slice(-2);
-  }).join('');
 }

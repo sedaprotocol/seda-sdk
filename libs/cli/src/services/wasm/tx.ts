@@ -7,6 +7,9 @@ import { WasmType } from '../../gen/sedachain/wasm_storage/v1/wasm_storage.js';
 import { BECH32_ADDRESS_PREFIX, MNEMONIC } from '../../config.js';
 import { DirectSecp256k1HdWallet, Registry } from '@cosmjs/proto-signing';
 import { SigningStargateClient, defaultRegistryTypes } from '@cosmjs/stargate';
+import { keccak256 } from '@cosmjs/crypto';
+
+import { toHexString } from './utils.js';
 
 export async function uploadDataRequestWasm(
   endpoint: string,
@@ -30,6 +33,8 @@ export async function uploadDataRequestWasm(
     '/sedachain.wasm_storage.v1.MsgStoreDataRequestWasm',
     MsgStoreDataRequestWasm
   );
+
+  // Tendermint client
   const client = await SigningStargateClient.connectWithSigner(
     endpoint,
     signer,
@@ -62,7 +67,10 @@ export async function uploadDataRequestWasm(
 
   // Throw error if transaction failed
   if (response.code == 1) {
-    throw Error(`${response.rawLog} (txn: ${response.transactionHash})`);
+    throw Error(`${response.rawLog}
+      txn: ${response.transactionHash}
+      wasmHash: ${toHexString(keccak256(new Uint8Array(wasmBinary)))}
+    `);
   }
 
   // Decode WASM binary hash (used as ID)
