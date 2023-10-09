@@ -18,7 +18,11 @@
         "main": "libs/vm/src/index.ts",
         "outputPath": "dist/libs/vm",
         "tsConfig": "libs/vm/tsconfig.json",
-        "thirdParty": true
+        "thirdParty": true,
+        "swcrc": "libs/vm/.swcrc",
+        "buildableProjectDepsInPackageJsonType": "dependencies",
+        "updateBuildableProjectDepsInPackageJson": true,
+        "generateExportsField": true
       },
       "outputs": ["{options.outputPath}"]
     },

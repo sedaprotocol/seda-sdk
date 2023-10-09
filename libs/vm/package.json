@@ -1,4 +1,5 @@
 {
-  "name": "@seda/vm",
-  "type": "module"
+  "name": "@seda-protocol/vm",
+  "type": "module",
+  "version": "0.0.1"
 }
