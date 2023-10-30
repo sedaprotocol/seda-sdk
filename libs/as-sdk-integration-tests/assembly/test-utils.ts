@@ -1,4 +1,4 @@
-import Process from './process';
+import { Process } from '../../as-sdk/assembly/index';
 
 @inline
 export function assert(expected: bool, message: string): void {

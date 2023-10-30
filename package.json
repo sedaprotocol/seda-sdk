@@ -6,6 +6,7 @@
     "start": "npm run build && node dist/libs/vm/src/index.js",
     "build": "nx run-many --all --target=build",
     "test": "npm run build && NODE_OPTIONS=--experimental-vm-modules nx run-many --all --target=test",
+    "docs": "typedoc libs/as-sdk/assembly/index.ts --tsconfig ./libs/as-sdk/assembly/tsconfig.json --skipErrorChecking",
     "cli:generate": "cd libs/cli/proto && npx buf generate"
   },
   "private": true,
@@ -38,6 +39,7 @@
     "prettier": "^2.8.8",
     "ts-jest": "^29.1.0",
     "ts-node": "10.9.1",
+    "typedoc": "^0.25.3",
     "typescript": "~5.1.3"
   },
   "dependencies": {

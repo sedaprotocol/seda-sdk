@@ -1,16 +1,10 @@
 import { httpFetch, Process } from '../../as-sdk/assembly/index';
-import { testInvalidUint8JsonArray, testValidUint8JsonArray } from './json-utils-test';
-
 const args = Process.args()[0];
 
 if (args === 'testHttpRejection') {
   testHttpRejection();
 } else if (args === 'testHttpSuccess') {
   testHttpSuccess();
-} else if (args === 'testValidUint8JsonArray') {
-  testValidUint8JsonArray();
-} else if (args === 'testInvalidUint8JsonArray') {
-  testInvalidUint8JsonArray();
 }
 
 export function testHttpRejection(): void {

@@ -3,18 +3,34 @@ import { call_result_write, http_fetch } from './bindings/env';
 import { jsonArrToUint8Array } from './json-utils';
 import { PromiseStatus, FromBuffer } from './promise';
 
+/**
+ * Response of an httpFetch call
+ */
 export class HttpResponse implements FromBuffer<HttpResponse> {
+  /**
+   * Raw result of the HTTP fetch. (usually not used)
+   */
   public result: Uint8Array | null = null;
+  /**
+   * The response body result. This can be used to convert to JSON, text, etc.
+   */
   public bytes: Uint8Array = new Uint8Array(0);
+  /**
+   * The length of the content
+   */
   public contentLength: i64 = 0;
+  /**
+   * The URL that was fetched (when it needs to follow redirects)
+   */
   public url: string = '';
+  /**
+   * The HTTP status code
+   */
   public status: i64 = 0;
+  /**
+   * The headers returned
+   */
   public headers: Map<string, string> = new Map();
-
-  json(): JSON.Value {
-    const body = String.UTF8.decode(this.bytes.buffer);
-    return JSON.parse(body);
-  }
 
   fromBuffer(buffer: Uint8Array): HttpResponse {
     const response = new HttpResponse();
@@ -61,6 +77,19 @@ export type HttpFetchMethod = string;
 
 /**
  * HTTP Fetch options
+ * @example
+ * ```ts
+ * const headers = new Map<string, string>();
+ * headers.set('x-header', 'example');
+ *
+ * const options = new HttpFetchOptions();
+ * options.method = "Post";
+ * options.headers = headers;
+ * // Do something with the body
+ * options.body = new Uint8Array(10);
+ *
+ * const response = httpFetch("https://swapi.dev/api/planets/1/", options);
+ * ```
  */
 export class HttpFetchOptions {
   /**
@@ -136,6 +165,18 @@ class HttpFetch {
  * @param {string} url The URL which to call
  * @param {HttpFetchOptions} options Options to modify the behaviour of the HTTP call
  * @returns {PromiseStatus<HttpResponse, HttpResponse>} Returns a HttpResponse instance for both fulfilled and rejected case with info about the HTTP call
+ * @example
+ * ```ts
+ * const response = httpFetch("https://swapi.dev/api/planets/1/");
+ * const fulfilled = response.fulfilled;
+ *
+ * if (fulfilled !== null) {
+ *   const data = String.UTF8.decode(fulfilled.bytes.buffer);
+ *   // Do something with data
+ * } else {
+ *   // Error occured
+ * }
+ * ```
  */
 export function httpFetch(
   url: string,

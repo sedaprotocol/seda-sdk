@@ -1,0 +1,46 @@
+name: Pull request checks
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  verify_build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: 📥 Install dependencies
+        run: npm ci
+
+      - name: 🔨 Build projects
+        run: npm run build
+
+      - name: 🧪 Run unit tests
+        run: npm run test
+
+      - name: 📄 Setup Pages
+        uses: actions/configure-pages@v3
+
+      - name: 📚 Create docs
+        run: npm run docs
+
+      - name: 🆙 Upload artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: './docs'
+
+      - name: 📄 Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
+
+

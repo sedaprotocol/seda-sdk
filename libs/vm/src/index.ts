@@ -11,6 +11,14 @@ const CURRENT_FILE_PATH = parse(import.meta.url);
 CURRENT_FILE_PATH.base = 'worker.js';
 const DEFAULT_WORKER_PATH = format(CURRENT_FILE_PATH);
 
+/**
+ * Executes the given WASM binary as if it were a Data Request
+ *
+ * @param callData The call data passed to the VM
+ * @param workerUrl URL of the compiled worker.js
+ * @param vmAdapter Option to insert a custom VM adapter, can be used to mock
+ * @returns
+ */
 export function callVm(callData: VmCallData, workerUrl = DEFAULT_WORKER_PATH, vmAdapter: VmAdapter = new DefaultVmAdapter()): Promise<VmResult> {
   return new Promise((resolve) => {
     const processId = createProcessId(callData);
