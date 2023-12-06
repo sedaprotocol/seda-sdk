@@ -55,7 +55,7 @@ export default class VmImports {
       // TODO: Data requests should not have this many imports
       // we should restrict it to only a few
       ...wasiImports,
-      env: {
+      seda_v1: {
         http_fetch: this.httpFetch.bind(this),
         call_result_write: this.callResultWrite.bind(this),
         execution_result: this.executionResult.bind(this),

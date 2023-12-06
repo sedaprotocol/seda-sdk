@@ -1,5 +1,5 @@
 import { Process as WasiProcess, CommandLine } from 'as-wasi/assembly';
-import { execution_result } from './bindings/env';
+import { execution_result } from './bindings/seda_v1';
 
 export default class Process {
   /**

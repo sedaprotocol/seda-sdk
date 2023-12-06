@@ -1,5 +1,5 @@
 import { JSON } from 'assemblyscript-json/assembly';
-import { call_result_write, http_fetch } from './bindings/env';
+import { call_result_write, http_fetch } from './bindings/seda_v1';
 import { jsonArrToUint8Array } from './json-utils';
 import { PromiseStatus, FromBuffer } from './promise';
 
