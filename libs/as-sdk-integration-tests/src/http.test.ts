@@ -20,7 +20,6 @@ describe('Http', () => {
     mockHttpFetch.mockReset();
   });
 
-
   it('Test SDK HTTP Rejection', async () => {
     const wasmBinary = await readFile('dist/libs/as-sdk-integration-tests/debug.wasm');
     const result = await callVm({
@@ -32,9 +31,6 @@ describe('Http', () => {
     expect(result.exitCode).toBe(0);
     expect(result.result).toEqual(new TextEncoder().encode("rejected"));
   });
-
-
-
 
   it('Test mocked SDK HTTP Success', async () => {
 
@@ -62,9 +58,6 @@ describe('Http', () => {
     expect(result.result).toEqual(new TextEncoder().encode('ok'));
   });
 
-
-
-
   it('Test SDK HTTP Success', async () => {
     const wasmBinary = await readFile('dist/libs/as-sdk-integration-tests/debug.wasm');
     const result = await callVm({
@@ -76,7 +69,6 @@ describe('Http', () => {
     expect(result.exitCode).toBe(0);
     expect(result.result).toEqual(new TextEncoder().encode("ok"));
   });
-
 
   it("should exit when an invalid WASM binary is given", async ()  => {
     const result = await callVm({

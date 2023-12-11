@@ -1,6 +1,5 @@
 import { init, WASI } from '@wasmer/wasi';
 import VmImports from './vm-imports.js';
-import { debug } from 'node:console';
 
 export interface VmCallData {
   binary: Uint8Array | number[];
