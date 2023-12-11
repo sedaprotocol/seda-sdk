@@ -16,6 +16,11 @@ const TestVmAdapter = jest.fn().mockImplementation(() => {
 });
 
 describe('Http', () => {
+  beforeEach(() => {
+    mockHttpFetch.mockReset();
+  });
+
+
   it('Test SDK HTTP Rejection', async () => {
     const wasmBinary = await readFile('dist/libs/as-sdk-integration-tests/debug.wasm');
     const result = await callVm({
@@ -28,7 +33,11 @@ describe('Http', () => {
     expect(result.result).toEqual(new TextEncoder().encode("rejected"));
   });
 
-  it('Test SDK HTTP Success', async () => {
+
+
+
+  it('Test mocked SDK HTTP Success', async () => {
+
     const wasmBinary = await readFile(
       'dist/libs/as-sdk-integration-tests/debug.wasm'
     );
@@ -52,4 +61,31 @@ describe('Http', () => {
     expect(result.exitCode).toBe(0);
     expect(result.result).toEqual(new TextEncoder().encode('ok'));
   });
+
+
+
+
+  it('Test SDK HTTP Success', async () => {
+    const wasmBinary = await readFile('dist/libs/as-sdk-integration-tests/debug.wasm');
+    const result = await callVm({
+      args: ['testHttpSuccess'],
+      envs: {},
+      binary: new Uint8Array(wasmBinary),
+    });
+
+    expect(result.exitCode).toBe(0);
+    expect(result.result).toEqual(new TextEncoder().encode("ok"));
+  });
+
+
+  it("should exit when an invalid WASM binary is given", async ()  => {
+    const result = await callVm({
+      args: ['testHttpSuccess'],
+      envs: {},
+      binary: new Uint8Array([0, 97, 115, 109]),
+    });
+
+    expect(result).toEqual({ exitCode: 1, stderr: 'CompileError: WebAssembly.compile(): expected 4 bytes, fell off end @+4', stdout: '', result: new Uint8Array(), resultAsString: '' });
+  });
+
 });
