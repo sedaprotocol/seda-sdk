@@ -21,7 +21,13 @@ const DEFAULT_WORKER_PATH = format(CURRENT_FILE_PATH);
  */
 export function callVm(callData: VmCallData, workerUrl = DEFAULT_WORKER_PATH, vmAdapter: VmAdapter = new DefaultVmAdapter()): Promise<VmResult> {
   return new Promise((resolve) => {
-    const processId = createProcessId(callData);
+    const finalCallData: VmCallData = {
+      ...callData,
+      // First argument matches the Rust Wasmer standard (_start for WASI)
+      args: ['_start', ...callData.args],
+    };
+
+    const processId = createProcessId(finalCallData);
     vmAdapter.setProcessId(processId);
 
     const worker = new Worker(new URL(workerUrl));
@@ -31,8 +37,8 @@ export function callVm(callData: VmCallData, workerUrl = DEFAULT_WORKER_PATH, vm
     const workerMessage: VmCallWorkerMessage = {
       processId,
       callData: {
-        ...callData,
-        binary: Array.from(callData.binary),
+        ...finalCallData,
+        binary: Array.from(finalCallData.binary),
       },
       notifierBuffer,
       type: WorkerMessageType.VmCall,

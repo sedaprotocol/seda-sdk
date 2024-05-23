@@ -1,5 +1,6 @@
 import { httpFetch, Process } from '../../as-sdk/assembly/index';
-const args = Process.args()[0];
+
+const args = Process.args().at(1);
 
 if (args === 'testHttpRejection') {
   testHttpRejection();
@@ -16,6 +17,8 @@ export function testHttpRejection(): void {
     const buffer = Uint8Array.wrap(msg);
 
     Process.exit_with_result(0, buffer);
+  } else {
+    Process.exit_with_message(1, "Test failed");
   }
 }
 
@@ -28,6 +31,8 @@ export function testHttpSuccess(): void {
     const buffer = Uint8Array.wrap(msg);
 
     Process.exit_with_result(0, buffer);
+  } else {
+    Process.exit_with_message(31, 'My custom test failed');
   }
 }
 
