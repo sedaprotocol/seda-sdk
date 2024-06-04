@@ -1,11 +1,22 @@
-import type { HttpFetchAction } from './types/vm-actions';
+import type { HttpFetchAction } from './types/vm-actions.js';
 import { HttpFetchResponse } from './types/vm-actions.js';
-import type { VmAdapter } from './types/vm-adapter';
+import type { VmAdapter } from './types/vm-adapter.js';
 import fetch from 'node-fetch';
 import { PromiseStatus } from './types/vm-promise.js';
+import { VmCallData } from './vm.js';
 
-export default class DefaultVmAdapter implements VmAdapter {
+export default class DataRequestVmAdapter implements VmAdapter {
   private processId?: string;
+
+  modifyVmCallData(input: VmCallData): VmCallData {
+    return {
+      ...input,
+      envs: {
+        ...input.envs,
+        VM_MODE: 'dr',
+      },
+    };
+  }
 
   setProcessId(processId: string) {
       this.processId = processId;

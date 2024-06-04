@@ -16,7 +16,6 @@ export interface VmResult {
 }
 
 export async function executeVm(callData: VmCallData, notifierBuffer: SharedArrayBuffer, processId: string): Promise<VmResult> {
-
   await init();
   const wasi = new WASI({
     args: callData.args,

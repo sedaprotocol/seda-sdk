@@ -2,10 +2,13 @@ import { Worker } from "node:worker_threads";
 import type { VmCallData, VmResult } from "./vm";
 import { VmCallWorkerMessage, WorkerMessage, WorkerMessageType } from "./types/worker-messages.js";
 import type { VmAdapter } from "./types/vm-adapter.js";
-import DefaultVmAdapter from "./default-vm-adapter.js";
+import DataRequestVmAdapter from "./data-request-vm-adapter.js";
 import { parse, format } from "node:path";
 import { HostToWorker } from "./worker-host-communication.js";
 import { createProcessId } from "./services/create-process-id.js";
+
+export { default as TallyVmAdapter } from './tally-vm-adapter.js';
+export { default as DataRequestVmAdapter } from './data-request-vm-adapter.js';
 
 const CURRENT_FILE_PATH = parse(import.meta.url);
 CURRENT_FILE_PATH.base = 'worker.js';
@@ -19,13 +22,17 @@ const DEFAULT_WORKER_PATH = format(CURRENT_FILE_PATH);
  * @param vmAdapter Option to insert a custom VM adapter, can be used to mock
  * @returns
  */
-export function callVm(callData: VmCallData, workerUrl = DEFAULT_WORKER_PATH, vmAdapter: VmAdapter = new DefaultVmAdapter()): Promise<VmResult> {
+export function callVm(
+  callData: VmCallData,
+  workerUrl = DEFAULT_WORKER_PATH,
+  vmAdapter: VmAdapter = new DataRequestVmAdapter()
+): Promise<VmResult> {
   return new Promise((resolve) => {
-    const finalCallData: VmCallData = {
+    const finalCallData: VmCallData = vmAdapter.modifyVmCallData({
       ...callData,
       // First argument matches the Rust Wasmer standard (_start for WASI)
       args: ['_start', ...callData.args],
-    };
+    });
 
     const processId = createProcessId(finalCallData);
     vmAdapter.setProcessId(processId);
@@ -74,7 +81,7 @@ export function callVm(callData: VmCallData, workerUrl = DEFAULT_WORKER_PATH, vm
         exitCode,
         stderr: `[${processId}] - The worker has been terminated`,
         stdout: '',
-      })
+      });
     });
 
     worker.postMessage(workerMessage);

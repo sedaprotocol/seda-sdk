@@ -1,4 +1,4 @@
-import { Process as WasiProcess, CommandLine } from 'as-wasi/assembly';
+import { Process as WasiProcess, CommandLine, Environ } from 'as-wasi/assembly';
 import { execution_result } from './bindings/seda_v1';
 
 export default class Process {
@@ -15,6 +15,28 @@ export default class Process {
    */
   static args(): string[] {
     return CommandLine.all;
+  }
+
+  /**
+   * Gets all the environment variables as a Map
+   *
+   * @returns {Map<string, string>} key, value pair with all environment variables
+   * @example
+   * ```ts
+   * const env = Process.env();
+   *
+   * const vmMode = env.get('VM_MODE');
+   * ```
+   */
+  static envs(): Map<string, string> {
+    const result: Map<string, string> = new Map();
+
+    for (let i: i32 = 0; i < Environ.all.length; i++) {
+      const entry = Environ.all[i];
+      result.set(entry.key, entry.value);
+    }
+
+    return result;
   }
 
   /**

@@ -10,6 +10,7 @@ jest.setTimeout(15_000);
 
 const TestVmAdapter = jest.fn().mockImplementation(() => {
   return {
+    modifyVmCallData: (v) => v,
     setProcessId: () => {},
     httpFetch: mockHttpFetch
   };
