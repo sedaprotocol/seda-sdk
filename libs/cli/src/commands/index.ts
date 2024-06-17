@@ -1,6 +1,7 @@
 import { Command } from 'commander';
 import { spinnerError, stopSpinner } from './spinner.js';
 import { wasm } from './wasm/index.js';
+import { dr } from './dr/index.js';
 
 export async function commandInit() {
   const program = new Command()
@@ -8,6 +9,7 @@ export async function commandInit() {
     .version('0.0.1')
     .addHelpText('after', '\r')
     .addCommand(wasm)
+    .addCommand(dr)
     .option('-v, --verbose', 'verbose logging')
     .helpOption(undefined, 'display this help');
 

@@ -6,10 +6,16 @@ import {
 import { WasmType } from '../../gen/sedachain/wasm_storage/v1/wasm_storage.js';
 import { BECH32_ADDRESS_PREFIX, MNEMONIC } from '../../config.js';
 import { DirectSecp256k1HdWallet, Registry } from '@cosmjs/proto-signing';
-import { SigningStargateClient, defaultRegistryTypes } from '@cosmjs/stargate';
+import {
+  GasPrice,
+  SigningStargateClient,
+  StdFee,
+  defaultRegistryTypes,
+} from '@cosmjs/stargate';
 import { keccak256 } from '@cosmjs/crypto';
 
 import { toHexString } from './utils.js';
+import { tryAsync } from '../try-async.js';
 
 export async function uploadDataRequestWasm(
   endpoint: string,
@@ -38,7 +44,7 @@ export async function uploadDataRequestWasm(
   const client = await SigningStargateClient.connectWithSigner(
     endpoint,
     signer,
-    { registry: myRegistry }
+    { registry: myRegistry, gasPrice: GasPrice.fromString('5000000000aseda') }
   );
 
   // In case that address is undefined, pick the first address from wallet
@@ -58,12 +64,17 @@ export async function uploadDataRequestWasm(
       wasmType: WasmType.WASM_TYPE_DATA_REQUEST,
     }),
   };
-  const fee = {
-    amount: [],
-    gas: gas ?? 'auto',
+
+  const simulatedGas = await client.simulate(address, [message], undefined);
+  const gasPrice = BigInt(5000000000);
+  const fee = BigInt(simulatedGas) * gasPrice * 3n;
+
+  const stdFee: StdFee = {
+    gas: Math.round(simulatedGas * 1.3).toString(),
+    amount: [{ denom: 'aseda', amount: fee.toString() }],
   };
 
-  const response = await client.signAndBroadcast(address, [message], fee);
+  const response = await client.signAndBroadcast(address, [message], stdFee);
 
   // Throw error if transaction failed
   if (response.code == 1) {
@@ -76,8 +87,9 @@ export async function uploadDataRequestWasm(
   // Decode WASM binary hash (used as ID)
   const wasmHash =
     response.msgResponses.length > 0
-      ? MsgStoreDataRequestWasmResponse.decode(response.msgResponses[0].value)
-          .hash
+      ? MsgStoreDataRequestWasmResponse.decode(
+          response.msgResponses[0].value
+        ).hash
       : '(empty)';
 
   return {

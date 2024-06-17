@@ -14,7 +14,8 @@
     "baseUrl": ".",
     "allowJs": true,
     "paths": {
-      "@seda/vm": ["libs/vm/src/index.ts"]
+      "@seda/vm": ["libs/vm/src/index.ts"],
+      "@seda/protobuf": ["libs/protobuf/src"]
     }
   },
   "exclude": ["node_modules", "tmp"]

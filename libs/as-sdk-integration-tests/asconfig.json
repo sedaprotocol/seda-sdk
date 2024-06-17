@@ -18,6 +18,7 @@
     }
   },
   "options": {
-    "bindings": "esm"
+    "bindings": "esm",
+    "exportStart": "_start"
   }
 }

@@ -14,7 +14,8 @@
         "dbaeumer.vscode-eslint",
         "esbenp.prettier-vscode",
         "nrwl.angular-console",
-        "dtsvet.vscode-wasm"
+        "dtsvet.vscode-wasm",
+        "pflannery.vscode-versionlens"
       ]
     }
   },

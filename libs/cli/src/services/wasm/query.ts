@@ -41,7 +41,8 @@ export async function queryDataRequestWasm(endpoint: string, hash: string) {
     hash: toHexString(queryResult.wasm?.hash),
     type: WasmType[queryResult.wasm?.wasmType],
     timestamp: queryResult.wasm?.addedAt?.toUTCString(),
-    bytes: queryResult.wasm?.bytecode.length,
+    bytesLength: queryResult.wasm?.bytecode.length,
+    bytes: queryResult.wasm.bytecode,
   };
 }
 

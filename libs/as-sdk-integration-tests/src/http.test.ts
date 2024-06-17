@@ -1,4 +1,4 @@
-import { callVm } from '../../../dist/libs/vm';
+import { callVm } from '../../../dist/libs/vm/src/index';
 import { jest } from '@jest/globals';
 import { readFile } from 'node:fs/promises';
 import { HttpFetchResponse } from '../../../dist/libs/vm/src/types/vm-actions';

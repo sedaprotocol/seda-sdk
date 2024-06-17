@@ -1,4 +1,5 @@
 import { httpFetch, Process } from '../../as-sdk/assembly/index';
+import { testTallyVmReveals } from './tally';
 import { testTallyVmHttp, testTallyVmMode } from './vm-tests';
 
 const args = Process.args().at(1);
@@ -11,6 +12,8 @@ if (args === 'testHttpRejection') {
   testTallyVmMode();
 } else if (args === 'testTallyVmHttp') {
   testTallyVmHttp();
+} else if (args === 'testTallyVmReveals') {
+  testTallyVmReveals();
 }
 
 export function testHttpRejection(): void {
@@ -39,4 +42,12 @@ export function testHttpSuccess(): void {
   } else {
     Process.exit_with_message(31, 'My custom test failed');
   }
+}
+
+export function encode(): void {
+  console.log('Encode');
+}
+
+export function decode(): void {
+  console.log('decode');
 }

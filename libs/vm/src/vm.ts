@@ -5,6 +5,11 @@ export interface VmCallData {
   binary: Uint8Array | number[];
   args: string[];
   envs: Record<string, string>;
+  /**
+   * Method you want to call on the WASM binary
+   * defaults to '_start' (The default for WASI and the SEDA SDK)
+   */
+  method?: string;
 }
 
 export interface VmResult {
@@ -30,6 +35,7 @@ export async function executeVm(callData: VmCallData, notifierBuffer: SharedArra
     const vmImports = new VmImports(notifierBuffer, processId);
     const finalImports = vmImports.getImports(wasiImports);
     const instance = await WebAssembly.instantiate(module, finalImports);
+    console.log(callData);
     const memory = instance.exports.memory;
     vmImports.setMemory(memory as WebAssembly.Memory);
 

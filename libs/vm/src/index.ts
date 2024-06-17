@@ -10,9 +10,19 @@ import { createProcessId } from "./services/create-process-id.js";
 export { default as TallyVmAdapter } from './tally-vm-adapter.js';
 export { default as DataRequestVmAdapter } from './data-request-vm-adapter.js';
 
-const CURRENT_FILE_PATH = parse(import.meta.url);
-CURRENT_FILE_PATH.base = 'worker.js';
-const DEFAULT_WORKER_PATH = format(CURRENT_FILE_PATH);
+let DEFAULT_WORKER_PATH = '/workspaces/seda-sdk/dist/libs/vm/src/worker.js';
+
+// We are in CommonJS mode..
+if (Object.keys(import.meta).length === 0) {
+  // const CURRENT_FILE_PATH = parse(__filename);
+  // CURRENT_FILE_PATH.base = 'worker.js';
+  // DEFAULT_WORKER_PATH = format(CURRENT_FILE_PATH);
+} else {
+  // We are in ESM mode
+  const CURRENT_FILE_PATH = parse(import.meta.url);
+  CURRENT_FILE_PATH.base = 'worker.js';
+  DEFAULT_WORKER_PATH = format(CURRENT_FILE_PATH);
+}
 
 /**
  * Executes the given WASM binary as if it were a Data Request
@@ -37,7 +47,14 @@ export function callVm(
     const processId = createProcessId(finalCallData);
     vmAdapter.setProcessId(processId);
 
-    const worker = new Worker(new URL(workerUrl));
+    let worker: Worker;
+
+    if (workerUrl.startsWith('file://')) {
+      worker = new Worker(new URL(workerUrl));
+    } else {
+      worker = new Worker(workerUrl);
+    }
+
     const notifierBuffer = new SharedArrayBuffer(8); // 4 bytes for notifying, 4 bytes for storing i32 numbers
 
     const hostToWorker = new HostToWorker(vmAdapter, notifierBuffer, processId);

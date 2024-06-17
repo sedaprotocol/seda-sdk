@@ -16,9 +16,11 @@ show.action(async () => {
 
   // Query DR WASM binaries and display
   const queryResult = await queryDataRequestWasm(endpoint, show.args[0]);
+  const queryResultCopy = { ...queryResult, bytes: undefined };
+  delete queryResultCopy.bytes;
 
   // Display results
   spinnerSuccess();
   console.log();
-  console.table(queryResult);
+  console.table(queryResultCopy);
 });
