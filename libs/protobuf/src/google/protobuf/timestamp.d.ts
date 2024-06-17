@@ -91,30 +91,45 @@ import _m0 from "protobufjs/minimal.js";
  * ) to obtain a formatter capable of generating timestamps in this format.
  */
 export interface Timestamp {
-    /**
-     * Represents seconds of UTC time since Unix epoch
-     * 1970-01-01T00:00:00Z. Must be from 0001-01-01T00:00:00Z to
-     * 9999-12-31T23:59:59Z inclusive.
-     */
-    seconds: number;
-    /**
-     * Non-negative fractions of a second at nanosecond resolution. Negative
-     * second values with fractions must still have non-negative nanos values
-     * that count forward in time. Must be from 0 to 999,999,999
-     * inclusive.
-     */
-    nanos: number;
+  /**
+   * Represents seconds of UTC time since Unix epoch
+   * 1970-01-01T00:00:00Z. Must be from 0001-01-01T00:00:00Z to
+   * 9999-12-31T23:59:59Z inclusive.
+   */
+  seconds: number;
+  /**
+   * Non-negative fractions of a second at nanosecond resolution. Negative
+   * second values with fractions must still have non-negative nanos values
+   * that count forward in time. Must be from 0 to 999,999,999
+   * inclusive.
+   */
+  nanos: number;
 }
 export declare const Timestamp: {
-    encode(message: Timestamp, writer?: _m0.Writer): _m0.Writer;
-    decode(input: _m0.Reader | Uint8Array, length?: number): Timestamp;
-    fromJSON(object: any): Timestamp;
-    toJSON(message: Timestamp): unknown;
-    create(base?: DeepPartial<Timestamp>): Timestamp;
-    fromPartial(object: DeepPartial<Timestamp>): Timestamp;
+  encode(message: Timestamp, writer?: _m0.Writer): _m0.Writer;
+  decode(input: _m0.Reader | Uint8Array, length?: number): Timestamp;
+  fromJSON(object: any): Timestamp;
+  toJSON(message: Timestamp): unknown;
+  create(base?: DeepPartial<Timestamp>): Timestamp;
+  fromPartial(object: DeepPartial<Timestamp>): Timestamp;
 };
-type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
-type DeepPartial<T> = T extends Builtin ? T : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>> : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>> : T extends {} ? {
-    [K in keyof T]?: DeepPartial<T[K]>;
-} : Partial<T>;
+type Builtin =
+  | Date
+  | Function
+  | Uint8Array
+  | string
+  | number
+  | boolean
+  | undefined;
+type DeepPartial<T> = T extends Builtin
+  ? T
+  : T extends globalThis.Array<infer U>
+  ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U>
+  ? ReadonlyArray<DeepPartial<U>>
+  : T extends {}
+  ? {
+      [K in keyof T]?: DeepPartial<T[K]>;
+    }
+  : Partial<T>;
 export {};

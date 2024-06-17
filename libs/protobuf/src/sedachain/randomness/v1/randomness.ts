@@ -24,7 +24,10 @@ function createBaseValidatorVRF(): ValidatorVRF {
 }
 
 export const ValidatorVRF = {
-  encode(message: ValidatorVRF, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+  encode(
+    message: ValidatorVRF,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     if (message.operatorAddress !== "") {
       writer.uint32(10).string(message.operatorAddress);
     }
@@ -35,7 +38,8 @@ export const ValidatorVRF = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): ValidatorVRF {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseValidatorVRF();
     while (reader.pos < end) {
@@ -66,8 +70,12 @@ export const ValidatorVRF = {
 
   fromJSON(object: any): ValidatorVRF {
     return {
-      operatorAddress: isSet(object.operatorAddress) ? globalThis.String(object.operatorAddress) : "",
-      vrfPubkey: isSet(object.vrfPubkey) ? Any.fromJSON(object.vrfPubkey) : undefined,
+      operatorAddress: isSet(object.operatorAddress)
+        ? globalThis.String(object.operatorAddress)
+        : "",
+      vrfPubkey: isSet(object.vrfPubkey)
+        ? Any.fromJSON(object.vrfPubkey)
+        : undefined,
     };
   },
 
@@ -88,19 +96,31 @@ export const ValidatorVRF = {
   fromPartial(object: DeepPartial<ValidatorVRF>): ValidatorVRF {
     const message = createBaseValidatorVRF();
     message.operatorAddress = object.operatorAddress ?? "";
-    message.vrfPubkey = (object.vrfPubkey !== undefined && object.vrfPubkey !== null)
-      ? Any.fromPartial(object.vrfPubkey)
-      : undefined;
+    message.vrfPubkey =
+      object.vrfPubkey !== undefined && object.vrfPubkey !== null
+        ? Any.fromPartial(object.vrfPubkey)
+        : undefined;
     return message;
   },
 };
 
-type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
+type Builtin =
+  | Date
+  | Function
+  | Uint8Array
+  | string
+  | number
+  | boolean
+  | undefined;
 
-type DeepPartial<T> = T extends Builtin ? T
-  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
-  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
+type DeepPartial<T> = T extends Builtin
+  ? T
+  : T extends globalThis.Array<infer U>
+  ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U>
+  ? ReadonlyArray<DeepPartial<U>>
+  : T extends {}
+  ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
 function isSet(value: any): boolean {

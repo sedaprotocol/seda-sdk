@@ -57,7 +57,10 @@ function createBaseBaseAccount(): BaseAccount {
 }
 
 export const BaseAccount = {
-  encode(message: BaseAccount, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+  encode(
+    message: BaseAccount,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     if (message.address !== "") {
       writer.uint32(10).string(message.address);
     }
@@ -74,7 +77,8 @@ export const BaseAccount = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): BaseAccount {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseBaseAccount();
     while (reader.pos < end) {
@@ -121,7 +125,9 @@ export const BaseAccount = {
     return {
       address: isSet(object.address) ? globalThis.String(object.address) : "",
       pubKey: isSet(object.pubKey) ? Any.fromJSON(object.pubKey) : undefined,
-      accountNumber: isSet(object.accountNumber) ? globalThis.Number(object.accountNumber) : 0,
+      accountNumber: isSet(object.accountNumber)
+        ? globalThis.Number(object.accountNumber)
+        : 0,
       sequence: isSet(object.sequence) ? globalThis.Number(object.sequence) : 0,
     };
   },
@@ -149,9 +155,10 @@ export const BaseAccount = {
   fromPartial(object: DeepPartial<BaseAccount>): BaseAccount {
     const message = createBaseBaseAccount();
     message.address = object.address ?? "";
-    message.pubKey = (object.pubKey !== undefined && object.pubKey !== null)
-      ? Any.fromPartial(object.pubKey)
-      : undefined;
+    message.pubKey =
+      object.pubKey !== undefined && object.pubKey !== null
+        ? Any.fromPartial(object.pubKey)
+        : undefined;
     message.accountNumber = object.accountNumber ?? 0;
     message.sequence = object.sequence ?? 0;
     return message;
@@ -163,9 +170,15 @@ function createBaseModuleAccount(): ModuleAccount {
 }
 
 export const ModuleAccount = {
-  encode(message: ModuleAccount, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+  encode(
+    message: ModuleAccount,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     if (message.baseAccount !== undefined) {
-      BaseAccount.encode(message.baseAccount, writer.uint32(10).fork()).ldelim();
+      BaseAccount.encode(
+        message.baseAccount,
+        writer.uint32(10).fork()
+      ).ldelim();
     }
     if (message.name !== "") {
       writer.uint32(18).string(message.name);
@@ -177,7 +190,8 @@ export const ModuleAccount = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): ModuleAccount {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseModuleAccount();
     while (reader.pos < end) {
@@ -215,7 +229,9 @@ export const ModuleAccount = {
 
   fromJSON(object: any): ModuleAccount {
     return {
-      baseAccount: isSet(object.baseAccount) ? BaseAccount.fromJSON(object.baseAccount) : undefined,
+      baseAccount: isSet(object.baseAccount)
+        ? BaseAccount.fromJSON(object.baseAccount)
+        : undefined,
       name: isSet(object.name) ? globalThis.String(object.name) : "",
       permissions: globalThis.Array.isArray(object?.permissions)
         ? object.permissions.map((e: any) => globalThis.String(e))
@@ -242,9 +258,10 @@ export const ModuleAccount = {
   },
   fromPartial(object: DeepPartial<ModuleAccount>): ModuleAccount {
     const message = createBaseModuleAccount();
-    message.baseAccount = (object.baseAccount !== undefined && object.baseAccount !== null)
-      ? BaseAccount.fromPartial(object.baseAccount)
-      : undefined;
+    message.baseAccount =
+      object.baseAccount !== undefined && object.baseAccount !== null
+        ? BaseAccount.fromPartial(object.baseAccount)
+        : undefined;
     message.name = object.name ?? "";
     message.permissions = object.permissions?.map((e) => e) || [];
     return message;
@@ -256,7 +273,10 @@ function createBaseModuleCredential(): ModuleCredential {
 }
 
 export const ModuleCredential = {
-  encode(message: ModuleCredential, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+  encode(
+    message: ModuleCredential,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     if (message.moduleName !== "") {
       writer.uint32(10).string(message.moduleName);
     }
@@ -267,7 +287,8 @@ export const ModuleCredential = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): ModuleCredential {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseModuleCredential();
     while (reader.pos < end) {
@@ -298,7 +319,9 @@ export const ModuleCredential = {
 
   fromJSON(object: any): ModuleCredential {
     return {
-      moduleName: isSet(object.moduleName) ? globalThis.String(object.moduleName) : "",
+      moduleName: isSet(object.moduleName)
+        ? globalThis.String(object.moduleName)
+        : "",
       derivationKeys: globalThis.Array.isArray(object?.derivationKeys)
         ? object.derivationKeys.map((e: any) => bytesFromBase64(e))
         : [],
@@ -311,7 +334,9 @@ export const ModuleCredential = {
       obj.moduleName = message.moduleName;
     }
     if (message.derivationKeys?.length) {
-      obj.derivationKeys = message.derivationKeys.map((e) => base64FromBytes(e));
+      obj.derivationKeys = message.derivationKeys.map((e) =>
+        base64FromBytes(e)
+      );
     }
     return obj;
   },
@@ -338,7 +363,10 @@ function createBaseParams(): Params {
 }
 
 export const Params = {
-  encode(message: Params, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+  encode(
+    message: Params,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     if (message.maxMemoCharacters !== 0) {
       writer.uint32(8).uint64(message.maxMemoCharacters);
     }
@@ -358,7 +386,8 @@ export const Params = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Params {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseParams();
     while (reader.pos < end) {
@@ -397,7 +426,9 @@ export const Params = {
             break;
           }
 
-          message.sigVerifyCostSecp256k1 = longToNumber(reader.uint64() as Long);
+          message.sigVerifyCostSecp256k1 = longToNumber(
+            reader.uint64() as Long
+          );
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -410,10 +441,18 @@ export const Params = {
 
   fromJSON(object: any): Params {
     return {
-      maxMemoCharacters: isSet(object.maxMemoCharacters) ? globalThis.Number(object.maxMemoCharacters) : 0,
-      txSigLimit: isSet(object.txSigLimit) ? globalThis.Number(object.txSigLimit) : 0,
-      txSizeCostPerByte: isSet(object.txSizeCostPerByte) ? globalThis.Number(object.txSizeCostPerByte) : 0,
-      sigVerifyCostEd25519: isSet(object.sigVerifyCostEd25519) ? globalThis.Number(object.sigVerifyCostEd25519) : 0,
+      maxMemoCharacters: isSet(object.maxMemoCharacters)
+        ? globalThis.Number(object.maxMemoCharacters)
+        : 0,
+      txSigLimit: isSet(object.txSigLimit)
+        ? globalThis.Number(object.txSigLimit)
+        : 0,
+      txSizeCostPerByte: isSet(object.txSizeCostPerByte)
+        ? globalThis.Number(object.txSizeCostPerByte)
+        : 0,
+      sigVerifyCostEd25519: isSet(object.sigVerifyCostEd25519)
+        ? globalThis.Number(object.sigVerifyCostEd25519)
+        : 0,
       sigVerifyCostSecp256k1: isSet(object.sigVerifyCostSecp256k1)
         ? globalThis.Number(object.sigVerifyCostSecp256k1)
         : 0,
@@ -479,12 +518,23 @@ function base64FromBytes(arr: Uint8Array): string {
   }
 }
 
-type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
+type Builtin =
+  | Date
+  | Function
+  | Uint8Array
+  | string
+  | number
+  | boolean
+  | undefined;
 
-type DeepPartial<T> = T extends Builtin ? T
-  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
-  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
+type DeepPartial<T> = T extends Builtin
+  ? T
+  : T extends globalThis.Array<infer U>
+  ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U>
+  ? ReadonlyArray<DeepPartial<U>>
+  : T extends {}
+  ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
 function longToNumber(long: Long): number {

@@ -9,8 +9,7 @@ import Long from "long";
 import _m0 from "protobufjs/minimal.js";
 
 /** The message for getting the random modules seed. */
-export interface QuerySeedRequest {
-}
+export interface QuerySeedRequest {}
 
 /** The message for returning the random modules seed. */
 export interface QuerySeedResponse {
@@ -23,12 +22,16 @@ function createBaseQuerySeedRequest(): QuerySeedRequest {
 }
 
 export const QuerySeedRequest = {
-  encode(_: QuerySeedRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+  encode(
+    _: QuerySeedRequest,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     return writer;
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): QuerySeedRequest {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseQuerySeedRequest();
     while (reader.pos < end) {
@@ -66,7 +69,10 @@ function createBaseQuerySeedResponse(): QuerySeedResponse {
 }
 
 export const QuerySeedResponse = {
-  encode(message: QuerySeedResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+  encode(
+    message: QuerySeedResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     if (message.seed !== "") {
       writer.uint32(10).string(message.seed);
     }
@@ -77,7 +83,8 @@ export const QuerySeedResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): QuerySeedResponse {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseQuerySeedResponse();
     while (reader.pos < end) {
@@ -109,7 +116,9 @@ export const QuerySeedResponse = {
   fromJSON(object: any): QuerySeedResponse {
     return {
       seed: isSet(object.seed) ? globalThis.String(object.seed) : "",
-      blockHeight: isSet(object.blockHeight) ? globalThis.Number(object.blockHeight) : 0,
+      blockHeight: isSet(object.blockHeight)
+        ? globalThis.Number(object.blockHeight)
+        : 0,
     };
   },
 
@@ -153,20 +162,37 @@ export class QueryClientImpl implements Query {
   Seed(request: QuerySeedRequest): Promise<QuerySeedResponse> {
     const data = QuerySeedRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "Seed", data);
-    return promise.then((data) => QuerySeedResponse.decode(_m0.Reader.create(data)));
+    return promise.then((data) =>
+      QuerySeedResponse.decode(_m0.Reader.create(data))
+    );
   }
 }
 
 interface Rpc {
-  request(service: string, method: string, data: Uint8Array): Promise<Uint8Array>;
+  request(
+    service: string,
+    method: string,
+    data: Uint8Array
+  ): Promise<Uint8Array>;
 }
 
-type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
+type Builtin =
+  | Date
+  | Function
+  | Uint8Array
+  | string
+  | number
+  | boolean
+  | undefined;
 
-type DeepPartial<T> = T extends Builtin ? T
-  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
-  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
+type DeepPartial<T> = T extends Builtin
+  ? T
+  : T extends globalThis.Array<infer U>
+  ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U>
+  ? ReadonlyArray<DeepPartial<U>>
+  : T extends {}
+  ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
 function longToNumber(long: Long): number {

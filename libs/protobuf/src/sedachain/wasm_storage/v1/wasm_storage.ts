@@ -71,9 +71,7 @@ export interface Wasm {
   hash: Uint8Array;
   bytecode: Uint8Array;
   wasmType: WasmType;
-  addedAt:
-    | Date
-    | undefined;
+  addedAt: Date | undefined;
   /**
    * ExpirationHeight represents the block height at which the data request
    * wasm will be pruned. The value of zero means no expiration.
@@ -92,7 +90,13 @@ export interface Params {
 }
 
 function createBaseWasm(): Wasm {
-  return { hash: new Uint8Array(0), bytecode: new Uint8Array(0), wasmType: 0, addedAt: undefined, expirationHeight: 0 };
+  return {
+    hash: new Uint8Array(0),
+    bytecode: new Uint8Array(0),
+    wasmType: 0,
+    addedAt: undefined,
+    expirationHeight: 0,
+  };
 }
 
 export const Wasm = {
@@ -107,7 +111,10 @@ export const Wasm = {
       writer.uint32(24).int32(message.wasmType);
     }
     if (message.addedAt !== undefined) {
-      Timestamp.encode(toTimestamp(message.addedAt), writer.uint32(34).fork()).ldelim();
+      Timestamp.encode(
+        toTimestamp(message.addedAt),
+        writer.uint32(34).fork()
+      ).ldelim();
     }
     if (message.expirationHeight !== 0) {
       writer.uint32(40).int64(message.expirationHeight);
@@ -116,7 +123,8 @@ export const Wasm = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Wasm {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseWasm();
     while (reader.pos < end) {
@@ -148,7 +156,9 @@ export const Wasm = {
             break;
           }
 
-          message.addedAt = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+          message.addedAt = fromTimestamp(
+            Timestamp.decode(reader, reader.uint32())
+          );
           continue;
         case 5:
           if (tag !== 40) {
@@ -168,11 +178,19 @@ export const Wasm = {
 
   fromJSON(object: any): Wasm {
     return {
-      hash: isSet(object.hash) ? bytesFromBase64(object.hash) : new Uint8Array(0),
-      bytecode: isSet(object.bytecode) ? bytesFromBase64(object.bytecode) : new Uint8Array(0),
+      hash: isSet(object.hash)
+        ? bytesFromBase64(object.hash)
+        : new Uint8Array(0),
+      bytecode: isSet(object.bytecode)
+        ? bytesFromBase64(object.bytecode)
+        : new Uint8Array(0),
       wasmType: isSet(object.wasmType) ? wasmTypeFromJSON(object.wasmType) : 0,
-      addedAt: isSet(object.addedAt) ? fromJsonTimestamp(object.addedAt) : undefined,
-      expirationHeight: isSet(object.expirationHeight) ? globalThis.Number(object.expirationHeight) : 0,
+      addedAt: isSet(object.addedAt)
+        ? fromJsonTimestamp(object.addedAt)
+        : undefined,
+      expirationHeight: isSet(object.expirationHeight)
+        ? globalThis.Number(object.expirationHeight)
+        : 0,
     };
   },
 
@@ -215,7 +233,10 @@ function createBaseParams(): Params {
 }
 
 export const Params = {
-  encode(message: Params, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+  encode(
+    message: Params,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     if (message.maxWasmSize !== 0) {
       writer.uint32(8).int64(message.maxWasmSize);
     }
@@ -226,7 +247,8 @@ export const Params = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Params {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseParams();
     while (reader.pos < end) {
@@ -257,7 +279,9 @@ export const Params = {
 
   fromJSON(object: any): Params {
     return {
-      maxWasmSize: isSet(object.maxWasmSize) ? globalThis.Number(object.maxWasmSize) : 0,
+      maxWasmSize: isSet(object.maxWasmSize)
+        ? globalThis.Number(object.maxWasmSize)
+        : 0,
       wasmTtl: isSet(object.wasmTtl) ? globalThis.Number(object.wasmTtl) : 0,
     };
   },
@@ -309,12 +333,23 @@ function base64FromBytes(arr: Uint8Array): string {
   }
 }
 
-type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
+type Builtin =
+  | Date
+  | Function
+  | Uint8Array
+  | string
+  | number
+  | boolean
+  | undefined;
 
-type DeepPartial<T> = T extends Builtin ? T
-  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
-  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
+type DeepPartial<T> = T extends Builtin
+  ? T
+  : T extends globalThis.Array<infer U>
+  ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U>
+  ? ReadonlyArray<DeepPartial<U>>
+  : T extends {}
+  ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
 function toTimestamp(date: Date): Timestamp {
