@@ -3,9 +3,9 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "start": "npm run build && node dist/libs/vm/src/index.js",
+    "start": "bun run build && node dist/libs/vm/src/index.js",
     "build": "nx run-many --all --target=build",
-    "test": "npm run build && NODE_OPTIONS=--experimental-vm-modules nx run-many --all --target=test",
+    "test": "bun run build && NODE_OPTIONS=--experimental-vm-modules nx run-many --all --target=test",
     "docs": "typedoc libs/as-sdk/assembly/index.ts --tsconfig ./libs/as-sdk/assembly/tsconfig.json --skipErrorChecking",
     "cli:generate": "cd libs/cli/proto && npx buf generate"
   },

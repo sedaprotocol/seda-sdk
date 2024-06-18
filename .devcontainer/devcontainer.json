@@ -3,7 +3,7 @@
   "build": {
     "dockerfile": "Dockerfile",
     "args": {
-      "VARIANT": "18"
+      "VARIANT": "1.1.13"
     }
   },
   "customizations": {
@@ -18,5 +18,5 @@
       ]
     }
   },
-  "postCreateCommand": "npm install"
+  "postCreateCommand": "bun install"
 }

@@ -1,4 +1,4 @@
-name: Pull request checks
+name: Deploy docs
 on:
   push:
     branches:
@@ -14,25 +14,24 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: actions/setup-node@v3
+      - uses: oven-sh/setup-bun@v1
         with:
-          node-version: '18'
-          cache: 'npm'
+          bun-version: 1.1.13
 
       - name: 📥 Install dependencies
-        run: npm ci
+        run: bun install --frozen-lockfile
 
       - name: 🔨 Build projects
-        run: npm run build
+        run: bun run build
 
       - name: 🧪 Run unit tests
-        run: npm run test
+        run: bun run test
 
       - name: 📄 Setup Pages
         uses: actions/configure-pages@v3
 
       - name: 📚 Create docs
-        run: npm run docs
+        run: bun run docs
 
       - name: 🆙 Upload artifact
         uses: actions/upload-pages-artifact@v1
@@ -42,5 +41,3 @@ jobs:
       - name: 📄 Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v2
-
-
