@@ -1,3 +1,4 @@
+import { VM_MODE_TALLY, VM_MODE_DR, VM_MODE_ENV_KEY } from './vm-modes';
 import { Process as WasiProcess, CommandLine, Environ } from 'as-wasi/assembly';
 import { execution_result } from './bindings/seda_v1';
 
@@ -37,6 +38,35 @@ export default class Process {
     }
 
     return result;
+  }
+
+  /**
+   * Gets the mode of the VM instance.
+   *
+   * @returns {string} The mode of the VM, either 'dr' or 'tally'.
+   */
+  static getVmMode(): string {
+    const env = Process.envs();
+
+    return env.get(VM_MODE_ENV_KEY);
+  }
+
+  /**
+   * Returns true when the VM instance is in 'tally' mode.
+   *
+   * @returns {boolean}
+   */
+  static isTallyVmMode(): boolean {
+    return Process.getVmMode() === VM_MODE_TALLY;
+  }
+
+  /**
+   * Returns true when the VM instance is in 'dr' mode.
+   *
+   * @returns {boolean}
+   */
+  static isDrVmMode(): boolean {
+    return Process.getVmMode() === VM_MODE_DR;
   }
 
   /**
