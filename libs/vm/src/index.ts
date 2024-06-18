@@ -7,6 +7,7 @@ import { parse, format } from "node:path";
 import { HostToWorker } from "./worker-host-communication.js";
 import { createProcessId } from "./services/create-process-id.js";
 
+export * from "./types/vm-modes.js";
 export { default as TallyVmAdapter } from './tally-vm-adapter.js';
 export { default as DataRequestVmAdapter } from './data-request-vm-adapter.js';
 

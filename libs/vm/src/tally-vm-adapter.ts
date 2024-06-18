@@ -2,6 +2,7 @@ import type { HttpFetchAction } from './types/vm-actions';
 import { HttpFetchResponse } from './types/vm-actions.js';
 import type { VmAdapter } from './types/vm-adapter';
 import { PromiseStatus } from './types/vm-promise.js';
+import { VM_MODE_ENV_KEY, VM_MODE_TALLY } from "./types/vm-modes.js";
 import type { VmCallData } from './vm';
 
 export default class TallyVmAdapter implements VmAdapter {
@@ -12,7 +13,7 @@ export default class TallyVmAdapter implements VmAdapter {
       ...input,
       envs: {
         ...input.envs,
-        VM_MODE: 'tally'
+        [VM_MODE_ENV_KEY]: VM_MODE_TALLY,
       }
     };
   }

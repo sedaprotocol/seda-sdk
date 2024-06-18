@@ -1,6 +1,7 @@
 import type { HttpFetchAction } from './types/vm-actions.js';
 import { HttpFetchResponse } from './types/vm-actions.js';
 import type { VmAdapter } from './types/vm-adapter.js';
+import { VM_MODE_ENV_KEY, VM_MODE_DR } from "./types/vm-modes.js";
 import fetch from 'node-fetch';
 import { PromiseStatus } from './types/vm-promise.js';
 import { VmCallData } from './vm.js';
@@ -13,7 +14,7 @@ export default class DataRequestVmAdapter implements VmAdapter {
       ...input,
       envs: {
         ...input.envs,
-        VM_MODE: 'dr',
+        [VM_MODE_ENV_KEY]: VM_MODE_DR,
       },
     };
   }
