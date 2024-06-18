@@ -3,13 +3,10 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/vm/src",
   "projectType": "library",
+  "tags": [],
   "targets": {
     "lint": {
-      "executor": "@nx/linter:eslint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": ["libs/vm/**/*.ts"]
-      }
+      "executor": "@nx/eslint:lint"
     },
     "build": {
       "executor": "@nx/js:swc",
@@ -20,8 +17,6 @@
         "tsConfig": "libs/vm/tsconfig.json",
         "thirdParty": true,
         "swcrc": "libs/vm/.swcrc",
-        "buildableProjectDepsInPackageJsonType": "dependencies",
-        "updateBuildableProjectDepsInPackageJson": true,
         "generateExportsField": true
       },
       "outputs": ["{options.outputPath}"]
@@ -30,16 +25,8 @@
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "jestConfig": "libs/vm/jest.config.ts",
-        "passWithNoTests": true
-      },
-      "configurations": {
-        "ci": {
-          "ci": true,
-          "codeCoverage": true
-        }
+        "jestConfig": "libs/vm/jest.config.ts"
       }
     }
-  },
-  "tags": []
+  }
 }
