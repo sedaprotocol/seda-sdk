@@ -1,4 +1,5 @@
 import { httpFetch, Process } from '../../as-sdk/assembly/index';
+import { testTallyVmReveals, testTallyVmRevealsFiltered } from './tally';
 import { testTallyVmHttp, testTallyVmMode } from './vm-tests';
 
 const args = Process.args().at(1);
@@ -11,6 +12,10 @@ if (args === 'testHttpRejection') {
   testTallyVmMode();
 } else if (args === 'testTallyVmHttp') {
   testTallyVmHttp();
+} else if (args === 'testTallyVmReveals') {
+  testTallyVmReveals();
+} else if (args === 'testTallyVmRevealsFiltered') {
+  testTallyVmRevealsFiltered();
 }
 
 export function testHttpRejection(): void {
