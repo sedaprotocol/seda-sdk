@@ -18,6 +18,8 @@
     }
   },
   "options": {
-    "bindings": "esm"
+    "bindings": "esm",
+    "exportStart": "_start",
+    "transform": ["json-as/transform"]
   }
 }
