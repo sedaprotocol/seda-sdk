@@ -21,7 +21,10 @@ function createBaseEventStoreDataRequestWasm(): EventStoreDataRequestWasm {
 }
 
 export const EventStoreDataRequestWasm = {
-  encode(message: EventStoreDataRequestWasm, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+  encode(
+    message: EventStoreDataRequestWasm,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     if (message.hash !== "") {
       writer.uint32(10).string(message.hash);
     }
@@ -34,8 +37,12 @@ export const EventStoreDataRequestWasm = {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): EventStoreDataRequestWasm {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): EventStoreDataRequestWasm {
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventStoreDataRequestWasm();
     while (reader.pos < end) {
@@ -75,7 +82,9 @@ export const EventStoreDataRequestWasm = {
     return {
       hash: isSet(object.hash) ? String(object.hash) : "",
       wasmType: isSet(object.wasmType) ? wasmTypeFromJSON(object.wasmType) : 0,
-      bytecode: isSet(object.bytecode) ? bytesFromBase64(object.bytecode) : new Uint8Array(0),
+      bytecode: isSet(object.bytecode)
+        ? bytesFromBase64(object.bytecode)
+        : new Uint8Array(0),
     };
   },
 
@@ -93,10 +102,14 @@ export const EventStoreDataRequestWasm = {
     return obj;
   },
 
-  create(base?: DeepPartial<EventStoreDataRequestWasm>): EventStoreDataRequestWasm {
+  create(
+    base?: DeepPartial<EventStoreDataRequestWasm>
+  ): EventStoreDataRequestWasm {
     return EventStoreDataRequestWasm.fromPartial(base ?? {});
   },
-  fromPartial(object: DeepPartial<EventStoreDataRequestWasm>): EventStoreDataRequestWasm {
+  fromPartial(
+    object: DeepPartial<EventStoreDataRequestWasm>
+  ): EventStoreDataRequestWasm {
     const message = createBaseEventStoreDataRequestWasm();
     message.hash = object.hash ?? "";
     message.wasmType = object.wasmType ?? 0;
@@ -110,7 +123,10 @@ function createBaseEventStoreOverlayWasm(): EventStoreOverlayWasm {
 }
 
 export const EventStoreOverlayWasm = {
-  encode(message: EventStoreOverlayWasm, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+  encode(
+    message: EventStoreOverlayWasm,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     if (message.hash !== "") {
       writer.uint32(10).string(message.hash);
     }
@@ -123,8 +139,12 @@ export const EventStoreOverlayWasm = {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): EventStoreOverlayWasm {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): EventStoreOverlayWasm {
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEventStoreOverlayWasm();
     while (reader.pos < end) {
@@ -164,7 +184,9 @@ export const EventStoreOverlayWasm = {
     return {
       hash: isSet(object.hash) ? String(object.hash) : "",
       wasmType: isSet(object.wasmType) ? wasmTypeFromJSON(object.wasmType) : 0,
-      bytecode: isSet(object.bytecode) ? bytesFromBase64(object.bytecode) : new Uint8Array(0),
+      bytecode: isSet(object.bytecode)
+        ? bytesFromBase64(object.bytecode)
+        : new Uint8Array(0),
     };
   },
 
@@ -185,7 +207,9 @@ export const EventStoreOverlayWasm = {
   create(base?: DeepPartial<EventStoreOverlayWasm>): EventStoreOverlayWasm {
     return EventStoreOverlayWasm.fromPartial(base ?? {});
   },
-  fromPartial(object: DeepPartial<EventStoreOverlayWasm>): EventStoreOverlayWasm {
+  fromPartial(
+    object: DeepPartial<EventStoreOverlayWasm>
+  ): EventStoreOverlayWasm {
     const message = createBaseEventStoreOverlayWasm();
     message.hash = object.hash ?? "";
     message.wasmType = object.wasmType ?? 0;
@@ -238,11 +262,23 @@ function base64FromBytes(arr: Uint8Array): string {
   }
 }
 
-type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
+type Builtin =
+  | Date
+  | Function
+  | Uint8Array
+  | string
+  | number
+  | boolean
+  | undefined;
 
-export type DeepPartial<T> = T extends Builtin ? T
-  : T extends Array<infer U> ? Array<DeepPartial<U>> : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
-  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
+export type DeepPartial<T> = T extends Builtin
+  ? T
+  : T extends Array<infer U>
+  ? Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U>
+  ? ReadonlyArray<DeepPartial<U>>
+  : T extends {}
+  ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
 function isSet(value: any): boolean {

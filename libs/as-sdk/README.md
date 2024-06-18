@@ -13,7 +13,7 @@ import { JSON } from "json-as/assembly";
 // @ts-expect-error
 @json
 class SwPlanet {
-  name!: string
+  name!: string;
 }
 
 function main(): void {

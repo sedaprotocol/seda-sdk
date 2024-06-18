@@ -1,15 +1,15 @@
 import type { ToBuffer } from "./vm-promise";
 
 enum HttpFetchMethod {
-  Options = 'Options',
-  Get = 'Get',
-  Post = 'Post',
-  Put = 'Put',
-  Delete = 'Delete',
-  Head = 'Head',
-  Trace = 'Trace',
-  Connect = 'Connect',
-  Patch = 'Patch',
+  Options = "Options",
+  Get = "Get",
+  Post = "Post",
+  Put = "Put",
+  Delete = "Delete",
+  Head = "Head",
+  Trace = "Trace",
+  Connect = "Connect",
+  Patch = "Patch",
 }
 
 export interface HttpFetchOptions {

@@ -11,6 +11,13 @@
         "command": "asc ./assembly/index.ts --target debug",
         "cwd": "libs/as-sdk"
       }
+    },
+    "build-demo": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "asc ./demo/index.ts --target release",
+        "cwd": "libs/as-sdk"
+      }
     }
   }
 }

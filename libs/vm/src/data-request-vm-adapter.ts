@@ -1,9 +1,10 @@
-import type { HttpFetchAction } from './types/vm-actions.js';
-import { HttpFetchResponse } from './types/vm-actions.js';
-import type { VmAdapter } from './types/vm-adapter.js';
-import fetch from 'node-fetch';
-import { PromiseStatus } from './types/vm-promise.js';
-import { VmCallData } from './vm.js';
+import type { HttpFetchAction } from "./types/vm-actions.js";
+import { HttpFetchResponse } from "./types/vm-actions.js";
+import type { VmAdapter } from "./types/vm-adapter.js";
+import { VM_MODE_ENV_KEY, VM_MODE_DR } from "./types/vm-modes.js";
+import fetch from "node-fetch";
+import { PromiseStatus } from "./types/vm-promise.js";
+import { VmCallData } from "./vm.js";
 
 export default class DataRequestVmAdapter implements VmAdapter {
   private processId?: string;
@@ -13,16 +14,18 @@ export default class DataRequestVmAdapter implements VmAdapter {
       ...input,
       envs: {
         ...input.envs,
-        VM_MODE: 'dr',
+        [VM_MODE_ENV_KEY]: VM_MODE_DR,
       },
     };
   }
 
   setProcessId(processId: string) {
-      this.processId = processId;
+    this.processId = processId;
   }
 
-  async httpFetch(action: HttpFetchAction): Promise<PromiseStatus<HttpFetchResponse>> {
+  async httpFetch(
+    action: HttpFetchAction
+  ): Promise<PromiseStatus<HttpFetchResponse>> {
     try {
       const response = await fetch(new URL(action.url), {
         method: action.options.method.toUpperCase(),
@@ -43,17 +46,22 @@ export default class DataRequestVmAdapter implements VmAdapter {
 
       return PromiseStatus.fulfilled(httpResponse);
     } catch (error) {
-      const stringifiedError = '' + error;
+      const stringifiedError = "" + error;
 
-      console.error(`[${this.processId}] - @default-vm-adapter: `, stringifiedError);
+      console.error(
+        `[${this.processId}] - @default-vm-adapter: `,
+        stringifiedError
+      );
 
-      return PromiseStatus.rejected(new HttpFetchResponse({
-        bytes: Array.from(new TextEncoder().encode(stringifiedError)),
-        content_length: stringifiedError.length,
-        headers: {},
-        status: 0,
-        url: '',
-      }));
+      return PromiseStatus.rejected(
+        new HttpFetchResponse({
+          bytes: Array.from(new TextEncoder().encode(stringifiedError)),
+          content_length: stringifiedError.length,
+          headers: {},
+          status: 0,
+          url: "",
+        })
+      );
     }
   }
 }

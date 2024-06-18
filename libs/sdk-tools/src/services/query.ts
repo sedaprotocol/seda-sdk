@@ -2,9 +2,9 @@ import {
   ProtobufRpcClient,
   QueryClient,
   createProtobufRpcClient,
-} from '@cosmjs/stargate';
-import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
-import { sedachain } from '@seda/protobuf';
+} from "@cosmjs/stargate";
+import { Tendermint34Client } from "@cosmjs/tendermint-rpc";
+import { sedachain } from "@seda/protobuf";
 
 export async function buildQueryService(endpoint: string) {
   // Tendermint RPC endpoint

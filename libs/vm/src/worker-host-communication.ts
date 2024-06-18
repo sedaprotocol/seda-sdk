@@ -1,7 +1,10 @@
 import { parentPort } from "worker_threads";
 import type { VmAdapter } from "./types/vm-adapter";
 import type { VmAction } from "./types/vm-actions";
-import type { VmActionExecuteMessage, VmActionResultBufferMessage } from "./types/worker-messages";
+import type {
+  VmActionExecuteMessage,
+  VmActionResultBufferMessage,
+} from "./types/worker-messages";
 import { WorkerMessageType } from "./types/worker-messages.js";
 import { PromiseStatus, ToBuffer } from "./types/vm-promise.js";
 
@@ -29,13 +32,14 @@ function updateNotifierState(buffer: Int32Array, state: AtomicState) {
   Atomics.notify(buffer, NOTIFIER_INDEX);
 }
 
-function resetNotifierState(
-  buffer: Int32Array,
-) {
+function resetNotifierState(buffer: Int32Array) {
   Atomics.store(buffer, NOTIFIER_INDEX, AtomicState.Initial);
 }
 
-function waitForNotifierStateChange(buffer: Int32Array, initialState: AtomicState) {
+function waitForNotifierStateChange(
+  buffer: Int32Array,
+  initialState: AtomicState
+) {
   const currentState = Atomics.load(buffer, NOTIFIER_INDEX);
 
   // If work has already been executed don't freeze the thread and wait
@@ -56,12 +60,14 @@ function waitForNotifierStateChange(buffer: Int32Array, initialState: AtomicStat
  * The host then writes the full value onto that buffer and unfreezes the worker thread
  */
 export class HostToWorker {
-  private actionResult: PromiseStatus<unknown> = PromiseStatus.rejected(new EmptyBuffer);
+  private actionResult: PromiseStatus<unknown> = PromiseStatus.rejected(
+    new EmptyBuffer()
+  );
 
   constructor(
     private adapter: VmAdapter,
     private notifierBuffer: SharedArrayBuffer,
-    private processId: string,
+    private processId: string
   ) {}
 
   async executeAction(action: VmAction) {
@@ -70,16 +76,20 @@ export class HostToWorker {
       this.actionResult = actionResult;
     } catch (error) {
       console.error(`[${this.processId}] - Error @executeAction: ${error}`);
-      this.actionResult = PromiseStatus.rejected(new EmptyBuffer);
+      this.actionResult = PromiseStatus.rejected(new EmptyBuffer());
     }
 
-    if (typeof this.actionResult === 'undefined') {
+    if (typeof this.actionResult === "undefined") {
       console.error(`[${this.processId}] - Objects that failed: ${action}`);
-      throw Error(`[${this.processId}] - Result was undefined while reading. Action was: ${action}`);
+      throw Error(
+        `[${this.processId}] - Result was undefined while reading. Action was: ${action}`
+      );
     }
 
     if (this.actionResult.length > MAX_I32_VALUE) {
-      throw Error(`[${this.processId}] - Value ${this.actionResult.length} exceeds max i32 (${MAX_I32_VALUE})`);
+      throw Error(
+        `[${this.processId}] - Value ${this.actionResult.length} exceeds max i32 (${MAX_I32_VALUE})`
+      );
     }
 
     const notifierBufferi32 = new Int32Array(this.notifierBuffer);
@@ -104,7 +114,10 @@ export class HostToWorker {
 }
 
 export class WorkerToHost {
-  constructor(private notifierBuffer: SharedArrayBuffer, private processId: string) {}
+  constructor(
+    private notifierBuffer: SharedArrayBuffer,
+    private processId: string
+  ) {}
 
   /**
    * Calls the given action on the host machine and sleeps the thread until an answer has been received

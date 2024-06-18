@@ -1,6 +1,10 @@
-import BN from 'bn.js';
+import BN from "bn.js";
 import { keccak256, Keccak256 } from "@cosmjs/crypto";
-import { hexToBytes, stringToBytes, toHexString } from "../services/bytes-utils.js";
+import {
+  hexToBytes,
+  stringToBytes,
+  toHexString,
+} from "../services/bytes-utils.js";
 
 export interface PostDataRequestArgs {
   version?: string;
@@ -69,10 +73,10 @@ export function getDataRequestId(args: Required<PostDataRequestArgs>): string {
   dataRequestId.update(hexToBytes(args.tallyBinaryId));
   dataRequestId.update(tallyInputsHash);
   dataRequestId.update(
-    Buffer.from(new BN(args.replicationFactor).toArray('be'))
+    Buffer.from(new BN(args.replicationFactor).toArray("be"))
   );
-  dataRequestId.update(Buffer.from(new BN(args.gasPrice).toArray('be')));
-  dataRequestId.update(Buffer.from(new BN(args.gasLimit).toArray('be')));
+  dataRequestId.update(Buffer.from(new BN(args.gasPrice).toArray("be")));
+  dataRequestId.update(Buffer.from(new BN(args.gasLimit).toArray("be")));
   dataRequestId.update(memoHash);
 
   return toHexString(dataRequestId.digest());

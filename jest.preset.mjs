@@ -1,6 +1,6 @@
-import nxPreset from '@nx/jest/preset/index.js';
+import nxPreset from "@nx/jest/preset/index.js";
 
 export default {
   ...nxPreset,
-  extensionsToTreatAsEsm: ['.ts'],
+  extensionsToTreatAsEsm: [".ts"],
 };

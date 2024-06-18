@@ -1,8 +1,9 @@
-import type { HttpFetchAction } from './types/vm-actions';
-import { HttpFetchResponse } from './types/vm-actions.js';
-import type { VmAdapter } from './types/vm-adapter';
-import { PromiseStatus } from './types/vm-promise.js';
-import type { VmCallData } from './vm';
+import type { HttpFetchAction } from "./types/vm-actions";
+import { HttpFetchResponse } from "./types/vm-actions.js";
+import type { VmAdapter } from "./types/vm-adapter";
+import { PromiseStatus } from "./types/vm-promise.js";
+import { VM_MODE_ENV_KEY, VM_MODE_TALLY } from "./types/vm-modes.js";
+import type { VmCallData } from "./vm";
 
 export default class TallyVmAdapter implements VmAdapter {
   private processId?: string;
@@ -12,8 +13,8 @@ export default class TallyVmAdapter implements VmAdapter {
       ...input,
       envs: {
         ...input.envs,
-        VM_MODE: 'tally'
-      }
+        [VM_MODE_ENV_KEY]: VM_MODE_TALLY,
+      },
     };
   }
 
@@ -25,7 +26,9 @@ export default class TallyVmAdapter implements VmAdapter {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _action: HttpFetchAction
   ): Promise<PromiseStatus<HttpFetchResponse>> {
-    const error = new TextEncoder().encode('http_fetch is not allowed in tally');
+    const error = new TextEncoder().encode(
+      "http_fetch is not allowed in tally"
+    );
 
     return PromiseStatus.rejected(
       new HttpFetchResponse({
@@ -33,7 +36,7 @@ export default class TallyVmAdapter implements VmAdapter {
         content_length: error.length,
         headers: {},
         status: 0,
-        url: '',
+        url: "",
       })
     );
   }

@@ -18,10 +18,7 @@ function createBasePublicKey(): PublicKey {
 }
 
 export const PublicKey = {
-  encode(
-    message: PublicKey,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: PublicKey, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.ed25519 !== undefined) {
       writer.uint32(10).bytes(message.ed25519);
     }
@@ -32,8 +29,7 @@ export const PublicKey = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): PublicKey {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBasePublicKey();
     while (reader.pos < end) {
@@ -64,12 +60,8 @@ export const PublicKey = {
 
   fromJSON(object: any): PublicKey {
     return {
-      ed25519: isSet(object.ed25519)
-        ? bytesFromBase64(object.ed25519)
-        : undefined,
-      secp256k1: isSet(object.secp256k1)
-        ? bytesFromBase64(object.secp256k1)
-        : undefined,
+      ed25519: isSet(object.ed25519) ? bytesFromBase64(object.ed25519) : undefined,
+      secp256k1: isSet(object.secp256k1) ? bytesFromBase64(object.secp256k1) : undefined,
     };
   },
 
@@ -120,23 +112,12 @@ function base64FromBytes(arr: Uint8Array): string {
   }
 }
 
-type Builtin =
-  | Date
-  | Function
-  | Uint8Array
-  | string
-  | number
-  | boolean
-  | undefined;
+type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
-type DeepPartial<T> = T extends Builtin
-  ? T
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
+type DeepPartial<T> = T extends Builtin ? T
+  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
 function isSet(value: any): boolean {

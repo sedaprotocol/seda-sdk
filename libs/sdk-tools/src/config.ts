@@ -1,4 +1,4 @@
-import { config } from 'dotenv';
+import { config } from "dotenv";
 
 function getEnvOrFail(key: string): string {
   const value = process.env[key];
@@ -13,13 +13,13 @@ function getEnvOrFail(key: string): string {
 export function loadConfig() {
   config();
   config({
-    path: `${process.cwd}/.env`
+    path: `${process.cwd}/.env`,
   });
 
   return {
-    mnemonic: getEnvOrFail('SEDA_MNEMONIC'),
-    rpcEndpoint: getEnvOrFail('SEDA_RPC_ENDPOINT'),
+    mnemonic: getEnvOrFail("SEDA_MNEMONIC"),
+    rpcEndpoint: getEnvOrFail("SEDA_RPC_ENDPOINT"),
   };
 }
 
-export const BECH32_ADDRESS_PREFIX = 'seda';
+export const BECH32_ADDRESS_PREFIX = "seda";

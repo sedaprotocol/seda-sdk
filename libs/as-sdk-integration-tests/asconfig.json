@@ -19,6 +19,7 @@
   },
   "options": {
     "bindings": "esm",
-    "exportStart": "_start"
+    "exportStart": "_start",
+    "transform": ["json-as/transform"]
   }
 }

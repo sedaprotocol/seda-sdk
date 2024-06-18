@@ -91,10 +91,7 @@ function createBaseDuration(): Duration {
 }
 
 export const Duration = {
-  encode(
-    message: Duration,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: Duration, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.seconds !== 0) {
       writer.uint32(8).int64(message.seconds);
     }
@@ -105,8 +102,7 @@ export const Duration = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Duration {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseDuration();
     while (reader.pos < end) {
@@ -164,23 +160,12 @@ export const Duration = {
   },
 };
 
-type Builtin =
-  | Date
-  | Function
-  | Uint8Array
-  | string
-  | number
-  | boolean
-  | undefined;
+type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
-type DeepPartial<T> = T extends Builtin
-  ? T
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
+type DeepPartial<T> = T extends Builtin ? T
+  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
 function longToNumber(long: Long): number {

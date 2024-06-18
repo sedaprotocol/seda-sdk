@@ -1,8 +1,8 @@
-import { callVm } from '../../../dist/libs/vm/src/index';
-import { jest } from '@jest/globals';
-import { readFile } from 'node:fs/promises';
-import { HttpFetchResponse } from '../../../dist/libs/vm/src/types/vm-actions';
-import { PromiseStatus } from '../../../dist/libs/vm/src/types/vm-promise';
+import { callVm } from "../../../dist/libs/vm/src/index";
+import { jest } from "@jest/globals";
+import { readFile } from "node:fs/promises";
+import { HttpFetchResponse } from "../../../dist/libs/vm/src/types/vm-actions";
+import { PromiseStatus } from "../../../dist/libs/vm/src/types/vm-promise";
 
 const mockHttpFetch = jest.fn();
 
@@ -12,19 +12,21 @@ const TestVmAdapter = jest.fn().mockImplementation(() => {
   return {
     modifyVmCallData: (v) => v,
     setProcessId: () => {},
-    httpFetch: mockHttpFetch
+    httpFetch: mockHttpFetch,
   };
 });
 
-describe('Http', () => {
+describe("Http", () => {
   beforeEach(() => {
     mockHttpFetch.mockReset();
   });
 
-  it('Test SDK HTTP Rejection', async () => {
-    const wasmBinary = await readFile('dist/libs/as-sdk-integration-tests/debug.wasm');
+  it("Test SDK HTTP Rejection", async () => {
+    const wasmBinary = await readFile(
+      "dist/libs/as-sdk-integration-tests/debug.wasm"
+    );
     const result = await callVm({
-      args: ['testHttpRejection'],
+      args: ["testHttpRejection"],
       envs: {},
       binary: new Uint8Array(wasmBinary),
     });
@@ -33,10 +35,9 @@ describe('Http', () => {
     expect(result.result).toEqual(new TextEncoder().encode("rejected"));
   });
 
-  it('Test mocked SDK HTTP Success', async () => {
-
+  it("Test mocked SDK HTTP Success", async () => {
     const wasmBinary = await readFile(
-      'dist/libs/as-sdk-integration-tests/debug.wasm'
+      "dist/libs/as-sdk-integration-tests/debug.wasm"
     );
 
     const mockResponse = new HttpFetchResponse({
@@ -44,25 +45,31 @@ describe('Http', () => {
       bytes: [1],
       headers: {},
       status: 200,
-      url: 'http://example.com',
+      url: "http://example.com",
     });
 
     mockHttpFetch.mockResolvedValue(PromiseStatus.fulfilled(mockResponse));
 
-    const result = await callVm({
-      args: ['testHttpSuccess'],
-      envs: {},
-      binary: new Uint8Array(wasmBinary),
-    }, undefined, new TestVmAdapter());
+    const result = await callVm(
+      {
+        args: ["testHttpSuccess"],
+        envs: {},
+        binary: new Uint8Array(wasmBinary),
+      },
+      undefined,
+      new TestVmAdapter()
+    );
 
     expect(result.exitCode).toBe(0);
-    expect(result.result).toEqual(new TextEncoder().encode('ok'));
+    expect(result.result).toEqual(new TextEncoder().encode("ok"));
   });
 
-  it('Test SDK HTTP Success', async () => {
-    const wasmBinary = await readFile('dist/libs/as-sdk-integration-tests/debug.wasm');
+  it("Test SDK HTTP Success", async () => {
+    const wasmBinary = await readFile(
+      "dist/libs/as-sdk-integration-tests/debug.wasm"
+    );
     const result = await callVm({
-      args: ['testHttpSuccess'],
+      args: ["testHttpSuccess"],
       envs: {},
       binary: new Uint8Array(wasmBinary),
     });
@@ -71,14 +78,20 @@ describe('Http', () => {
     expect(result.result).toEqual(new TextEncoder().encode("ok"));
   });
 
-  it("should exit when an invalid WASM binary is given", async ()  => {
+  it("should exit when an invalid WASM binary is given", async () => {
     const result = await callVm({
-      args: ['testHttpSuccess'],
+      args: ["testHttpSuccess"],
       envs: {},
       binary: new Uint8Array([0, 97, 115, 109]),
     });
 
-    expect(result).toEqual({ exitCode: 1, stderr: 'CompileError: WebAssembly.compile(): expected 4 bytes, fell off end @+4', stdout: '', result: new Uint8Array(), resultAsString: '' });
+    expect(result).toEqual({
+      exitCode: 1,
+      stderr:
+        "CompileError: WebAssembly.compile(): expected 4 bytes, fell off end @+4",
+      stdout: "",
+      result: new Uint8Array(),
+      resultAsString: "",
+    });
   });
-
 });

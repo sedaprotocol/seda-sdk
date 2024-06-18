@@ -23,15 +23,9 @@ function createBaseClawbackContinuousVestingAccount(): ClawbackContinuousVesting
 }
 
 export const ClawbackContinuousVestingAccount = {
-  encode(
-    message: ClawbackContinuousVestingAccount,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: ClawbackContinuousVestingAccount, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.baseVestingAccount !== undefined) {
-      ContinuousVestingAccount.encode(
-        message.baseVestingAccount,
-        writer.uint32(10).fork()
-      ).ldelim();
+      ContinuousVestingAccount.encode(message.baseVestingAccount, writer.uint32(10).fork()).ldelim();
     }
     if (message.funderAddress !== "") {
       writer.uint32(18).string(message.funderAddress);
@@ -39,12 +33,8 @@ export const ClawbackContinuousVestingAccount = {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): ClawbackContinuousVestingAccount {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): ClawbackContinuousVestingAccount {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseClawbackContinuousVestingAccount();
     while (reader.pos < end) {
@@ -55,10 +45,7 @@ export const ClawbackContinuousVestingAccount = {
             break;
           }
 
-          message.baseVestingAccount = ContinuousVestingAccount.decode(
-            reader,
-            reader.uint32()
-          );
+          message.baseVestingAccount = ContinuousVestingAccount.decode(reader, reader.uint32());
           continue;
         case 2:
           if (tag !== 18) {
@@ -81,18 +68,14 @@ export const ClawbackContinuousVestingAccount = {
       baseVestingAccount: isSet(object.baseVestingAccount)
         ? ContinuousVestingAccount.fromJSON(object.baseVestingAccount)
         : undefined,
-      funderAddress: isSet(object.funderAddress)
-        ? globalThis.String(object.funderAddress)
-        : "",
+      funderAddress: isSet(object.funderAddress) ? globalThis.String(object.funderAddress) : "",
     };
   },
 
   toJSON(message: ClawbackContinuousVestingAccount): unknown {
     const obj: any = {};
     if (message.baseVestingAccount !== undefined) {
-      obj.baseVestingAccount = ContinuousVestingAccount.toJSON(
-        message.baseVestingAccount
-      );
+      obj.baseVestingAccount = ContinuousVestingAccount.toJSON(message.baseVestingAccount);
     }
     if (message.funderAddress !== "") {
       obj.funderAddress = message.funderAddress;
@@ -100,42 +83,25 @@ export const ClawbackContinuousVestingAccount = {
     return obj;
   },
 
-  create(
-    base?: DeepPartial<ClawbackContinuousVestingAccount>
-  ): ClawbackContinuousVestingAccount {
+  create(base?: DeepPartial<ClawbackContinuousVestingAccount>): ClawbackContinuousVestingAccount {
     return ClawbackContinuousVestingAccount.fromPartial(base ?? {});
   },
-  fromPartial(
-    object: DeepPartial<ClawbackContinuousVestingAccount>
-  ): ClawbackContinuousVestingAccount {
+  fromPartial(object: DeepPartial<ClawbackContinuousVestingAccount>): ClawbackContinuousVestingAccount {
     const message = createBaseClawbackContinuousVestingAccount();
-    message.baseVestingAccount =
-      object.baseVestingAccount !== undefined &&
-      object.baseVestingAccount !== null
-        ? ContinuousVestingAccount.fromPartial(object.baseVestingAccount)
-        : undefined;
+    message.baseVestingAccount = (object.baseVestingAccount !== undefined && object.baseVestingAccount !== null)
+      ? ContinuousVestingAccount.fromPartial(object.baseVestingAccount)
+      : undefined;
     message.funderAddress = object.funderAddress ?? "";
     return message;
   },
 };
 
-type Builtin =
-  | Date
-  | Function
-  | Uint8Array
-  | string
-  | number
-  | boolean
-  | undefined;
+type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
-type DeepPartial<T> = T extends Builtin
-  ? T
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
+type DeepPartial<T> = T extends Builtin ? T
+  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
 function isSet(value: any): boolean {

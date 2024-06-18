@@ -7,10 +7,7 @@
 /* eslint-disable */
 import _m0 from "protobufjs/minimal.js";
 import { Coin } from "../../../cosmos/base/v1beta1/coin.js";
-import {
-  CommissionRates,
-  Description,
-} from "../../../cosmos/staking/v1beta1/staking.js";
+import { CommissionRates, Description } from "../../../cosmos/staking/v1beta1/staking.js";
 import { Any } from "../../../google/protobuf/any.js";
 
 /** MsgCreateValidator defines a SDK message for creating a new validator. */
@@ -33,7 +30,8 @@ export interface MsgCreateValidatorWithVRF {
 }
 
 /** MsgCreateValidatorResponse defines the Msg/CreateValidator response type. */
-export interface MsgCreateValidatorWithVRFResponse {}
+export interface MsgCreateValidatorWithVRFResponse {
+}
 
 function createBaseMsgCreateValidatorWithVRF(): MsgCreateValidatorWithVRF {
   return {
@@ -49,21 +47,12 @@ function createBaseMsgCreateValidatorWithVRF(): MsgCreateValidatorWithVRF {
 }
 
 export const MsgCreateValidatorWithVRF = {
-  encode(
-    message: MsgCreateValidatorWithVRF,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: MsgCreateValidatorWithVRF, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.description !== undefined) {
-      Description.encode(
-        message.description,
-        writer.uint32(10).fork()
-      ).ldelim();
+      Description.encode(message.description, writer.uint32(10).fork()).ldelim();
     }
     if (message.commission !== undefined) {
-      CommissionRates.encode(
-        message.commission,
-        writer.uint32(18).fork()
-      ).ldelim();
+      CommissionRates.encode(message.commission, writer.uint32(18).fork()).ldelim();
     }
     if (message.minSelfDelegation !== "") {
       writer.uint32(26).string(message.minSelfDelegation);
@@ -86,12 +75,8 @@ export const MsgCreateValidatorWithVRF = {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): MsgCreateValidatorWithVRF {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgCreateValidatorWithVRF {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgCreateValidatorWithVRF();
     while (reader.pos < end) {
@@ -164,26 +149,14 @@ export const MsgCreateValidatorWithVRF = {
 
   fromJSON(object: any): MsgCreateValidatorWithVRF {
     return {
-      description: isSet(object.description)
-        ? Description.fromJSON(object.description)
-        : undefined,
-      commission: isSet(object.commission)
-        ? CommissionRates.fromJSON(object.commission)
-        : undefined,
-      minSelfDelegation: isSet(object.minSelfDelegation)
-        ? globalThis.String(object.minSelfDelegation)
-        : "",
-      delegatorAddress: isSet(object.delegatorAddress)
-        ? globalThis.String(object.delegatorAddress)
-        : "",
-      validatorAddress: isSet(object.validatorAddress)
-        ? globalThis.String(object.validatorAddress)
-        : "",
+      description: isSet(object.description) ? Description.fromJSON(object.description) : undefined,
+      commission: isSet(object.commission) ? CommissionRates.fromJSON(object.commission) : undefined,
+      minSelfDelegation: isSet(object.minSelfDelegation) ? globalThis.String(object.minSelfDelegation) : "",
+      delegatorAddress: isSet(object.delegatorAddress) ? globalThis.String(object.delegatorAddress) : "",
+      validatorAddress: isSet(object.validatorAddress) ? globalThis.String(object.validatorAddress) : "",
       pubkey: isSet(object.pubkey) ? Any.fromJSON(object.pubkey) : undefined,
       value: isSet(object.value) ? Coin.fromJSON(object.value) : undefined,
-      vrfPubkey: isSet(object.vrfPubkey)
-        ? Any.fromJSON(object.vrfPubkey)
-        : undefined,
+      vrfPubkey: isSet(object.vrfPubkey) ? Any.fromJSON(object.vrfPubkey) : undefined,
     };
   },
 
@@ -216,38 +189,27 @@ export const MsgCreateValidatorWithVRF = {
     return obj;
   },
 
-  create(
-    base?: DeepPartial<MsgCreateValidatorWithVRF>
-  ): MsgCreateValidatorWithVRF {
+  create(base?: DeepPartial<MsgCreateValidatorWithVRF>): MsgCreateValidatorWithVRF {
     return MsgCreateValidatorWithVRF.fromPartial(base ?? {});
   },
-  fromPartial(
-    object: DeepPartial<MsgCreateValidatorWithVRF>
-  ): MsgCreateValidatorWithVRF {
+  fromPartial(object: DeepPartial<MsgCreateValidatorWithVRF>): MsgCreateValidatorWithVRF {
     const message = createBaseMsgCreateValidatorWithVRF();
-    message.description =
-      object.description !== undefined && object.description !== null
-        ? Description.fromPartial(object.description)
-        : undefined;
-    message.commission =
-      object.commission !== undefined && object.commission !== null
-        ? CommissionRates.fromPartial(object.commission)
-        : undefined;
+    message.description = (object.description !== undefined && object.description !== null)
+      ? Description.fromPartial(object.description)
+      : undefined;
+    message.commission = (object.commission !== undefined && object.commission !== null)
+      ? CommissionRates.fromPartial(object.commission)
+      : undefined;
     message.minSelfDelegation = object.minSelfDelegation ?? "";
     message.delegatorAddress = object.delegatorAddress ?? "";
     message.validatorAddress = object.validatorAddress ?? "";
-    message.pubkey =
-      object.pubkey !== undefined && object.pubkey !== null
-        ? Any.fromPartial(object.pubkey)
-        : undefined;
-    message.value =
-      object.value !== undefined && object.value !== null
-        ? Coin.fromPartial(object.value)
-        : undefined;
-    message.vrfPubkey =
-      object.vrfPubkey !== undefined && object.vrfPubkey !== null
-        ? Any.fromPartial(object.vrfPubkey)
-        : undefined;
+    message.pubkey = (object.pubkey !== undefined && object.pubkey !== null)
+      ? Any.fromPartial(object.pubkey)
+      : undefined;
+    message.value = (object.value !== undefined && object.value !== null) ? Coin.fromPartial(object.value) : undefined;
+    message.vrfPubkey = (object.vrfPubkey !== undefined && object.vrfPubkey !== null)
+      ? Any.fromPartial(object.vrfPubkey)
+      : undefined;
     return message;
   },
 };
@@ -257,19 +219,12 @@ function createBaseMsgCreateValidatorWithVRFResponse(): MsgCreateValidatorWithVR
 }
 
 export const MsgCreateValidatorWithVRFResponse = {
-  encode(
-    _: MsgCreateValidatorWithVRFResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(_: MsgCreateValidatorWithVRFResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): MsgCreateValidatorWithVRFResponse {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgCreateValidatorWithVRFResponse {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgCreateValidatorWithVRFResponse();
     while (reader.pos < end) {
@@ -293,14 +248,10 @@ export const MsgCreateValidatorWithVRFResponse = {
     return obj;
   },
 
-  create(
-    base?: DeepPartial<MsgCreateValidatorWithVRFResponse>
-  ): MsgCreateValidatorWithVRFResponse {
+  create(base?: DeepPartial<MsgCreateValidatorWithVRFResponse>): MsgCreateValidatorWithVRFResponse {
     return MsgCreateValidatorWithVRFResponse.fromPartial(base ?? {});
   },
-  fromPartial(
-    _: DeepPartial<MsgCreateValidatorWithVRFResponse>
-  ): MsgCreateValidatorWithVRFResponse {
+  fromPartial(_: DeepPartial<MsgCreateValidatorWithVRFResponse>): MsgCreateValidatorWithVRFResponse {
     const message = createBaseMsgCreateValidatorWithVRFResponse();
     return message;
   },
@@ -309,9 +260,7 @@ export const MsgCreateValidatorWithVRFResponse = {
 /** Msg defines the staking Msg service. */
 export interface Msg {
   /** CreateValidatorWithVRF defines a method for creating a new validator. */
-  CreateValidatorWithVRF(
-    request: MsgCreateValidatorWithVRF
-  ): Promise<MsgCreateValidatorWithVRFResponse>;
+  CreateValidatorWithVRF(request: MsgCreateValidatorWithVRF): Promise<MsgCreateValidatorWithVRFResponse>;
 }
 
 export const MsgServiceName = "sedachain.staking.v1.Msg";
@@ -323,46 +272,23 @@ export class MsgClientImpl implements Msg {
     this.rpc = rpc;
     this.CreateValidatorWithVRF = this.CreateValidatorWithVRF.bind(this);
   }
-  CreateValidatorWithVRF(
-    request: MsgCreateValidatorWithVRF
-  ): Promise<MsgCreateValidatorWithVRFResponse> {
+  CreateValidatorWithVRF(request: MsgCreateValidatorWithVRF): Promise<MsgCreateValidatorWithVRFResponse> {
     const data = MsgCreateValidatorWithVRF.encode(request).finish();
-    const promise = this.rpc.request(
-      this.service,
-      "CreateValidatorWithVRF",
-      data
-    );
-    return promise.then((data) =>
-      MsgCreateValidatorWithVRFResponse.decode(_m0.Reader.create(data))
-    );
+    const promise = this.rpc.request(this.service, "CreateValidatorWithVRF", data);
+    return promise.then((data) => MsgCreateValidatorWithVRFResponse.decode(_m0.Reader.create(data)));
   }
 }
 
 interface Rpc {
-  request(
-    service: string,
-    method: string,
-    data: Uint8Array
-  ): Promise<Uint8Array>;
+  request(service: string, method: string, data: Uint8Array): Promise<Uint8Array>;
 }
 
-type Builtin =
-  | Date
-  | Function
-  | Uint8Array
-  | string
-  | number
-  | boolean
-  | undefined;
+type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
-type DeepPartial<T> = T extends Builtin
-  ? T
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
+type DeepPartial<T> = T extends Builtin ? T
+  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
 function isSet(value: any): boolean {

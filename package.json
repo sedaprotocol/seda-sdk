@@ -52,6 +52,7 @@
     "@cosmjs/crypto": "^0.32.3",
     "@cosmjs/proto-signing": "^0.32.3",
     "@cosmjs/stargate": "^0.32.3",
+    "@cosmjs/cosmwasm-stargate": "^0.32.3",
     "@types/node-gzip": "^1.1.1",
     "@wasmer/wasi": "^1.2.2",
     "as-wasi": "^0.6.0",

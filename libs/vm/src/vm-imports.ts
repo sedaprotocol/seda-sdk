@@ -1,5 +1,5 @@
-import type { HttpFetchAction } from './types/vm-actions';
-import { WorkerToHost } from './worker-host-communication.js';
+import type { HttpFetchAction } from "./types/vm-actions";
+import { WorkerToHost } from "./worker-host-communication.js";
 
 export default class VmImports {
   memory?: WebAssembly.Memory;
@@ -21,7 +21,7 @@ export default class VmImports {
     const rawAction = new Uint8Array(
       this.memory?.buffer.slice(action, action + actionLength) ?? []
     );
-    const messageRaw = Buffer.from(rawAction).toString('utf-8');
+    const messageRaw = Buffer.from(rawAction).toString("utf-8");
 
     try {
       const message: HttpFetchAction = JSON.parse(messageRaw);

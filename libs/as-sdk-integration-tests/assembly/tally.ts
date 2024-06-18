@@ -1,10 +1,14 @@
-import { Tally } from '../../as-sdk/assembly';
+import { JSON } from "json-as";
+import { Tally, Process } from "../../as-sdk/assembly";
 
 export function testTallyVmReveals(): void {
   const reveals = Tally.getReveals();
 
-  for (let index = 0; index < reveals.length; index++) {
-    const reveal = reveals[index];
-    console.log('Some gas used: ' + reveal.gas_used);
-  }
+  Process.exit_with_message(0, JSON.stringify(reveals));
+}
+
+export function testTallyVmRevealsFiltered(): void {
+  const reveals = Tally.getConsensusReveals();
+
+  Process.exit_with_message(0, JSON.stringify(reveals));
 }

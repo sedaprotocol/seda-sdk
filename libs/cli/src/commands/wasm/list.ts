@@ -1,15 +1,15 @@
-import { Command } from 'commander';
+import { Command } from "commander";
 
-import { spinnerSuccess, updateSpinnerText } from '../spinner.js';
-import { queryDataRequestWasms } from '../../services/wasm/query.js';
-import { getRpcOption } from './options.js';
+import { spinnerSuccess, updateSpinnerText } from "../spinner.js";
+import { queryDataRequestWasms } from "../../services/wasm/query.js";
+import { getRpcOption } from "./options.js";
 
-export const list = new Command('list');
-list.description('list existing Data Request WASM binaries in the SEDA chain');
-list.option('-r, --rpc [string]', 'Tendermint/CometBFT RPC Endpoint');
+export const list = new Command("list");
+list.description("list existing Data Request WASM binaries in the SEDA chain");
+list.option("-r, --rpc [string]", "Tendermint/CometBFT RPC Endpoint");
 list.action(async () => {
   updateSpinnerText(
-    'Querying Data Request WASM binaries from the SEDA network'
+    "Querying Data Request WASM binaries from the SEDA network"
   );
 
   // Check RPC config

@@ -1,8 +1,8 @@
-import ora from 'ora';
+import ora from "ora";
 
 const spinner = ora({
   // make a singleton so we don't ever have 2 spinners
-  spinner: 'dots',
+  spinner: "dots",
 });
 
 export const updateSpinnerText = (message: string) => {

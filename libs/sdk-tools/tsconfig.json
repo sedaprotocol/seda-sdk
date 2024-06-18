@@ -1,17 +1,12 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "rootDirs": [
-      ".",
-      "../../"
-    ]
+    "rootDirs": [".", "../../"]
   },
   "include": [
     "src/**/*.ts",
     "src/models/data-request.test.js",
     "../protobuf/src"
   ],
-  "exclude": [
-    "src/**/*.test.ts"
-  ]
+  "exclude": ["src/**/*.test.ts"]
 }

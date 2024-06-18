@@ -2,12 +2,12 @@ import {
   ProtobufRpcClient,
   QueryClient,
   createProtobufRpcClient,
-} from '@cosmjs/stargate';
-import { QueryClientImpl } from '../../gen/sedachain/wasm_storage/v1/query.js';
-import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
-import { WasmType } from '../../gen/sedachain/wasm_storage/v1/wasm_storage.js';
+} from "@cosmjs/stargate";
+import { QueryClientImpl } from "../../gen/sedachain/wasm_storage/v1/query.js";
+import { Tendermint34Client } from "@cosmjs/tendermint-rpc";
+import { WasmType } from "../../gen/sedachain/wasm_storage/v1/wasm_storage.js";
 
-import { toHexString } from './utils.js';
+import { toHexString } from "./utils.js";
 
 export async function queryDataRequestWasms(endpoint: string) {
   const queryService = await buildQueryService(endpoint);
@@ -15,7 +15,7 @@ export async function queryDataRequestWasms(endpoint: string) {
 
   // Transform to something that can be displayed
   const result = queryResult.hashTypePairs.map((item) => {
-    const itemComponents = item.split(',');
+    const itemComponents = item.split(",");
     return {
       hash: itemComponents[0],
       type: itemComponents[1],
@@ -33,7 +33,7 @@ export async function queryDataRequestWasm(endpoint: string, hash: string) {
 
   // If wasm does not exist, it returns a result with empty/zeroed fields
   if (!queryResult.wasm || queryResult.wasm.hash.length == 0) {
-    throw Error('Data Request WASM binary not found');
+    throw Error("Data Request WASM binary not found");
   }
 
   // Transform to something that can be displayed

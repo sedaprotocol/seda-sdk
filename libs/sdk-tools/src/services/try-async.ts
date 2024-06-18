@@ -1,4 +1,4 @@
-import { Result } from 'true-myth';
+import { Result } from "true-myth";
 
 export async function tryOrAsync<T, E>(
   error: E,

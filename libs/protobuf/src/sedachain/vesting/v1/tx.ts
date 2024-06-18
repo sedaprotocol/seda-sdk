@@ -24,7 +24,8 @@ export interface MsgCreateVestingAccount {
  * MsgCreateVestingAccountResponse defines the CreateVestingAccount response
  * type.
  */
-export interface MsgCreateVestingAccountResponse {}
+export interface MsgCreateVestingAccountResponse {
+}
 
 /** MsgClawback defines a message that returns the vesting funds to the funder. */
 export interface MsgClawback {
@@ -42,20 +43,11 @@ export interface MsgClawbackResponse {
 }
 
 function createBaseMsgCreateVestingAccount(): MsgCreateVestingAccount {
-  return {
-    fromAddress: "",
-    toAddress: "",
-    amount: [],
-    endTime: 0,
-    disableClawback: false,
-  };
+  return { fromAddress: "", toAddress: "", amount: [], endTime: 0, disableClawback: false };
 }
 
 export const MsgCreateVestingAccount = {
-  encode(
-    message: MsgCreateVestingAccount,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: MsgCreateVestingAccount, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.fromAddress !== "") {
       writer.uint32(10).string(message.fromAddress);
     }
@@ -74,12 +66,8 @@ export const MsgCreateVestingAccount = {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): MsgCreateVestingAccount {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgCreateVestingAccount {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgCreateVestingAccount();
     while (reader.pos < end) {
@@ -131,19 +119,11 @@ export const MsgCreateVestingAccount = {
 
   fromJSON(object: any): MsgCreateVestingAccount {
     return {
-      fromAddress: isSet(object.fromAddress)
-        ? globalThis.String(object.fromAddress)
-        : "",
-      toAddress: isSet(object.toAddress)
-        ? globalThis.String(object.toAddress)
-        : "",
-      amount: globalThis.Array.isArray(object?.amount)
-        ? object.amount.map((e: any) => Coin.fromJSON(e))
-        : [],
+      fromAddress: isSet(object.fromAddress) ? globalThis.String(object.fromAddress) : "",
+      toAddress: isSet(object.toAddress) ? globalThis.String(object.toAddress) : "",
+      amount: globalThis.Array.isArray(object?.amount) ? object.amount.map((e: any) => Coin.fromJSON(e)) : [],
       endTime: isSet(object.endTime) ? globalThis.Number(object.endTime) : 0,
-      disableClawback: isSet(object.disableClawback)
-        ? globalThis.Boolean(object.disableClawback)
-        : false,
+      disableClawback: isSet(object.disableClawback) ? globalThis.Boolean(object.disableClawback) : false,
     };
   },
 
@@ -170,9 +150,7 @@ export const MsgCreateVestingAccount = {
   create(base?: DeepPartial<MsgCreateVestingAccount>): MsgCreateVestingAccount {
     return MsgCreateVestingAccount.fromPartial(base ?? {});
   },
-  fromPartial(
-    object: DeepPartial<MsgCreateVestingAccount>
-  ): MsgCreateVestingAccount {
+  fromPartial(object: DeepPartial<MsgCreateVestingAccount>): MsgCreateVestingAccount {
     const message = createBaseMsgCreateVestingAccount();
     message.fromAddress = object.fromAddress ?? "";
     message.toAddress = object.toAddress ?? "";
@@ -188,19 +166,12 @@ function createBaseMsgCreateVestingAccountResponse(): MsgCreateVestingAccountRes
 }
 
 export const MsgCreateVestingAccountResponse = {
-  encode(
-    _: MsgCreateVestingAccountResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(_: MsgCreateVestingAccountResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): MsgCreateVestingAccountResponse {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgCreateVestingAccountResponse {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgCreateVestingAccountResponse();
     while (reader.pos < end) {
@@ -224,14 +195,10 @@ export const MsgCreateVestingAccountResponse = {
     return obj;
   },
 
-  create(
-    base?: DeepPartial<MsgCreateVestingAccountResponse>
-  ): MsgCreateVestingAccountResponse {
+  create(base?: DeepPartial<MsgCreateVestingAccountResponse>): MsgCreateVestingAccountResponse {
     return MsgCreateVestingAccountResponse.fromPartial(base ?? {});
   },
-  fromPartial(
-    _: DeepPartial<MsgCreateVestingAccountResponse>
-  ): MsgCreateVestingAccountResponse {
+  fromPartial(_: DeepPartial<MsgCreateVestingAccountResponse>): MsgCreateVestingAccountResponse {
     const message = createBaseMsgCreateVestingAccountResponse();
     return message;
   },
@@ -242,10 +209,7 @@ function createBaseMsgClawback(): MsgClawback {
 }
 
 export const MsgClawback = {
-  encode(
-    message: MsgClawback,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: MsgClawback, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.funderAddress !== "") {
       writer.uint32(10).string(message.funderAddress);
     }
@@ -256,8 +220,7 @@ export const MsgClawback = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgClawback {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgClawback();
     while (reader.pos < end) {
@@ -288,12 +251,8 @@ export const MsgClawback = {
 
   fromJSON(object: any): MsgClawback {
     return {
-      funderAddress: isSet(object.funderAddress)
-        ? globalThis.String(object.funderAddress)
-        : "",
-      accountAddress: isSet(object.accountAddress)
-        ? globalThis.String(object.accountAddress)
-        : "",
+      funderAddress: isSet(object.funderAddress) ? globalThis.String(object.funderAddress) : "",
+      accountAddress: isSet(object.accountAddress) ? globalThis.String(object.accountAddress) : "",
     };
   },
 
@@ -324,10 +283,7 @@ function createBaseMsgClawbackResponse(): MsgClawbackResponse {
 }
 
 export const MsgClawbackResponse = {
-  encode(
-    message: MsgClawbackResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: MsgClawbackResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     for (const v of message.clawedUnbonded) {
       Coin.encode(v!, writer.uint32(10).fork()).ldelim();
     }
@@ -341,8 +297,7 @@ export const MsgClawbackResponse = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgClawbackResponse {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgClawbackResponse();
     while (reader.pos < end) {
@@ -411,12 +366,9 @@ export const MsgClawbackResponse = {
   },
   fromPartial(object: DeepPartial<MsgClawbackResponse>): MsgClawbackResponse {
     const message = createBaseMsgClawbackResponse();
-    message.clawedUnbonded =
-      object.clawedUnbonded?.map((e) => Coin.fromPartial(e)) || [];
-    message.clawedUnbonding =
-      object.clawedUnbonding?.map((e) => Coin.fromPartial(e)) || [];
-    message.clawedBonded =
-      object.clawedBonded?.map((e) => Coin.fromPartial(e)) || [];
+    message.clawedUnbonded = object.clawedUnbonded?.map((e) => Coin.fromPartial(e)) || [];
+    message.clawedUnbonding = object.clawedUnbonding?.map((e) => Coin.fromPartial(e)) || [];
+    message.clawedBonded = object.clawedBonded?.map((e) => Coin.fromPartial(e)) || [];
     return message;
   },
 };
@@ -424,9 +376,7 @@ export const MsgClawbackResponse = {
 /** Msg defines the vesting Msg service. */
 export interface Msg {
   /** CreateVestingAccount creates a new vesting account. */
-  CreateVestingAccount(
-    request: MsgCreateVestingAccount
-  ): Promise<MsgCreateVestingAccountResponse>;
+  CreateVestingAccount(request: MsgCreateVestingAccount): Promise<MsgCreateVestingAccountResponse>;
   /** Clawback returns the vesting funds back to the funder. */
   Clawback(request: MsgClawback): Promise<MsgClawbackResponse>;
 }
@@ -441,54 +391,29 @@ export class MsgClientImpl implements Msg {
     this.CreateVestingAccount = this.CreateVestingAccount.bind(this);
     this.Clawback = this.Clawback.bind(this);
   }
-  CreateVestingAccount(
-    request: MsgCreateVestingAccount
-  ): Promise<MsgCreateVestingAccountResponse> {
+  CreateVestingAccount(request: MsgCreateVestingAccount): Promise<MsgCreateVestingAccountResponse> {
     const data = MsgCreateVestingAccount.encode(request).finish();
-    const promise = this.rpc.request(
-      this.service,
-      "CreateVestingAccount",
-      data
-    );
-    return promise.then((data) =>
-      MsgCreateVestingAccountResponse.decode(_m0.Reader.create(data))
-    );
+    const promise = this.rpc.request(this.service, "CreateVestingAccount", data);
+    return promise.then((data) => MsgCreateVestingAccountResponse.decode(_m0.Reader.create(data)));
   }
 
   Clawback(request: MsgClawback): Promise<MsgClawbackResponse> {
     const data = MsgClawback.encode(request).finish();
     const promise = this.rpc.request(this.service, "Clawback", data);
-    return promise.then((data) =>
-      MsgClawbackResponse.decode(_m0.Reader.create(data))
-    );
+    return promise.then((data) => MsgClawbackResponse.decode(_m0.Reader.create(data)));
   }
 }
 
 interface Rpc {
-  request(
-    service: string,
-    method: string,
-    data: Uint8Array
-  ): Promise<Uint8Array>;
+  request(service: string, method: string, data: Uint8Array): Promise<Uint8Array>;
 }
 
-type Builtin =
-  | Date
-  | Function
-  | Uint8Array
-  | string
-  | number
-  | boolean
-  | undefined;
+type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
-type DeepPartial<T> = T extends Builtin
-  ? T
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
+type DeepPartial<T> = T extends Builtin ? T
+  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
 function longToNumber(long: Long): number {

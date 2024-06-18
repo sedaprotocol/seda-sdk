@@ -1,16 +1,21 @@
 import { Worker } from "node:worker_threads";
 import type { VmCallData, VmResult } from "./vm";
-import { VmCallWorkerMessage, WorkerMessage, WorkerMessageType } from "./types/worker-messages.js";
+import {
+  VmCallWorkerMessage,
+  WorkerMessage,
+  WorkerMessageType,
+} from "./types/worker-messages.js";
 import type { VmAdapter } from "./types/vm-adapter.js";
 import DataRequestVmAdapter from "./data-request-vm-adapter.js";
 import { parse, format } from "node:path";
 import { HostToWorker } from "./worker-host-communication.js";
 import { createProcessId } from "./services/create-process-id.js";
 
-export { default as TallyVmAdapter } from './tally-vm-adapter.js';
-export { default as DataRequestVmAdapter } from './data-request-vm-adapter.js';
+export * from "./types/vm-modes.js";
+export { default as TallyVmAdapter } from "./tally-vm-adapter.js";
+export { default as DataRequestVmAdapter } from "./data-request-vm-adapter.js";
 
-let DEFAULT_WORKER_PATH = '/workspaces/seda-sdk/dist/libs/vm/src/worker.js';
+let DEFAULT_WORKER_PATH = "/workspaces/seda-sdk/dist/libs/vm/src/worker.js";
 
 // We are in CommonJS mode..
 if (Object.keys(import.meta).length === 0) {
@@ -20,7 +25,7 @@ if (Object.keys(import.meta).length === 0) {
 } else {
   // We are in ESM mode
   const CURRENT_FILE_PATH = parse(import.meta.url);
-  CURRENT_FILE_PATH.base = 'worker.js';
+  CURRENT_FILE_PATH.base = "worker.js";
   DEFAULT_WORKER_PATH = format(CURRENT_FILE_PATH);
 }
 
@@ -41,7 +46,7 @@ export function callVm(
     const finalCallData: VmCallData = vmAdapter.modifyVmCallData({
       ...callData,
       // First argument matches the Rust Wasmer standard (_start for WASI)
-      args: ['_start', ...callData.args],
+      args: ["_start", ...callData.args],
     });
 
     const processId = createProcessId(finalCallData);
@@ -49,7 +54,7 @@ export function callVm(
 
     let worker: Worker;
 
-    if (workerUrl.startsWith('file://')) {
+    if (workerUrl.startsWith("file://")) {
       worker = new Worker(new URL(workerUrl));
     } else {
       worker = new Worker(workerUrl);
@@ -68,7 +73,7 @@ export function callVm(
       type: WorkerMessageType.VmCall,
     };
 
-    worker.on('message', async (message: WorkerMessage) => {
+    worker.on("message", async (message: WorkerMessage) => {
       try {
         if (message.type === WorkerMessageType.VmResult) {
           worker.terminate();
@@ -85,19 +90,19 @@ export function callVm(
       }
     });
 
-    worker.on('error', (error) => {
+    worker.on("error", (error) => {
       resolve({
         exitCode: 1,
         stderr: `[${processId}] - Worker threw an uncaught error: ${error}`,
-        stdout: '',
+        stdout: "",
       });
     });
 
-    worker.on('exit', (exitCode) => {
+    worker.on("exit", (exitCode) => {
       resolve({
         exitCode,
         stderr: `[${processId}] - The worker has been terminated`,
-        stdout: '',
+        stdout: "",
       });
     });
 

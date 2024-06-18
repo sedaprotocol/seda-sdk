@@ -9,27 +9,26 @@ export enum WorkerMessageType {
 }
 
 export interface VmCallWorkerMessage {
-  callData: VmCallData,
-  processId: string,
-  notifierBuffer: SharedArrayBuffer,
-  type: WorkerMessageType.VmCall,
+  callData: VmCallData;
+  processId: string;
+  notifierBuffer: SharedArrayBuffer;
+  type: WorkerMessageType.VmCall;
 }
 
 export interface VmResultWorkerMessage {
-  result: VmResult,
-  type: WorkerMessageType.VmResult,
+  result: VmResult;
+  type: WorkerMessageType.VmResult;
 }
 
 export interface VmActionResultBufferMessage {
-  buffer: SharedArrayBuffer,
-  type: WorkerMessageType.VmActionResultBuffer,
+  buffer: SharedArrayBuffer;
+  type: WorkerMessageType.VmActionResultBuffer;
 }
 
 export interface VmActionExecuteMessage {
   action: VmAction;
   type: WorkerMessageType.VmActionExecute;
 }
-
 
 export type WorkerMessage =
   | VmCallWorkerMessage

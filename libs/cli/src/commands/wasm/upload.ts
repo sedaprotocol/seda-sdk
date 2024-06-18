@@ -1,25 +1,25 @@
-import { Command } from 'commander';
-import { readFile } from 'node:fs/promises';
+import { Command } from "commander";
+import { readFile } from "node:fs/promises";
 
-import { ADDRESS, GAS_LIMIT } from '../../config.js';
-import { spinnerSuccess, updateSpinnerText } from '../spinner.js';
-import { uploadDataRequestWasm } from '../../services/wasm/tx.js';
-import { getRpcOption } from './options.js';
+import { ADDRESS, GAS_LIMIT } from "../../config.js";
+import { spinnerSuccess, updateSpinnerText } from "../spinner.js";
+import { uploadDataRequestWasm } from "../../services/wasm/tx.js";
+import { getRpcOption } from "./options.js";
 
-export const upload = new Command('upload');
-upload.description('upload a Data Request WASM binary to the SEDA chain');
-upload.argument('<wasm-filepath>', 'File path of the Data Request WASM binary');
-upload.option('-r, --rpc [string]', 'Tendermint/CometBFT RPC Endpoint');
+export const upload = new Command("upload");
+upload.description("upload a Data Request WASM binary to the SEDA chain");
+upload.argument("<wasm-filepath>", "File path of the Data Request WASM binary");
+upload.option("-r, --rpc [string]", "Tendermint/CometBFT RPC Endpoint");
 upload.option(
-  '-a, --address [string]',
-  'Wallet address in Bech32 format (default: index 0)'
+  "-a, --address [string]",
+  "Wallet address in Bech32 format (default: index 0)"
 );
 upload.option(
-  '-g, --gas [string]',
-  'Transaction gas limit (default: ' + GAS_LIMIT + ')'
+  "-g, --gas [string]",
+  "Transaction gas limit (default: " + GAS_LIMIT + ")"
 );
 upload.action(async () => {
-  updateSpinnerText('Uploading Data Request WASM binary to the SEDA network');
+  updateSpinnerText("Uploading Data Request WASM binary to the SEDA network");
 
   // Tendermint/CometBFT RPC endpoint
   const endpoint: string = getRpcOption(upload);

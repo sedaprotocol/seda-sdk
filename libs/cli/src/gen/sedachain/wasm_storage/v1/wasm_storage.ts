@@ -68,7 +68,12 @@ export interface Params {
 }
 
 function createBaseWasm(): Wasm {
-  return { hash: new Uint8Array(0), bytecode: new Uint8Array(0), wasmType: 0, addedAt: undefined };
+  return {
+    hash: new Uint8Array(0),
+    bytecode: new Uint8Array(0),
+    wasmType: 0,
+    addedAt: undefined,
+  };
 }
 
 export const Wasm = {
@@ -83,13 +88,17 @@ export const Wasm = {
       writer.uint32(24).int32(message.wasmType);
     }
     if (message.addedAt !== undefined) {
-      Timestamp.encode(toTimestamp(message.addedAt), writer.uint32(34).fork()).ldelim();
+      Timestamp.encode(
+        toTimestamp(message.addedAt),
+        writer.uint32(34).fork()
+      ).ldelim();
     }
     return writer;
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Wasm {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseWasm();
     while (reader.pos < end) {
@@ -121,7 +130,9 @@ export const Wasm = {
             break;
           }
 
-          message.addedAt = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+          message.addedAt = fromTimestamp(
+            Timestamp.decode(reader, reader.uint32())
+          );
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -134,10 +145,16 @@ export const Wasm = {
 
   fromJSON(object: any): Wasm {
     return {
-      hash: isSet(object.hash) ? bytesFromBase64(object.hash) : new Uint8Array(0),
-      bytecode: isSet(object.bytecode) ? bytesFromBase64(object.bytecode) : new Uint8Array(0),
+      hash: isSet(object.hash)
+        ? bytesFromBase64(object.hash)
+        : new Uint8Array(0),
+      bytecode: isSet(object.bytecode)
+        ? bytesFromBase64(object.bytecode)
+        : new Uint8Array(0),
       wasmType: isSet(object.wasmType) ? wasmTypeFromJSON(object.wasmType) : 0,
-      addedAt: isSet(object.addedAt) ? fromJsonTimestamp(object.addedAt) : undefined,
+      addedAt: isSet(object.addedAt)
+        ? fromJsonTimestamp(object.addedAt)
+        : undefined,
     };
   },
 
@@ -176,7 +193,10 @@ function createBaseParams(): Params {
 }
 
 export const Params = {
-  encode(message: Params, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+  encode(
+    message: Params,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     if (message.maxWasmSize !== 0) {
       writer.uint32(8).uint64(message.maxWasmSize);
     }
@@ -184,7 +204,8 @@ export const Params = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Params {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseParams();
     while (reader.pos < end) {
@@ -207,7 +228,9 @@ export const Params = {
   },
 
   fromJSON(object: any): Params {
-    return { maxWasmSize: isSet(object.maxWasmSize) ? Number(object.maxWasmSize) : 0 };
+    return {
+      maxWasmSize: isSet(object.maxWasmSize) ? Number(object.maxWasmSize) : 0,
+    };
   },
 
   toJSON(message: Params): unknown {
@@ -272,11 +295,23 @@ function base64FromBytes(arr: Uint8Array): string {
   }
 }
 
-type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
+type Builtin =
+  | Date
+  | Function
+  | Uint8Array
+  | string
+  | number
+  | boolean
+  | undefined;
 
-export type DeepPartial<T> = T extends Builtin ? T
-  : T extends Array<infer U> ? Array<DeepPartial<U>> : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
-  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
+export type DeepPartial<T> = T extends Builtin
+  ? T
+  : T extends Array<infer U>
+  ? Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U>
+  ? ReadonlyArray<DeepPartial<U>>
+  : T extends {}
+  ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
 function toTimestamp(date: Date): Timestamp {
@@ -303,7 +338,9 @@ function fromJsonTimestamp(o: any): Date {
 
 function longToNumber(long: Long): number {
   if (long.gt(Number.MAX_SAFE_INTEGER)) {
-    throw new tsProtoGlobalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
+    throw new tsProtoGlobalThis.Error(
+      "Value is larger than Number.MAX_SAFE_INTEGER"
+    );
   }
   return long.toNumber();
 }

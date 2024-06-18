@@ -2,7 +2,6 @@ import type { VmCallData } from "../vm";
 import type { HttpFetchAction, HttpFetchResponse } from "./vm-actions";
 import { PromiseStatus } from "./vm-promise.js";
 
-
 export interface VmAdapter {
   /**
    * Allows the adapter to modify the call data before executing
@@ -17,7 +16,7 @@ export interface VmAdapter {
    *
    * @param processId
    */
-  setProcessId(processId: string): void,
+  setProcessId(processId: string): void;
 
   /**
    * Method to do a remote http fetch call

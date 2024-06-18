@@ -1,15 +1,15 @@
 module.exports = {
   root: true,
-  parser: '@typescript-eslint/parser',
+  parser: "@typescript-eslint/parser",
   extends: [
-    'eslint:recommended',
-    'plugin:@typescript-eslint/recommended',
-    'prettier',
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "prettier",
   ],
-  plugins: ['@typescript-eslint', 'eslint-plugin-import'],
-  ignorePatterns: ['*.cjs'],
+  plugins: ["@typescript-eslint", "eslint-plugin-import"],
+  ignorePatterns: ["*.cjs"],
   parserOptions: {
-    sourceType: 'module',
+    sourceType: "module",
     ecmaVersion: 2020,
   },
   env: {
@@ -17,6 +17,6 @@ module.exports = {
     node: true,
   },
   rules: {
-    'import/extensions': [2, 'ignorePackages'],
+    "import/extensions": [2, "ignorePackages"],
   },
 };

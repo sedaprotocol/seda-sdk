@@ -1,7 +1,7 @@
-import { JSON } from 'assemblyscript-json/assembly';
-import { call_result_write, http_fetch } from './bindings/seda_v1';
-import { jsonArrToUint8Array } from './json-utils';
-import { PromiseStatus, FromBuffer } from './promise';
+import { JSON } from "assemblyscript-json/assembly";
+import { call_result_write, http_fetch } from "./bindings/seda_v1";
+import { jsonArrToUint8Array } from "./json-utils";
+import { PromiseStatus, FromBuffer } from "./promise";
 
 /**
  * Response of an httpFetch call
@@ -22,7 +22,7 @@ export class HttpResponse implements FromBuffer<HttpResponse> {
   /**
    * The URL that was fetched (when it needs to follow redirects)
    */
-  public url: string = '';
+  public url: string = "";
   /**
    * The HTTP status code
    */
@@ -36,27 +36,27 @@ export class HttpResponse implements FromBuffer<HttpResponse> {
     const response = new HttpResponse();
     const value = <JSON.Obj>JSON.parse(buffer);
 
-    const rawResponseBytes = value.getArr('bytes');
+    const rawResponseBytes = value.getArr("bytes");
     if (rawResponseBytes) {
       response.bytes = jsonArrToUint8Array(rawResponseBytes);
     }
 
-    const rawContentLength = value.getInteger('content_length');
+    const rawContentLength = value.getInteger("content_length");
     if (rawContentLength) {
       response.contentLength = rawContentLength.valueOf();
     }
 
-    const rawStatus = value.getInteger('status');
+    const rawStatus = value.getInteger("status");
     if (rawStatus) {
       response.status = rawStatus.valueOf();
     }
 
-    const rawUrl = value.getString('url');
+    const rawUrl = value.getString("url");
     if (rawUrl) {
       response.url = rawUrl.valueOf();
     }
 
-    const rawHeaders = value.getObj('headers');
+    const rawHeaders = value.getObj("headers");
     if (rawHeaders) {
       for (let i = 0; i < rawHeaders.keys.length; i++) {
         const key = rawHeaders.keys[i];
@@ -95,7 +95,7 @@ export class HttpFetchOptions {
   /**
    * HTTP Method (Get, Post, Patch, etc.)
    */
-  method: HttpFetchMethod = 'Get';
+  method: HttpFetchMethod = "Get";
 
   /**
    * Headers to send along. Key -> Value
@@ -125,11 +125,11 @@ export class HttpFetchOptions {
       headers.set(headerKey, headerValue);
     }
 
-    obj.set('headers', headers);
-    obj.set('method', this.method);
+    obj.set("headers", headers);
+    obj.set("method", this.method);
 
     if (this.body !== null) {
-      obj.set('body', this.body);
+      obj.set("body", this.body);
     }
 
     return obj;
@@ -148,8 +148,8 @@ class HttpFetch {
   toObject(): JSON.Obj {
     const obj = JSON.Value.Object();
 
-    obj.set('url', this.url);
-    obj.set('options', this.options.toObject());
+    obj.set("url", this.url);
+    obj.set("options", this.options.toObject());
 
     return obj;
   }

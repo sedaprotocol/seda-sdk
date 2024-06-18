@@ -46,7 +46,10 @@ function createBaseMsgStoreDataRequestWasm(): MsgStoreDataRequestWasm {
 }
 
 export const MsgStoreDataRequestWasm = {
-  encode(message: MsgStoreDataRequestWasm, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+  encode(
+    message: MsgStoreDataRequestWasm,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     if (message.sender !== "") {
       writer.uint32(10).string(message.sender);
     }
@@ -59,8 +62,12 @@ export const MsgStoreDataRequestWasm = {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgStoreDataRequestWasm {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): MsgStoreDataRequestWasm {
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgStoreDataRequestWasm();
     while (reader.pos < end) {
@@ -99,7 +106,9 @@ export const MsgStoreDataRequestWasm = {
   fromJSON(object: any): MsgStoreDataRequestWasm {
     return {
       sender: isSet(object.sender) ? String(object.sender) : "",
-      wasm: isSet(object.wasm) ? bytesFromBase64(object.wasm) : new Uint8Array(0),
+      wasm: isSet(object.wasm)
+        ? bytesFromBase64(object.wasm)
+        : new Uint8Array(0),
       wasmType: isSet(object.wasmType) ? wasmTypeFromJSON(object.wasmType) : 0,
     };
   },
@@ -121,7 +130,9 @@ export const MsgStoreDataRequestWasm = {
   create(base?: DeepPartial<MsgStoreDataRequestWasm>): MsgStoreDataRequestWasm {
     return MsgStoreDataRequestWasm.fromPartial(base ?? {});
   },
-  fromPartial(object: DeepPartial<MsgStoreDataRequestWasm>): MsgStoreDataRequestWasm {
+  fromPartial(
+    object: DeepPartial<MsgStoreDataRequestWasm>
+  ): MsgStoreDataRequestWasm {
     const message = createBaseMsgStoreDataRequestWasm();
     message.sender = object.sender ?? "";
     message.wasm = object.wasm ?? new Uint8Array(0);
@@ -135,15 +146,22 @@ function createBaseMsgStoreDataRequestWasmResponse(): MsgStoreDataRequestWasmRes
 }
 
 export const MsgStoreDataRequestWasmResponse = {
-  encode(message: MsgStoreDataRequestWasmResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+  encode(
+    message: MsgStoreDataRequestWasmResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     if (message.hash !== "") {
       writer.uint32(10).string(message.hash);
     }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgStoreDataRequestWasmResponse {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): MsgStoreDataRequestWasmResponse {
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgStoreDataRequestWasmResponse();
     while (reader.pos < end) {
@@ -177,10 +195,14 @@ export const MsgStoreDataRequestWasmResponse = {
     return obj;
   },
 
-  create(base?: DeepPartial<MsgStoreDataRequestWasmResponse>): MsgStoreDataRequestWasmResponse {
+  create(
+    base?: DeepPartial<MsgStoreDataRequestWasmResponse>
+  ): MsgStoreDataRequestWasmResponse {
     return MsgStoreDataRequestWasmResponse.fromPartial(base ?? {});
   },
-  fromPartial(object: DeepPartial<MsgStoreDataRequestWasmResponse>): MsgStoreDataRequestWasmResponse {
+  fromPartial(
+    object: DeepPartial<MsgStoreDataRequestWasmResponse>
+  ): MsgStoreDataRequestWasmResponse {
     const message = createBaseMsgStoreDataRequestWasmResponse();
     message.hash = object.hash ?? "";
     return message;
@@ -192,7 +214,10 @@ function createBaseMsgStoreOverlayWasm(): MsgStoreOverlayWasm {
 }
 
 export const MsgStoreOverlayWasm = {
-  encode(message: MsgStoreOverlayWasm, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+  encode(
+    message: MsgStoreOverlayWasm,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     if (message.sender !== "") {
       writer.uint32(10).string(message.sender);
     }
@@ -206,7 +231,8 @@ export const MsgStoreOverlayWasm = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgStoreOverlayWasm {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgStoreOverlayWasm();
     while (reader.pos < end) {
@@ -245,7 +271,9 @@ export const MsgStoreOverlayWasm = {
   fromJSON(object: any): MsgStoreOverlayWasm {
     return {
       sender: isSet(object.sender) ? String(object.sender) : "",
-      wasm: isSet(object.wasm) ? bytesFromBase64(object.wasm) : new Uint8Array(0),
+      wasm: isSet(object.wasm)
+        ? bytesFromBase64(object.wasm)
+        : new Uint8Array(0),
       wasmType: isSet(object.wasmType) ? wasmTypeFromJSON(object.wasmType) : 0,
     };
   },
@@ -281,15 +309,22 @@ function createBaseMsgStoreOverlayWasmResponse(): MsgStoreOverlayWasmResponse {
 }
 
 export const MsgStoreOverlayWasmResponse = {
-  encode(message: MsgStoreOverlayWasmResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+  encode(
+    message: MsgStoreOverlayWasmResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     if (message.hash !== "") {
       writer.uint32(10).string(message.hash);
     }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgStoreOverlayWasmResponse {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): MsgStoreOverlayWasmResponse {
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgStoreOverlayWasmResponse();
     while (reader.pos < end) {
@@ -323,10 +358,14 @@ export const MsgStoreOverlayWasmResponse = {
     return obj;
   },
 
-  create(base?: DeepPartial<MsgStoreOverlayWasmResponse>): MsgStoreOverlayWasmResponse {
+  create(
+    base?: DeepPartial<MsgStoreOverlayWasmResponse>
+  ): MsgStoreOverlayWasmResponse {
     return MsgStoreOverlayWasmResponse.fromPartial(base ?? {});
   },
-  fromPartial(object: DeepPartial<MsgStoreOverlayWasmResponse>): MsgStoreOverlayWasmResponse {
+  fromPartial(
+    object: DeepPartial<MsgStoreOverlayWasmResponse>
+  ): MsgStoreOverlayWasmResponse {
     const message = createBaseMsgStoreOverlayWasmResponse();
     message.hash = object.hash ?? "";
     return message;
@@ -347,7 +386,10 @@ function createBaseMsgInstantiateAndRegisterProxyContract(): MsgInstantiateAndRe
 }
 
 export const MsgInstantiateAndRegisterProxyContract = {
-  encode(message: MsgInstantiateAndRegisterProxyContract, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+  encode(
+    message: MsgInstantiateAndRegisterProxyContract,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
     if (message.sender !== "") {
       writer.uint32(10).string(message.sender);
     }
@@ -375,8 +417,12 @@ export const MsgInstantiateAndRegisterProxyContract = {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgInstantiateAndRegisterProxyContract {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): MsgInstantiateAndRegisterProxyContract {
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgInstantiateAndRegisterProxyContract();
     while (reader.pos < end) {
@@ -454,8 +500,12 @@ export const MsgInstantiateAndRegisterProxyContract = {
       codeId: isSet(object.codeId) ? Number(object.codeId) : 0,
       label: isSet(object.label) ? String(object.label) : "",
       msg: isSet(object.msg) ? bytesFromBase64(object.msg) : new Uint8Array(0),
-      funds: Array.isArray(object?.funds) ? object.funds.map((e: any) => Coin.fromJSON(e)) : [],
-      salt: isSet(object.salt) ? bytesFromBase64(object.salt) : new Uint8Array(0),
+      funds: Array.isArray(object?.funds)
+        ? object.funds.map((e: any) => Coin.fromJSON(e))
+        : [],
+      salt: isSet(object.salt)
+        ? bytesFromBase64(object.salt)
+        : new Uint8Array(0),
       fixMsg: isSet(object.fixMsg) ? Boolean(object.fixMsg) : false,
     };
   },
@@ -489,10 +539,14 @@ export const MsgInstantiateAndRegisterProxyContract = {
     return obj;
   },
 
-  create(base?: DeepPartial<MsgInstantiateAndRegisterProxyContract>): MsgInstantiateAndRegisterProxyContract {
+  create(
+    base?: DeepPartial<MsgInstantiateAndRegisterProxyContract>
+  ): MsgInstantiateAndRegisterProxyContract {
     return MsgInstantiateAndRegisterProxyContract.fromPartial(base ?? {});
   },
-  fromPartial(object: DeepPartial<MsgInstantiateAndRegisterProxyContract>): MsgInstantiateAndRegisterProxyContract {
+  fromPartial(
+    object: DeepPartial<MsgInstantiateAndRegisterProxyContract>
+  ): MsgInstantiateAndRegisterProxyContract {
     const message = createBaseMsgInstantiateAndRegisterProxyContract();
     message.sender = object.sender ?? "";
     message.admin = object.admin ?? "";
@@ -513,7 +567,7 @@ function createBaseMsgInstantiateAndRegisterProxyContractResponse(): MsgInstanti
 export const MsgInstantiateAndRegisterProxyContractResponse = {
   encode(
     message: MsgInstantiateAndRegisterProxyContractResponse,
-    writer: _m0.Writer = _m0.Writer.create(),
+    writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.contractAddress !== "") {
       writer.uint32(10).string(message.contractAddress);
@@ -521,8 +575,12 @@ export const MsgInstantiateAndRegisterProxyContractResponse = {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgInstantiateAndRegisterProxyContractResponse {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): MsgInstantiateAndRegisterProxyContractResponse {
+    const reader =
+      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgInstantiateAndRegisterProxyContractResponse();
     while (reader.pos < end) {
@@ -545,7 +603,11 @@ export const MsgInstantiateAndRegisterProxyContractResponse = {
   },
 
   fromJSON(object: any): MsgInstantiateAndRegisterProxyContractResponse {
-    return { contractAddress: isSet(object.contractAddress) ? String(object.contractAddress) : "" };
+    return {
+      contractAddress: isSet(object.contractAddress)
+        ? String(object.contractAddress)
+        : "",
+    };
   },
 
   toJSON(message: MsgInstantiateAndRegisterProxyContractResponse): unknown {
@@ -557,12 +619,14 @@ export const MsgInstantiateAndRegisterProxyContractResponse = {
   },
 
   create(
-    base?: DeepPartial<MsgInstantiateAndRegisterProxyContractResponse>,
+    base?: DeepPartial<MsgInstantiateAndRegisterProxyContractResponse>
   ): MsgInstantiateAndRegisterProxyContractResponse {
-    return MsgInstantiateAndRegisterProxyContractResponse.fromPartial(base ?? {});
+    return MsgInstantiateAndRegisterProxyContractResponse.fromPartial(
+      base ?? {}
+    );
   },
   fromPartial(
-    object: DeepPartial<MsgInstantiateAndRegisterProxyContractResponse>,
+    object: DeepPartial<MsgInstantiateAndRegisterProxyContractResponse>
   ): MsgInstantiateAndRegisterProxyContractResponse {
     const message = createBaseMsgInstantiateAndRegisterProxyContractResponse();
     message.contractAddress = object.contractAddress ?? "";
@@ -571,10 +635,14 @@ export const MsgInstantiateAndRegisterProxyContractResponse = {
 };
 
 export interface Msg {
-  StoreDataRequestWasm(request: MsgStoreDataRequestWasm): Promise<MsgStoreDataRequestWasmResponse>;
-  StoreOverlayWasm(request: MsgStoreOverlayWasm): Promise<MsgStoreOverlayWasmResponse>;
+  StoreDataRequestWasm(
+    request: MsgStoreDataRequestWasm
+  ): Promise<MsgStoreDataRequestWasmResponse>;
+  StoreOverlayWasm(
+    request: MsgStoreOverlayWasm
+  ): Promise<MsgStoreOverlayWasmResponse>;
   InstantiateAndRegisterProxyContract(
-    request: MsgInstantiateAndRegisterProxyContract,
+    request: MsgInstantiateAndRegisterProxyContract
   ): Promise<MsgInstantiateAndRegisterProxyContractResponse>;
 }
 
@@ -587,31 +655,57 @@ export class MsgClientImpl implements Msg {
     this.rpc = rpc;
     this.StoreDataRequestWasm = this.StoreDataRequestWasm.bind(this);
     this.StoreOverlayWasm = this.StoreOverlayWasm.bind(this);
-    this.InstantiateAndRegisterProxyContract = this.InstantiateAndRegisterProxyContract.bind(this);
+    this.InstantiateAndRegisterProxyContract =
+      this.InstantiateAndRegisterProxyContract.bind(this);
   }
-  StoreDataRequestWasm(request: MsgStoreDataRequestWasm): Promise<MsgStoreDataRequestWasmResponse> {
+  StoreDataRequestWasm(
+    request: MsgStoreDataRequestWasm
+  ): Promise<MsgStoreDataRequestWasmResponse> {
     const data = MsgStoreDataRequestWasm.encode(request).finish();
-    const promise = this.rpc.request(this.service, "StoreDataRequestWasm", data);
-    return promise.then((data) => MsgStoreDataRequestWasmResponse.decode(_m0.Reader.create(data)));
+    const promise = this.rpc.request(
+      this.service,
+      "StoreDataRequestWasm",
+      data
+    );
+    return promise.then((data) =>
+      MsgStoreDataRequestWasmResponse.decode(_m0.Reader.create(data))
+    );
   }
 
-  StoreOverlayWasm(request: MsgStoreOverlayWasm): Promise<MsgStoreOverlayWasmResponse> {
+  StoreOverlayWasm(
+    request: MsgStoreOverlayWasm
+  ): Promise<MsgStoreOverlayWasmResponse> {
     const data = MsgStoreOverlayWasm.encode(request).finish();
     const promise = this.rpc.request(this.service, "StoreOverlayWasm", data);
-    return promise.then((data) => MsgStoreOverlayWasmResponse.decode(_m0.Reader.create(data)));
+    return promise.then((data) =>
+      MsgStoreOverlayWasmResponse.decode(_m0.Reader.create(data))
+    );
   }
 
   InstantiateAndRegisterProxyContract(
-    request: MsgInstantiateAndRegisterProxyContract,
+    request: MsgInstantiateAndRegisterProxyContract
   ): Promise<MsgInstantiateAndRegisterProxyContractResponse> {
-    const data = MsgInstantiateAndRegisterProxyContract.encode(request).finish();
-    const promise = this.rpc.request(this.service, "InstantiateAndRegisterProxyContract", data);
-    return promise.then((data) => MsgInstantiateAndRegisterProxyContractResponse.decode(_m0.Reader.create(data)));
+    const data =
+      MsgInstantiateAndRegisterProxyContract.encode(request).finish();
+    const promise = this.rpc.request(
+      this.service,
+      "InstantiateAndRegisterProxyContract",
+      data
+    );
+    return promise.then((data) =>
+      MsgInstantiateAndRegisterProxyContractResponse.decode(
+        _m0.Reader.create(data)
+      )
+    );
   }
 }
 
 interface Rpc {
-  request(service: string, method: string, data: Uint8Array): Promise<Uint8Array>;
+  request(
+    service: string,
+    method: string,
+    data: Uint8Array
+  ): Promise<Uint8Array>;
 }
 
 declare const self: any | undefined;
@@ -658,16 +752,30 @@ function base64FromBytes(arr: Uint8Array): string {
   }
 }
 
-type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
+type Builtin =
+  | Date
+  | Function
+  | Uint8Array
+  | string
+  | number
+  | boolean
+  | undefined;
 
-export type DeepPartial<T> = T extends Builtin ? T
-  : T extends Array<infer U> ? Array<DeepPartial<U>> : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
-  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
+export type DeepPartial<T> = T extends Builtin
+  ? T
+  : T extends Array<infer U>
+  ? Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U>
+  ? ReadonlyArray<DeepPartial<U>>
+  : T extends {}
+  ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
 function longToNumber(long: Long): number {
   if (long.gt(Number.MAX_SAFE_INTEGER)) {
-    throw new tsProtoGlobalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
+    throw new tsProtoGlobalThis.Error(
+      "Value is larger than Number.MAX_SAFE_INTEGER"
+    );
   }
   return long.toNumber();
 }

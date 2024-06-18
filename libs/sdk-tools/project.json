@@ -8,19 +8,19 @@
     "lint": {
       "executor": "@nx/eslint:lint"
     },
-    "build": {
-      "executor": "@nx/js:swc",
-      "options": {
-        "clean": true,
-        "main": "libs/sdk-tools/src/index.ts",
-        "outputPath": "dist/libs/sdk-tools/",
-        "tsConfig": "libs/sdk-tools/tsconfig.json",
-        "thirdParty": true,
-        "swcrc": "libs/sdk-tools/.swcrc",
-        "generateExportsField": true
-      },
-      "outputs": ["{options.outputPath}"]
-    },
+    // "build": {
+    //   "executor": "@nx/js:swc",
+    //   "options": {
+    //     "clean": true,
+    //     "main": "libs/sdk-tools/src/index.ts",
+    //     "outputPath": "dist/libs/sdk-tools/",
+    //     "tsConfig": "libs/sdk-tools/tsconfig.json",
+    //     "thirdParty": true,
+    //     "swcrc": "libs/sdk-tools/.swcrc",
+    //     "generateExportsField": true
+    //   },
+    //   "outputs": ["{options.outputPath}"]
+    // },
     "test": {
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],

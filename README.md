@@ -25,19 +25,19 @@
 
 Collection of packages which allow you to build SEDA Data Requests:
 
-* [vm](./libs/vm/README.md) - Virtual Machine which can run Data Request WASM binaries
-* [as-sdk](./libs/as-sdk/README.md) - [AssemblyScript](https://www.assemblyscript.org/) SDK
-* [cli](./libs/cli/README.md) - Command Line Interface for uploading and listing Data Request binaries
+- [vm](./libs/vm/README.md) - Virtual Machine which can run Data Request WASM binaries
+- [as-sdk](./libs/as-sdk/README.md) - [AssemblyScript](https://www.assemblyscript.org/) SDK
+- [cli](./libs/cli/README.md) - Command Line Interface for uploading and listing Data Request binaries
 
 # Quick getting started
 
 The easiest way to get started it by using our [starter kit](https://github.com/sedaprotocol/seda-sdk-starter-template) this has all the tools installed that you need:
 
-* AssemblyScript
-* SEDA SDK
-* SEDA CLI
-* SEDA VM
-* WASI
+- AssemblyScript
+- SEDA SDK
+- SEDA CLI
+- SEDA VM
+- WASI
 
 In our `assembly/index.ts` we have the following example:
 

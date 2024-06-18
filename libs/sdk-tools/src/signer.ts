@@ -16,15 +16,13 @@ export class Signer {
   async init() {
     this.client = Maybe.just(await this.getCosmosClient());
     this.account = Maybe.just(await this.getAccount());
-
-
   }
 
   private async getAccount() {
     const accounts = await this.signer.getAccounts();
 
     if (accounts.length == 0) {
-      throw Error('Address for given mnemonics does not exist');
+      throw Error("Address for given mnemonics does not exist");
     }
 
     return accounts[0].address;

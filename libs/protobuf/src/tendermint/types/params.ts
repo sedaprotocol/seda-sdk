@@ -50,7 +50,9 @@ export interface EvidenceParams {
    * mechanism for handling [Nothing-At-Stake
    * attacks](https://github.com/ethereum/wiki/wiki/Proof-of-Stake-FAQ#what-is-the-nothing-at-stake-problem-and-how-can-it-be-fixed).
    */
-  maxAgeDuration: Duration | undefined;
+  maxAgeDuration:
+    | Duration
+    | undefined;
   /**
    * This sets the maximum size of total evidence in bytes that can be committed in a single block.
    * and should fall comfortably under the max block bytes.
@@ -83,33 +85,19 @@ export interface HashedParams {
 }
 
 function createBaseConsensusParams(): ConsensusParams {
-  return {
-    block: undefined,
-    evidence: undefined,
-    validator: undefined,
-    version: undefined,
-  };
+  return { block: undefined, evidence: undefined, validator: undefined, version: undefined };
 }
 
 export const ConsensusParams = {
-  encode(
-    message: ConsensusParams,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: ConsensusParams, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.block !== undefined) {
       BlockParams.encode(message.block, writer.uint32(10).fork()).ldelim();
     }
     if (message.evidence !== undefined) {
-      EvidenceParams.encode(
-        message.evidence,
-        writer.uint32(18).fork()
-      ).ldelim();
+      EvidenceParams.encode(message.evidence, writer.uint32(18).fork()).ldelim();
     }
     if (message.validator !== undefined) {
-      ValidatorParams.encode(
-        message.validator,
-        writer.uint32(26).fork()
-      ).ldelim();
+      ValidatorParams.encode(message.validator, writer.uint32(26).fork()).ldelim();
     }
     if (message.version !== undefined) {
       VersionParams.encode(message.version, writer.uint32(34).fork()).ldelim();
@@ -118,8 +106,7 @@ export const ConsensusParams = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): ConsensusParams {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseConsensusParams();
     while (reader.pos < end) {
@@ -164,18 +151,10 @@ export const ConsensusParams = {
 
   fromJSON(object: any): ConsensusParams {
     return {
-      block: isSet(object.block)
-        ? BlockParams.fromJSON(object.block)
-        : undefined,
-      evidence: isSet(object.evidence)
-        ? EvidenceParams.fromJSON(object.evidence)
-        : undefined,
-      validator: isSet(object.validator)
-        ? ValidatorParams.fromJSON(object.validator)
-        : undefined,
-      version: isSet(object.version)
-        ? VersionParams.fromJSON(object.version)
-        : undefined,
+      block: isSet(object.block) ? BlockParams.fromJSON(object.block) : undefined,
+      evidence: isSet(object.evidence) ? EvidenceParams.fromJSON(object.evidence) : undefined,
+      validator: isSet(object.validator) ? ValidatorParams.fromJSON(object.validator) : undefined,
+      version: isSet(object.version) ? VersionParams.fromJSON(object.version) : undefined,
     };
   },
 
@@ -201,22 +180,18 @@ export const ConsensusParams = {
   },
   fromPartial(object: DeepPartial<ConsensusParams>): ConsensusParams {
     const message = createBaseConsensusParams();
-    message.block =
-      object.block !== undefined && object.block !== null
-        ? BlockParams.fromPartial(object.block)
-        : undefined;
-    message.evidence =
-      object.evidence !== undefined && object.evidence !== null
-        ? EvidenceParams.fromPartial(object.evidence)
-        : undefined;
-    message.validator =
-      object.validator !== undefined && object.validator !== null
-        ? ValidatorParams.fromPartial(object.validator)
-        : undefined;
-    message.version =
-      object.version !== undefined && object.version !== null
-        ? VersionParams.fromPartial(object.version)
-        : undefined;
+    message.block = (object.block !== undefined && object.block !== null)
+      ? BlockParams.fromPartial(object.block)
+      : undefined;
+    message.evidence = (object.evidence !== undefined && object.evidence !== null)
+      ? EvidenceParams.fromPartial(object.evidence)
+      : undefined;
+    message.validator = (object.validator !== undefined && object.validator !== null)
+      ? ValidatorParams.fromPartial(object.validator)
+      : undefined;
+    message.version = (object.version !== undefined && object.version !== null)
+      ? VersionParams.fromPartial(object.version)
+      : undefined;
     return message;
   },
 };
@@ -226,10 +201,7 @@ function createBaseBlockParams(): BlockParams {
 }
 
 export const BlockParams = {
-  encode(
-    message: BlockParams,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: BlockParams, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.maxBytes !== 0) {
       writer.uint32(8).int64(message.maxBytes);
     }
@@ -240,8 +212,7 @@ export const BlockParams = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): BlockParams {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseBlockParams();
     while (reader.pos < end) {
@@ -304,18 +275,12 @@ function createBaseEvidenceParams(): EvidenceParams {
 }
 
 export const EvidenceParams = {
-  encode(
-    message: EvidenceParams,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: EvidenceParams, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.maxAgeNumBlocks !== 0) {
       writer.uint32(8).int64(message.maxAgeNumBlocks);
     }
     if (message.maxAgeDuration !== undefined) {
-      Duration.encode(
-        message.maxAgeDuration,
-        writer.uint32(18).fork()
-      ).ldelim();
+      Duration.encode(message.maxAgeDuration, writer.uint32(18).fork()).ldelim();
     }
     if (message.maxBytes !== 0) {
       writer.uint32(24).int64(message.maxBytes);
@@ -324,8 +289,7 @@ export const EvidenceParams = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): EvidenceParams {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEvidenceParams();
     while (reader.pos < end) {
@@ -363,12 +327,8 @@ export const EvidenceParams = {
 
   fromJSON(object: any): EvidenceParams {
     return {
-      maxAgeNumBlocks: isSet(object.maxAgeNumBlocks)
-        ? globalThis.Number(object.maxAgeNumBlocks)
-        : 0,
-      maxAgeDuration: isSet(object.maxAgeDuration)
-        ? Duration.fromJSON(object.maxAgeDuration)
-        : undefined,
+      maxAgeNumBlocks: isSet(object.maxAgeNumBlocks) ? globalThis.Number(object.maxAgeNumBlocks) : 0,
+      maxAgeDuration: isSet(object.maxAgeDuration) ? Duration.fromJSON(object.maxAgeDuration) : undefined,
       maxBytes: isSet(object.maxBytes) ? globalThis.Number(object.maxBytes) : 0,
     };
   },
@@ -393,10 +353,9 @@ export const EvidenceParams = {
   fromPartial(object: DeepPartial<EvidenceParams>): EvidenceParams {
     const message = createBaseEvidenceParams();
     message.maxAgeNumBlocks = object.maxAgeNumBlocks ?? 0;
-    message.maxAgeDuration =
-      object.maxAgeDuration !== undefined && object.maxAgeDuration !== null
-        ? Duration.fromPartial(object.maxAgeDuration)
-        : undefined;
+    message.maxAgeDuration = (object.maxAgeDuration !== undefined && object.maxAgeDuration !== null)
+      ? Duration.fromPartial(object.maxAgeDuration)
+      : undefined;
     message.maxBytes = object.maxBytes ?? 0;
     return message;
   },
@@ -407,10 +366,7 @@ function createBaseValidatorParams(): ValidatorParams {
 }
 
 export const ValidatorParams = {
-  encode(
-    message: ValidatorParams,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: ValidatorParams, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     for (const v of message.pubKeyTypes) {
       writer.uint32(10).string(v!);
     }
@@ -418,8 +374,7 @@ export const ValidatorParams = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): ValidatorParams {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseValidatorParams();
     while (reader.pos < end) {
@@ -472,10 +427,7 @@ function createBaseVersionParams(): VersionParams {
 }
 
 export const VersionParams = {
-  encode(
-    message: VersionParams,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: VersionParams, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.app !== 0) {
       writer.uint32(8).uint64(message.app);
     }
@@ -483,8 +435,7 @@ export const VersionParams = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): VersionParams {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseVersionParams();
     while (reader.pos < end) {
@@ -533,10 +484,7 @@ function createBaseHashedParams(): HashedParams {
 }
 
 export const HashedParams = {
-  encode(
-    message: HashedParams,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: HashedParams, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.blockMaxBytes !== 0) {
       writer.uint32(8).int64(message.blockMaxBytes);
     }
@@ -547,8 +495,7 @@ export const HashedParams = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): HashedParams {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseHashedParams();
     while (reader.pos < end) {
@@ -579,12 +526,8 @@ export const HashedParams = {
 
   fromJSON(object: any): HashedParams {
     return {
-      blockMaxBytes: isSet(object.blockMaxBytes)
-        ? globalThis.Number(object.blockMaxBytes)
-        : 0,
-      blockMaxGas: isSet(object.blockMaxGas)
-        ? globalThis.Number(object.blockMaxGas)
-        : 0,
+      blockMaxBytes: isSet(object.blockMaxBytes) ? globalThis.Number(object.blockMaxBytes) : 0,
+      blockMaxGas: isSet(object.blockMaxGas) ? globalThis.Number(object.blockMaxGas) : 0,
     };
   },
 
@@ -610,23 +553,12 @@ export const HashedParams = {
   },
 };
 
-type Builtin =
-  | Date
-  | Function
-  | Uint8Array
-  | string
-  | number
-  | boolean
-  | undefined;
+type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
-type DeepPartial<T> = T extends Builtin
-  ? T
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
+type DeepPartial<T> = T extends Builtin ? T
+  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
 function longToNumber(long: Long): number {

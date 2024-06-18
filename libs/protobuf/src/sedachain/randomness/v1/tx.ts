@@ -18,17 +18,15 @@ export interface MsgNewSeed {
 }
 
 /** The response message for submitting a new seed to the chain. */
-export interface MsgNewSeedResponse {}
+export interface MsgNewSeedResponse {
+}
 
 function createBaseMsgNewSeed(): MsgNewSeed {
   return { prover: "", pi: "", beta: "" };
 }
 
 export const MsgNewSeed = {
-  encode(
-    message: MsgNewSeed,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: MsgNewSeed, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.prover !== "") {
       writer.uint32(10).string(message.prover);
     }
@@ -42,8 +40,7 @@ export const MsgNewSeed = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgNewSeed {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgNewSeed();
     while (reader.pos < end) {
@@ -118,16 +115,12 @@ function createBaseMsgNewSeedResponse(): MsgNewSeedResponse {
 }
 
 export const MsgNewSeedResponse = {
-  encode(
-    _: MsgNewSeedResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(_: MsgNewSeedResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): MsgNewSeedResponse {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseMsgNewSeedResponse();
     while (reader.pos < end) {
@@ -178,37 +171,20 @@ export class MsgClientImpl implements Msg {
   NewSeed(request: MsgNewSeed): Promise<MsgNewSeedResponse> {
     const data = MsgNewSeed.encode(request).finish();
     const promise = this.rpc.request(this.service, "NewSeed", data);
-    return promise.then((data) =>
-      MsgNewSeedResponse.decode(_m0.Reader.create(data))
-    );
+    return promise.then((data) => MsgNewSeedResponse.decode(_m0.Reader.create(data)));
   }
 }
 
 interface Rpc {
-  request(
-    service: string,
-    method: string,
-    data: Uint8Array
-  ): Promise<Uint8Array>;
+  request(service: string, method: string, data: Uint8Array): Promise<Uint8Array>;
 }
 
-type Builtin =
-  | Date
-  | Function
-  | Uint8Array
-  | string
-  | number
-  | boolean
-  | undefined;
+type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
-type DeepPartial<T> = T extends Builtin
-  ? T
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
+type DeepPartial<T> = T extends Builtin ? T
+  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
 function isSet(value: any): boolean {

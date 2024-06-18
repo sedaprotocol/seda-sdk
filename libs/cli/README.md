@@ -52,8 +52,9 @@ npx seda-sdk wasm upload <INSERT_PATH_TO_WASM> --rpc <INSERT_SEDA_CHAIN_RPC>
 This will return the `wasm hash` which you can use for Data Requests.
 
 You can apply the following options:
-* --rpc - The SEDA chain RPC to use
-* --gas - The amount of gas to attach to the transaction (default: 100000)
+
+- --rpc - The SEDA chain RPC to use
+- --gas - The amount of gas to attach to the transaction (default: 100000)
 
 ## Data Request binary details
 
@@ -66,7 +67,8 @@ npx seda-sdk wasm show <INSERT_DR_WASM_BINRAY_ID> --rpc <INSERT_SEDA_CHAIN_RPC>
 ```
 
 You can apply the following options:
-* --rpc - The SEDA chain RPC to use
+
+- --rpc - The SEDA chain RPC to use
 
 ## List Data Request binaries
 
@@ -79,4 +81,5 @@ npx seda-sdk wasm list --rpc <INSERT_SEDA_CHAIN_RPC>
 ```
 
 You can apply the following options:
-* --rpc - The SEDA chain RPC to use
+
+- --rpc - The SEDA chain RPC to use

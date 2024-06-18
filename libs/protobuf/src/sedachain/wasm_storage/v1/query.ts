@@ -19,7 +19,8 @@ export interface QueryDataRequestWasmResponse {
 }
 
 /** The request message for QueryDataRequestWasms RPC. */
-export interface QueryDataRequestWasmsRequest {}
+export interface QueryDataRequestWasmsRequest {
+}
 
 /** The response message for QueryDataRequestWasms RPC. */
 export interface QueryDataRequestWasmsResponse {
@@ -37,7 +38,8 @@ export interface QueryOverlayWasmResponse {
 }
 
 /** The request message for QueryOverlayWasms RPC. */
-export interface QueryOverlayWasmsRequest {}
+export interface QueryOverlayWasmsRequest {
+}
 
 /** The response message for QueryOverlayWasms RPC. */
 export interface QueryOverlayWasmsResponse {
@@ -45,7 +47,8 @@ export interface QueryOverlayWasmsResponse {
 }
 
 /** The request message for QueryProxyContractRegistry RPC. */
-export interface QueryProxyContractRegistryRequest {}
+export interface QueryProxyContractRegistryRequest {
+}
 
 /** The response message for QueryProxyContractRegistry RPC. */
 export interface QueryProxyContractRegistryResponse {
@@ -57,22 +60,15 @@ function createBaseQueryDataRequestWasmRequest(): QueryDataRequestWasmRequest {
 }
 
 export const QueryDataRequestWasmRequest = {
-  encode(
-    message: QueryDataRequestWasmRequest,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: QueryDataRequestWasmRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.hash !== "") {
       writer.uint32(10).string(message.hash);
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): QueryDataRequestWasmRequest {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryDataRequestWasmRequest {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseQueryDataRequestWasmRequest();
     while (reader.pos < end) {
@@ -106,14 +102,10 @@ export const QueryDataRequestWasmRequest = {
     return obj;
   },
 
-  create(
-    base?: DeepPartial<QueryDataRequestWasmRequest>
-  ): QueryDataRequestWasmRequest {
+  create(base?: DeepPartial<QueryDataRequestWasmRequest>): QueryDataRequestWasmRequest {
     return QueryDataRequestWasmRequest.fromPartial(base ?? {});
   },
-  fromPartial(
-    object: DeepPartial<QueryDataRequestWasmRequest>
-  ): QueryDataRequestWasmRequest {
+  fromPartial(object: DeepPartial<QueryDataRequestWasmRequest>): QueryDataRequestWasmRequest {
     const message = createBaseQueryDataRequestWasmRequest();
     message.hash = object.hash ?? "";
     return message;
@@ -125,22 +117,15 @@ function createBaseQueryDataRequestWasmResponse(): QueryDataRequestWasmResponse 
 }
 
 export const QueryDataRequestWasmResponse = {
-  encode(
-    message: QueryDataRequestWasmResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: QueryDataRequestWasmResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.wasm !== undefined) {
       Wasm.encode(message.wasm, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): QueryDataRequestWasmResponse {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryDataRequestWasmResponse {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseQueryDataRequestWasmResponse();
     while (reader.pos < end) {
@@ -163,9 +148,7 @@ export const QueryDataRequestWasmResponse = {
   },
 
   fromJSON(object: any): QueryDataRequestWasmResponse {
-    return {
-      wasm: isSet(object.wasm) ? Wasm.fromJSON(object.wasm) : undefined,
-    };
+    return { wasm: isSet(object.wasm) ? Wasm.fromJSON(object.wasm) : undefined };
   },
 
   toJSON(message: QueryDataRequestWasmResponse): unknown {
@@ -176,19 +159,12 @@ export const QueryDataRequestWasmResponse = {
     return obj;
   },
 
-  create(
-    base?: DeepPartial<QueryDataRequestWasmResponse>
-  ): QueryDataRequestWasmResponse {
+  create(base?: DeepPartial<QueryDataRequestWasmResponse>): QueryDataRequestWasmResponse {
     return QueryDataRequestWasmResponse.fromPartial(base ?? {});
   },
-  fromPartial(
-    object: DeepPartial<QueryDataRequestWasmResponse>
-  ): QueryDataRequestWasmResponse {
+  fromPartial(object: DeepPartial<QueryDataRequestWasmResponse>): QueryDataRequestWasmResponse {
     const message = createBaseQueryDataRequestWasmResponse();
-    message.wasm =
-      object.wasm !== undefined && object.wasm !== null
-        ? Wasm.fromPartial(object.wasm)
-        : undefined;
+    message.wasm = (object.wasm !== undefined && object.wasm !== null) ? Wasm.fromPartial(object.wasm) : undefined;
     return message;
   },
 };
@@ -198,19 +174,12 @@ function createBaseQueryDataRequestWasmsRequest(): QueryDataRequestWasmsRequest 
 }
 
 export const QueryDataRequestWasmsRequest = {
-  encode(
-    _: QueryDataRequestWasmsRequest,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(_: QueryDataRequestWasmsRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): QueryDataRequestWasmsRequest {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryDataRequestWasmsRequest {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseQueryDataRequestWasmsRequest();
     while (reader.pos < end) {
@@ -234,14 +203,10 @@ export const QueryDataRequestWasmsRequest = {
     return obj;
   },
 
-  create(
-    base?: DeepPartial<QueryDataRequestWasmsRequest>
-  ): QueryDataRequestWasmsRequest {
+  create(base?: DeepPartial<QueryDataRequestWasmsRequest>): QueryDataRequestWasmsRequest {
     return QueryDataRequestWasmsRequest.fromPartial(base ?? {});
   },
-  fromPartial(
-    _: DeepPartial<QueryDataRequestWasmsRequest>
-  ): QueryDataRequestWasmsRequest {
+  fromPartial(_: DeepPartial<QueryDataRequestWasmsRequest>): QueryDataRequestWasmsRequest {
     const message = createBaseQueryDataRequestWasmsRequest();
     return message;
   },
@@ -252,22 +217,15 @@ function createBaseQueryDataRequestWasmsResponse(): QueryDataRequestWasmsRespons
 }
 
 export const QueryDataRequestWasmsResponse = {
-  encode(
-    message: QueryDataRequestWasmsResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: QueryDataRequestWasmsResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     for (const v of message.hashTypePairs) {
       writer.uint32(10).string(v!);
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): QueryDataRequestWasmsResponse {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryDataRequestWasmsResponse {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseQueryDataRequestWasmsResponse();
     while (reader.pos < end) {
@@ -305,14 +263,10 @@ export const QueryDataRequestWasmsResponse = {
     return obj;
   },
 
-  create(
-    base?: DeepPartial<QueryDataRequestWasmsResponse>
-  ): QueryDataRequestWasmsResponse {
+  create(base?: DeepPartial<QueryDataRequestWasmsResponse>): QueryDataRequestWasmsResponse {
     return QueryDataRequestWasmsResponse.fromPartial(base ?? {});
   },
-  fromPartial(
-    object: DeepPartial<QueryDataRequestWasmsResponse>
-  ): QueryDataRequestWasmsResponse {
+  fromPartial(object: DeepPartial<QueryDataRequestWasmsResponse>): QueryDataRequestWasmsResponse {
     const message = createBaseQueryDataRequestWasmsResponse();
     message.hashTypePairs = object.hashTypePairs?.map((e) => e) || [];
     return message;
@@ -324,22 +278,15 @@ function createBaseQueryOverlayWasmRequest(): QueryOverlayWasmRequest {
 }
 
 export const QueryOverlayWasmRequest = {
-  encode(
-    message: QueryOverlayWasmRequest,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: QueryOverlayWasmRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.hash !== "") {
       writer.uint32(10).string(message.hash);
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): QueryOverlayWasmRequest {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryOverlayWasmRequest {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseQueryOverlayWasmRequest();
     while (reader.pos < end) {
@@ -376,9 +323,7 @@ export const QueryOverlayWasmRequest = {
   create(base?: DeepPartial<QueryOverlayWasmRequest>): QueryOverlayWasmRequest {
     return QueryOverlayWasmRequest.fromPartial(base ?? {});
   },
-  fromPartial(
-    object: DeepPartial<QueryOverlayWasmRequest>
-  ): QueryOverlayWasmRequest {
+  fromPartial(object: DeepPartial<QueryOverlayWasmRequest>): QueryOverlayWasmRequest {
     const message = createBaseQueryOverlayWasmRequest();
     message.hash = object.hash ?? "";
     return message;
@@ -390,22 +335,15 @@ function createBaseQueryOverlayWasmResponse(): QueryOverlayWasmResponse {
 }
 
 export const QueryOverlayWasmResponse = {
-  encode(
-    message: QueryOverlayWasmResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: QueryOverlayWasmResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.wasm !== undefined) {
       Wasm.encode(message.wasm, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): QueryOverlayWasmResponse {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryOverlayWasmResponse {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseQueryOverlayWasmResponse();
     while (reader.pos < end) {
@@ -428,9 +366,7 @@ export const QueryOverlayWasmResponse = {
   },
 
   fromJSON(object: any): QueryOverlayWasmResponse {
-    return {
-      wasm: isSet(object.wasm) ? Wasm.fromJSON(object.wasm) : undefined,
-    };
+    return { wasm: isSet(object.wasm) ? Wasm.fromJSON(object.wasm) : undefined };
   },
 
   toJSON(message: QueryOverlayWasmResponse): unknown {
@@ -441,19 +377,12 @@ export const QueryOverlayWasmResponse = {
     return obj;
   },
 
-  create(
-    base?: DeepPartial<QueryOverlayWasmResponse>
-  ): QueryOverlayWasmResponse {
+  create(base?: DeepPartial<QueryOverlayWasmResponse>): QueryOverlayWasmResponse {
     return QueryOverlayWasmResponse.fromPartial(base ?? {});
   },
-  fromPartial(
-    object: DeepPartial<QueryOverlayWasmResponse>
-  ): QueryOverlayWasmResponse {
+  fromPartial(object: DeepPartial<QueryOverlayWasmResponse>): QueryOverlayWasmResponse {
     const message = createBaseQueryOverlayWasmResponse();
-    message.wasm =
-      object.wasm !== undefined && object.wasm !== null
-        ? Wasm.fromPartial(object.wasm)
-        : undefined;
+    message.wasm = (object.wasm !== undefined && object.wasm !== null) ? Wasm.fromPartial(object.wasm) : undefined;
     return message;
   },
 };
@@ -463,19 +392,12 @@ function createBaseQueryOverlayWasmsRequest(): QueryOverlayWasmsRequest {
 }
 
 export const QueryOverlayWasmsRequest = {
-  encode(
-    _: QueryOverlayWasmsRequest,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(_: QueryOverlayWasmsRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): QueryOverlayWasmsRequest {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryOverlayWasmsRequest {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseQueryOverlayWasmsRequest();
     while (reader.pos < end) {
@@ -499,14 +421,10 @@ export const QueryOverlayWasmsRequest = {
     return obj;
   },
 
-  create(
-    base?: DeepPartial<QueryOverlayWasmsRequest>
-  ): QueryOverlayWasmsRequest {
+  create(base?: DeepPartial<QueryOverlayWasmsRequest>): QueryOverlayWasmsRequest {
     return QueryOverlayWasmsRequest.fromPartial(base ?? {});
   },
-  fromPartial(
-    _: DeepPartial<QueryOverlayWasmsRequest>
-  ): QueryOverlayWasmsRequest {
+  fromPartial(_: DeepPartial<QueryOverlayWasmsRequest>): QueryOverlayWasmsRequest {
     const message = createBaseQueryOverlayWasmsRequest();
     return message;
   },
@@ -517,22 +435,15 @@ function createBaseQueryOverlayWasmsResponse(): QueryOverlayWasmsResponse {
 }
 
 export const QueryOverlayWasmsResponse = {
-  encode(
-    message: QueryOverlayWasmsResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: QueryOverlayWasmsResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     for (const v of message.hashTypePairs) {
       writer.uint32(10).string(v!);
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): QueryOverlayWasmsResponse {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryOverlayWasmsResponse {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseQueryOverlayWasmsResponse();
     while (reader.pos < end) {
@@ -570,14 +481,10 @@ export const QueryOverlayWasmsResponse = {
     return obj;
   },
 
-  create(
-    base?: DeepPartial<QueryOverlayWasmsResponse>
-  ): QueryOverlayWasmsResponse {
+  create(base?: DeepPartial<QueryOverlayWasmsResponse>): QueryOverlayWasmsResponse {
     return QueryOverlayWasmsResponse.fromPartial(base ?? {});
   },
-  fromPartial(
-    object: DeepPartial<QueryOverlayWasmsResponse>
-  ): QueryOverlayWasmsResponse {
+  fromPartial(object: DeepPartial<QueryOverlayWasmsResponse>): QueryOverlayWasmsResponse {
     const message = createBaseQueryOverlayWasmsResponse();
     message.hashTypePairs = object.hashTypePairs?.map((e) => e) || [];
     return message;
@@ -589,19 +496,12 @@ function createBaseQueryProxyContractRegistryRequest(): QueryProxyContractRegist
 }
 
 export const QueryProxyContractRegistryRequest = {
-  encode(
-    _: QueryProxyContractRegistryRequest,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(_: QueryProxyContractRegistryRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): QueryProxyContractRegistryRequest {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryProxyContractRegistryRequest {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseQueryProxyContractRegistryRequest();
     while (reader.pos < end) {
@@ -625,14 +525,10 @@ export const QueryProxyContractRegistryRequest = {
     return obj;
   },
 
-  create(
-    base?: DeepPartial<QueryProxyContractRegistryRequest>
-  ): QueryProxyContractRegistryRequest {
+  create(base?: DeepPartial<QueryProxyContractRegistryRequest>): QueryProxyContractRegistryRequest {
     return QueryProxyContractRegistryRequest.fromPartial(base ?? {});
   },
-  fromPartial(
-    _: DeepPartial<QueryProxyContractRegistryRequest>
-  ): QueryProxyContractRegistryRequest {
+  fromPartial(_: DeepPartial<QueryProxyContractRegistryRequest>): QueryProxyContractRegistryRequest {
     const message = createBaseQueryProxyContractRegistryRequest();
     return message;
   },
@@ -643,22 +539,15 @@ function createBaseQueryProxyContractRegistryResponse(): QueryProxyContractRegis
 }
 
 export const QueryProxyContractRegistryResponse = {
-  encode(
-    message: QueryProxyContractRegistryResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: QueryProxyContractRegistryResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.address !== "") {
       writer.uint32(10).string(message.address);
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): QueryProxyContractRegistryResponse {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryProxyContractRegistryResponse {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseQueryProxyContractRegistryResponse();
     while (reader.pos < end) {
@@ -681,9 +570,7 @@ export const QueryProxyContractRegistryResponse = {
   },
 
   fromJSON(object: any): QueryProxyContractRegistryResponse {
-    return {
-      address: isSet(object.address) ? globalThis.String(object.address) : "",
-    };
+    return { address: isSet(object.address) ? globalThis.String(object.address) : "" };
   },
 
   toJSON(message: QueryProxyContractRegistryResponse): unknown {
@@ -694,14 +581,10 @@ export const QueryProxyContractRegistryResponse = {
     return obj;
   },
 
-  create(
-    base?: DeepPartial<QueryProxyContractRegistryResponse>
-  ): QueryProxyContractRegistryResponse {
+  create(base?: DeepPartial<QueryProxyContractRegistryResponse>): QueryProxyContractRegistryResponse {
     return QueryProxyContractRegistryResponse.fromPartial(base ?? {});
   },
-  fromPartial(
-    object: DeepPartial<QueryProxyContractRegistryResponse>
-  ): QueryProxyContractRegistryResponse {
+  fromPartial(object: DeepPartial<QueryProxyContractRegistryResponse>): QueryProxyContractRegistryResponse {
     const message = createBaseQueryProxyContractRegistryResponse();
     message.address = object.address ?? "";
     return message;
@@ -711,25 +594,15 @@ export const QueryProxyContractRegistryResponse = {
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** DataRequestWasm returns Data Request Wasm given its hash. */
-  DataRequestWasm(
-    request: QueryDataRequestWasmRequest
-  ): Promise<QueryDataRequestWasmResponse>;
+  DataRequestWasm(request: QueryDataRequestWasmRequest): Promise<QueryDataRequestWasmResponse>;
   /** DataRequestWasms returns all Data Request Wasms. */
-  DataRequestWasms(
-    request: QueryDataRequestWasmsRequest
-  ): Promise<QueryDataRequestWasmsResponse>;
+  DataRequestWasms(request: QueryDataRequestWasmsRequest): Promise<QueryDataRequestWasmsResponse>;
   /** OverlayWasm returns Overlay Wasm given its hash. */
-  OverlayWasm(
-    request: QueryOverlayWasmRequest
-  ): Promise<QueryOverlayWasmResponse>;
+  OverlayWasm(request: QueryOverlayWasmRequest): Promise<QueryOverlayWasmResponse>;
   /** OverlayWasms returns all Overlay Wasms. */
-  OverlayWasms(
-    request: QueryOverlayWasmsRequest
-  ): Promise<QueryOverlayWasmsResponse>;
+  OverlayWasms(request: QueryOverlayWasmsRequest): Promise<QueryOverlayWasmsResponse>;
   /** ProxyContractRegistry returns the Proxy Contract Registry address. */
-  ProxyContractRegistry(
-    request: QueryProxyContractRegistryRequest
-  ): Promise<QueryProxyContractRegistryResponse>;
+  ProxyContractRegistry(request: QueryProxyContractRegistryRequest): Promise<QueryProxyContractRegistryResponse>;
 }
 
 export const QueryServiceName = "sedachain.wasm_storage.v1.Query";
@@ -745,86 +618,47 @@ export class QueryClientImpl implements Query {
     this.OverlayWasms = this.OverlayWasms.bind(this);
     this.ProxyContractRegistry = this.ProxyContractRegistry.bind(this);
   }
-  DataRequestWasm(
-    request: QueryDataRequestWasmRequest
-  ): Promise<QueryDataRequestWasmResponse> {
+  DataRequestWasm(request: QueryDataRequestWasmRequest): Promise<QueryDataRequestWasmResponse> {
     const data = QueryDataRequestWasmRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "DataRequestWasm", data);
-    return promise.then((data) =>
-      QueryDataRequestWasmResponse.decode(_m0.Reader.create(data))
-    );
+    return promise.then((data) => QueryDataRequestWasmResponse.decode(_m0.Reader.create(data)));
   }
 
-  DataRequestWasms(
-    request: QueryDataRequestWasmsRequest
-  ): Promise<QueryDataRequestWasmsResponse> {
+  DataRequestWasms(request: QueryDataRequestWasmsRequest): Promise<QueryDataRequestWasmsResponse> {
     const data = QueryDataRequestWasmsRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "DataRequestWasms", data);
-    return promise.then((data) =>
-      QueryDataRequestWasmsResponse.decode(_m0.Reader.create(data))
-    );
+    return promise.then((data) => QueryDataRequestWasmsResponse.decode(_m0.Reader.create(data)));
   }
 
-  OverlayWasm(
-    request: QueryOverlayWasmRequest
-  ): Promise<QueryOverlayWasmResponse> {
+  OverlayWasm(request: QueryOverlayWasmRequest): Promise<QueryOverlayWasmResponse> {
     const data = QueryOverlayWasmRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "OverlayWasm", data);
-    return promise.then((data) =>
-      QueryOverlayWasmResponse.decode(_m0.Reader.create(data))
-    );
+    return promise.then((data) => QueryOverlayWasmResponse.decode(_m0.Reader.create(data)));
   }
 
-  OverlayWasms(
-    request: QueryOverlayWasmsRequest
-  ): Promise<QueryOverlayWasmsResponse> {
+  OverlayWasms(request: QueryOverlayWasmsRequest): Promise<QueryOverlayWasmsResponse> {
     const data = QueryOverlayWasmsRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "OverlayWasms", data);
-    return promise.then((data) =>
-      QueryOverlayWasmsResponse.decode(_m0.Reader.create(data))
-    );
+    return promise.then((data) => QueryOverlayWasmsResponse.decode(_m0.Reader.create(data)));
   }
 
-  ProxyContractRegistry(
-    request: QueryProxyContractRegistryRequest
-  ): Promise<QueryProxyContractRegistryResponse> {
+  ProxyContractRegistry(request: QueryProxyContractRegistryRequest): Promise<QueryProxyContractRegistryResponse> {
     const data = QueryProxyContractRegistryRequest.encode(request).finish();
-    const promise = this.rpc.request(
-      this.service,
-      "ProxyContractRegistry",
-      data
-    );
-    return promise.then((data) =>
-      QueryProxyContractRegistryResponse.decode(_m0.Reader.create(data))
-    );
+    const promise = this.rpc.request(this.service, "ProxyContractRegistry", data);
+    return promise.then((data) => QueryProxyContractRegistryResponse.decode(_m0.Reader.create(data)));
   }
 }
 
 interface Rpc {
-  request(
-    service: string,
-    method: string,
-    data: Uint8Array
-  ): Promise<Uint8Array>;
+  request(service: string, method: string, data: Uint8Array): Promise<Uint8Array>;
 }
 
-type Builtin =
-  | Date
-  | Function
-  | Uint8Array
-  | string
-  | number
-  | boolean
-  | undefined;
+type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
-type DeepPartial<T> = T extends Builtin
-  ? T
-  : T extends globalThis.Array<infer U>
-  ? globalThis.Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
+type DeepPartial<T> = T extends Builtin ? T
+  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
 function isSet(value: any): boolean {
