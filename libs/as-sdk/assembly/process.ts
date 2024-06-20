@@ -1,6 +1,69 @@
+import {
+  args_get,
+  args_sizes_get,
+  environ_get,
+  environ_sizes_get,
+} from "@assemblyscript/wasi-shim/assembly/bindings/wasi_snapshot_preview1";
 import { VM_MODE_TALLY, VM_MODE_DR, VM_MODE_ENV_KEY } from "./vm-modes";
 import { Process as WasiProcess, CommandLine, Environ } from "as-wasi/assembly";
 import { execution_result } from "./bindings/seda_v1";
+
+const tempbuf = memory.data(4 * sizeof<usize>());
+
+function errnoToString(errno: u16): string {
+  return errno.toString();
+}
+
+function lazyArgv(): string[] {
+  let err = args_sizes_get(tempbuf, tempbuf + sizeof<usize>());
+  if (err) throw new Error(errnoToString(err));
+  let count = load<usize>(tempbuf);
+  let ptrsSize = count * sizeof<usize>();
+  let dataSize = load<usize>(tempbuf, sizeof<usize>());
+  let bufSize = ptrsSize + dataSize;
+  let buf = __alloc(bufSize);
+  err = args_get(buf, buf + ptrsSize);
+  if (err) throw new Error(errnoToString(err));
+  let count32 = <i32>count;
+  let argv = new Array<string>(count32);
+  for (let i = 0; i < count32; ++i) {
+    let ptr = load<usize>(buf + i * sizeof<usize>());
+    let str = String.UTF8.decodeUnsafe(ptr, ptr + bufSize - buf, true);
+    argv[i] = str;
+  }
+  __free(buf);
+  return argv;
+}
+
+function lazyEnv(): Map<string, string> {
+  let err = environ_sizes_get(tempbuf, tempbuf + 4);
+  if (err) throw new Error(errnoToString(err));
+  let count = load<usize>(tempbuf);
+  let ptrsSize = count * sizeof<usize>();
+  let dataSize = load<usize>(tempbuf, sizeof<usize>());
+  let bufSize = ptrsSize + dataSize;
+  let buf = __alloc(bufSize);
+  err = environ_get(buf, buf + ptrsSize);
+  if (err) throw new Error(errnoToString(err));
+  let env = new Map<string, string>();
+  for (let i: usize = 0; i < count; ++i) {
+    let ptr = load<usize>(buf + i * sizeof<usize>());
+    let str = String.UTF8.decodeUnsafe(ptr, ptr + bufSize - buf, true);
+    let pos = str.indexOf("=");
+    if (~pos) {
+      env.set(str.substring(0, pos), str.substring(pos + 1));
+      // __dispose(changetype<usize>(str));
+    } else {
+      env.set(str, "");
+    }
+  }
+  __free(buf);
+  return env;
+}
+
+@lazy export const argv = lazyArgv();
+  // @ts-ignore: decorator
+@lazy export const env = lazyEnv();
 
 export default class Process {
   /**
@@ -15,7 +78,8 @@ export default class Process {
    * ```
    */
   static args(): string[] {
-    return CommandLine.all;
+    // return CommandLine.all;
+    return argv;
   }
 
   /**
@@ -30,14 +94,22 @@ export default class Process {
    * ```
    */
   static envs(): Map<string, string> {
-    const result: Map<string, string> = new Map();
+    // const result: Map<string, string> = new Map();
+    // const envs = Environ.all;
 
-    for (let i: i32 = 0; i < Environ.all.length; i++) {
-      const entry = Environ.all[i];
-      result.set(entry.key, entry.value);
-    }
+    // for (let index = 0; index < envs.length; index++) {
+    //   const element = envs[index];
+    //   console.log(element.key + "=" + element.value);
+    //   result.set(element.key, element.value);
+    // }
 
-    return result;
+    // for (let i: i32 = 0; i < Environ.all.length; i++) {
+    //   const entry = Environ.all[i];
+    //   result.set(entry.key, entry.value);
+    // }
+
+    // return result;
+    return env;
   }
 
   /**

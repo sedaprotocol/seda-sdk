@@ -23,18 +23,26 @@ export class RevealResult {
 
 export default class Tally {
   static getReveals(): RevealResult[] {
+    // const args = Process.args();
+    // for (let index = 0; index < args.length; index++) {
+    //   const element = args[index];
+    //   console.log(
+    //     "Yooo kijk eens naar mij: " + index.toString() + ":" + element
+    //   );
+    // }
+
     const encodedReveals = Process.args().at(REVEALS_ARGUMENT_POSITION);
-    console.log('[DEBUG]: encodedReveals');
+    console.log("[DEBUG]: encodedReveals");
     console.log(encodedReveals);
     const reveals = JSON.parse<RevealBody[]>(encodedReveals);
-    console.log('[DEBUG]: reveals');
+    console.log("[DEBUG]: reveals");
     console.log(JSON.stringify(reveals));
 
     const encodedConsensus = Process.args().at(CONSENSUS_ARGUMENT_POSITION);
-    console.log('[DEBUG]: encodedConsensus');
+    console.log("[DEBUG]: encodedConsensus");
     console.log(encodedConsensus);
     const consensus = JSON.parse<u8[]>(encodedConsensus);
-    console.log('[DEBUG]: consensus');
+    console.log("[DEBUG]: consensus");
     console.log(JSON.stringify(consensus));
 
     const revealsAmount = reveals.length;
