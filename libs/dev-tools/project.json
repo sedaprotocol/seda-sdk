@@ -1,0 +1,34 @@
+{
+  "name": "dev-tools",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/dev-tools/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "build-cli": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "bun run build:cli",
+        "cwd": "libs/dev-tools"
+      }
+    },
+    "build-lib": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "bun run build:lib",
+        "cwd": "libs/dev-tools"
+      }
+    },
+    "build": {},
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "bun test",
+        "cwd": "libs/dev-tools"
+      }
+    }
+  }
+}

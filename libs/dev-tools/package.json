@@ -1,0 +1,24 @@
+{
+  "name": "@seda-protocol/dev-tools",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "build:cli": "bun build src/cli/index.ts --target node --outdir bin",
+    "build:lib": "bun build src/index.ts --target node --outdir build",
+    "build": "bun run build:cli && bun run build:lib",
+    "prepublish": "bun run build"
+  },
+  "bin": {
+    "seda-sdk": "bin/index.js"
+  },
+  "main": "build/index.js",
+  "dependencies": {
+    "@cosmjs/cosmwasm-stargate": "^0.32.3",
+    "@cosmjs/crypto": "^0.32.3",
+    "@cosmjs/proto-signing": "^0.32.3",
+    "@cosmjs/stargate": "^0.32.3",
+    "@cosmjs/tendermint-rpc": "^0.32.3",
+    "dotenv": "^16.3.1",
+    "true-myth": "^7.3.0"
+  }
+}
