@@ -43,10 +43,11 @@
     "@nx/eslint": "19.3.0"
   },
   "dependencies": {
-    "@cosmjs/cli": "^0.31.1",
-    "@cosmjs/crypto": "^0.31.1",
-    "@cosmjs/proto-signing": "^0.31.1",
-    "@cosmjs/stargate": "^0.31.1",
+    "@cosmjs/cli": "^0.32.3",
+    "@cosmjs/cosmwasm-stargate": "^0.32.3",
+    "@cosmjs/crypto": "^0.32.3",
+    "@cosmjs/proto-signing": "^0.32.3",
+    "@cosmjs/stargate": "^0.32.3",
     "@types/node-gzip": "^1.1.1",
     "@wasmer/wasi": "^1.2.2",
     "as-wasi": "^0.6.0",
@@ -59,6 +60,7 @@
     "node-gzip": "^1.1.2",
     "ora": "^7.0.1",
     "protobufjs": "^7.2.5",
+    "true-myth": "^7.3.0",
     "tslib": "^2.3.0"
   }
 }
