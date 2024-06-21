@@ -1,7 +1,16 @@
-import { JSON } from 'assemblyscript-json/assembly';
+import { JSON } from 'json-as/assembly';
 import { call_result_write, http_fetch } from './bindings/seda_v1';
 import { jsonArrToUint8Array } from './json-utils';
 import { PromiseStatus, FromBuffer } from './promise';
+
+@json
+class InnerResponse {
+  bytes!: u8[];
+  content_length!: i64;
+  status!: i64;
+  url!: string;
+  headers!: Map<string, string>;
+}
 
 /**
  * Response of an httpFetch call
@@ -34,36 +43,34 @@ export class HttpResponse implements FromBuffer<HttpResponse> {
 
   fromBuffer(buffer: Uint8Array): HttpResponse {
     const response = new HttpResponse();
-    const value = <JSON.Obj>JSON.parse(buffer);
+    const value = JSON.parse<InnerResponse>(String.UTF8.decode(buffer.buffer));
 
-    const rawResponseBytes = value.getArr('bytes');
-    if (rawResponseBytes) {
-      response.bytes = jsonArrToUint8Array(rawResponseBytes);
+    if (value.bytes) {
+      response.bytes = jsonArrToUint8Array(<u8[]>value.bytes);
     }
 
-    const rawContentLength = value.getInteger('content_length');
-    if (rawContentLength) {
-      response.contentLength = rawContentLength.valueOf();
+    if (value.content_length) {
+      response.contentLength = value.content_length;
     }
 
-    const rawStatus = value.getInteger('status');
-    if (rawStatus) {
-      response.status = rawStatus.valueOf();
+    if (value.status) {
+      response.status = value.status;
     }
 
-    const rawUrl = value.getString('url');
-    if (rawUrl) {
-      response.url = rawUrl.valueOf();
+    if (value.url) {
+      response.url = <string>value.url;
     }
 
-    const rawHeaders = value.getObj('headers');
+    const rawHeaders = value.headers;
     if (rawHeaders) {
-      for (let i = 0; i < rawHeaders.keys.length; i++) {
-        const key = rawHeaders.keys[i];
-        const value = rawHeaders.getString(key);
+      const keys = rawHeaders.keys();
+      const values = rawHeaders.values();
+      for (let i = 0; i < keys.length; i++) {
+        const key = keys[i];
+        const value = values[i];
 
         if (value) {
-          response.headers.set(key, value.valueOf());
+          response.headers.set(key, value);
         }
       }
     }
@@ -91,6 +98,7 @@ export type HttpFetchMethod = string;
  * const response = httpFetch("https://swapi.dev/api/planets/1/", options);
  * ```
  */
+@json
 export class HttpFetchOptions {
   /**
    * HTTP Method (Get, Post, Patch, etc.)
@@ -107,35 +115,9 @@ export class HttpFetchOptions {
    * Body encoded in bytes to send along in a POST, PATCH, etc.
    */
   body: Uint8Array | null = null;
-
-  /**
-   * Converts the class to an object (internal use)
-   *
-   * @returns {JSON.Obj} A JSON object
-   */
-  toObject(): JSON.Obj {
-    const obj = JSON.Value.Object();
-    const headers = JSON.Value.Object();
-    const headerKeys = this.headers.keys();
-
-    for (let i = 0; i < headerKeys.length; i++) {
-      const headerKey = headerKeys[i];
-      const headerValue = this.headers.get(headerKey);
-
-      headers.set(headerKey, headerValue);
-    }
-
-    obj.set('headers', headers);
-    obj.set('method', this.method);
-
-    if (this.body !== null) {
-      obj.set('body', this.body);
-    }
-
-    return obj;
-  }
 }
 
+@json
 class HttpFetch {
   url: string;
   options: HttpFetchOptions;
@@ -143,19 +125,6 @@ class HttpFetch {
   constructor(url: string, options: HttpFetchOptions = new HttpFetchOptions()) {
     this.url = url;
     this.options = options;
-  }
-
-  toObject(): JSON.Obj {
-    const obj = JSON.Value.Object();
-
-    obj.set('url', this.url);
-    obj.set('options', this.options.toObject());
-
-    return obj;
-  }
-
-  toString(): string {
-    return this.toObject().toString();
   }
 }
 
@@ -183,7 +152,7 @@ export function httpFetch(
   options: HttpFetchOptions = new HttpFetchOptions()
 ): PromiseStatus<HttpResponse, HttpResponse> {
   const action = new HttpFetch(url, options);
-  const actionStr = action.toString();
+  const actionStr = JSON.stringify(action);
 
   const buffer = String.UTF8.encode(actionStr);
   const utf8ptr = changetype<usize>(buffer);
