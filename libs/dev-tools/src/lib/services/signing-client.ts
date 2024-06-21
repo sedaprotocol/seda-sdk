@@ -2,7 +2,7 @@ import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate';
 import { Registry } from '@cosmjs/proto-signing';
 import { defaultRegistryTypes } from '@cosmjs/stargate';
 import { Result } from 'true-myth';
-import { sedachain } from '@seda/protobuf';
+import { sedachain } from '../../../gen';
 import { tryAsync } from '../utils/try-async';
 import { ISigner } from './signer';
 

@@ -8,21 +8,32 @@
     "lint": {
       "executor": "@nx/eslint:lint"
     },
+    "generate-proto": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "libs/dev-tools/proto",
+        "command": "bunx buf generate"
+      }
+    },
     "build-cli": {
       "executor": "nx:run-commands",
       "options": {
         "command": "bun run build:cli",
         "cwd": "libs/dev-tools"
-      }
+      },
+      "dependsOn": [{ "target": "generate-proto" }]
     },
     "build-lib": {
       "executor": "nx:run-commands",
       "options": {
         "command": "bun run build:lib",
         "cwd": "libs/dev-tools"
-      }
+      },
+      "dependsOn": [{ "target": "generate-proto" }]
     },
-    "build": {},
+    "build": {
+      "dependsOn": [{ "target": "generate-proto" }]
+    },
     "test": {
       "executor": "nx:run-commands",
       "options": {

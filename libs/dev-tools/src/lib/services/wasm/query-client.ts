@@ -1,4 +1,4 @@
-import { sedachain } from '@seda/protobuf';
+import { sedachain } from '../../../../gen';
 import { createQueryClient } from '../query-client';
 import { QueryConfig } from '../config';
 
