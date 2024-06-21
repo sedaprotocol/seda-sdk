@@ -1,5 +1,5 @@
 import { VM_MODE_TALLY, VM_MODE_DR, VM_MODE_ENV_KEY } from './vm-modes';
-import { Process as WasiProcess, CommandLine, Environ } from 'as-wasi/assembly';
+import { wasi_process } from '@assemblyscript/wasi-shim/assembly/wasi_process';
 import { execution_result } from './bindings/seda_v1';
 
 export default class Process {
@@ -15,7 +15,7 @@ export default class Process {
    * ```
    */
   static args(): string[] {
-    return CommandLine.all;
+    return wasi_process.argv;
   }
 
   /**
@@ -30,14 +30,7 @@ export default class Process {
    * ```
    */
   static envs(): Map<string, string> {
-    const result: Map<string, string> = new Map();
-
-    for (let i: i32 = 0; i < Environ.all.length; i++) {
-      const entry = Environ.all[i];
-      result.set(entry.key, entry.value);
-    }
-
-    return result;
+    return wasi_process.env;
   }
 
   /**
@@ -112,7 +105,7 @@ export default class Process {
     const bufferPtr = changetype<usize>(buffer);
 
     execution_result(bufferPtr, buffer.byteLength);
-    WasiProcess.exit(u32(code));
+    wasi_process.exit(u32(code));
   }
 
   /**
