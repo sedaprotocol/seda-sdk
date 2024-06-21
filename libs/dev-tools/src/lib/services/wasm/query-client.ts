@@ -1,4 +1,4 @@
-import { sedachain } from '../../../../gen';
+import { sedachain } from '@dev-tools/proto';
 import { createQueryClient } from '../query-client';
 import { QueryConfig } from '../config';
 

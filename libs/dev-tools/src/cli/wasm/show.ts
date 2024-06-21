@@ -5,10 +5,10 @@ import {
   spinnerError,
   spinnerSuccess,
   updateSpinnerText,
-} from '../utils/spinner';
-import { createWasmQueryClient } from '../../lib/services/wasm/query-client';
-import { buildQueryConfig } from '../../lib/services/config';
-import { tryAsync } from '../../lib/utils/try-async';
+} from '@dev-tools/cli-utils/spinner';
+import { createWasmQueryClient } from '@dev-tools/services/wasm/query-client';
+import { buildQueryConfig } from '@dev-tools/services/config';
+import { tryAsync } from '@dev-tools/utils/try-async';
 
 export const show = new Command('show');
 show.description('show a Data Request WASM binary in the SEDA chain');

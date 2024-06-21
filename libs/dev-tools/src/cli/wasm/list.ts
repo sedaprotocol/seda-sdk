@@ -1,8 +1,11 @@
 import { Command } from 'commander';
 
-import { spinnerSuccess, updateSpinnerText } from '../utils/spinner';
-import { createWasmQueryClient } from '../../lib/services/wasm/query-client';
-import { buildQueryConfig } from '../../lib/services/config';
+import {
+  spinnerSuccess,
+  updateSpinnerText,
+} from '@dev-tools/cli-utils/spinner';
+import { createWasmQueryClient } from '@dev-tools/services/wasm/query-client';
+import { buildQueryConfig } from '@dev-tools/services/config';
 
 export const list = new Command('list');
 list.description('list existing Data Request WASM binaries in the SEDA chain');

@@ -5,15 +5,15 @@ import {
   spinnerError,
   spinnerSuccess,
   updateSpinnerText,
-} from '../utils/spinner';
+} from '@dev-tools/cli-utils/spinner';
 import {
   addGasOptionsToCommand,
   getGasOptionsFromCommand,
-} from '../utils/gas-options-commands';
-import { uploadWasmBinary } from '../../lib/services/wasm/upload-wasm-binary';
-import { tryAsync } from '../../lib/utils/try-async';
-import { Signer } from '../../lib/services/signer';
-import { buildSigningConfig } from '../../lib/services/config';
+} from '@dev-tools/cli-utils/gas-options-commands';
+import { uploadWasmBinary } from '@dev-tools/services/wasm/upload-wasm-binary';
+import { tryAsync } from '@dev-tools/utils/try-async';
+import { Signer } from '@dev-tools/services/signer';
+import { buildSigningConfig } from '@dev-tools/services/config';
 
 export const upload = new Command('upload');
 upload.description('upload a Data Request WASM binary to the SEDA chain.');

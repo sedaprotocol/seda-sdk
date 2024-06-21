@@ -1,5 +1,5 @@
 import { Maybe } from 'true-myth';
-import { getEnvOrFail } from '../utils/get-env';
+import { getEnvOrFail } from '@dev-tools/utils/get-env';
 
 export const RPC_ENV_KEY = 'SEDA_RPC_ENDPOINT';
 const MNEMONIC_ENV_KEY = 'SEDA_MNEMONIC';

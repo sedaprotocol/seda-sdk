@@ -2,8 +2,8 @@ import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate';
 import { Registry } from '@cosmjs/proto-signing';
 import { defaultRegistryTypes } from '@cosmjs/stargate';
 import { Result } from 'true-myth';
-import { sedachain } from '../../../gen';
-import { tryAsync } from '../utils/try-async';
+import { sedachain } from '@dev-tools/proto';
+import { tryAsync } from '@dev-tools/utils/try-async';
 import { ISigner } from './signer';
 
 export async function createSigningClient(

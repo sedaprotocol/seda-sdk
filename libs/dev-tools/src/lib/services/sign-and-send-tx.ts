@@ -2,7 +2,7 @@ import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate';
 import { EncodeObject } from '@cosmjs/proto-signing';
 import { DeliverTxResponse, StdFee } from '@cosmjs/stargate';
 import { Result, ResultNS } from 'true-myth';
-import { tryAsync } from '../utils/try-async';
+import { tryAsync } from '@dev-tools/utils/try-async';
 import {
   type GasOptions,
   DEFAULT_ADJUSTMENT_FACTOR,

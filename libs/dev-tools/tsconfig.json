@@ -2,7 +2,14 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "rootDirs": [".", "../../"],
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "paths": {
+      "@dev-tools/proto": ["./gen"],
+      "@dev-tools/utils/*": ["./src/lib/utils/*"],
+      "@dev-tools/services/*": ["./src/lib/services/*"],
+      "@dev-tools/cli-utils/*": ["./src/cli/utils/*"]
+    }
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts", "gen/**/*.ts"]
 }

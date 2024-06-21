@@ -1,6 +1,6 @@
 import { Result } from 'true-myth';
 import { gzip } from 'node-gzip';
-import { sedachain } from '../../../../gen';
+import { sedachain } from '@dev-tools/proto';
 import { createSigningClient } from '../signing-client';
 import { signAndSendTx } from '../sign-and-send-tx';
 import type { GasOptions } from '../gas-options';
@@ -8,7 +8,7 @@ import type { ISigner } from '../signer';
 
 export async function uploadWasmBinary(
   signer: ISigner,
-  wasmBinary: ArrayBuffer,
+  wasmBinary: Buffer,
   gasOptions: GasOptions
 ): Promise<Result<{ tx: string; wasmHash: string }, unknown>> {
   const sigingClientResult = await createSigningClient(signer);

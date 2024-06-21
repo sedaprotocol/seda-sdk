@@ -4,7 +4,7 @@ import {
   DEFAULT_ADJUSTMENT_FACTOR,
   DEFAULT_GAS,
   DEFAULT_GAS_PRICE,
-} from '../../lib/services/gas-options';
+} from '@dev-tools/services/gas-options';
 
 export function addGasOptionsToCommand(command: Command): Command {
   command.option(
