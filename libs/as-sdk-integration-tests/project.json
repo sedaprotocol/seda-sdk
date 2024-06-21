@@ -13,10 +13,9 @@
       }
     },
     "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "executor": "nx:run-commands",
       "options": {
-        "jestConfig": "libs/as-sdk-integration-tests/jest.config.ts"
+        "command": "bun test libs/as-sdk-integration-tests/"
       },
       "dependsOn": [
         {

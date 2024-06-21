@@ -1,4 +1,5 @@
-import { TallyVmAdapter, callVm } from '../../../dist/libs/vm/src/index';
+import { expect, describe, it } from 'bun:test';
+import { TallyVmAdapter, callVm } from '../../../dist/libs/vm/src/index.js';
 import { readFile } from 'node:fs/promises';
 
 describe('TallyVm', () => {
@@ -88,7 +89,9 @@ describe('TallyVm', () => {
     );
 
     expect(result.exitCode).toBe(255);
-    expect(result.stderr.length).toBeGreaterThan(1);
+    expect(result.stderr).toInclude(
+      'abort: Number of reveals (2) does not equal number of consensus reports (1)'
+    );
   });
 
   it('should be able to parse the reveals', async () => {
