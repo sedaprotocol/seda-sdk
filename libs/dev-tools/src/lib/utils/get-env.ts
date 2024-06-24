@@ -5,7 +5,7 @@ config();
 config({ path: `${process.cwd}/.env` });
 
 export function getEnvOrFail(key: string): string {
-  return Maybe.of(process.env[key]).match({
+  return getEnv(key).match({
     Just(value) {
       return value;
     },
@@ -13,4 +13,8 @@ export function getEnvOrFail(key: string): string {
       throw new Error(`No environment variable "${key}" found.`);
     },
   });
+}
+
+export function getEnv(key: string): Maybe<string> {
+  return Maybe.of(process.env[key]);
 }
