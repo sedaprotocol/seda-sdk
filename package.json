@@ -47,6 +47,7 @@
     "@types/node-gzip": "^1.1.1",
     "@wasmer/wasi": "^1.2.2",
     "commander": "^11.0.0",
+    "cosmjs-types": "^0.9.0",
     "dotenv": "^16.3.1",
     "figlet": "^1.6.0",
     "json-as": "^0.9.6",

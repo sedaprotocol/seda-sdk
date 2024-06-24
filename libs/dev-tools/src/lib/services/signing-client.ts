@@ -1,4 +1,5 @@
 import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate';
+import { MsgExecuteContractResponse } from 'cosmjs-types/cosmwasm/wasm/v1/tx';
 import { Result } from 'true-myth';
 import { sedachain } from '@dev-tools/proto';
 import { tryAsync } from '@dev-tools/utils/try-async';
@@ -22,6 +23,11 @@ export async function createSigningClient(
   signingClientResult.value.registry.register(
     '/sedachain.wasm_storage.v1.MsgStoreDataRequestWasm',
     sedachain.wasm_storage.v1.MsgStoreDataRequestWasm
+  );
+
+  signingClientResult.value.registry.register(
+    MsgExecuteContractResponse.typeUrl,
+    MsgExecuteContractResponse
   );
 
   return Result.ok({
