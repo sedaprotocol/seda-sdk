@@ -20,7 +20,7 @@ export async function signAndSendTx(
   const gasInput = gasOptions.gas ?? DEFAULT_GAS;
 
   let gas: bigint;
-  if (gasOptions.gas === 'auto') {
+  if (gasInput === 'auto') {
     const simulatedGas = await tryAsync(async () =>
       signingClient.simulate(address, messages, memo)
     );
