@@ -20,6 +20,7 @@
     "@cosmjs/tendermint-rpc": "^0.32.3",
     "dotenv": "^16.3.1",
     "node-gzip": "^1.1.2",
-    "true-myth": "^7.3.0"
+    "true-myth": "^7.3.0",
+    "valibot": "^0.35.0"
   }
 }
