@@ -18,7 +18,7 @@ export class RevealResult {
   exit_code!: u8;
   gas_used!: string;
   reveal!: u8[];
-  inConsensus!: u8;
+  in_consensus!: u8;
 }
 
 export default class Tally {
@@ -46,7 +46,7 @@ export default class Tally {
         gas_used: reveal.gas_used,
         reveal: reveal.reveal,
         salt: reveal.salt,
-        inConsensus: consensus.at(index),
+        in_consensus: consensus.at(index),
       });
     }
 
@@ -57,7 +57,7 @@ export default class Tally {
     const revealResults = Tally.getReveals();
 
     return revealResults.filter(
-      (revealResult) => revealResult.inConsensus === 0
+      (revealResult) => revealResult.in_consensus === 0
     );
   }
 }
