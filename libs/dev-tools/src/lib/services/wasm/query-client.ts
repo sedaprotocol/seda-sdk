@@ -1,8 +1,8 @@
 import { sedachain } from '@dev-tools/proto';
-import { createQueryClient } from '../query-client';
+import { createProtoQueryClient } from '../proto-query-client';
 import { QueryConfig } from '../config';
 
 export async function createWasmQueryClient(config: QueryConfig) {
-  const rpcClient = await createQueryClient(config);
-  return new sedachain.wasm_storage.v1.QueryClientImpl(rpcClient);
+  const protoRpcClient = await createProtoQueryClient(config);
+  return new sedachain.wasm_storage.v1.QueryClientImpl(protoRpcClient);
 }
