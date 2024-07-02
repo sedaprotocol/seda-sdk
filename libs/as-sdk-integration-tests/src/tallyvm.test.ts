@@ -1,5 +1,6 @@
 import { expect, describe, it } from 'bun:test';
 import { TallyVmAdapter, callVm } from '../../../dist/libs/vm/src/index.js';
+import { createMockTallyArgs, createMockReveal } from '@seda/dev-tools';
 import { readFile } from 'node:fs/promises';
 
 describe('TallyVm', () => {
@@ -59,18 +60,16 @@ describe('TallyVm', () => {
     );
 
     const reveals = [
-      {
-        salt: [5, 0, 1, 2, 3],
-        exit_code: 1,
-        gas_used: '200000',
-        reveal: [1, 2, 3, 3, 3, 3, 3],
-      },
-      {
-        salt: [5, 0, 1, 2, 3],
-        exit_code: 1,
-        gas_used: '1336',
-        reveal: [1, 2, 3, 3, 3, 3, 3],
-      },
+      createMockReveal({
+        exitCode: 0,
+        gasUsed: 200000,
+        result: JSON.stringify({ data: 'baby_shark' }),
+      }),
+      createMockReveal({
+        exitCode: 1,
+        gasUsed: 1336,
+        result: JSON.stringify({ data: 'grandpa_shark' }),
+      }),
     ];
     const consensus = [0];
 
@@ -99,29 +98,24 @@ describe('TallyVm', () => {
       'dist/libs/as-sdk-integration-tests/debug.wasm'
     );
 
-    const reveals = [
+    const args = createMockTallyArgs('testTallyVmReveals', [
       {
-        salt: [0, 1, 2, 3],
-        exit_code: 0,
-        gas_used: '200000',
-        reveal: [0, 2, 3, 3, 3, 3, 3],
+        exitCode: 0,
+        gasUsed: 200000,
+        result: JSON.stringify({ data: 'baby_shark' }),
+        inConsensus: true,
       },
       {
-        salt: [4, 1, 2, 3],
-        exit_code: 1,
-        gas_used: '1336',
-        reveal: [9, 2, 3, 3, 3, 3, 3],
+        exitCode: 1,
+        gasUsed: 1336,
+        result: JSON.stringify({ data: 'grandpa_shark' }),
+        inConsensus: true,
       },
-    ];
-    const consensus = [0, 0];
+    ]);
 
     const result = await callVm(
       {
-        args: [
-          'testTallyVmReveals',
-          JSON.stringify(reveals),
-          JSON.stringify(consensus),
-        ],
+        args,
         envs: {},
         binary: new Uint8Array(wasmBinary),
       },
@@ -131,7 +125,7 @@ describe('TallyVm', () => {
 
     expect(result.exitCode).toBe(0);
     expect(result.resultAsString).toBe(
-      '[{"salt":[0,1,2,3],"exit_code":0,"gas_used":"200000","reveal":[0,2,3,3,3,3,3],"inConsensus":0},{"salt":[4,1,2,3],"exit_code":1,"gas_used":"1336","reveal":[9,2,3,3,3,3,3],"inConsensus":0}]'
+      '[{"salt":[115,101,100,97,95,115,100,107],"exit_code":0,"gas_used":"200000","reveal":[123,34,100,97,116,97,34,58,34,98,97,98,121,95,115,104,97,114,107,34,125],"in_consensus":0},{"salt":[115,101,100,97,95,115,100,107],"exit_code":1,"gas_used":"1336","reveal":[123,34,100,97,116,97,34,58,34,103,114,97,110,100,112,97,95,115,104,97,114,107,34,125],"in_consensus":0}]'
     );
   });
 
@@ -140,35 +134,31 @@ describe('TallyVm', () => {
       'dist/libs/as-sdk-integration-tests/debug.wasm'
     );
 
-    const reveals = [
+    const args = createMockTallyArgs('testTallyVmRevealsFiltered', [
       {
-        salt: [3],
-        exit_code: 1,
-        gas_used: '200000',
-        reveal: [1],
+        exitCode: 1,
+        gasUsed: 200000,
+        result: JSON.stringify({ data: 'baby_shark' }),
+        inConsensus: false,
       },
       {
-        salt: [2],
-        exit_code: 0,
-        gas_used: '1336',
-        reveal: [2],
+        exitCode: 0,
+        gasUsed: 1336,
+        result: JSON.stringify({ data: 'grandpa_shark' }),
+        inConsensus: true,
       },
       {
-        salt: [1],
-        exit_code: 0,
-        gas_used: '1346',
-        reveal: [3],
+        exitCode: 0,
+        gasUsed: 1346,
+        result: JSON.stringify({ data: 'cousin_shark' }),
+
+        inConsensus: true,
       },
-    ];
-    const consensus = [1, 0, 0];
+    ]);
 
     const result = await callVm(
       {
-        args: [
-          'testTallyVmRevealsFiltered',
-          JSON.stringify(reveals),
-          JSON.stringify(consensus),
-        ],
+        args: args,
         envs: {},
         binary: new Uint8Array(wasmBinary),
       },
@@ -178,7 +168,7 @@ describe('TallyVm', () => {
 
     expect(result.exitCode).toBe(0);
     expect(result.resultAsString).toBe(
-      '[{"salt":[2],"exit_code":0,"gas_used":"1336","reveal":[2],"inConsensus":0},{"salt":[1],"exit_code":0,"gas_used":"1346","reveal":[3],"inConsensus":0}]'
+      '[{"salt":[115,101,100,97,95,115,100,107],"exit_code":0,"gas_used":"1336","reveal":[123,34,100,97,116,97,34,58,34,103,114,97,110,100,112,97,95,115,104,97,114,107,34,125],"in_consensus":0},{"salt":[115,101,100,97,95,115,100,107],"exit_code":0,"gas_used":"1346","reveal":[123,34,100,97,116,97,34,58,34,99,111,117,115,105,110,95,115,104,97,114,107,34,125],"in_consensus":0}]'
     );
   });
 });
