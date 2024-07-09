@@ -1,6 +1,9 @@
 import { expect, describe, it } from 'bun:test';
-import { TallyVmAdapter, callVm } from '../../../dist/libs/vm/src/index.js';
-import { createMockTallyArgs, createMockReveal } from '@seda/dev-tools';
+import {
+  createMockTallyArgs,
+  executeTallyWasm,
+  executeDrWasm,
+} from '@seda/dev-tools';
 import { readFile } from 'node:fs/promises';
 
 describe('TallyVm', () => {
@@ -8,11 +11,10 @@ describe('TallyVm', () => {
     const wasmBinary = await readFile(
       'dist/libs/as-sdk-integration-tests/debug.wasm'
     );
-    const result = await callVm({
-      args: ['testTallyVmMode'],
-      envs: {},
-      binary: new Uint8Array(wasmBinary),
-    });
+    const result = await executeDrWasm(
+      wasmBinary,
+      createMockTallyArgs('testTallyVmMode', [])
+    );
 
     expect(result.resultAsString).toEqual('dr');
     expect(result.exitCode).toBe(1);
@@ -22,14 +24,9 @@ describe('TallyVm', () => {
     const wasmBinary = await readFile(
       'dist/libs/as-sdk-integration-tests/debug.wasm'
     );
-    const result = await callVm(
-      {
-        args: ['testTallyVmMode'],
-        envs: {},
-        binary: new Uint8Array(wasmBinary),
-      },
-      undefined,
-      new TallyVmAdapter()
+    const result = await executeTallyWasm(
+      wasmBinary,
+      createMockTallyArgs('testTallyVmMode', [])
     );
 
     expect(result.resultAsString).toEqual('tally');
@@ -40,14 +37,9 @@ describe('TallyVm', () => {
     const wasmBinary = await readFile(
       'dist/libs/as-sdk-integration-tests/debug.wasm'
     );
-    const result = await callVm(
-      {
-        args: ['testTallyVmHttp'],
-        envs: {},
-        binary: new Uint8Array(wasmBinary),
-      },
-      undefined,
-      new TallyVmAdapter()
+    const result = await executeTallyWasm(
+      wasmBinary,
+      createMockTallyArgs('testTallyVmHttp', [])
     );
 
     expect(result.resultAsString).toEqual('http_fetch is not allowed in tally');
@@ -59,33 +51,23 @@ describe('TallyVm', () => {
       'dist/libs/as-sdk-integration-tests/debug.wasm'
     );
 
-    const reveals = [
-      createMockReveal({
+    const args = createMockTallyArgs('testTallyVmReveals', [
+      {
         exitCode: 0,
         gasUsed: 200000,
         result: JSON.stringify({ data: 'baby_shark' }),
-      }),
-      createMockReveal({
+        inConsensus: true,
+      },
+      {
         exitCode: 1,
         gasUsed: 1336,
         result: JSON.stringify({ data: 'grandpa_shark' }),
-      }),
-    ];
-    const consensus = [0];
-
-    const result = await callVm(
-      {
-        args: [
-          'testTallyVmReveals',
-          JSON.stringify(reveals),
-          JSON.stringify(consensus),
-        ],
-        envs: {},
-        binary: new Uint8Array(wasmBinary),
+        inConsensus: false,
       },
-      undefined,
-      new TallyVmAdapter()
-    );
+    ]);
+    // Override consensus array from the helper.
+    args[2] = '[0]';
+    const result = await executeTallyWasm(wasmBinary, args);
 
     expect(result.exitCode).toBe(255);
     expect(result.stderr).toInclude(
@@ -113,15 +95,7 @@ describe('TallyVm', () => {
       },
     ]);
 
-    const result = await callVm(
-      {
-        args,
-        envs: {},
-        binary: new Uint8Array(wasmBinary),
-      },
-      undefined,
-      new TallyVmAdapter()
-    );
+    const result = await executeTallyWasm(wasmBinary, args);
 
     expect(result.exitCode).toBe(0);
     expect(result.resultAsString).toBe(
@@ -156,15 +130,7 @@ describe('TallyVm', () => {
       },
     ]);
 
-    const result = await callVm(
-      {
-        args: args,
-        envs: {},
-        binary: new Uint8Array(wasmBinary),
-      },
-      undefined,
-      new TallyVmAdapter()
-    );
+    const result = await executeTallyWasm(wasmBinary, args);
 
     expect(result.exitCode).toBe(0);
     expect(result.resultAsString).toBe(

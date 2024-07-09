@@ -33,14 +33,11 @@ export function testHttpRejection(): void {
 }
 
 export function testHttpSuccess(): void {
-  const response = httpFetch('http://example.com/');
+  const response = httpFetch('https://jsonplaceholder.typicode.com/todos/1');
   const fulfilled = response.fulfilled;
 
   if (fulfilled !== null) {
-    const msg = String.UTF8.encode('ok');
-    const buffer = Uint8Array.wrap(msg);
-
-    Process.exit_with_result(0, buffer);
+    Process.exit_with_result(0, fulfilled.bytes);
   } else {
     Process.exit_with_message(31, 'My custom test failed');
   }

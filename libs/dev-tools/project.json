@@ -29,10 +29,16 @@
         "command": "bun run build:lib",
         "cwd": "libs/dev-tools"
       },
-      "dependsOn": [{ "target": "generate-proto" }]
+      "dependsOn": [
+        { "target": "generate-proto" },
+        { "target": "build", "projects": ["vm"] }
+      ]
     },
     "build": {
-      "dependsOn": [{ "target": "generate-proto" }]
+      "dependsOn": [
+        { "target": "generate-proto" },
+        { "target": "build", "projects": ["vm"] }
+      ]
     },
     "test": {
       "executor": "nx:run-commands",
