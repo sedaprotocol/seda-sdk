@@ -57,6 +57,7 @@
     "protobufjs": "^7.2.5",
     "true-myth": "^7.3.0",
     "tslib": "^2.3.0",
-    "valibot": "^0.35.0"
+    "valibot": "^0.35.0",
+    "visitor-as": "^0.11.4"
   }
 }
