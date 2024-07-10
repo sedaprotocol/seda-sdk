@@ -5,6 +5,7 @@ import {
   executeDrWasm,
 } from '@seda/dev-tools';
 import { readFile } from 'node:fs/promises';
+import { callVm, TallyVmAdapter } from '@seda-protocol/vm';
 
 describe('TallyVm', () => {
   it('should run in dr vm mode by default', async () => {
@@ -13,7 +14,7 @@ describe('TallyVm', () => {
     );
     const result = await executeDrWasm(
       wasmBinary,
-      createMockTallyArgs('testTallyVmMode', [])
+      Buffer.from('testTallyVmMode'),
     );
 
     expect(result.resultAsString).toEqual('dr');
@@ -26,7 +27,8 @@ describe('TallyVm', () => {
     );
     const result = await executeTallyWasm(
       wasmBinary,
-      createMockTallyArgs('testTallyVmMode', [])
+      Buffer.from('testTallyVmMode'), 
+      []
     );
 
     expect(result.resultAsString).toEqual('tally');
@@ -39,7 +41,8 @@ describe('TallyVm', () => {
     );
     const result = await executeTallyWasm(
       wasmBinary,
-      createMockTallyArgs('testTallyVmHttp', [])
+      Buffer.from('testTallyVmHttp'), 
+      []
     );
 
     expect(result.resultAsString).toEqual('http_fetch is not allowed in tally');
@@ -51,7 +54,7 @@ describe('TallyVm', () => {
       'dist/libs/as-sdk-integration-tests/debug.wasm'
     );
 
-    const args = createMockTallyArgs('testTallyVmReveals', [
+    const args = createMockTallyArgs(Buffer.from('testTallyVmReveals'), [
       {
         exitCode: 0,
         gasUsed: 200000,
@@ -67,7 +70,11 @@ describe('TallyVm', () => {
     ]);
     // Override consensus array from the helper.
     args[2] = '[0]';
-    const result = await executeTallyWasm(wasmBinary, args);
+    const result = await callVm({
+      args,
+      binary: wasmBinary,
+      envs: {},
+    }, undefined, new TallyVmAdapter());
 
     expect(result.exitCode).toBe(255);
     expect(result.stderr).toInclude(
@@ -80,7 +87,7 @@ describe('TallyVm', () => {
       'dist/libs/as-sdk-integration-tests/debug.wasm'
     );
 
-    const args = createMockTallyArgs('testTallyVmReveals', [
+    const reports = [
       {
         exitCode: 0,
         gasUsed: 200000,
@@ -93,9 +100,9 @@ describe('TallyVm', () => {
         result: JSON.stringify({ data: 'grandpa_shark' }),
         inConsensus: true,
       },
-    ]);
+    ];
 
-    const result = await executeTallyWasm(wasmBinary, args);
+    const result = await executeTallyWasm(wasmBinary, Buffer.from('testTallyVmReveals'), reports);
 
     expect(result.exitCode).toBe(0);
     expect(result.resultAsString).toBe(
@@ -108,7 +115,7 @@ describe('TallyVm', () => {
       'dist/libs/as-sdk-integration-tests/debug.wasm'
     );
 
-    const args = createMockTallyArgs('testTallyVmRevealsFiltered', [
+    const reports = [
       {
         exitCode: 1,
         gasUsed: 200000,
@@ -128,9 +135,9 @@ describe('TallyVm', () => {
 
         inConsensus: true,
       },
-    ]);
+    ];
 
-    const result = await executeTallyWasm(wasmBinary, args);
+    const result = await executeTallyWasm(wasmBinary, Buffer.from('testTallyVmRevealsFiltered'), reports);
 
     expect(result.exitCode).toBe(0);
     expect(result.resultAsString).toBe(

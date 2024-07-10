@@ -46,9 +46,11 @@ export default class Process {
    * ```
    */
   static getInputs(): Uint8Array {
+    // Data at index 0 is the dr/tally inputs encoded as hex
     const data = Process.args().at(1);
     const array = new Uint8Array(data.length >>> 1)
 
+    // Decodes the hex string into a buffer
     for (let i = 0; i < data.length >>> 1; ++i) {
       array.fill(i32(parseInt('0x' + data.substr(i * 2, 2), 16)), i, i + 1)
     }

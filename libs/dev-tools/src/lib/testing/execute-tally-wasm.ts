@@ -1,9 +1,14 @@
 import { callVm, TallyVmAdapter } from '@seda-protocol/vm';
+import { createMockTallyArgs } from './create-mock-tally-args';
 
-export function executeTallyWasm(wasmBinary: Buffer, inputs: string[]) {
+type TallyArgs = Parameters<typeof createMockTallyArgs>
+
+export function executeTallyWasm(wasmBinary: Buffer, ...tallyArgs: TallyArgs) {
+  const args = createMockTallyArgs(...tallyArgs);
+
   return callVm(
     {
-      args: inputs,
+      args,
       envs: {},
       binary: new Uint8Array(wasmBinary),
     },

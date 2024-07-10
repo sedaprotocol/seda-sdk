@@ -5,11 +5,6 @@ import { Response } from 'node-fetch';
 
 const mockHttpFetch = mock();
 
-function encodeFunctionName(functionName: string) {
-  const bytes = Buffer.from(new TextEncoder().encode(functionName));
-  return bytes.toString('hex');
-}
-
 describe('Http', () => {
   beforeEach(() => {
     mockHttpFetch.mockReset();
@@ -22,7 +17,7 @@ describe('Http', () => {
 
     const result = await executeDrWasm(
       wasmBinary,
-      [encodeFunctionName('testHttpRejection')],
+      Buffer.from('testHttpRejection'),
       mockHttpFetch
     );
 
@@ -40,7 +35,7 @@ describe('Http', () => {
 
     const result = await executeDrWasm(
       wasmBinary,
-      [encodeFunctionName('testHttpSuccess')],
+      Buffer.from('testHttpSuccess'),
       mockHttpFetch
     );
 
@@ -53,7 +48,7 @@ describe('Http', () => {
     const wasmBinary = await readFile(
       'dist/libs/as-sdk-integration-tests/debug.wasm'
     );
-    const result = await executeDrWasm(wasmBinary, [encodeFunctionName('testHttpSuccess')]);
+    const result = await executeDrWasm(wasmBinary, Buffer.from('testHttpSuccess'));
 
     expect(result.exitCode).toBe(0);
     expect(result.result).toEqual(
@@ -75,7 +70,7 @@ describe('Http', () => {
   it('should exit when an invalid WASM binary is given', async () => {
     const result = await executeDrWasm(
       Buffer.from(new Uint8Array([0, 97, 115, 109])),
-      [encodeFunctionName('testHttpSuccess')]
+      Buffer.from('testHttpSuccess')
     );
 
     expect(result).toEqual({

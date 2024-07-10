@@ -6,12 +6,12 @@ import fetch from 'node-fetch';
 
 export function executeDrWasm(
   wasmBinary: Buffer,
-  inputs: string[],
+  inputs: Buffer,
   fetchMock?: typeof fetch
 ) {
   return callVm(
     {
-      args: inputs,
+      args: [inputs.toString('hex')],
       envs: {},
       binary: new Uint8Array(wasmBinary),
     },
