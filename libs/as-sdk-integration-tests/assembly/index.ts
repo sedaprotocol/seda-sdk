@@ -2,7 +2,7 @@ import { httpFetch, Process } from '../../as-sdk/assembly/index';
 import { testTallyVmReveals, testTallyVmRevealsFiltered } from './tally';
 import { testTallyVmHttp, testTallyVmMode } from './vm-tests';
 
-const args = Process.args().at(1);
+const args = String.UTF8.decode(Process.getInputs().buffer);
 
 if (args === 'testHttpRejection') {
   testHttpRejection();

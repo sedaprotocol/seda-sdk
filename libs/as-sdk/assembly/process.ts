@@ -34,6 +34,29 @@ export default class Process {
   }
 
   /**
+   * Gets the data request / tally inputs
+   * 
+   * @returns {Uint8Array} bytes encoded inputs
+   * @example
+   * ```ts
+   * const inputs = Process.getInputs();
+   * const inputAsString = String.UTF8.decode(inputs.buffer);
+   * 
+   * console.log(inputAsString);
+   * ```
+   */
+  static getInputs(): Uint8Array {
+    const data = Process.args().at(1);
+    const array = new Uint8Array(data.length >>> 1)
+
+    for (let i = 0; i < data.length >>> 1; ++i) {
+      array.fill(i32(parseInt('0x' + data.substr(i * 2, 2), 16)), i, i + 1)
+    }
+
+    return array;
+  }
+
+  /**
    * Gets the mode of the VM instance.
    *
    * @returns {string} The mode of the VM, either 'dr' or 'tally'.

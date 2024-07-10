@@ -7,10 +7,15 @@ type ReportInput = RevealInput & {
   inConsensus: boolean;
 };
 
+function encodeFunctionName(functionName: string) {
+  const bytes = Buffer.from(new TextEncoder().encode(functionName));
+  return bytes.toString('hex');
+}
+
 export function createMockTallyArgs(tallyInputs: string, reports: ReportInput[]): string[] {
   const reveals = createMockReveals(reports);
   // Encode booleans with 0 for true and 1 for false.
   const consensus = reports.map((report) => report.inConsensus ? 0 : 1);
 
-  return [tallyInputs, JSON.stringify(reveals), JSON.stringify(consensus)];
+  return [encodeFunctionName(tallyInputs), JSON.stringify(reveals), JSON.stringify(consensus)];
 }
