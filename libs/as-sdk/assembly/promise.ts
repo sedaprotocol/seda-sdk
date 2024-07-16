@@ -24,13 +24,13 @@ export class PromiseStatus<F, R> {
     let rejectedResult: R | null = null;
 
     const rawFulfilled = value.Fulfilled;
-    if (rawFulfilled) {
+    if (rawFulfilled && rawFulfilled.length > 0) {
       const bytes = jsonArrToUint8Array(rawFulfilled);
       fulfilledResult = fulfilled.fromBuffer(bytes);
     }
 
     const rawRejected = value.Rejected;
-    if (rawRejected) {
+    if (rawRejected && rawRejected.length > 0) {
       const bytes = jsonArrToUint8Array(rawRejected);
       rejectedResult = rejected.fromBuffer(bytes);
     }
