@@ -14,7 +14,7 @@ export async function signAndSendTx(
   signingClient: SigningCosmWasmClient,
   address: string,
   messages: EncodeObject[],
-  gasOptions: GasOptions,
+  gasOptions: GasOptions = {},
   memo = 'Sent from SEDA SDK'
 ): Promise<Result<DeliverTxResponse, unknown>> {
   const gasInput = gasOptions.gas ?? DEFAULT_GAS;

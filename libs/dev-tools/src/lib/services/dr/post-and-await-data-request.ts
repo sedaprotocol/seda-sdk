@@ -9,8 +9,8 @@ type AwaitOptions = Parameters<typeof awaitDataResult>['2'];
 export async function postAndAwaitDataRequest(
   signer: ISigner,
   dataRequestInput: PostDataRequestInput,
-  gasOptions: GasOptions,
-  awaitOptions: AwaitOptions
+  gasOptions?: GasOptions,
+  awaitOptions?: AwaitOptions
 ) {
   const postDrResponse = await postDataRequest(
     signer,

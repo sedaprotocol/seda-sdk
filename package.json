@@ -11,6 +11,9 @@
   },
   "private": true,
   "type": "module",
+  "overrides": {
+    "@types/glob": "file:./libs/glob-types/"
+  },
   "devDependencies": {
     "@as-pect/cli": "^8.1.0",
     "@assemblyscript/wasi-shim": "^0.1.0",
@@ -28,6 +31,7 @@
     "@types/node": "18.19.9",
     "@typescript-eslint/eslint-plugin": "7.9.0",
     "assemblyscript": "^0.27.11",
+    "bun-plugin-dts": "^0.2.3",
     "esbuild": "0.19.9",
     "eslint": "8.57.0",
     "eslint-config-prettier": "9.1.0",

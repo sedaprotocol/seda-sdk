@@ -10,7 +10,7 @@ import {
 export async function postDataRequest(
   signer: ISigner,
   dataRequestInput: PostDataRequestInput,
-  gasOptions: GasOptions
+  gasOptions?: GasOptions
 ): Promise<{ tx: string; drId: string }> {
   const sigingClientResult = await createSigningClient(signer);
   if (sigingClientResult.isErr) {

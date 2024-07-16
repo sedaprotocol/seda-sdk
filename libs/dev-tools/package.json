@@ -4,8 +4,8 @@
   "version": "0.0.1",
   "scripts": {
     "build:cli": "bun build src/cli/index.ts --target node --outdir bin",
-    "build:lib": "bun build src/index.ts --target node --outdir build",
     "build": "bun run build:cli && bun run build:lib",
+    "build:lib": "bun run build.ts",
     "prepublish": "bun run build"
   },
   "bin": {
