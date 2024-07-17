@@ -1,7 +1,7 @@
 {
   "name": "@seda-protocol/dev-tools",
   "type": "module",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "scripts": {
     "build:cli": "bun build src/cli/index.ts --target node --outdir bin",
     "build": "bun run build:cli && bun run build:lib",
@@ -19,6 +19,7 @@
     "@cosmjs/stargate": "^0.32.3",
     "@cosmjs/tendermint-rpc": "^0.32.3",
     "dotenv": "^16.3.1",
+    "node-fetch": "^3.3.2",
     "node-gzip": "^1.1.2",
     "true-myth": "^7.3.0",
     "valibot": "^0.35.0"
