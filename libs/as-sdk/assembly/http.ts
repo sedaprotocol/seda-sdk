@@ -1,6 +1,6 @@
 import { JSON } from 'json-as/assembly';
 import { call_result_write, http_fetch } from './bindings/seda_v1';
-import { jsonArrToUint8Array } from './json-utils';
+import { jsonArrToUint8Array, uint8arrayToJsonArray } from './json-utils';
 import { PromiseStatus, FromBuffer } from './promise';
 
 @json
@@ -15,6 +15,7 @@ class InnerResponse {
 /**
  * Response of an httpFetch call
  */
+@json
 export class HttpResponse implements FromBuffer<HttpResponse> {
   /**
    * Raw result of the HTTP fetch. (usually not used)
@@ -77,6 +78,18 @@ export class HttpResponse implements FromBuffer<HttpResponse> {
 
     response.result = buffer;
     return response;
+  }
+
+  toString(): string {
+    const response = new InnerResponse();
+    
+    response.bytes = uint8arrayToJsonArray(this.bytes);
+    response.content_length = this.contentLength;
+    response.headers = this.headers;
+    response.status = this.status;
+    response.url = this.url;
+
+    return JSON.stringify(response);
   }
 }
 

@@ -1,4 +1,4 @@
-import { httpFetch, Process } from '../../as-sdk/assembly/index';
+import { Console, httpFetch, HttpFetchOptions, Process } from '../../as-sdk/assembly/index';
 import { testTallyVmReveals, testTallyVmRevealsFiltered } from './tally';
 import { testTallyVmHttp, testTallyVmMode } from './vm-tests';
 
