@@ -11,7 +11,6 @@ import { WasmType, wasmTypeFromJSON, wasmTypeToJSON } from "./wasm_storage.js";
 /** The msg for storing a data request wasm. */
 export interface EventStoreDataRequestWasm {
   hash: string;
-  wasmType: WasmType;
   bytecode: Uint8Array;
 }
 
@@ -23,7 +22,7 @@ export interface EventStoreOverlayWasm {
 }
 
 function createBaseEventStoreDataRequestWasm(): EventStoreDataRequestWasm {
-  return { hash: "", wasmType: 0, bytecode: new Uint8Array(0) };
+  return { hash: "", bytecode: new Uint8Array(0) };
 }
 
 export const EventStoreDataRequestWasm = {
@@ -31,11 +30,8 @@ export const EventStoreDataRequestWasm = {
     if (message.hash !== "") {
       writer.uint32(10).string(message.hash);
     }
-    if (message.wasmType !== 0) {
-      writer.uint32(16).int32(message.wasmType);
-    }
     if (message.bytecode.length !== 0) {
-      writer.uint32(26).bytes(message.bytecode);
+      writer.uint32(18).bytes(message.bytecode);
     }
     return writer;
   },
@@ -55,14 +51,7 @@ export const EventStoreDataRequestWasm = {
           message.hash = reader.string();
           continue;
         case 2:
-          if (tag !== 16) {
-            break;
-          }
-
-          message.wasmType = reader.int32() as any;
-          continue;
-        case 3:
-          if (tag !== 26) {
+          if (tag !== 18) {
             break;
           }
 
@@ -80,7 +69,6 @@ export const EventStoreDataRequestWasm = {
   fromJSON(object: any): EventStoreDataRequestWasm {
     return {
       hash: isSet(object.hash) ? globalThis.String(object.hash) : "",
-      wasmType: isSet(object.wasmType) ? wasmTypeFromJSON(object.wasmType) : 0,
       bytecode: isSet(object.bytecode) ? bytesFromBase64(object.bytecode) : new Uint8Array(0),
     };
   },
@@ -89,9 +77,6 @@ export const EventStoreDataRequestWasm = {
     const obj: any = {};
     if (message.hash !== "") {
       obj.hash = message.hash;
-    }
-    if (message.wasmType !== 0) {
-      obj.wasmType = wasmTypeToJSON(message.wasmType);
     }
     if (message.bytecode.length !== 0) {
       obj.bytecode = base64FromBytes(message.bytecode);
@@ -105,7 +90,6 @@ export const EventStoreDataRequestWasm = {
   fromPartial(object: DeepPartial<EventStoreDataRequestWasm>): EventStoreDataRequestWasm {
     const message = createBaseEventStoreDataRequestWasm();
     message.hash = object.hash ?? "";
-    message.wasmType = object.wasmType ?? 0;
     message.bytecode = object.bytecode ?? new Uint8Array(0);
     return message;
   },

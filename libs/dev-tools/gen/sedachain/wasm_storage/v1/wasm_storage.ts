@@ -11,34 +11,24 @@ import { Timestamp } from "../../../google/protobuf/timestamp.js";
 
 /** WasmType is an enum for the type of wasm. */
 export enum WasmType {
-  /** WASM_TYPE_UNSPECIFIED - An unspecified kind of wasm. */
-  WASM_TYPE_UNSPECIFIED = 0,
-  /** WASM_TYPE_DATA_REQUEST - A wasm that is a data request. */
-  WASM_TYPE_DATA_REQUEST = 1,
-  /** WASM_TYPE_TALLY - A wasm that is a DR tally. */
-  WASM_TYPE_TALLY = 2,
-  /** WASM_TYPE_DATA_REQUEST_EXECUTOR - A wasm that is an overlay executor. */
-  WASM_TYPE_DATA_REQUEST_EXECUTOR = 3,
-  /** WASM_TYPE_RELAYER - A wasm that is an overlay relayer. */
-  WASM_TYPE_RELAYER = 4,
+  /** WASM_TYPE_DATA_REQUEST - WASM_TYPE_DATA_REQUEST is for data request and tally wasms. */
+  WASM_TYPE_DATA_REQUEST = 0,
+  /** WASM_TYPE_DATA_REQUEST_EXECUTOR - WASM_TYPE_DATA_REQUEST_EXECUTOR is for overlay executors. */
+  WASM_TYPE_DATA_REQUEST_EXECUTOR = 1,
+  /** WASM_TYPE_RELAYER - WASM_TYPE_RELAYER is for overlay relayers. */
+  WASM_TYPE_RELAYER = 2,
   UNRECOGNIZED = -1,
 }
 
 export function wasmTypeFromJSON(object: any): WasmType {
   switch (object) {
     case 0:
-    case "WASM_TYPE_UNSPECIFIED":
-      return WasmType.WASM_TYPE_UNSPECIFIED;
-    case 1:
     case "WASM_TYPE_DATA_REQUEST":
       return WasmType.WASM_TYPE_DATA_REQUEST;
-    case 2:
-    case "WASM_TYPE_TALLY":
-      return WasmType.WASM_TYPE_TALLY;
-    case 3:
+    case 1:
     case "WASM_TYPE_DATA_REQUEST_EXECUTOR":
       return WasmType.WASM_TYPE_DATA_REQUEST_EXECUTOR;
-    case 4:
+    case 2:
     case "WASM_TYPE_RELAYER":
       return WasmType.WASM_TYPE_RELAYER;
     case -1:
@@ -50,12 +40,8 @@ export function wasmTypeFromJSON(object: any): WasmType {
 
 export function wasmTypeToJSON(object: WasmType): string {
   switch (object) {
-    case WasmType.WASM_TYPE_UNSPECIFIED:
-      return "WASM_TYPE_UNSPECIFIED";
     case WasmType.WASM_TYPE_DATA_REQUEST:
       return "WASM_TYPE_DATA_REQUEST";
-    case WasmType.WASM_TYPE_TALLY:
-      return "WASM_TYPE_TALLY";
     case WasmType.WASM_TYPE_DATA_REQUEST_EXECUTOR:
       return "WASM_TYPE_DATA_REQUEST_EXECUTOR";
     case WasmType.WASM_TYPE_RELAYER:

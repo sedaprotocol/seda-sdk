@@ -46,12 +46,12 @@ export interface QueryOverlayWasmsResponse {
   hashTypePairs: string[];
 }
 
-/** The request message for QueryProxyContractRegistry RPC. */
-export interface QueryProxyContractRegistryRequest {
+/** The request message for QueryCoreContractRegistry RPC. */
+export interface QueryCoreContractRegistryRequest {
 }
 
-/** The response message for QueryProxyContractRegistry RPC. */
-export interface QueryProxyContractRegistryResponse {
+/** The response message for QueryCoreContractRegistry RPC. */
+export interface QueryCoreContractRegistryResponse {
   address: string;
 }
 
@@ -491,19 +491,19 @@ export const QueryOverlayWasmsResponse = {
   },
 };
 
-function createBaseQueryProxyContractRegistryRequest(): QueryProxyContractRegistryRequest {
+function createBaseQueryCoreContractRegistryRequest(): QueryCoreContractRegistryRequest {
   return {};
 }
 
-export const QueryProxyContractRegistryRequest = {
-  encode(_: QueryProxyContractRegistryRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const QueryCoreContractRegistryRequest = {
+  encode(_: QueryCoreContractRegistryRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): QueryProxyContractRegistryRequest {
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryCoreContractRegistryRequest {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseQueryProxyContractRegistryRequest();
+    const message = createBaseQueryCoreContractRegistryRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -516,40 +516,40 @@ export const QueryProxyContractRegistryRequest = {
     return message;
   },
 
-  fromJSON(_: any): QueryProxyContractRegistryRequest {
+  fromJSON(_: any): QueryCoreContractRegistryRequest {
     return {};
   },
 
-  toJSON(_: QueryProxyContractRegistryRequest): unknown {
+  toJSON(_: QueryCoreContractRegistryRequest): unknown {
     const obj: any = {};
     return obj;
   },
 
-  create(base?: DeepPartial<QueryProxyContractRegistryRequest>): QueryProxyContractRegistryRequest {
-    return QueryProxyContractRegistryRequest.fromPartial(base ?? {});
+  create(base?: DeepPartial<QueryCoreContractRegistryRequest>): QueryCoreContractRegistryRequest {
+    return QueryCoreContractRegistryRequest.fromPartial(base ?? {});
   },
-  fromPartial(_: DeepPartial<QueryProxyContractRegistryRequest>): QueryProxyContractRegistryRequest {
-    const message = createBaseQueryProxyContractRegistryRequest();
+  fromPartial(_: DeepPartial<QueryCoreContractRegistryRequest>): QueryCoreContractRegistryRequest {
+    const message = createBaseQueryCoreContractRegistryRequest();
     return message;
   },
 };
 
-function createBaseQueryProxyContractRegistryResponse(): QueryProxyContractRegistryResponse {
+function createBaseQueryCoreContractRegistryResponse(): QueryCoreContractRegistryResponse {
   return { address: "" };
 }
 
-export const QueryProxyContractRegistryResponse = {
-  encode(message: QueryProxyContractRegistryResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const QueryCoreContractRegistryResponse = {
+  encode(message: QueryCoreContractRegistryResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.address !== "") {
       writer.uint32(10).string(message.address);
     }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): QueryProxyContractRegistryResponse {
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryCoreContractRegistryResponse {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseQueryProxyContractRegistryResponse();
+    const message = createBaseQueryCoreContractRegistryResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -569,11 +569,11 @@ export const QueryProxyContractRegistryResponse = {
     return message;
   },
 
-  fromJSON(object: any): QueryProxyContractRegistryResponse {
+  fromJSON(object: any): QueryCoreContractRegistryResponse {
     return { address: isSet(object.address) ? globalThis.String(object.address) : "" };
   },
 
-  toJSON(message: QueryProxyContractRegistryResponse): unknown {
+  toJSON(message: QueryCoreContractRegistryResponse): unknown {
     const obj: any = {};
     if (message.address !== "") {
       obj.address = message.address;
@@ -581,11 +581,11 @@ export const QueryProxyContractRegistryResponse = {
     return obj;
   },
 
-  create(base?: DeepPartial<QueryProxyContractRegistryResponse>): QueryProxyContractRegistryResponse {
-    return QueryProxyContractRegistryResponse.fromPartial(base ?? {});
+  create(base?: DeepPartial<QueryCoreContractRegistryResponse>): QueryCoreContractRegistryResponse {
+    return QueryCoreContractRegistryResponse.fromPartial(base ?? {});
   },
-  fromPartial(object: DeepPartial<QueryProxyContractRegistryResponse>): QueryProxyContractRegistryResponse {
-    const message = createBaseQueryProxyContractRegistryResponse();
+  fromPartial(object: DeepPartial<QueryCoreContractRegistryResponse>): QueryCoreContractRegistryResponse {
+    const message = createBaseQueryCoreContractRegistryResponse();
     message.address = object.address ?? "";
     return message;
   },
@@ -601,8 +601,8 @@ export interface Query {
   OverlayWasm(request: QueryOverlayWasmRequest): Promise<QueryOverlayWasmResponse>;
   /** OverlayWasms returns all Overlay Wasms. */
   OverlayWasms(request: QueryOverlayWasmsRequest): Promise<QueryOverlayWasmsResponse>;
-  /** ProxyContractRegistry returns the Proxy Contract Registry address. */
-  ProxyContractRegistry(request: QueryProxyContractRegistryRequest): Promise<QueryProxyContractRegistryResponse>;
+  /** CoreContractRegistry returns the Core Contract Registry address. */
+  CoreContractRegistry(request: QueryCoreContractRegistryRequest): Promise<QueryCoreContractRegistryResponse>;
 }
 
 export const QueryServiceName = "sedachain.wasm_storage.v1.Query";
@@ -616,7 +616,7 @@ export class QueryClientImpl implements Query {
     this.DataRequestWasms = this.DataRequestWasms.bind(this);
     this.OverlayWasm = this.OverlayWasm.bind(this);
     this.OverlayWasms = this.OverlayWasms.bind(this);
-    this.ProxyContractRegistry = this.ProxyContractRegistry.bind(this);
+    this.CoreContractRegistry = this.CoreContractRegistry.bind(this);
   }
   DataRequestWasm(request: QueryDataRequestWasmRequest): Promise<QueryDataRequestWasmResponse> {
     const data = QueryDataRequestWasmRequest.encode(request).finish();
@@ -642,10 +642,10 @@ export class QueryClientImpl implements Query {
     return promise.then((data) => QueryOverlayWasmsResponse.decode(_m0.Reader.create(data)));
   }
 
-  ProxyContractRegistry(request: QueryProxyContractRegistryRequest): Promise<QueryProxyContractRegistryResponse> {
-    const data = QueryProxyContractRegistryRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "ProxyContractRegistry", data);
-    return promise.then((data) => QueryProxyContractRegistryResponse.decode(_m0.Reader.create(data)));
+  CoreContractRegistry(request: QueryCoreContractRegistryRequest): Promise<QueryCoreContractRegistryResponse> {
+    const data = QueryCoreContractRegistryRequest.encode(request).finish();
+    const promise = this.rpc.request(this.service, "CoreContractRegistry", data);
+    return promise.then((data) => QueryCoreContractRegistryResponse.decode(_m0.Reader.create(data)));
   }
 }
 

@@ -23,7 +23,6 @@ export async function uploadWasmBinary(
     value: sedachain.wasm_storage.v1.MsgStoreDataRequestWasm.fromPartial({
       sender: address,
       wasm: await gzip(wasmBinary),
-      wasmType: sedachain.wasm_storage.v1.WasmType.WASM_TYPE_DATA_REQUEST,
     }),
   };
 

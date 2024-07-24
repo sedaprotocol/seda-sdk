@@ -72,7 +72,7 @@ async function resolveCoreContractAddress(config: SigningConfig) {
 
   const queryClient = await createWasmQueryClient(config);
 
-  const response = await queryClient.ProxyContractRegistry({});
+  const response = await queryClient.CoreContractRegistry({});
 
   return response.address;
 }

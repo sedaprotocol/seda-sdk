@@ -14,7 +14,6 @@ import { Params, WasmType, wasmTypeFromJSON, wasmTypeToJSON } from "./wasm_stora
 export interface MsgStoreDataRequestWasm {
   sender: string;
   wasm: Uint8Array;
-  wasmType: WasmType;
 }
 
 /** The response message for the StoreDataRequestWasm method. */
@@ -34,8 +33,8 @@ export interface MsgStoreOverlayWasmResponse {
   hash: string;
 }
 
-/** The request message for the InstantiateAndRegisterProxyContract method. */
-export interface MsgInstantiateAndRegisterProxyContract {
+/** The request message for the InstantiateAndRegisterCoreContract method. */
+export interface MsgInstantiateAndRegisterCoreContract {
   sender: string;
   admin: string;
   codeId: number;
@@ -46,8 +45,8 @@ export interface MsgInstantiateAndRegisterProxyContract {
   fixMsg: boolean;
 }
 
-/** The response message for the InstantiateAndRegisterProxyContract method. */
-export interface MsgInstantiateAndRegisterProxyContractResponse {
+/** The response message for the InstantiateAndRegisterCoreContract method. */
+export interface MsgInstantiateAndRegisterCoreContractResponse {
   contractAddress: string;
 }
 
@@ -66,7 +65,7 @@ export interface MsgUpdateParamsResponse {
 }
 
 function createBaseMsgStoreDataRequestWasm(): MsgStoreDataRequestWasm {
-  return { sender: "", wasm: new Uint8Array(0), wasmType: 0 };
+  return { sender: "", wasm: new Uint8Array(0) };
 }
 
 export const MsgStoreDataRequestWasm = {
@@ -76,9 +75,6 @@ export const MsgStoreDataRequestWasm = {
     }
     if (message.wasm.length !== 0) {
       writer.uint32(18).bytes(message.wasm);
-    }
-    if (message.wasmType !== 0) {
-      writer.uint32(24).int32(message.wasmType);
     }
     return writer;
   },
@@ -104,13 +100,6 @@ export const MsgStoreDataRequestWasm = {
 
           message.wasm = reader.bytes();
           continue;
-        case 3:
-          if (tag !== 24) {
-            break;
-          }
-
-          message.wasmType = reader.int32() as any;
-          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -124,7 +113,6 @@ export const MsgStoreDataRequestWasm = {
     return {
       sender: isSet(object.sender) ? globalThis.String(object.sender) : "",
       wasm: isSet(object.wasm) ? bytesFromBase64(object.wasm) : new Uint8Array(0),
-      wasmType: isSet(object.wasmType) ? wasmTypeFromJSON(object.wasmType) : 0,
     };
   },
 
@@ -136,9 +124,6 @@ export const MsgStoreDataRequestWasm = {
     if (message.wasm.length !== 0) {
       obj.wasm = base64FromBytes(message.wasm);
     }
-    if (message.wasmType !== 0) {
-      obj.wasmType = wasmTypeToJSON(message.wasmType);
-    }
     return obj;
   },
 
@@ -149,7 +134,6 @@ export const MsgStoreDataRequestWasm = {
     const message = createBaseMsgStoreDataRequestWasm();
     message.sender = object.sender ?? "";
     message.wasm = object.wasm ?? new Uint8Array(0);
-    message.wasmType = object.wasmType ?? 0;
     return message;
   },
 };
@@ -357,7 +341,7 @@ export const MsgStoreOverlayWasmResponse = {
   },
 };
 
-function createBaseMsgInstantiateAndRegisterProxyContract(): MsgInstantiateAndRegisterProxyContract {
+function createBaseMsgInstantiateAndRegisterCoreContract(): MsgInstantiateAndRegisterCoreContract {
   return {
     sender: "",
     admin: "",
@@ -370,8 +354,8 @@ function createBaseMsgInstantiateAndRegisterProxyContract(): MsgInstantiateAndRe
   };
 }
 
-export const MsgInstantiateAndRegisterProxyContract = {
-  encode(message: MsgInstantiateAndRegisterProxyContract, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const MsgInstantiateAndRegisterCoreContract = {
+  encode(message: MsgInstantiateAndRegisterCoreContract, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.sender !== "") {
       writer.uint32(10).string(message.sender);
     }
@@ -399,10 +383,10 @@ export const MsgInstantiateAndRegisterProxyContract = {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgInstantiateAndRegisterProxyContract {
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgInstantiateAndRegisterCoreContract {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgInstantiateAndRegisterProxyContract();
+    const message = createBaseMsgInstantiateAndRegisterCoreContract();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -471,7 +455,7 @@ export const MsgInstantiateAndRegisterProxyContract = {
     return message;
   },
 
-  fromJSON(object: any): MsgInstantiateAndRegisterProxyContract {
+  fromJSON(object: any): MsgInstantiateAndRegisterCoreContract {
     return {
       sender: isSet(object.sender) ? globalThis.String(object.sender) : "",
       admin: isSet(object.admin) ? globalThis.String(object.admin) : "",
@@ -484,7 +468,7 @@ export const MsgInstantiateAndRegisterProxyContract = {
     };
   },
 
-  toJSON(message: MsgInstantiateAndRegisterProxyContract): unknown {
+  toJSON(message: MsgInstantiateAndRegisterCoreContract): unknown {
     const obj: any = {};
     if (message.sender !== "") {
       obj.sender = message.sender;
@@ -513,11 +497,11 @@ export const MsgInstantiateAndRegisterProxyContract = {
     return obj;
   },
 
-  create(base?: DeepPartial<MsgInstantiateAndRegisterProxyContract>): MsgInstantiateAndRegisterProxyContract {
-    return MsgInstantiateAndRegisterProxyContract.fromPartial(base ?? {});
+  create(base?: DeepPartial<MsgInstantiateAndRegisterCoreContract>): MsgInstantiateAndRegisterCoreContract {
+    return MsgInstantiateAndRegisterCoreContract.fromPartial(base ?? {});
   },
-  fromPartial(object: DeepPartial<MsgInstantiateAndRegisterProxyContract>): MsgInstantiateAndRegisterProxyContract {
-    const message = createBaseMsgInstantiateAndRegisterProxyContract();
+  fromPartial(object: DeepPartial<MsgInstantiateAndRegisterCoreContract>): MsgInstantiateAndRegisterCoreContract {
+    const message = createBaseMsgInstantiateAndRegisterCoreContract();
     message.sender = object.sender ?? "";
     message.admin = object.admin ?? "";
     message.codeId = object.codeId ?? 0;
@@ -530,25 +514,22 @@ export const MsgInstantiateAndRegisterProxyContract = {
   },
 };
 
-function createBaseMsgInstantiateAndRegisterProxyContractResponse(): MsgInstantiateAndRegisterProxyContractResponse {
+function createBaseMsgInstantiateAndRegisterCoreContractResponse(): MsgInstantiateAndRegisterCoreContractResponse {
   return { contractAddress: "" };
 }
 
-export const MsgInstantiateAndRegisterProxyContractResponse = {
-  encode(
-    message: MsgInstantiateAndRegisterProxyContractResponse,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+export const MsgInstantiateAndRegisterCoreContractResponse = {
+  encode(message: MsgInstantiateAndRegisterCoreContractResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.contractAddress !== "") {
       writer.uint32(10).string(message.contractAddress);
     }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgInstantiateAndRegisterProxyContractResponse {
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgInstantiateAndRegisterCoreContractResponse {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgInstantiateAndRegisterProxyContractResponse();
+    const message = createBaseMsgInstantiateAndRegisterCoreContractResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -568,11 +549,11 @@ export const MsgInstantiateAndRegisterProxyContractResponse = {
     return message;
   },
 
-  fromJSON(object: any): MsgInstantiateAndRegisterProxyContractResponse {
+  fromJSON(object: any): MsgInstantiateAndRegisterCoreContractResponse {
     return { contractAddress: isSet(object.contractAddress) ? globalThis.String(object.contractAddress) : "" };
   },
 
-  toJSON(message: MsgInstantiateAndRegisterProxyContractResponse): unknown {
+  toJSON(message: MsgInstantiateAndRegisterCoreContractResponse): unknown {
     const obj: any = {};
     if (message.contractAddress !== "") {
       obj.contractAddress = message.contractAddress;
@@ -581,14 +562,14 @@ export const MsgInstantiateAndRegisterProxyContractResponse = {
   },
 
   create(
-    base?: DeepPartial<MsgInstantiateAndRegisterProxyContractResponse>,
-  ): MsgInstantiateAndRegisterProxyContractResponse {
-    return MsgInstantiateAndRegisterProxyContractResponse.fromPartial(base ?? {});
+    base?: DeepPartial<MsgInstantiateAndRegisterCoreContractResponse>,
+  ): MsgInstantiateAndRegisterCoreContractResponse {
+    return MsgInstantiateAndRegisterCoreContractResponse.fromPartial(base ?? {});
   },
   fromPartial(
-    object: DeepPartial<MsgInstantiateAndRegisterProxyContractResponse>,
-  ): MsgInstantiateAndRegisterProxyContractResponse {
-    const message = createBaseMsgInstantiateAndRegisterProxyContractResponse();
+    object: DeepPartial<MsgInstantiateAndRegisterCoreContractResponse>,
+  ): MsgInstantiateAndRegisterCoreContractResponse {
+    const message = createBaseMsgInstantiateAndRegisterCoreContractResponse();
     message.contractAddress = object.contractAddress ?? "";
     return message;
   },
@@ -726,12 +707,12 @@ export interface Msg {
    */
   StoreOverlayWasm(request: MsgStoreOverlayWasm): Promise<MsgStoreOverlayWasmResponse>;
   /**
-   * The InstantiateAndRegisterProxyContract method instantiates the proxy
-   * contract and registers it's address.
+   * The InstantiateAndRegisterCoreContract method instantiates the Core
+   * Contract and registers its address.
    */
-  InstantiateAndRegisterProxyContract(
-    request: MsgInstantiateAndRegisterProxyContract,
-  ): Promise<MsgInstantiateAndRegisterProxyContractResponse>;
+  InstantiateAndRegisterCoreContract(
+    request: MsgInstantiateAndRegisterCoreContract,
+  ): Promise<MsgInstantiateAndRegisterCoreContractResponse>;
   /** The UpdateParams method updates the module's parameters. */
   UpdateParams(request: MsgUpdateParams): Promise<MsgUpdateParamsResponse>;
 }
@@ -745,7 +726,7 @@ export class MsgClientImpl implements Msg {
     this.rpc = rpc;
     this.StoreDataRequestWasm = this.StoreDataRequestWasm.bind(this);
     this.StoreOverlayWasm = this.StoreOverlayWasm.bind(this);
-    this.InstantiateAndRegisterProxyContract = this.InstantiateAndRegisterProxyContract.bind(this);
+    this.InstantiateAndRegisterCoreContract = this.InstantiateAndRegisterCoreContract.bind(this);
     this.UpdateParams = this.UpdateParams.bind(this);
   }
   StoreDataRequestWasm(request: MsgStoreDataRequestWasm): Promise<MsgStoreDataRequestWasmResponse> {
@@ -760,12 +741,12 @@ export class MsgClientImpl implements Msg {
     return promise.then((data) => MsgStoreOverlayWasmResponse.decode(_m0.Reader.create(data)));
   }
 
-  InstantiateAndRegisterProxyContract(
-    request: MsgInstantiateAndRegisterProxyContract,
-  ): Promise<MsgInstantiateAndRegisterProxyContractResponse> {
-    const data = MsgInstantiateAndRegisterProxyContract.encode(request).finish();
-    const promise = this.rpc.request(this.service, "InstantiateAndRegisterProxyContract", data);
-    return promise.then((data) => MsgInstantiateAndRegisterProxyContractResponse.decode(_m0.Reader.create(data)));
+  InstantiateAndRegisterCoreContract(
+    request: MsgInstantiateAndRegisterCoreContract,
+  ): Promise<MsgInstantiateAndRegisterCoreContractResponse> {
+    const data = MsgInstantiateAndRegisterCoreContract.encode(request).finish();
+    const promise = this.rpc.request(this.service, "InstantiateAndRegisterCoreContract", data);
+    return promise.then((data) => MsgInstantiateAndRegisterCoreContractResponse.decode(_m0.Reader.create(data)));
   }
 
   UpdateParams(request: MsgUpdateParams): Promise<MsgUpdateParamsResponse> {

@@ -16,11 +16,11 @@ export interface GenesisState {
   /** Params represents module specific parameters. */
   params: Params | undefined;
   wasms: Wasm[];
-  proxyContractRegistry: string;
+  coreContractRegistry: string;
 }
 
 function createBaseGenesisState(): GenesisState {
-  return { params: undefined, wasms: [], proxyContractRegistry: "" };
+  return { params: undefined, wasms: [], coreContractRegistry: "" };
 }
 
 export const GenesisState = {
@@ -31,8 +31,8 @@ export const GenesisState = {
     for (const v of message.wasms) {
       Wasm.encode(v!, writer.uint32(18).fork()).ldelim();
     }
-    if (message.proxyContractRegistry !== "") {
-      writer.uint32(26).string(message.proxyContractRegistry);
+    if (message.coreContractRegistry !== "") {
+      writer.uint32(26).string(message.coreContractRegistry);
     }
     return writer;
   },
@@ -63,7 +63,7 @@ export const GenesisState = {
             break;
           }
 
-          message.proxyContractRegistry = reader.string();
+          message.coreContractRegistry = reader.string();
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -78,7 +78,7 @@ export const GenesisState = {
     return {
       params: isSet(object.params) ? Params.fromJSON(object.params) : undefined,
       wasms: globalThis.Array.isArray(object?.wasms) ? object.wasms.map((e: any) => Wasm.fromJSON(e)) : [],
-      proxyContractRegistry: isSet(object.proxyContractRegistry) ? globalThis.String(object.proxyContractRegistry) : "",
+      coreContractRegistry: isSet(object.coreContractRegistry) ? globalThis.String(object.coreContractRegistry) : "",
     };
   },
 
@@ -90,8 +90,8 @@ export const GenesisState = {
     if (message.wasms?.length) {
       obj.wasms = message.wasms.map((e) => Wasm.toJSON(e));
     }
-    if (message.proxyContractRegistry !== "") {
-      obj.proxyContractRegistry = message.proxyContractRegistry;
+    if (message.coreContractRegistry !== "") {
+      obj.coreContractRegistry = message.coreContractRegistry;
     }
     return obj;
   },
@@ -105,7 +105,7 @@ export const GenesisState = {
       ? Params.fromPartial(object.params)
       : undefined;
     message.wasms = object.wasms?.map((e) => Wasm.fromPartial(e)) || [];
-    message.proxyContractRegistry = object.proxyContractRegistry ?? "";
+    message.coreContractRegistry = object.coreContractRegistry ?? "";
     return message;
   },
 };
