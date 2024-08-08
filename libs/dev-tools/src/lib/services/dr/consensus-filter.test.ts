@@ -43,4 +43,58 @@ describe('encodeConsensusFilter', () => {
       }).toThrowError();
     });
   });
+
+  describe('method: std-dev', () => {
+    // Taken from chain unit tests
+    it.each([
+      {
+        input: {
+          jsonPath: '$.result.text',
+          maxSigma: 1.5,
+          numberType: 'uint64',
+        },
+        expectedResult:
+          '02000000000016E36003000000000000000D242E726573756C742E74657874',
+      },
+      {
+        input: {
+          jsonPath: '$.result.text',
+          maxSigma: 1.5,
+          numberType: 'int64',
+        },
+        expectedResult:
+          '02000000000016E36001000000000000000D242E726573756C742E74657874',
+      },
+      {
+        input: {
+          jsonPath: '$.result.text',
+          maxSigma: 0.5,
+          numberType: 'int64',
+        },
+        expectedResult:
+          '02000000000007A12001000000000000000D242E726573756C742E74657874',
+      },
+    ] as const)('should encode a valid filter', ({ input, expectedResult }) => {
+      const result = encodeConsensusFilter({
+        method: 'std-dev',
+        ...input,
+      });
+
+      const resultAsHex = Buffer.from(result).toString('hex').toUpperCase();
+
+      expect(resultAsHex).toBe(expectedResult);
+    });
+
+    it('should fail on an invalid JSON path', () => {
+      expect(() => {
+        encodeConsensusFilter({
+          method: 'std-dev',
+          // @ts-expect-error Force invalid input
+          jsonPath: 'result.text',
+          maxSigma: 1.5,
+          numberType: 'int32',
+        });
+      }).toThrowError();
+    });
+  });
 });
