@@ -14,6 +14,8 @@ import { uploadWasmBinary } from '@dev-tools/services/wasm/upload-wasm-binary';
 import { tryAsync } from '@dev-tools/utils/try-async';
 import { Signer } from '@dev-tools/services/signer';
 import { buildSigningConfig } from '@dev-tools/services/config';
+import { keccak256 } from '@dev-tools/cli-utils/keccak256';
+import { getWasmBinary } from '@dev-tools/services/wasm/get-wasm-binary';
 
 export const upload = new Command('upload');
 upload.description('upload a Data Request WASM binary to the SEDA chain.');
@@ -41,6 +43,20 @@ upload.action(async () => {
     spinnerError(`Failed to read file "${filePath}"`);
     console.error(wasmBinary.error);
     process.exit(1);
+  }
+
+  const drWasmId = keccak256(wasmBinary.value);
+  const wasm = await getWasmBinary(signer.value, drWasmId);
+  
+  if (wasm.isOk) {
+    if (wasm.value.isJust) {
+      // There is already a binary with the same hash on chain
+      spinnerSuccess();
+      console.table({
+        wasmHash: Buffer.from(wasm.value.value.hash).toString('hex'),
+      });
+      process.exit(0);
+    }
   }
 
   const response = await uploadWasmBinary(
