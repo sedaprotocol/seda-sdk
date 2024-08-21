@@ -1,4 +1,4 @@
-import { sedachain } from '@dev-tools/proto';
+import { sedachain } from '@seda-protocol/proto-messages';
 import { createProtoQueryClient } from '../proto-query-client';
 import { QueryConfig } from '../config';
 

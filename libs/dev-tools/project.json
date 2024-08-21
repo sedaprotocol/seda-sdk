@@ -8,20 +8,13 @@
     "lint": {
       "executor": "@nx/eslint:lint"
     },
-    "generate-proto": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "libs/dev-tools/proto",
-        "command": "bunx buf generate"
-      }
-    },
     "build-cli": {
       "executor": "nx:run-commands",
       "options": {
         "command": "bun run build:cli",
         "cwd": "libs/dev-tools"
       },
-      "dependsOn": [{ "target": "generate-proto" }]
+      "dependsOn": [{ "target": "build", "projects": ["proto-messages"] }]
     },
     "build-lib": {
       "executor": "nx:run-commands",
@@ -30,13 +23,13 @@
         "cwd": "libs/dev-tools"
       },
       "dependsOn": [
-        { "target": "generate-proto" },
+        { "target": "build", "projects": ["proto-messages"] },
         { "target": "build", "projects": ["vm"] }
       ]
     },
     "build": {
       "dependsOn": [
-        { "target": "generate-proto" },
+        { "target": "build", "projects": ["proto-messages"] },
         { "target": "build", "projects": ["vm"] }
       ]
     },

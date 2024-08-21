@@ -1,7 +1,7 @@
 import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate';
 import { MsgExecuteContractResponse } from 'cosmjs-types/cosmwasm/wasm/v1/tx';
 import { Result } from 'true-myth';
-import { sedachain } from '@dev-tools/proto';
+import { sedachain } from '@seda-protocol/proto-messages';
 import { tryAsync } from '@dev-tools/utils/try-async';
 import { ISigner } from './signer';
 

@@ -1,6 +1,6 @@
 import { Result } from 'true-myth';
 import { gzip } from 'node-gzip';
-import { sedachain } from '@dev-tools/proto';
+import { sedachain } from '@seda-protocol/proto-messages';
 import { createSigningClient } from '../signing-client';
 import { signAndSendTx } from '../sign-and-send-tx';
 import type { GasOptions } from '../gas-options';

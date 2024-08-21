@@ -1,10 +1,10 @@
+import { Maybe, Result } from "true-myth";
+import type { sedachain } from "@seda-protocol/proto-messages";
 import { tryAsync } from "@dev-tools/utils/try-async";
 import { ISigner } from "../signer";
 import { createWasmQueryClient } from "./query-client";
-import { Maybe, Result } from "true-myth";
-import { Wasm } from "gen/index.sedachain.wasm_storage.v1";
 
-export async function getWasmBinary(signer: ISigner, id: string): Promise<Result<Maybe<Wasm>, string>> {
+export async function getWasmBinary(signer: ISigner, id: string): Promise<Result<Maybe<sedachain.wasm_storage.v1.Wasm>, string>> {
     const queryClient = await tryAsync(async () => await createWasmQueryClient({
         rpc: signer.getEndpoint(),
     }));

@@ -1,0 +1,10 @@
+{
+  "name": "@seda-protocol/proto-messages",
+  "type": "module",
+  "version": "0.2.0",
+  "scripts": {
+    "build": "bunx buf generate",
+    "prepublish": "bun run build"
+  },
+  "main": "gen/index.ts"
+}

@@ -1,0 +1,11 @@
+# buf.gen.yaml
+version: v1
+managed:
+  enabled: true
+plugins:
+  - plugin: buf.build/community/stephenh-ts-proto
+    out: ../gen/
+    opt:
+      - esModuleInterop=true
+      - useExactTypes=false
+      - outputIndex=true
