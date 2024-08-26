@@ -5,6 +5,7 @@
   "scripts": {
     "start": "bun run build && node dist/libs/vm/src/index.js",
     "build": "nx run-many --all --target=build",
+    "cli": "bun run libs/dev-tools/bin/index.js",
     "test": "bun run build && NODE_OPTIONS=--experimental-vm-modules nx run-many --all --target=test",
     "docs": "typedoc libs/as-sdk/assembly/index.ts --tsconfig ./libs/as-sdk/assembly/tsconfig.json --skipErrorChecking",
     "cli:generate": "cd libs/cli/proto && npx buf generate"
@@ -31,7 +32,7 @@
     "@types/figlet": "^1.5.6",
     "@types/node": "18.19.9",
     "@typescript-eslint/eslint-plugin": "7.9.0",
-    "assemblyscript": "^0.27.11",
+    "assemblyscript": "0.27.11",
     "bun-plugin-dts": "^0.2.3",
     "esbuild": "0.19.9",
     "eslint": "8.57.0",
@@ -52,6 +53,7 @@
     "@types/node-gzip": "^1.1.1",
     "@wasmer/wasi": "^1.2.2",
     "big.js": "^6.2.1",
+    "@noble/secp256k1": "2.1.0",
     "commander": "^11.0.0",
     "cosmjs-types": "^0.9.0",
     "dotenv": "^16.3.1",
@@ -64,6 +66,6 @@
     "true-myth": "^7.3.0",
     "tslib": "^2.3.0",
     "valibot": "^0.35.0",
-    "visitor-as": "^0.11.4"
+    "visitor-as": "0.11.4"
   }
 }

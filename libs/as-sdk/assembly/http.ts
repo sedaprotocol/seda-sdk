@@ -2,13 +2,24 @@ import { JSON } from 'json-as/assembly';
 import { call_result_write, http_fetch } from './bindings/seda_v1';
 import { jsonArrToUint8Array, uint8arrayToJsonArray } from './json-utils';
 import { PromiseStatus, FromBuffer } from './promise';
+import { Bytes } from './bytes';
 
 @json
-class InnerResponse {
+export class InnerHttpResponse {
   bytes!: u8[];
   content_length!: i64;
   status!: i64;
   url!: string;
+  headers!: Map<string, string>;
+}
+
+@json
+export class HttpResponseDisplay {
+  type: string = "HttpResponseDisplay";
+  bytes!: Bytes;
+  contentLength!: i64;
+  url!: string;
+  status!: i64;
   headers!: Map<string, string>;
 }
 
@@ -18,13 +29,9 @@ class InnerResponse {
 @json
 export class HttpResponse implements FromBuffer<HttpResponse> {
   /**
-   * Raw result of the HTTP fetch. (usually not used)
-   */
-  public result: Uint8Array | null = null;
-  /**
    * The response body result. This can be used to convert to JSON, text, etc.
    */
-  public bytes: Uint8Array = new Uint8Array(0);
+  public bytes: Bytes = new Bytes(new Uint8Array(0));
   /**
    * The length of the content
    */
@@ -42,12 +49,11 @@ export class HttpResponse implements FromBuffer<HttpResponse> {
    */
   public headers: Map<string, string> = new Map();
 
-  fromBuffer(buffer: Uint8Array): HttpResponse {
+  static fromInner(value: InnerHttpResponse): HttpResponse {
     const response = new HttpResponse();
-    const value = JSON.parse<InnerResponse>(String.UTF8.decode(buffer.buffer));
-
+    
     if (value.bytes) {
-      response.bytes = jsonArrToUint8Array(<u8[]>value.bytes);
+      response.bytes.value = jsonArrToUint8Array(<u8[]>value.bytes);
     }
 
     if (value.content_length) {
@@ -76,15 +82,20 @@ export class HttpResponse implements FromBuffer<HttpResponse> {
       }
     }
 
-    response.result = buffer;
     return response;
   }
 
+  fromBuffer(buffer: Uint8Array): HttpResponse {
+    const value = JSON.parse<InnerHttpResponse>(String.UTF8.decode(buffer.buffer));
+
+    return HttpResponse.fromInner(value);
+  }
+
   toString(): string {
-    const response = new InnerResponse();
+    const response = new HttpResponseDisplay();
     
-    response.bytes = uint8arrayToJsonArray(this.bytes);
-    response.content_length = this.contentLength;
+    response.bytes = this.bytes;
+    response.contentLength = this.contentLength;
     response.headers = this.headers;
     response.status = this.status;
     response.url = this.url;
@@ -131,7 +142,7 @@ export class HttpFetchOptions {
 }
 
 @json
-class HttpFetch {
+export class HttpFetch {
   url: string;
   options: HttpFetchOptions;
 

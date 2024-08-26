@@ -1,4 +1,4 @@
-import type { ToBuffer } from "./vm-promise";
+import { PromiseStatus, PromiseStatusResult, ToBuffer } from "./vm-promise";
 
 enum HttpFetchMethod {
   Options = 'Options',
@@ -45,6 +45,38 @@ export class HttpFetchResponse implements ToBuffer {
 
   toBuffer(): Uint8Array {
     return new TextEncoder().encode(JSON.stringify(this.data));
+  }
+
+  static createRejectedPromise(error: string): PromiseStatus<HttpFetchResponse> {
+    const errorBytes = Array.from(new TextEncoder().encode(error));
+
+    return PromiseStatus.rejected(new HttpFetchResponse({
+      bytes: errorBytes,
+      content_length: errorBytes.length,
+      headers: {},
+      status: 0,
+      url: '',
+    }));
+  }
+
+  static fromPromise(input: PromiseStatus<HttpFetchResponse>): HttpFetchResponse {
+    if (input.value.Fulfilled) {
+      const fulfilled = Buffer.from(input.value.Fulfilled).toString('utf-8');
+      return new HttpFetchResponse(JSON.parse(fulfilled));
+    }
+
+    if (input.value.Rejected) {
+      const rejected = Buffer.from(input.value.Rejected).toString('utf-8');
+      return new HttpFetchResponse(JSON.parse(rejected));
+    }
+
+    return new HttpFetchResponse({
+      bytes: [],
+      content_length: 0,
+      headers: {},
+      status: 0,
+      url: ''
+    });
   }
 }
 

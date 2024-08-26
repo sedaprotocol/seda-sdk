@@ -20,6 +20,6 @@ export function testTallyVmHttp(): void {
   }
 
   if (rejected !== null) {
-    Process.exit_with_result(0, rejected.bytes);
+    Process.exit_with_result(0, rejected.bytes.value);
   }
 }
