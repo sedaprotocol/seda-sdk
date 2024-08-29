@@ -18,7 +18,7 @@
     "@cosmjs/proto-signing": "^0.32.3",
     "@cosmjs/stargate": "^0.32.3",
     "@cosmjs/tendermint-rpc": "^0.32.3",
-    "@seda-protocol/proto-messages": "^0.2.0",
+    "@seda-protocol/proto-messages": "0.3.0-dev.0",
     "@seda-protocol/vm": "^0.0.3",
     "big.js": "^6.2.1",
     "dotenv": "^16.3.1",
