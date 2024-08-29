@@ -9,54 +9,10 @@ import Long from "long";
 import _m0 from "protobufjs/minimal";
 import { Timestamp } from "../../../google/protobuf/timestamp";
 
-/** WasmType is an enum for the type of wasm. */
-export enum WasmType {
-  /** WASM_TYPE_DATA_REQUEST - WASM_TYPE_DATA_REQUEST is for data request and tally wasms. */
-  WASM_TYPE_DATA_REQUEST = 0,
-  /** WASM_TYPE_DATA_REQUEST_EXECUTOR - WASM_TYPE_DATA_REQUEST_EXECUTOR is for overlay executors. */
-  WASM_TYPE_DATA_REQUEST_EXECUTOR = 1,
-  /** WASM_TYPE_RELAYER - WASM_TYPE_RELAYER is for overlay relayers. */
-  WASM_TYPE_RELAYER = 2,
-  UNRECOGNIZED = -1,
-}
-
-export function wasmTypeFromJSON(object: any): WasmType {
-  switch (object) {
-    case 0:
-    case "WASM_TYPE_DATA_REQUEST":
-      return WasmType.WASM_TYPE_DATA_REQUEST;
-    case 1:
-    case "WASM_TYPE_DATA_REQUEST_EXECUTOR":
-      return WasmType.WASM_TYPE_DATA_REQUEST_EXECUTOR;
-    case 2:
-    case "WASM_TYPE_RELAYER":
-      return WasmType.WASM_TYPE_RELAYER;
-    case -1:
-    case "UNRECOGNIZED":
-    default:
-      return WasmType.UNRECOGNIZED;
-  }
-}
-
-export function wasmTypeToJSON(object: WasmType): string {
-  switch (object) {
-    case WasmType.WASM_TYPE_DATA_REQUEST:
-      return "WASM_TYPE_DATA_REQUEST";
-    case WasmType.WASM_TYPE_DATA_REQUEST_EXECUTOR:
-      return "WASM_TYPE_DATA_REQUEST_EXECUTOR";
-    case WasmType.WASM_TYPE_RELAYER:
-      return "WASM_TYPE_RELAYER";
-    case WasmType.UNRECOGNIZED:
-    default:
-      return "UNRECOGNIZED";
-  }
-}
-
-/** A Wasm msg. */
-export interface Wasm {
+/** DataRequestWasm represents a wasm used for data requests. */
+export interface DataRequestWasm {
   hash: Uint8Array;
   bytecode: Uint8Array;
-  wasmType: WasmType;
   addedAt:
     | Date
     | undefined;
@@ -65,6 +21,13 @@ export interface Wasm {
    * wasm will be pruned. The value of zero means no expiration.
    */
   expirationHeight: number;
+}
+
+/** ExecutorWasm represents a wasm used for some execution in the protocol. */
+export interface ExecutorWasm {
+  hash: Uint8Array;
+  bytecode: Uint8Array;
+  addedAt: Date | undefined;
 }
 
 /** Params to define the max wasm size allowed. */
@@ -77,34 +40,31 @@ export interface Params {
   wasmTtl: number;
 }
 
-function createBaseWasm(): Wasm {
-  return { hash: new Uint8Array(0), bytecode: new Uint8Array(0), wasmType: 0, addedAt: undefined, expirationHeight: 0 };
+function createBaseDataRequestWasm(): DataRequestWasm {
+  return { hash: new Uint8Array(0), bytecode: new Uint8Array(0), addedAt: undefined, expirationHeight: 0 };
 }
 
-export const Wasm = {
-  encode(message: Wasm, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const DataRequestWasm = {
+  encode(message: DataRequestWasm, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.hash.length !== 0) {
       writer.uint32(10).bytes(message.hash);
     }
     if (message.bytecode.length !== 0) {
       writer.uint32(18).bytes(message.bytecode);
     }
-    if (message.wasmType !== 0) {
-      writer.uint32(24).int32(message.wasmType);
-    }
     if (message.addedAt !== undefined) {
-      Timestamp.encode(toTimestamp(message.addedAt), writer.uint32(34).fork()).ldelim();
+      Timestamp.encode(toTimestamp(message.addedAt), writer.uint32(26).fork()).ldelim();
     }
     if (message.expirationHeight !== 0) {
-      writer.uint32(40).int64(message.expirationHeight);
+      writer.uint32(32).int64(message.expirationHeight);
     }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): Wasm {
+  decode(input: _m0.Reader | Uint8Array, length?: number): DataRequestWasm {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseWasm();
+    const message = createBaseDataRequestWasm();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -123,21 +83,14 @@ export const Wasm = {
           message.bytecode = reader.bytes();
           continue;
         case 3:
-          if (tag !== 24) {
-            break;
-          }
-
-          message.wasmType = reader.int32() as any;
-          continue;
-        case 4:
-          if (tag !== 34) {
+          if (tag !== 26) {
             break;
           }
 
           message.addedAt = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
           continue;
-        case 5:
-          if (tag !== 40) {
+        case 4:
+          if (tag !== 32) {
             break;
           }
 
@@ -152,26 +105,22 @@ export const Wasm = {
     return message;
   },
 
-  fromJSON(object: any): Wasm {
+  fromJSON(object: any): DataRequestWasm {
     return {
       hash: isSet(object.hash) ? bytesFromBase64(object.hash) : new Uint8Array(0),
       bytecode: isSet(object.bytecode) ? bytesFromBase64(object.bytecode) : new Uint8Array(0),
-      wasmType: isSet(object.wasmType) ? wasmTypeFromJSON(object.wasmType) : 0,
       addedAt: isSet(object.addedAt) ? fromJsonTimestamp(object.addedAt) : undefined,
       expirationHeight: isSet(object.expirationHeight) ? globalThis.Number(object.expirationHeight) : 0,
     };
   },
 
-  toJSON(message: Wasm): unknown {
+  toJSON(message: DataRequestWasm): unknown {
     const obj: any = {};
     if (message.hash.length !== 0) {
       obj.hash = base64FromBytes(message.hash);
     }
     if (message.bytecode.length !== 0) {
       obj.bytecode = base64FromBytes(message.bytecode);
-    }
-    if (message.wasmType !== 0) {
-      obj.wasmType = wasmTypeToJSON(message.wasmType);
     }
     if (message.addedAt !== undefined) {
       obj.addedAt = message.addedAt.toISOString();
@@ -182,16 +131,104 @@ export const Wasm = {
     return obj;
   },
 
-  create(base?: DeepPartial<Wasm>): Wasm {
-    return Wasm.fromPartial(base ?? {});
+  create(base?: DeepPartial<DataRequestWasm>): DataRequestWasm {
+    return DataRequestWasm.fromPartial(base ?? {});
   },
-  fromPartial(object: DeepPartial<Wasm>): Wasm {
-    const message = createBaseWasm();
+  fromPartial(object: DeepPartial<DataRequestWasm>): DataRequestWasm {
+    const message = createBaseDataRequestWasm();
     message.hash = object.hash ?? new Uint8Array(0);
     message.bytecode = object.bytecode ?? new Uint8Array(0);
-    message.wasmType = object.wasmType ?? 0;
     message.addedAt = object.addedAt ?? undefined;
     message.expirationHeight = object.expirationHeight ?? 0;
+    return message;
+  },
+};
+
+function createBaseExecutorWasm(): ExecutorWasm {
+  return { hash: new Uint8Array(0), bytecode: new Uint8Array(0), addedAt: undefined };
+}
+
+export const ExecutorWasm = {
+  encode(message: ExecutorWasm, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.hash.length !== 0) {
+      writer.uint32(10).bytes(message.hash);
+    }
+    if (message.bytecode.length !== 0) {
+      writer.uint32(18).bytes(message.bytecode);
+    }
+    if (message.addedAt !== undefined) {
+      Timestamp.encode(toTimestamp(message.addedAt), writer.uint32(26).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ExecutorWasm {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseExecutorWasm();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.hash = reader.bytes();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.bytecode = reader.bytes();
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.addedAt = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ExecutorWasm {
+    return {
+      hash: isSet(object.hash) ? bytesFromBase64(object.hash) : new Uint8Array(0),
+      bytecode: isSet(object.bytecode) ? bytesFromBase64(object.bytecode) : new Uint8Array(0),
+      addedAt: isSet(object.addedAt) ? fromJsonTimestamp(object.addedAt) : undefined,
+    };
+  },
+
+  toJSON(message: ExecutorWasm): unknown {
+    const obj: any = {};
+    if (message.hash.length !== 0) {
+      obj.hash = base64FromBytes(message.hash);
+    }
+    if (message.bytecode.length !== 0) {
+      obj.bytecode = base64FromBytes(message.bytecode);
+    }
+    if (message.addedAt !== undefined) {
+      obj.addedAt = message.addedAt.toISOString();
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<ExecutorWasm>): ExecutorWasm {
+    return ExecutorWasm.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ExecutorWasm>): ExecutorWasm {
+    const message = createBaseExecutorWasm();
+    message.hash = object.hash ?? new Uint8Array(0);
+    message.bytecode = object.bytecode ?? new Uint8Array(0);
+    message.addedAt = object.addedAt ?? undefined;
     return message;
   },
 };

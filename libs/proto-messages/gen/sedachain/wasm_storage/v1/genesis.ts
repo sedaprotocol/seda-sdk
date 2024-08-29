@@ -6,21 +6,21 @@
 
 /* eslint-disable */
 import _m0 from "protobufjs/minimal";
-import { Params, Wasm } from "./wasm_storage";
+import { DataRequestWasm, ExecutorWasm, Params } from "./wasm_storage";
 
 /**
  * GenesisState defines the wasm module's genesis state(i.e wasms stored at
  * genesis.)
  */
 export interface GenesisState {
-  /** Params represents module specific parameters. */
   params: Params | undefined;
-  wasms: Wasm[];
+  dataRequestWasms: DataRequestWasm[];
+  executorWasms: ExecutorWasm[];
   coreContractRegistry: string;
 }
 
 function createBaseGenesisState(): GenesisState {
-  return { params: undefined, wasms: [], coreContractRegistry: "" };
+  return { params: undefined, dataRequestWasms: [], executorWasms: [], coreContractRegistry: "" };
 }
 
 export const GenesisState = {
@@ -28,11 +28,14 @@ export const GenesisState = {
     if (message.params !== undefined) {
       Params.encode(message.params, writer.uint32(10).fork()).ldelim();
     }
-    for (const v of message.wasms) {
-      Wasm.encode(v!, writer.uint32(18).fork()).ldelim();
+    for (const v of message.dataRequestWasms) {
+      DataRequestWasm.encode(v!, writer.uint32(18).fork()).ldelim();
+    }
+    for (const v of message.executorWasms) {
+      ExecutorWasm.encode(v!, writer.uint32(26).fork()).ldelim();
     }
     if (message.coreContractRegistry !== "") {
-      writer.uint32(26).string(message.coreContractRegistry);
+      writer.uint32(34).string(message.coreContractRegistry);
     }
     return writer;
   },
@@ -56,10 +59,17 @@ export const GenesisState = {
             break;
           }
 
-          message.wasms.push(Wasm.decode(reader, reader.uint32()));
+          message.dataRequestWasms.push(DataRequestWasm.decode(reader, reader.uint32()));
           continue;
         case 3:
           if (tag !== 26) {
+            break;
+          }
+
+          message.executorWasms.push(ExecutorWasm.decode(reader, reader.uint32()));
+          continue;
+        case 4:
+          if (tag !== 34) {
             break;
           }
 
@@ -77,7 +87,12 @@ export const GenesisState = {
   fromJSON(object: any): GenesisState {
     return {
       params: isSet(object.params) ? Params.fromJSON(object.params) : undefined,
-      wasms: globalThis.Array.isArray(object?.wasms) ? object.wasms.map((e: any) => Wasm.fromJSON(e)) : [],
+      dataRequestWasms: globalThis.Array.isArray(object?.dataRequestWasms)
+        ? object.dataRequestWasms.map((e: any) => DataRequestWasm.fromJSON(e))
+        : [],
+      executorWasms: globalThis.Array.isArray(object?.executorWasms)
+        ? object.executorWasms.map((e: any) => ExecutorWasm.fromJSON(e))
+        : [],
       coreContractRegistry: isSet(object.coreContractRegistry) ? globalThis.String(object.coreContractRegistry) : "",
     };
   },
@@ -87,8 +102,11 @@ export const GenesisState = {
     if (message.params !== undefined) {
       obj.params = Params.toJSON(message.params);
     }
-    if (message.wasms?.length) {
-      obj.wasms = message.wasms.map((e) => Wasm.toJSON(e));
+    if (message.dataRequestWasms?.length) {
+      obj.dataRequestWasms = message.dataRequestWasms.map((e) => DataRequestWasm.toJSON(e));
+    }
+    if (message.executorWasms?.length) {
+      obj.executorWasms = message.executorWasms.map((e) => ExecutorWasm.toJSON(e));
     }
     if (message.coreContractRegistry !== "") {
       obj.coreContractRegistry = message.coreContractRegistry;
@@ -104,7 +122,8 @@ export const GenesisState = {
     message.params = (object.params !== undefined && object.params !== null)
       ? Params.fromPartial(object.params)
       : undefined;
-    message.wasms = object.wasms?.map((e) => Wasm.fromPartial(e)) || [];
+    message.dataRequestWasms = object.dataRequestWasms?.map((e) => DataRequestWasm.fromPartial(e)) || [];
+    message.executorWasms = object.executorWasms?.map((e) => ExecutorWasm.fromPartial(e)) || [];
     message.coreContractRegistry = object.coreContractRegistry ?? "";
     return message;
   },

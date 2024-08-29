@@ -5,10 +5,10 @@
 
 /* eslint-disable */
 
-export * as sedachain from "./index.sedachain";
 export * as google from "./index.google";
-export * as cosmos_proto from "./index.cosmos_proto";
-export * as cosmos from "./index.cosmos";
 export * as gogoproto from "./index.gogoproto";
+export * as cosmos_proto from "./index.cosmos_proto";
 export * as amino from "./index.amino";
+export * as cosmos from "./index.cosmos";
+export * as sedachain from "./index.sedachain";
 export * as tendermint from "./index.tendermint";

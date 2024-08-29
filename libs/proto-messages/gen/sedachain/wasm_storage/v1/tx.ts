@@ -8,7 +8,7 @@
 import Long from "long";
 import _m0 from "protobufjs/minimal";
 import { Coin } from "../../../cosmos/base/v1beta1/coin";
-import { Params, WasmType, wasmTypeFromJSON, wasmTypeToJSON } from "./wasm_storage";
+import { Params } from "./wasm_storage";
 
 /** The request message for the StoreDataRequestWasm method. */
 export interface MsgStoreDataRequestWasm {
@@ -21,20 +21,19 @@ export interface MsgStoreDataRequestWasmResponse {
   hash: string;
 }
 
-/** The request message for the StoreOverlayWasm method. */
-export interface MsgStoreOverlayWasm {
+/** The request message for the StoreExecutorWasm method. */
+export interface MsgStoreExecutorWasm {
   sender: string;
   wasm: Uint8Array;
-  wasmType: WasmType;
 }
 
-/** The response message for the StoreOverlayWasm method. */
-export interface MsgStoreOverlayWasmResponse {
+/** The response message for the StoreExecutorWasm method. */
+export interface MsgStoreExecutorWasmResponse {
   hash: string;
 }
 
-/** The request message for the InstantiateAndRegisterCoreContract method. */
-export interface MsgInstantiateAndRegisterCoreContract {
+/** The request message for the InstantiateCoreContract method. */
+export interface MsgInstantiateCoreContract {
   sender: string;
   admin: string;
   codeId: number;
@@ -45,8 +44,8 @@ export interface MsgInstantiateAndRegisterCoreContract {
   fixMsg: boolean;
 }
 
-/** The response message for the InstantiateAndRegisterCoreContract method. */
-export interface MsgInstantiateAndRegisterCoreContractResponse {
+/** The response message for the InstantiateCoreContract method. */
+export interface MsgInstantiateCoreContractResponse {
   contractAddress: string;
 }
 
@@ -195,28 +194,25 @@ export const MsgStoreDataRequestWasmResponse = {
   },
 };
 
-function createBaseMsgStoreOverlayWasm(): MsgStoreOverlayWasm {
-  return { sender: "", wasm: new Uint8Array(0), wasmType: 0 };
+function createBaseMsgStoreExecutorWasm(): MsgStoreExecutorWasm {
+  return { sender: "", wasm: new Uint8Array(0) };
 }
 
-export const MsgStoreOverlayWasm = {
-  encode(message: MsgStoreOverlayWasm, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const MsgStoreExecutorWasm = {
+  encode(message: MsgStoreExecutorWasm, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.sender !== "") {
       writer.uint32(10).string(message.sender);
     }
     if (message.wasm.length !== 0) {
       writer.uint32(18).bytes(message.wasm);
     }
-    if (message.wasmType !== 0) {
-      writer.uint32(24).int32(message.wasmType);
-    }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgStoreOverlayWasm {
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgStoreExecutorWasm {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgStoreOverlayWasm();
+    const message = createBaseMsgStoreExecutorWasm();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -234,13 +230,6 @@ export const MsgStoreOverlayWasm = {
 
           message.wasm = reader.bytes();
           continue;
-        case 3:
-          if (tag !== 24) {
-            break;
-          }
-
-          message.wasmType = reader.int32() as any;
-          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -250,15 +239,14 @@ export const MsgStoreOverlayWasm = {
     return message;
   },
 
-  fromJSON(object: any): MsgStoreOverlayWasm {
+  fromJSON(object: any): MsgStoreExecutorWasm {
     return {
       sender: isSet(object.sender) ? globalThis.String(object.sender) : "",
       wasm: isSet(object.wasm) ? bytesFromBase64(object.wasm) : new Uint8Array(0),
-      wasmType: isSet(object.wasmType) ? wasmTypeFromJSON(object.wasmType) : 0,
     };
   },
 
-  toJSON(message: MsgStoreOverlayWasm): unknown {
+  toJSON(message: MsgStoreExecutorWasm): unknown {
     const obj: any = {};
     if (message.sender !== "") {
       obj.sender = message.sender;
@@ -266,40 +254,36 @@ export const MsgStoreOverlayWasm = {
     if (message.wasm.length !== 0) {
       obj.wasm = base64FromBytes(message.wasm);
     }
-    if (message.wasmType !== 0) {
-      obj.wasmType = wasmTypeToJSON(message.wasmType);
-    }
     return obj;
   },
 
-  create(base?: DeepPartial<MsgStoreOverlayWasm>): MsgStoreOverlayWasm {
-    return MsgStoreOverlayWasm.fromPartial(base ?? {});
+  create(base?: DeepPartial<MsgStoreExecutorWasm>): MsgStoreExecutorWasm {
+    return MsgStoreExecutorWasm.fromPartial(base ?? {});
   },
-  fromPartial(object: DeepPartial<MsgStoreOverlayWasm>): MsgStoreOverlayWasm {
-    const message = createBaseMsgStoreOverlayWasm();
+  fromPartial(object: DeepPartial<MsgStoreExecutorWasm>): MsgStoreExecutorWasm {
+    const message = createBaseMsgStoreExecutorWasm();
     message.sender = object.sender ?? "";
     message.wasm = object.wasm ?? new Uint8Array(0);
-    message.wasmType = object.wasmType ?? 0;
     return message;
   },
 };
 
-function createBaseMsgStoreOverlayWasmResponse(): MsgStoreOverlayWasmResponse {
+function createBaseMsgStoreExecutorWasmResponse(): MsgStoreExecutorWasmResponse {
   return { hash: "" };
 }
 
-export const MsgStoreOverlayWasmResponse = {
-  encode(message: MsgStoreOverlayWasmResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const MsgStoreExecutorWasmResponse = {
+  encode(message: MsgStoreExecutorWasmResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.hash !== "") {
       writer.uint32(10).string(message.hash);
     }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgStoreOverlayWasmResponse {
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgStoreExecutorWasmResponse {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgStoreOverlayWasmResponse();
+    const message = createBaseMsgStoreExecutorWasmResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -319,11 +303,11 @@ export const MsgStoreOverlayWasmResponse = {
     return message;
   },
 
-  fromJSON(object: any): MsgStoreOverlayWasmResponse {
+  fromJSON(object: any): MsgStoreExecutorWasmResponse {
     return { hash: isSet(object.hash) ? globalThis.String(object.hash) : "" };
   },
 
-  toJSON(message: MsgStoreOverlayWasmResponse): unknown {
+  toJSON(message: MsgStoreExecutorWasmResponse): unknown {
     const obj: any = {};
     if (message.hash !== "") {
       obj.hash = message.hash;
@@ -331,17 +315,17 @@ export const MsgStoreOverlayWasmResponse = {
     return obj;
   },
 
-  create(base?: DeepPartial<MsgStoreOverlayWasmResponse>): MsgStoreOverlayWasmResponse {
-    return MsgStoreOverlayWasmResponse.fromPartial(base ?? {});
+  create(base?: DeepPartial<MsgStoreExecutorWasmResponse>): MsgStoreExecutorWasmResponse {
+    return MsgStoreExecutorWasmResponse.fromPartial(base ?? {});
   },
-  fromPartial(object: DeepPartial<MsgStoreOverlayWasmResponse>): MsgStoreOverlayWasmResponse {
-    const message = createBaseMsgStoreOverlayWasmResponse();
+  fromPartial(object: DeepPartial<MsgStoreExecutorWasmResponse>): MsgStoreExecutorWasmResponse {
+    const message = createBaseMsgStoreExecutorWasmResponse();
     message.hash = object.hash ?? "";
     return message;
   },
 };
 
-function createBaseMsgInstantiateAndRegisterCoreContract(): MsgInstantiateAndRegisterCoreContract {
+function createBaseMsgInstantiateCoreContract(): MsgInstantiateCoreContract {
   return {
     sender: "",
     admin: "",
@@ -354,8 +338,8 @@ function createBaseMsgInstantiateAndRegisterCoreContract(): MsgInstantiateAndReg
   };
 }
 
-export const MsgInstantiateAndRegisterCoreContract = {
-  encode(message: MsgInstantiateAndRegisterCoreContract, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const MsgInstantiateCoreContract = {
+  encode(message: MsgInstantiateCoreContract, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.sender !== "") {
       writer.uint32(10).string(message.sender);
     }
@@ -383,10 +367,10 @@ export const MsgInstantiateAndRegisterCoreContract = {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgInstantiateAndRegisterCoreContract {
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgInstantiateCoreContract {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgInstantiateAndRegisterCoreContract();
+    const message = createBaseMsgInstantiateCoreContract();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -455,7 +439,7 @@ export const MsgInstantiateAndRegisterCoreContract = {
     return message;
   },
 
-  fromJSON(object: any): MsgInstantiateAndRegisterCoreContract {
+  fromJSON(object: any): MsgInstantiateCoreContract {
     return {
       sender: isSet(object.sender) ? globalThis.String(object.sender) : "",
       admin: isSet(object.admin) ? globalThis.String(object.admin) : "",
@@ -468,7 +452,7 @@ export const MsgInstantiateAndRegisterCoreContract = {
     };
   },
 
-  toJSON(message: MsgInstantiateAndRegisterCoreContract): unknown {
+  toJSON(message: MsgInstantiateCoreContract): unknown {
     const obj: any = {};
     if (message.sender !== "") {
       obj.sender = message.sender;
@@ -497,11 +481,11 @@ export const MsgInstantiateAndRegisterCoreContract = {
     return obj;
   },
 
-  create(base?: DeepPartial<MsgInstantiateAndRegisterCoreContract>): MsgInstantiateAndRegisterCoreContract {
-    return MsgInstantiateAndRegisterCoreContract.fromPartial(base ?? {});
+  create(base?: DeepPartial<MsgInstantiateCoreContract>): MsgInstantiateCoreContract {
+    return MsgInstantiateCoreContract.fromPartial(base ?? {});
   },
-  fromPartial(object: DeepPartial<MsgInstantiateAndRegisterCoreContract>): MsgInstantiateAndRegisterCoreContract {
-    const message = createBaseMsgInstantiateAndRegisterCoreContract();
+  fromPartial(object: DeepPartial<MsgInstantiateCoreContract>): MsgInstantiateCoreContract {
+    const message = createBaseMsgInstantiateCoreContract();
     message.sender = object.sender ?? "";
     message.admin = object.admin ?? "";
     message.codeId = object.codeId ?? 0;
@@ -514,22 +498,22 @@ export const MsgInstantiateAndRegisterCoreContract = {
   },
 };
 
-function createBaseMsgInstantiateAndRegisterCoreContractResponse(): MsgInstantiateAndRegisterCoreContractResponse {
+function createBaseMsgInstantiateCoreContractResponse(): MsgInstantiateCoreContractResponse {
   return { contractAddress: "" };
 }
 
-export const MsgInstantiateAndRegisterCoreContractResponse = {
-  encode(message: MsgInstantiateAndRegisterCoreContractResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const MsgInstantiateCoreContractResponse = {
+  encode(message: MsgInstantiateCoreContractResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.contractAddress !== "") {
       writer.uint32(10).string(message.contractAddress);
     }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgInstantiateAndRegisterCoreContractResponse {
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgInstantiateCoreContractResponse {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgInstantiateAndRegisterCoreContractResponse();
+    const message = createBaseMsgInstantiateCoreContractResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -549,11 +533,11 @@ export const MsgInstantiateAndRegisterCoreContractResponse = {
     return message;
   },
 
-  fromJSON(object: any): MsgInstantiateAndRegisterCoreContractResponse {
+  fromJSON(object: any): MsgInstantiateCoreContractResponse {
     return { contractAddress: isSet(object.contractAddress) ? globalThis.String(object.contractAddress) : "" };
   },
 
-  toJSON(message: MsgInstantiateAndRegisterCoreContractResponse): unknown {
+  toJSON(message: MsgInstantiateCoreContractResponse): unknown {
     const obj: any = {};
     if (message.contractAddress !== "") {
       obj.contractAddress = message.contractAddress;
@@ -561,15 +545,11 @@ export const MsgInstantiateAndRegisterCoreContractResponse = {
     return obj;
   },
 
-  create(
-    base?: DeepPartial<MsgInstantiateAndRegisterCoreContractResponse>,
-  ): MsgInstantiateAndRegisterCoreContractResponse {
-    return MsgInstantiateAndRegisterCoreContractResponse.fromPartial(base ?? {});
+  create(base?: DeepPartial<MsgInstantiateCoreContractResponse>): MsgInstantiateCoreContractResponse {
+    return MsgInstantiateCoreContractResponse.fromPartial(base ?? {});
   },
-  fromPartial(
-    object: DeepPartial<MsgInstantiateAndRegisterCoreContractResponse>,
-  ): MsgInstantiateAndRegisterCoreContractResponse {
-    const message = createBaseMsgInstantiateAndRegisterCoreContractResponse();
+  fromPartial(object: DeepPartial<MsgInstantiateCoreContractResponse>): MsgInstantiateCoreContractResponse {
+    const message = createBaseMsgInstantiateCoreContractResponse();
     message.contractAddress = object.contractAddress ?? "";
     return message;
   },
@@ -696,23 +676,15 @@ export const MsgUpdateParamsResponse = {
 
 /** Msg service defines the wasm-storage tx gRPC methods. */
 export interface Msg {
-  /**
-   * The StoreDataRequestWasm method stores a dr wasm in the wasm-storage
-   * module.
-   */
+  /** StoreDataRequestWasm stores a data request wasm. */
   StoreDataRequestWasm(request: MsgStoreDataRequestWasm): Promise<MsgStoreDataRequestWasmResponse>;
+  /** StoreExecutorWasm stores an executor wasm. */
+  StoreExecutorWasm(request: MsgStoreExecutorWasm): Promise<MsgStoreExecutorWasmResponse>;
   /**
-   * The StoreOverlayWasm method stores an overlay wasm in the wasm-storage
-   * module.
+   * InstantiateCoreContract instantiates the Core Contract and registers its
+   * address.
    */
-  StoreOverlayWasm(request: MsgStoreOverlayWasm): Promise<MsgStoreOverlayWasmResponse>;
-  /**
-   * The InstantiateAndRegisterCoreContract method instantiates the Core
-   * Contract and registers its address.
-   */
-  InstantiateAndRegisterCoreContract(
-    request: MsgInstantiateAndRegisterCoreContract,
-  ): Promise<MsgInstantiateAndRegisterCoreContractResponse>;
+  InstantiateCoreContract(request: MsgInstantiateCoreContract): Promise<MsgInstantiateCoreContractResponse>;
   /** The UpdateParams method updates the module's parameters. */
   UpdateParams(request: MsgUpdateParams): Promise<MsgUpdateParamsResponse>;
 }
@@ -725,8 +697,8 @@ export class MsgClientImpl implements Msg {
     this.service = opts?.service || MsgServiceName;
     this.rpc = rpc;
     this.StoreDataRequestWasm = this.StoreDataRequestWasm.bind(this);
-    this.StoreOverlayWasm = this.StoreOverlayWasm.bind(this);
-    this.InstantiateAndRegisterCoreContract = this.InstantiateAndRegisterCoreContract.bind(this);
+    this.StoreExecutorWasm = this.StoreExecutorWasm.bind(this);
+    this.InstantiateCoreContract = this.InstantiateCoreContract.bind(this);
     this.UpdateParams = this.UpdateParams.bind(this);
   }
   StoreDataRequestWasm(request: MsgStoreDataRequestWasm): Promise<MsgStoreDataRequestWasmResponse> {
@@ -735,18 +707,16 @@ export class MsgClientImpl implements Msg {
     return promise.then((data) => MsgStoreDataRequestWasmResponse.decode(_m0.Reader.create(data)));
   }
 
-  StoreOverlayWasm(request: MsgStoreOverlayWasm): Promise<MsgStoreOverlayWasmResponse> {
-    const data = MsgStoreOverlayWasm.encode(request).finish();
-    const promise = this.rpc.request(this.service, "StoreOverlayWasm", data);
-    return promise.then((data) => MsgStoreOverlayWasmResponse.decode(_m0.Reader.create(data)));
+  StoreExecutorWasm(request: MsgStoreExecutorWasm): Promise<MsgStoreExecutorWasmResponse> {
+    const data = MsgStoreExecutorWasm.encode(request).finish();
+    const promise = this.rpc.request(this.service, "StoreExecutorWasm", data);
+    return promise.then((data) => MsgStoreExecutorWasmResponse.decode(_m0.Reader.create(data)));
   }
 
-  InstantiateAndRegisterCoreContract(
-    request: MsgInstantiateAndRegisterCoreContract,
-  ): Promise<MsgInstantiateAndRegisterCoreContractResponse> {
-    const data = MsgInstantiateAndRegisterCoreContract.encode(request).finish();
-    const promise = this.rpc.request(this.service, "InstantiateAndRegisterCoreContract", data);
-    return promise.then((data) => MsgInstantiateAndRegisterCoreContractResponse.decode(_m0.Reader.create(data)));
+  InstantiateCoreContract(request: MsgInstantiateCoreContract): Promise<MsgInstantiateCoreContractResponse> {
+    const data = MsgInstantiateCoreContract.encode(request).finish();
+    const promise = this.rpc.request(this.service, "InstantiateCoreContract", data);
+    return promise.then((data) => MsgInstantiateCoreContractResponse.decode(_m0.Reader.create(data)));
   }
 
   UpdateParams(request: MsgUpdateParams): Promise<MsgUpdateParamsResponse> {

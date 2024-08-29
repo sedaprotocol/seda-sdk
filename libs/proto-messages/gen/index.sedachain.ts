@@ -5,6 +5,7 @@
 
 /* eslint-disable */
 
+export * as data_proxy from "./index.sedachain.data_proxy";
 export * as randomness from "./index.sedachain.randomness";
 export * as staking from "./index.sedachain.staking";
 export * as vesting from "./index.sedachain.vesting";

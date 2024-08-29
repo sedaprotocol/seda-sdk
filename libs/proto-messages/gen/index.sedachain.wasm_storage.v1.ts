@@ -6,7 +6,6 @@
 /* eslint-disable */
 
 export * from "./sedachain/wasm_storage/v1/wasm_storage";
-export * from "./sedachain/wasm_storage/v1/events";
 export * from "./sedachain/wasm_storage/v1/genesis";
 export * from "./sedachain/wasm_storage/v1/query";
 export * from "./sedachain/wasm_storage/v1/tx";
