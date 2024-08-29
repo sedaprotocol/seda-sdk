@@ -40,7 +40,6 @@ show.action(async () => {
         hash,
         addedAt: wasm.addedAt,
         expirationHeight: wasm.expirationHeight,
-        wasmType: wasm.wasmType,
       });
     },
     Nothing() {

@@ -5,6 +5,7 @@ import {
   buildSigningConfig,
 } from './config';
 import { createWasmQueryClient } from '@dev-tools/services/wasm/query-client';
+import { tryAsync } from '@dev-tools/utils/try-async';
 
 const BECH32_ADDRESS_PREFIX = 'seda';
 
@@ -72,7 +73,15 @@ async function resolveCoreContractAddress(config: SigningConfig) {
 
   const queryClient = await createWasmQueryClient(config);
 
-  const response = await queryClient.CoreContractRegistry({});
+  const response = await tryAsync(async () =>
+    queryClient.CoreContractRegistry({})
+  );
 
-  return response.address;
+  if (response.isErr) {
+    throw Error(
+      'No core contract set on chain. Please provide a SEDA_CORE_CONTRACT address manually.'
+    );
+  }
+
+  return response.value.address;
 }

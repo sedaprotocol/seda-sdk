@@ -20,9 +20,9 @@ list.action(async () => {
 
   const queryResult = await wasmQueryClient.DataRequestWasms({});
 
-  const result = queryResult.hashTypePairs.map((hashTypePair) => {
-    const [hash, type] = hashTypePair.split(',');
-    return { hash, type };
+  const result = queryResult.list.map((hashTypePair) => {
+    const [hash, expirationHeight] = hashTypePair.split(',');
+    return { hash, expirationHeight };
   });
 
   spinnerSuccess();
