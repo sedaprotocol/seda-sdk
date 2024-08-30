@@ -2,6 +2,10 @@ import { VM_MODE_TALLY, VM_MODE_DR, VM_MODE_ENV_KEY } from './vm-modes';
 import { wasi_process } from '@assemblyscript/wasi-shim/assembly/wasi_process';
 import { execution_result } from './bindings/seda_v1';
 import { decodeHex } from './hex';
+import { Bytes } from './bytes';
+
+const POSIX_SUCCESS_CODE = u8(0);
+const POSIX_ERROR_CODE = u8(1);
 
 export default class Process {
   /**
@@ -36,13 +40,13 @@ export default class Process {
 
   /**
    * Gets the data request / tally inputs
-   * 
+   *
    * @returns {Uint8Array} bytes encoded inputs
    * @example
    * ```ts
    * const inputs = Process.getInputs();
    * const inputAsString = String.UTF8.decode(inputs.buffer);
-   * 
+   *
    * console.log(inputAsString);
    * ```
    */
@@ -83,52 +87,6 @@ export default class Process {
   }
 
   /**
-   * Exits the process with a message
-   * This sets the result of the Data Request execution to the message
-   *
-   * @param {u8} code Exit code (POSIX compatible, 0 is success, >= 1 is error)
-   * @param {string} message Message to exit the process with (ex. an error message)
-   * @example
-   * ```ts
-   * const result = true;
-   *
-   * if (result) {
-   *   Process.exit_with_message(0, "result was true");
-   * } else {
-   *   Process.exit_with_message(1, "result errored");
-   * }
-   * ```
-   */
-  static exit_with_message(code: u8, message: string): void {
-    const msg = String.UTF8.encode(message);
-    const buffer = Uint8Array.wrap(msg);
-
-    Process.exit_with_result(code, buffer);
-  }
-
-  /**
-   * Exits the process with a bytes encoded result.
-   * This sets Data Request execution result to the bytes
-   *
-   * @param {u8} code Exit code (POSIX compatible, 0 is success, >= 1 is error)
-   * @param {Uint8Array} result Bytes encoded result, which will be sent back to the contract
-   * @example
-   * ```ts
-   * const result = String.UTF8.encode("{\"price\": \"10.23\"}");
-   * const resultBuffer = Uint8Array.wrap(msg);
-   *
-   * Process.exit_with_result(0, resultBuffer);
-   * ```
-   */
-  static exit_with_result(code: u8, result: Uint8Array): void {
-    const buffer = result.buffer;
-    const bufferPtr = changetype<usize>(buffer);
-
-    execution_result(bufferPtr, buffer.byteLength);
-    wasi_process.exit(u32(code));
-  }
-
-  /**
    * Exits the process (no result set)
    *
    * @param {u8} code Exit code (POSIX compatible, 0 is success, >= 1 is error)
@@ -138,6 +96,47 @@ export default class Process {
    * ```
    */
   static exit(code: u8): void {
-    Process.exit_with_result(code, new Uint8Array(0));
+    exitWithResult(code, Bytes.empty());
   }
+
+  /**
+   * Exits the process with a bytes encoded result.
+   * This sets Data Request execution result to the bytes
+   *
+   * @param {Bytes} result Bytes encoded result, which will be sent back to the contract
+   * @example
+   * ```ts
+   * const result = "{\"price\": \"10.23\"}";
+   *
+   * Process.success(Bytes.fromString(result));
+   * ```
+   */
+  static success(result: Bytes): void {
+    exitWithResult(POSIX_SUCCESS_CODE, result);
+  }
+
+  /**
+   * Exits the process with a bytes encoded result.
+   * This sets Data Request execution result to the bytes
+   *
+   * @param {Bytes} result Bytes encoded result, which will be sent back to the contract
+   * @param {u8} [code=1] code Exit code, defaults to 1 (POSIX compatible, 0 is success, >= 1 is error)
+   * @example
+   * ```ts
+   * const error = "Failed to fetch data from https://example.com";
+   *
+   * Process.error(Bytes.fromString(error));
+   * ```
+   */
+    static error(result: Bytes, code: u8 = POSIX_ERROR_CODE): void {
+      exitWithResult(code, result);
+    }
+}
+
+function exitWithResult(code: u8, result: Bytes): void {
+  const buffer = result.value.buffer;
+  const bufferPtr = changetype<usize>(buffer);
+
+  execution_result(bufferPtr, buffer.byteLength);
+  wasi_process.exit(u32(code));
 }

@@ -31,7 +31,7 @@ export class HttpResponse implements FromBuffer<HttpResponse> {
   /**
    * The response body result. This can be used to convert to JSON, text, etc.
    */
-  public bytes: Bytes = new Bytes(new Uint8Array(0));
+  public bytes: Bytes = Bytes.empty();
   /**
    * The length of the content
    */
@@ -51,7 +51,7 @@ export class HttpResponse implements FromBuffer<HttpResponse> {
 
   static fromInner(value: InnerHttpResponse): HttpResponse {
     const response = new HttpResponse();
-    
+
     if (value.bytes) {
       response.bytes.value = jsonArrToUint8Array(<u8[]>value.bytes);
     }
@@ -93,7 +93,7 @@ export class HttpResponse implements FromBuffer<HttpResponse> {
 
   toString(): string {
     const response = new HttpResponseDisplay();
-    
+
     response.bytes = this.bytes;
     response.contentLength = this.contentLength;
     response.headers = this.headers;
@@ -138,7 +138,7 @@ export class HttpFetchOptions {
   /**
    * Body encoded in bytes to send along in a POST, PATCH, etc.
    */
-  body: Uint8Array | null = null;
+  body: Bytes | null = null;
 }
 
 @json

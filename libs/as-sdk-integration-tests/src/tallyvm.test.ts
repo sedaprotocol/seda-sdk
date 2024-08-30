@@ -27,7 +27,7 @@ describe('TallyVm', () => {
     );
     const result = await executeTallyWasm(
       wasmBinary,
-      Buffer.from('testTallyVmMode'), 
+      Buffer.from('testTallyVmMode'),
       []
     );
 
@@ -41,7 +41,7 @@ describe('TallyVm', () => {
     );
     const result = await executeTallyWasm(
       wasmBinary,
-      Buffer.from('testTallyVmHttp'), 
+      Buffer.from('testTallyVmHttp'),
       []
     );
 

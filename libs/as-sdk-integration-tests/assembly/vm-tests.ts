@@ -1,10 +1,10 @@
-import { Process, httpFetch } from '../../as-sdk/assembly/index';
+import { Bytes, Process, httpFetch } from '../../as-sdk/assembly/index';
 
 export function testTallyVmMode(): void {
   if (Process.isTallyVmMode()) {
-    Process.exit_with_message(0, 'tally');
+    Process.success(Bytes.fromString('tally'));
   } else if (Process.isDrVmMode()) {
-    Process.exit_with_message(1, 'dr');
+    Process.error(Bytes.fromString('dr'));
   }
 
   throw new Error(`Unknown VM mode: ${Process.getVmMode()}`);
@@ -16,10 +16,10 @@ export function testTallyVmHttp(): void {
   const rejected = response.rejected;
 
   if (fulfilled !== null) {
-    Process.exit_with_message(1, 'this should not be allowed in tally mode');
+    Process.error(Bytes.fromString('this should not be allowed in tally mode'));
   }
 
   if (rejected !== null) {
-    Process.exit_with_result(0, rejected.bytes.value);
+    Process.success(rejected.bytes);
   }
 }

@@ -1,4 +1,4 @@
-import { Console, httpFetch, Process } from '../../as-sdk/assembly/index';
+import { httpFetch, Process, Bytes } from '../../as-sdk/assembly/index';
 import { testProxyHttpFetch } from './proxy-http';
 import { testTallyVmReveals, testTallyVmRevealsFiltered } from './tally';
 import { testTallyVmHttp, testTallyVmMode } from './vm-tests';
@@ -21,35 +21,31 @@ if (args === 'testHttpRejection') {
   testProxyHttpFetch();
 }
 
-Process.exit_with_message(1, "No argument given");
+Process.error(Bytes.fromString("No argument given"));
 
-export function testHttpRejection(): void {
+function testHttpRejection(): void {
   const response = httpFetch('example.com/');
   const rejected = response.rejected;
 
   if (rejected !== null) {
-    const msg = String.UTF8.encode('rejected');
-    const buffer = Uint8Array.wrap(msg);
-
-    Process.exit_with_result(0, buffer);
+    Process.success(Bytes.fromString('rejected'));
   } else {
-    Process.exit_with_message(1, 'Test failed');
+    Process.error(Bytes.fromString('Test failed'));
   }
 }
 
-export function testHttpSuccess(): void {
+function testHttpSuccess(): void {
   const response = httpFetch('https://jsonplaceholder.typicode.com/todos/1');
   const fulfilled = response.fulfilled;
   const rejected = response.rejected;
 
-  
   if (fulfilled !== null) {
-    Process.exit_with_result(0, fulfilled.bytes.value);
-  } 
+    Process.success(fulfilled.bytes);
+  }
 
   if (rejected !== null) {
-    Process.exit_with_result(1, rejected.bytes.value);
+    Process.error(rejected.bytes);
   }
-  
-  Process.exit_with_message(20, 'Something went wrong..');
+
+  Process.error(Bytes.fromString('Something went wrong..'), 20);
 }
