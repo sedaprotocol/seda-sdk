@@ -7,27 +7,29 @@ For API documentation please see our docs: https://sedaprotocol.github.io/seda-s
 ## Example
 
 ```ts
-import { Process, httpFetch, Bytes } from "@seda-protocol/as-sdk/assembly";
-import { JSON } from "json-as/assembly";
+import { Process, httpFetch, Bytes, OracleProgram } from '@seda-protocol/as-sdk/assembly';
+import { JSON } from 'json-as/assembly';
 
 @json
 class SwPlanet {
-  name!: string
+  name!: string;
 }
 
-function main(): void {
-  const response = httpFetch("https://swapi.dev/api/planets/1/");
-  const fulfilled = response.fulfilled;
+class PlanetProgram extends OracleProgram {
+  execute(): void {
+    const response = httpFetch('https://swapi.dev/api/planets/1/');
+    const fulfilled = response.fulfilled;
 
-  if (fulfilled !== null) {
-    const data = String.UTF8.decode(fulfilled.bytes.buffer);
-    const planet = JSON.parse<SwPlanet>(data);
+    if (fulfilled !== null) {
+      const data = String.UTF8.decode(fulfilled.bytes.buffer);
+      const planet = JSON.parse<SwPlanet>(data);
 
-    Process.success(Bytes.fromString(planet.name));
-  } else {
-    Process.error(Bytes.fromString("Error while fetching"));
+      Process.success(Bytes.fromString(planet.name));
+    } else {
+      Process.error(Bytes.fromString('Error while fetching'));
+    }
   }
 }
 
-main();
+new PlanetProgram().run();
 ```

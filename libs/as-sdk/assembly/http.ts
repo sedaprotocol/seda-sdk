@@ -1,6 +1,6 @@
 import { JSON } from 'json-as/assembly';
 import { call_result_write, http_fetch } from './bindings/seda_v1';
-import { jsonArrToUint8Array, uint8arrayToJsonArray } from './json-utils';
+import { jsonArrToUint8Array } from './json-utils';
 import { PromiseStatus, FromBuffer } from './promise';
 import { Bytes } from './bytes';
 

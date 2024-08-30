@@ -25,67 +25,69 @@
 
 Collection of packages which allow you to build SEDA Data Requests:
 
-* [vm](./libs/vm/README.md) - Virtual Machine which can run Data Request WASM binaries
-* [as-sdk](./libs/as-sdk/README.md) - [AssemblyScript](https://www.assemblyscript.org/) SDK
-* [cli](./libs/cli/README.md) - Command Line Interface for uploading and listing Data Request binaries
+- [vm](./libs/vm/README.md) - Virtual Machine which can run Data Request WASM binaries
+- [as-sdk](./libs/as-sdk/README.md) - [AssemblyScript](https://www.assemblyscript.org/) SDK
+- [cli](./libs/cli/README.md) - Command Line Interface for uploading and listing Data Request binaries
 
 # Quick getting started
 
 The easiest way to get started it by using our [starter kit](https://github.com/sedaprotocol/seda-sdk-starter-template) this has all the tools installed that you need:
 
-* AssemblyScript
-* SEDA SDK
-* SEDA CLI
-* SEDA VM
-* WASI
+- AssemblyScript
+- SEDA SDK
+- SEDA CLI
+- SEDA VM
+- WASI
 
 In our `assembly/index.ts` we have the following example:
 
-```TypeScript
-import { Process, httpFetch } from "@seda-protocol/as-sdk/assembly";
-import { JSON } from "json-as/assembly";
+```ts
+import { Process, httpFetch, OracleProgram, Bytes } from '@seda-protocol/as-sdk/assembly';
+import { JSON } from 'json-as/assembly';
 
 // Our SWAPI JSON schema, since in AssemblyScript we need to define our shape beforehand
 // @ts-expect-error
 @json
 class SwPlanet {
-  name!: string
+  name!: string;
 }
 
-function main(): void {
-  // HTTP Fetch to the SWAPI
-  const response = httpFetch("https://swapi.dev/api/planets/1/");
+class PlanetProgram extends OracleProgram {
+  execution() {
+    // HTTP Fetch to the SWAPI
+    const response = httpFetch('https://swapi.dev/api/planets/1/');
 
-  // Returns either fulfilled or rejected based on the status code
-  const fulfilled = response.fulfilled;
+    // Returns either fulfilled or rejected based on the status code
+    const fulfilled = response.fulfilled;
 
-  if (fulfilled !== null) {
-    // Converts our buffer to a string
-    const data = String.UTF8.decode(fulfilled.bytes.buffer);
+    if (fulfilled !== null) {
+      // Converts our buffer to a string
+      const data = String.UTF8.decode(fulfilled.bytes.buffer);
 
-    // Parses the JSON to our schema
-    const planet = JSON.parse<SwPlanet>(data);
+      // Parses the JSON to our schema
+      const planet = JSON.parse<SwPlanet>(data);
 
-    // Exits the program (with an exit code of 0) and sets the Data Request result to the planet name
-    Process.exit_with_message(0, planet.name);
-  } else {
-    Process.exit_with_message(1, "Error while fetching");
+      // Exits the program (with an exit code of 0) and sets the Data Request result to the planet name
+      Process.success(Bytes.fromString(planet.name));
+    } else {
+      Process.error(Bytes.fromString('Error while fetching'));
+    }
   }
 }
 
-main();
+new PlanetProgram().run();
 ```
 
 And in order to test this we have to use a JS testing suite (In our starting kit we use Jest, but any suite should work). We use the `@seda-protocol/vm` package for this. Which runs the binary in the context of a SEDA Data Request:
 
-```JavaScript
-import { callVm } from "@seda-protocol/vm";
-import { readFile } from "node:fs/promises";
+```js
+import { callVm } from '@seda-protocol/vm';
+import { readFile } from 'node:fs/promises';
 
-const WASM_PATH = "build/debug.wasm";
+const WASM_PATH = 'build/debug.wasm';
 
-describe("index.ts", () => {
-  it("should be able to run", async () => {
+describe('Oracel Program: execution', () => {
+  it('should be able to run', async () => {
     const wasmBinary = await readFile(WASM_PATH);
 
     // Calls our SEDA VM
@@ -99,7 +101,7 @@ describe("index.ts", () => {
     });
 
     expect(vmResult.exitCode).toBe(0);
-    expect(vmResult.resultAsString).toBe("Tatooine");
+    expect(vmResult.resultAsString).toBe('Tatooine');
   });
 });
 ```

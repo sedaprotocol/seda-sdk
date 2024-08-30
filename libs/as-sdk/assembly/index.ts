@@ -20,3 +20,4 @@ export { RevealBody } from './tally';
 export { Console } from './console';
 export { Bytes } from './bytes';
 export { decodeHex, encodeHex } from './hex';
+export { OracleProgram } from './oracle-program';
