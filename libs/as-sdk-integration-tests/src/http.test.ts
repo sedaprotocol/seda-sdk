@@ -48,7 +48,10 @@ describe('Http', () => {
     const wasmBinary = await readFile(
       'dist/libs/as-sdk-integration-tests/debug.wasm'
     );
-    const result = await executeDrWasm(wasmBinary, Buffer.from('testHttpSuccess'));
+    const result = await executeDrWasm(
+      wasmBinary,
+      Buffer.from('testHttpSuccess')
+    );
 
     expect(result.exitCode).toBe(0);
     expect(result.result).toEqual(
@@ -59,6 +62,32 @@ describe('Http', () => {
             id: 1,
             title: 'delectus aut autem',
             completed: false,
+          },
+          undefined,
+          2
+        )
+      )
+    );
+  });
+
+  // Possibly flakey as it relies on internet connectivity and an external service
+  it('Test SDK HTTP POST Success', async () => {
+    const wasmBinary = await readFile(
+      'dist/libs/as-sdk-integration-tests/debug.wasm'
+    );
+    const result = await executeDrWasm(
+      wasmBinary,
+      Buffer.from('testPostHttpSuccess')
+    );
+
+    expect(result.exitCode).toBe(0);
+    expect(result.result).toEqual(
+      new TextEncoder().encode(
+        JSON.stringify(
+          {
+            title: 'Test SDK',
+            body: "Don't forget to test some integrations.",
+            id: 101,
           },
           undefined,
           2

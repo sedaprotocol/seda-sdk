@@ -35,3 +35,30 @@ export class TestHttpSuccess extends OracleProgram {
     Process.error(Bytes.fromString('Something went wrong..'), 20);
   }
 }
+
+export class TestPostHttpSuccess extends OracleProgram {
+  execution(): void {
+    const headers = new Map<string, string>();
+    headers.set('content-type', 'application/json');
+
+    const response = httpFetch('https://jsonplaceholder.typicode.com/posts', {
+      body: Bytes.fromString(
+        `{"title":"Test SDK","body":"Don't forget to test some integrations."}`
+      ),
+      method: 'POST',
+      headers,
+    });
+    const fulfilled = response.fulfilled;
+    const rejected = response.rejected;
+
+    if (fulfilled !== null) {
+      Process.success(fulfilled.bytes);
+    }
+
+    if (rejected !== null) {
+      Process.error(rejected.bytes);
+    }
+
+    Process.error(Bytes.fromString('Something went wrong..'), 20);
+  }
+}

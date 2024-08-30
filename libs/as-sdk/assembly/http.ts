@@ -1,25 +1,16 @@
 import { JSON } from 'json-as/assembly';
 import { call_result_write, http_fetch } from './bindings/seda_v1';
-import { jsonArrToUint8Array } from './json-utils';
+import { jsonArrToUint8Array, bytesToJsonArray } from './json-utils';
 import { PromiseStatus, FromBuffer } from './promise';
 import { Bytes } from './bytes';
+import { Console } from './console';
 
 @json
-export class InnerHttpResponse {
+export class SerializableHttpResponse {
   bytes!: u8[];
   content_length!: i64;
   status!: i64;
   url!: string;
-  headers!: Map<string, string>;
-}
-
-@json
-export class HttpResponseDisplay {
-  type: string = "HttpResponseDisplay";
-  bytes!: Bytes;
-  contentLength!: i64;
-  url!: string;
-  status!: i64;
   headers!: Map<string, string>;
 }
 
@@ -49,7 +40,7 @@ export class HttpResponse implements FromBuffer<HttpResponse> {
    */
   public headers: Map<string, string> = new Map();
 
-  static fromInner(value: InnerHttpResponse): HttpResponse {
+  static fromSerializable(value: SerializableHttpResponse): HttpResponse {
     const response = new HttpResponse();
 
     if (value.bytes) {
@@ -86,21 +77,9 @@ export class HttpResponse implements FromBuffer<HttpResponse> {
   }
 
   fromBuffer(buffer: Uint8Array): HttpResponse {
-    const value = JSON.parse<InnerHttpResponse>(String.UTF8.decode(buffer.buffer));
+    const value = JSON.parse<SerializableHttpResponse>(String.UTF8.decode(buffer.buffer));
 
-    return HttpResponse.fromInner(value);
-  }
-
-  toString(): string {
-    const response = new HttpResponseDisplay();
-
-    response.bytes = this.bytes;
-    response.contentLength = this.contentLength;
-    response.headers = this.headers;
-    response.status = this.status;
-    response.url = this.url;
-
-    return JSON.stringify(response);
+    return HttpResponse.fromSerializable(value);
   }
 }
 
@@ -142,13 +121,24 @@ export class HttpFetchOptions {
 }
 
 @json
-export class HttpFetch {
-  url: string;
-  options: HttpFetchOptions;
+class SerializableHttpFetchOptions {
+  method!: string;
+  headers!: Map<string, string>;
+  body: u8[] = [];
+}
 
-  constructor(url: string, options: HttpFetchOptions = new HttpFetchOptions()) {
+@json
+export class HttpFetchAction {
+  url: string;
+  options: SerializableHttpFetchOptions;
+
+  constructor(url: string, options: HttpFetchOptions) {
     this.url = url;
-    this.options = options;
+    this.options = new SerializableHttpFetchOptions();
+
+    this.options.method = options.method;
+    this.options.headers = options.headers;
+    this.options.body = bytesToJsonArray(options.body)
   }
 }
 
@@ -175,7 +165,7 @@ export function httpFetch(
   url: string,
   options: HttpFetchOptions = new HttpFetchOptions()
 ): PromiseStatus<HttpResponse, HttpResponse> {
-  const action = new HttpFetch(url, options);
+  const action = new HttpFetchAction(url, options);
   const actionStr = JSON.stringify(action);
 
   const buffer = String.UTF8.encode(actionStr);
