@@ -6,5 +6,8 @@
     "build": "bunx buf generate",
     "prepublish": "bun run build"
   },
+  "dependencies": {
+    "protobufjs": "^7.4.0"
+  },
   "main": "gen/index.ts"
 }
