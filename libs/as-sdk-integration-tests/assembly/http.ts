@@ -8,9 +8,8 @@ import {
 export class TestHttpRejection extends OracleProgram {
   execution(): void {
     const response = httpFetch('example.com/');
-    const rejected = response.rejected;
 
-    if (rejected !== null) {
+    if (response.isRejected()) {
       Process.success(Bytes.fromString('rejected'));
     } else {
       Process.error(Bytes.fromString('Test failed'));
@@ -21,15 +20,13 @@ export class TestHttpRejection extends OracleProgram {
 export class TestHttpSuccess extends OracleProgram {
   execution(): void {
     const response = httpFetch('https://jsonplaceholder.typicode.com/todos/1');
-    const fulfilled = response.fulfilled;
-    const rejected = response.rejected;
 
-    if (fulfilled !== null) {
-      Process.success(fulfilled.bytes);
+    if (response.isFulfilled()) {
+      Process.success(response.unwrap().bytes);
     }
 
-    if (rejected !== null) {
-      Process.error(rejected.bytes);
+    if (response.isRejected()) {
+      Process.error(response.unwrapRejected().bytes);
     }
 
     Process.error(Bytes.fromString('Something went wrong..'), 20);
@@ -48,15 +45,13 @@ export class TestPostHttpSuccess extends OracleProgram {
       method: 'POST',
       headers,
     });
-    const fulfilled = response.fulfilled;
-    const rejected = response.rejected;
 
-    if (fulfilled !== null) {
-      Process.success(fulfilled.bytes);
+    if (response.isFulfilled()) {
+      Process.success(response.unwrap().bytes);
     }
 
-    if (rejected !== null) {
-      Process.error(rejected.bytes);
+    if (response.isRejected()) {
+      Process.error(response.unwrap().bytes);
     }
 
     Process.error(Bytes.fromString('Something went wrong..'), 20);

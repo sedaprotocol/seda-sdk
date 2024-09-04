@@ -33,8 +33,12 @@ export class Bytes {
         return true;
     }
 
+    buffer(): ArrayBuffer {
+      return this.value.buffer;
+    }
+
     toUtf8String(): string {
-      return String.UTF8.decode(this.value);
+      return String.UTF8.decode(this.value.buffer);
     }
 
     static fromString(payload: string): Bytes {

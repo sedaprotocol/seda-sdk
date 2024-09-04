@@ -1,10 +1,10 @@
 import { Process, Bytes } from '../../as-sdk/assembly/index';
 import { TestHttpRejection, TestHttpSuccess, TestPostHttpSuccess} from './http';
-import { testProxyHttpFetch } from './proxy-http';
+import { TestProxyHttpFetch } from './proxy-http';
 import { TestTallyVmReveals, TestTallyVmRevealsFiltered } from './tally';
 import { TestTallyVmHttp, TestTallyVmMode } from './vm-tests';
 
-const args = String.UTF8.decode(Process.getInputs().buffer);
+const args = Process.getInputs().toUtf8String();
 
 if (args === 'testHttpRejection') {
   new TestHttpRejection().run();
@@ -21,7 +21,7 @@ if (args === 'testHttpRejection') {
 } else if (args === 'testTallyVmRevealsFiltered') {
   new TestTallyVmRevealsFiltered().run();
 } else if (args === 'testProxyHttpFetch') {
-  testProxyHttpFetch();
+  new TestProxyHttpFetch().run();
 }
 
 Process.error(Bytes.fromString('No argument given'));

@@ -13,7 +13,7 @@ class PromiseStatusResult {
 }
 
 export class PromiseStatus<F, R> {
-  private constructor(public fulfilled: F | null, public rejected: R | null) {}
+  private constructor(private fulfilled: F | null, private rejected: R | null) {}
 
   static fromStr<F extends FromBuffer<F>, R extends FromBuffer<R>>(
     promiseStatus: string,
@@ -37,6 +37,34 @@ export class PromiseStatus<F, R> {
     }
 
     return new PromiseStatus(fulfilledResult, rejectedResult);
+  }
+
+  isRejected(): bool {
+    return this.rejected !== null;
+  }
+
+  isFulfilled(): bool {
+    return this.fulfilled !== null;
+  }
+
+  unwrap(): F {
+    const fulfilled = this.fulfilled;
+
+    if (fulfilled === null) {
+      throw new Error('Unwrapping a non fulfilled value');
+    }
+
+    return fulfilled;
+  }
+
+  unwrapRejected(): R {
+    const rejected = this.rejected;
+
+    if (rejected === null) {
+      throw new Error('Unwrapping a non rejected value');
+    }
+
+    return rejected;
   }
 
   toString(): string {

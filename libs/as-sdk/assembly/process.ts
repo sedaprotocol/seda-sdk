@@ -41,7 +41,7 @@ export default class Process {
   /**
    * Gets the data request / tally inputs
    *
-   * @returns {Uint8Array} bytes encoded inputs
+   * @returns {Bytes} bytes encoded inputs
    * @example
    * ```ts
    * const inputs = Process.getInputs();
@@ -50,11 +50,11 @@ export default class Process {
    * console.log(inputAsString);
    * ```
    */
-  static getInputs(): Uint8Array {
+  static getInputs(): Bytes {
     // Data at index 0 is the dr/tally inputs encoded as hex
     const data = Process.args().at(1);
 
-    return decodeHex(data);
+    return Bytes.fromBytes(decodeHex(data));
   }
 
   /**
