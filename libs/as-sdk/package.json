@@ -1,7 +1,7 @@
 {
 	"name": "@seda-protocol/as-sdk",
 	"type": "module",
-	"version": "0.0.5",
+	"version": "0.0.6",
 	"types": "./assembly/index.ts",
 	"dependencies": {
 		"@assemblyscript/wasi-shim": "^0.1.0",
