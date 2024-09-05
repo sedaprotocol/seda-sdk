@@ -1,5 +1,7 @@
 import { JSON } from "json-as/assembly";
 import Process from "./process";
+import { Bytes } from "./bytes";
+import { jsonArrToUint8Array } from "./json-utils";
 
 const REVEALS_ARGUMENT_POSITION = 2;
 const CONSENSUS_ARGUMENT_POSITION = 3;
@@ -14,10 +16,10 @@ export class RevealBody {
 
 @json
 export class RevealResult {
-  salt!: u8[];
+  salt!: Bytes;
   exit_code!: u8;
   gas_used!: string;
-  reveal!: u8[];
+  reveal!: Bytes;
   in_consensus!: u8;
 }
 
@@ -44,8 +46,8 @@ export default class Tally {
       revealResults.push({
         exit_code: reveal.exit_code,
         gas_used: reveal.gas_used,
-        reveal: reveal.reveal,
-        salt: reveal.salt,
+        reveal: Bytes.fromBytes(jsonArrToUint8Array(reveal.reveal)),
+        salt: Bytes.fromBytes(jsonArrToUint8Array(reveal.salt)),
         in_consensus: consensus.at(index),
       });
     }
