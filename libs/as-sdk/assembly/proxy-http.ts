@@ -1,13 +1,39 @@
 import { JSON } from "json-as/assembly";
 import { call_result_write, proxy_http_fetch } from "./bindings/seda_v1";
 import { HttpFetchAction, HttpFetchOptions, HttpResponse } from "./http";
+// Is used in the transform (because ProxyHttpFetchAction extends from HttpFetchAction)
+import { SerializableHttpFetchOptions } from "./http";
 import { PromiseStatus } from "./promise";
 
+@json
+export class ProxyHttpFetchAction extends HttpFetchAction {
+	@omitnull()
+	public_key: string | null = null;
+
+	constructor(
+		url: string,
+		publicKey: string | null,
+		options: HttpFetchOptions,
+	) {
+		super(url, options);
+		this.public_key = publicKey;
+	}
+}
+
+/**
+ * Calls a Data Proxy Node the same way httpFetch does, but checks the signature and
+ *
+ * @param url The URL of the Data Proxy Node you want to access
+ * @param publicKey Optional: The public key of the proxy node, verifies if the signature came from this public key
+ * @param options Optional: Allows you to set headers, method, body
+ * @returns Promise with information about the response
+ */
 export function proxyHttpFetch(
 	url: string,
+	publicKey: string | null = null,
 	options: HttpFetchOptions = new HttpFetchOptions(),
 ): PromiseStatus<HttpResponse, HttpResponse> {
-	const action = new HttpFetchAction(url, options);
+	const action = new ProxyHttpFetchAction(url, publicKey, options);
 	const actionStr = JSON.stringify(action);
 
 	const buffer = String.UTF8.encode(actionStr);

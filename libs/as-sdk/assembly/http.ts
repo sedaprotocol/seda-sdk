@@ -123,7 +123,7 @@ export class HttpFetchOptions {
 }
 
 @json
-class SerializableHttpFetchOptions {
+export class SerializableHttpFetchOptions {
 	method!: string;
 	headers!: Map<string, string>;
 	body: u8[] = [];

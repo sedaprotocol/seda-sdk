@@ -17,7 +17,7 @@ export declare function execution_result(
 
 export declare function secp256k1_verify(
 	message: usize,
-	message_length: u32,
+	message_length: u64,
 	signature: usize,
 	signature_length: u32,
 	public_key: usize,
