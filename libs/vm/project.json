@@ -1,25 +1,22 @@
 {
-  "name": "vm",
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/vm/src",
-  "projectType": "library",
-  "tags": [],
-  "targets": {
-    "lint": {
-      "executor": "@nx/eslint:lint"
-    },
-    "build": {
-      "executor": "@nx/js:swc",
-      "options": {
-        "clean": true,
-        "main": "libs/vm/src/index.ts",
-        "outputPath": "dist/libs/vm",
-        "tsConfig": "libs/vm/tsconfig.json",
-        "thirdParty": true,
-        "swcrc": "libs/vm/.swcrc",
-        "generateExportsField": true
-      },
-      "outputs": ["{options.outputPath}"]
-    }
-  }
+	"name": "vm",
+	"$schema": "../../node_modules/nx/schemas/project-schema.json",
+	"sourceRoot": "libs/vm/src",
+	"projectType": "library",
+	"tags": [],
+	"targets": {
+		"build": {
+			"executor": "@nx/js:swc",
+			"options": {
+				"clean": true,
+				"main": "libs/vm/src/index.ts",
+				"outputPath": "dist/libs/vm",
+				"tsConfig": "libs/vm/tsconfig.json",
+				"thirdParty": true,
+				"swcrc": "libs/vm/.swcrc",
+				"generateExportsField": true
+			},
+			"outputs": ["{options.outputPath}"]
+		}
+	}
 }

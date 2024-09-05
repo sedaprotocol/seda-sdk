@@ -1,0 +1,45 @@
+{
+	"$schema": "https://biomejs.dev/schemas/1.8.3/schema.json",
+	"files": {
+		"ignore": [
+			"./libs/dev-tools/bin/**",
+			"./libs/dev-tools/build/**",
+			"./libs/proto-messages/gen/**"
+		]
+	},
+	"organizeImports": {
+		"enabled": true
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"recommended": true
+		}
+	},
+	"vcs": {
+		"enabled": true,
+		"clientKind": "git"
+	},
+	"overrides": [
+		{
+			"include": [
+				"./libs/as-sdk/assembly/**",
+				"./libs/as-sdk-integration-tests/assembly/**"
+			],
+			"linter": {
+				"rules": {
+					"suspicious": {
+						"noShadowRestrictedNames": "off"
+					},
+					"complexity": {
+						"noStaticOnlyClass": "off"
+					},
+					"style": {
+						"useImportType": "off",
+						"noInferrableTypes": "off"
+					}
+				}
+			}
+		}
+	]
+}

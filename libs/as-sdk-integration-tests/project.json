@@ -1,27 +1,27 @@
 {
-  "name": "as-sdk-integration-tests",
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/as-sdk-integration-tests/assembly",
-  "projectType": "library",
-  "tags": [],
-  "targets": {
-    "build": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "asc ./assembly/index.ts --target debug",
-        "cwd": "libs/as-sdk-integration-tests"
-      }
-    },
-    "test": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "bun test libs/as-sdk-integration-tests/"
-      },
-      "dependsOn": [
-        {
-          "target": "build"
-        }
-      ]
-    }
-  }
+	"name": "as-sdk-integration-tests",
+	"$schema": "../../node_modules/nx/schemas/project-schema.json",
+	"sourceRoot": "libs/as-sdk-integration-tests/assembly",
+	"projectType": "library",
+	"tags": [],
+	"targets": {
+		"build": {
+			"executor": "nx:run-commands",
+			"options": {
+				"command": "asc ./assembly/index.ts --target debug",
+				"cwd": "libs/as-sdk-integration-tests"
+			}
+		},
+		"test": {
+			"executor": "nx:run-commands",
+			"options": {
+				"command": "bun test libs/as-sdk-integration-tests/"
+			},
+			"dependsOn": [
+				{
+					"target": "build"
+				}
+			]
+		}
+	}
 }

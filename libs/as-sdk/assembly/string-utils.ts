@@ -1,5 +1,5 @@
 export interface ToString {
-    toString(): string;
+	toString(): string;
 }
 
 /**
@@ -10,21 +10,21 @@ export interface ToString {
  * @returns
  */
 export function toString<T = string>(message: T): string {
-    if (message === null) {
-        return "null";
-    }
+	if (message === null) {
+		return "null";
+	}
 
-    // @ts-expect-error We're testing for the method before calling it
-    if (isString<T>() || isDefined(message.toString)) {
-        // @ts-expect-error We're testing for the method before calling it
-        return message.toString();
-    }
+	// @ts-expect-error We're testing for the method before calling it
+	if (isString<T>() || isDefined(message.toString)) {
+		// @ts-expect-error We're testing for the method before calling it
+		return message.toString();
+	}
 
-    // @ts-expect-error We're testing for the method before calling it
-    if (isDefined(message.__SERIALIZE)) {
-        // @ts-expect-error We're testing for the method before calling it
-        return message.__SERIALIZE();
-    }
+	// @ts-expect-error We're testing for the method before calling it
+	if (isDefined(message.__SERIALIZE)) {
+		// @ts-expect-error We're testing for the method before calling it
+		return message.__SERIALIZE();
+	}
 
-    return "[Object object]";
+	return "[Object object]";
 }

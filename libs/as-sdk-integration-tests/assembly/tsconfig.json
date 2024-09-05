@@ -1,4 +1,4 @@
 {
-  "extends": "../../../node_modules/assemblyscript/std/assembly.json",
-  "include": ["./**/*.ts", "../../as-sdk/assembly/json-utils.ts"]
+	"extends": "../../../node_modules/assemblyscript/std/assembly.json",
+	"include": ["./**/*.ts", "../../as-sdk/assembly/json-utils.ts"]
 }

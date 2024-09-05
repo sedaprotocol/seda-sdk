@@ -1,13 +1,13 @@
 {
-  "name": "@seda-protocol/proto-messages",
-  "type": "module",
-  "version": "0.3.0-dev.0-1",
-  "scripts": {
-    "build": "bunx buf generate",
-    "prepublish": "bun run build"
-  },
-  "dependencies": {
-    "protobufjs": "^7.4.0"
-  },
-  "main": "gen/index.ts"
+	"name": "@seda-protocol/proto-messages",
+	"type": "module",
+	"version": "0.3.0-dev.0-1",
+	"scripts": {
+		"build": "bunx buf generate",
+		"prepublish": "bun run build"
+	},
+	"dependencies": {
+		"protobufjs": "^7.4.0"
+	},
+	"main": "gen/index.ts"
 }

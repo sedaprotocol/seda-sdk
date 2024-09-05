@@ -1,16 +1,16 @@
 {
-  "extends": "../../tsconfig.base.json",
-  "compilerOptions": {
-    "rootDirs": [".", "../../"],
-    "resolveJsonModule": true,
-    "baseUrl": ".",
-    "paths": {
-      "@seda-protocol/proto-messages": ["../proto-messages"],
-      "@dev-tools/utils/*": ["./src/lib/utils/*"],
-      "@dev-tools/services/*": ["./src/lib/services/*"],
-      "@dev-tools/cli-utils/*": ["./src/cli/utils/*"],
-      "@seda-protocol/vm": ["../../dist/libs/vm"]
-    }
-  },
-  "include": ["src/**/*.ts", "gen/**/*.ts"]
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"rootDirs": [".", "../../"],
+		"resolveJsonModule": true,
+		"baseUrl": ".",
+		"paths": {
+			"@seda-protocol/proto-messages": ["../proto-messages"],
+			"@dev-tools/utils/*": ["./src/lib/utils/*"],
+			"@dev-tools/services/*": ["./src/lib/services/*"],
+			"@dev-tools/cli-utils/*": ["./src/cli/utils/*"],
+			"@seda-protocol/vm": ["../../dist/libs/vm"]
+		}
+	},
+	"include": ["src/**/*.ts", "gen/**/*.ts"]
 }

@@ -1,47 +1,47 @@
 export interface PromiseStatusResult {
-  /** Actually a Uint8[] */
-  Fulfilled?: number[];
-  /** Actually a Uint8[] */
-  Rejected?: number[];
+	/** Actually a Uint8[] */
+	Fulfilled?: number[];
+	/** Actually a Uint8[] */
+	Rejected?: number[];
 }
 
 export interface ToBuffer {
-  toBuffer(): Uint8Array;
+	toBuffer(): Uint8Array;
 }
 
 export class PromiseStatus<T> {
-  private constructor(public value: PromiseStatusResult) {}
+	private constructor(public value: PromiseStatusResult) {}
 
-  static fromBuffer<T extends ToBuffer>(value: Buffer): PromiseStatus<T> {
-    const raw: PromiseStatusResult = JSON.parse(value.toString('utf-8'));
-    
-    return new PromiseStatus({
-      Fulfilled: raw.Fulfilled,
-      Rejected: raw.Rejected,
-    });
-  }
+	static fromBuffer<T extends ToBuffer>(value: Buffer): PromiseStatus<T> {
+		const raw: PromiseStatusResult = JSON.parse(value.toString("utf-8"));
 
-  static rejected<T extends ToBuffer>(value: T): PromiseStatus<T> {
-    return new PromiseStatus({
-      Rejected: Array.from(value.toBuffer()),
-    });
-  }
+		return new PromiseStatus({
+			Fulfilled: raw.Fulfilled,
+			Rejected: raw.Rejected,
+		});
+	}
 
-  static fulfilled<T extends ToBuffer>(value?: T): PromiseStatus<T> {
-    return new PromiseStatus({
-      Fulfilled: Array.from(value?.toBuffer() ?? []),
-    });
-  }
+	static rejected<T extends ToBuffer>(value: T): PromiseStatus<T> {
+		return new PromiseStatus({
+			Rejected: Array.from(value.toBuffer()),
+		});
+	}
 
-  get length() {
-    return this.toJSON().length;
-  }
+	static fulfilled<T extends ToBuffer>(value?: T): PromiseStatus<T> {
+		return new PromiseStatus({
+			Fulfilled: Array.from(value?.toBuffer() ?? []),
+		});
+	}
 
-  toJSON(): string {
-    return JSON.stringify(this.value);
-  }
+	get length() {
+		return this.toJSON().length;
+	}
 
-  toBuffer(): Uint8Array {
-    return new TextEncoder().encode(this.toJSON());
-  }
+	toJSON(): string {
+		return JSON.stringify(this.value);
+	}
+
+	toBuffer(): Uint8Array {
+		return new TextEncoder().encode(this.toJSON());
+	}
 }

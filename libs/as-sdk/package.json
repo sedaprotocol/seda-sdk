@@ -1,11 +1,11 @@
 {
-  "name": "@seda-protocol/as-sdk",
-  "type": "module",
-  "version": "0.0.5",
-  "types": "./assembly/index.ts",
-  "dependencies": {
-    "@assemblyscript/wasi-shim": "^0.1.0",
-    "json-as": "^0.9.6",
-    "visitor-as": "^0.11.4"
-  }
+	"name": "@seda-protocol/as-sdk",
+	"type": "module",
+	"version": "0.0.5",
+	"types": "./assembly/index.ts",
+	"dependencies": {
+		"@assemblyscript/wasi-shim": "^0.1.0",
+		"json-as": "^0.9.6",
+		"visitor-as": "^0.11.4"
+	}
 }

@@ -1,44 +1,41 @@
 {
-  "name": "dev-tools",
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/dev-tools/src",
-  "projectType": "library",
-  "tags": [],
-  "targets": {
-    "lint": {
-      "executor": "@nx/eslint:lint"
-    },
-    "build-cli": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "bun run build:cli",
-        "cwd": "libs/dev-tools"
-      },
-      "dependsOn": [{ "target": "build", "projects": ["proto-messages"] }]
-    },
-    "build-lib": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "bun run build:lib",
-        "cwd": "libs/dev-tools"
-      },
-      "dependsOn": [
-        { "target": "build", "projects": ["proto-messages"] },
-        { "target": "build", "projects": ["vm"] }
-      ]
-    },
-    "build": {
-      "dependsOn": [
-        { "target": "build", "projects": ["proto-messages"] },
-        { "target": "build", "projects": ["vm"] }
-      ]
-    },
-    "test": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "bun test",
-        "cwd": "libs/dev-tools"
-      }
-    }
-  }
+	"name": "dev-tools",
+	"$schema": "../../node_modules/nx/schemas/project-schema.json",
+	"sourceRoot": "libs/dev-tools/src",
+	"projectType": "library",
+	"tags": [],
+	"targets": {
+		"build-cli": {
+			"executor": "nx:run-commands",
+			"options": {
+				"command": "bun run build:cli",
+				"cwd": "libs/dev-tools"
+			},
+			"dependsOn": [{ "target": "build", "projects": ["proto-messages"] }]
+		},
+		"build-lib": {
+			"executor": "nx:run-commands",
+			"options": {
+				"command": "bun run build:lib",
+				"cwd": "libs/dev-tools"
+			},
+			"dependsOn": [
+				{ "target": "build", "projects": ["proto-messages"] },
+				{ "target": "build", "projects": ["vm"] }
+			]
+		},
+		"build": {
+			"dependsOn": [
+				{ "target": "build", "projects": ["proto-messages"] },
+				{ "target": "build", "projects": ["vm"] }
+			]
+		},
+		"test": {
+			"executor": "nx:run-commands",
+			"options": {
+				"command": "bun test",
+				"cwd": "libs/dev-tools"
+			}
+		}
+	}
 }

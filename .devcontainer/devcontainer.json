@@ -1,22 +1,21 @@
 {
-  "name": "seda-sdk",
-  "build": {
-    "dockerfile": "Dockerfile",
-    "args": {
-      "VARIANT": "1.1.13"
-    }
-  },
-  "customizations": {
-    "vscode": {
-      "settings": {},
-      "extensions": [
-        "EditorConfig.EditorConfig",
-        "dbaeumer.vscode-eslint",
-        "esbenp.prettier-vscode",
-        "nrwl.angular-console",
-        "dtsvet.vscode-wasm"
-      ]
-    }
-  },
-  "postCreateCommand": "bun install"
+	"name": "seda-sdk",
+	"build": {
+		"dockerfile": "Dockerfile",
+		"args": {
+			"VARIANT": "1.1.13"
+		}
+	},
+	"customizations": {
+		"vscode": {
+			"settings": {},
+			"extensions": [
+				"EditorConfig.EditorConfig",
+				"nrwl.angular-console",
+				"dtsvet.vscode-wasm",
+				"biomejs.biome"
+			]
+		}
+	},
+	"postCreateCommand": "bun install"
 }

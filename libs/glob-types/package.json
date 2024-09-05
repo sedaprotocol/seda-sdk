@@ -1,4 +1,4 @@
 {
-  "name": "@types/glob",
-  "types": "index.d.ts"
+	"name": "@types/glob",
+	"types": "index.d.ts"
 }

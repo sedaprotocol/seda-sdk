@@ -1,4 +1,4 @@
 {
-  "name": "@seda/as-sdk-integration-tests",
-  "type": "module"
+	"name": "@seda/as-sdk-integration-tests",
+	"type": "module"
 }
