@@ -1,6 +1,6 @@
 import * as Secp256k1 from "@noble/secp256k1";
 import { Maybe } from "true-myth";
-import { keccak256 } from "./services/keccak256";
+import { keccak256, secp256k1Verify } from "./services/crypto";
 import { type HttpFetchAction, HttpFetchResponse } from "./types/vm-actions";
 import { PromiseStatus } from "./types/vm-promise";
 import { WorkerToHost } from "./worker-host-communication.js";
@@ -8,7 +8,9 @@ import { WorkerToHost } from "./worker-host-communication.js";
 export default class VmImports {
 	memory?: WebAssembly.Memory;
 	workerToHost: WorkerToHost;
+	// Used for async calls (for knowing the length of the buffer)
 	callResult: Uint8Array = new Uint8Array();
+	// Execution result
 	result: Uint8Array = new Uint8Array();
 	usedPublicKeys: string[] = [];
 	processId: string;
@@ -113,6 +115,49 @@ export default class VmImports {
 		}
 	}
 
+	secp256k1Verify(
+		messagePtr: number,
+		messageLength: number,
+		signaturePtr: number,
+		signatureLength: number,
+		publicKeyPtr: number,
+		publicKeyLength: number,
+	) {
+		const message = Buffer.from(
+			new Uint8Array(
+				this.memory?.buffer.slice(messagePtr, messagePtr + messageLength) ?? [],
+			),
+		);
+		const signature = Buffer.from(
+			new Uint8Array(
+				this.memory?.buffer.slice(
+					signaturePtr,
+					signaturePtr + signatureLength,
+				) ?? [],
+			),
+		);
+		const publicKey = Buffer.from(
+			new Uint8Array(
+				this.memory?.buffer.slice(
+					publicKeyPtr,
+					publicKeyPtr + publicKeyLength,
+				) ?? [],
+			),
+		);
+
+		try {
+			this.callResult = secp256k1Verify(message, signature, publicKey);
+			return this.callResult.length;
+		} catch (error) {
+			console.error(
+				`[${this.processId}] - @secp256k1Verify: ${message}`,
+				error,
+			);
+			this.callResult = new Uint8Array();
+			return 0;
+		}
+	}
+
 	callResultWrite(ptr: number, length: number) {
 		try {
 			const memory = new Uint8Array(this.memory?.buffer ?? []);
@@ -137,6 +182,7 @@ export default class VmImports {
 				// TODO: Should be this.proxyHttpFetch but since thats broken for now we will use httpFetch
 				proxy_http_fetch: this.httpFetch.bind(this),
 				http_fetch: this.httpFetch.bind(this),
+				secp256k1_verify: this.secp256k1Verify.bind(this),
 				call_result_write: this.callResultWrite.bind(this),
 				execution_result: this.executionResult.bind(this),
 			},
