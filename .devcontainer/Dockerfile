@@ -6,6 +6,7 @@ RUN apt-get update \
     git \
     nano \
     vim-tiny \
+    ca-certificates \
     && apt-get auto-remove -y \
     && apt-get clean -y \
     && chsh -s $(which bash) bun \
