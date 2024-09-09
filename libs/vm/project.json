@@ -17,6 +17,17 @@
 				"generateExportsField": true
 			},
 			"outputs": ["{options.outputPath}"]
+		},
+		"test": {
+			"executor": "nx:run-commands",
+			"options": {
+				"command": "bun test libs/vm/"
+			},
+			"dependsOn": [
+				{
+					"target": "build"
+				}
+			]
 		}
 	}
 }
