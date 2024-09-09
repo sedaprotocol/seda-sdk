@@ -1,6 +1,7 @@
 import * as Secp256k1 from "@noble/secp256k1";
 import { Maybe } from "true-myth";
 import { keccak256, secp256k1Verify } from "./services/crypto";
+import { trySync } from "./services/try";
 import { type HttpFetchAction, HttpFetchResponse } from "./types/vm-actions";
 import { PromiseStatus } from "./types/vm-promise";
 import { WorkerToHost } from "./worker-host-communication.js";
@@ -145,17 +146,21 @@ export default class VmImports {
 			),
 		);
 
-		try {
-			this.callResult = secp256k1Verify(message, signature, publicKey);
-			return this.callResult.length;
-		} catch (error) {
+		const result = trySync(() =>
+			secp256k1Verify(message, signature, publicKey),
+		);
+
+		if (result.isErr) {
 			console.error(
 				`[${this.processId}] - @secp256k1Verify: ${message}`,
-				error,
+				result.error,
 			);
 			this.callResult = new Uint8Array();
 			return 0;
 		}
+    
+		this.callResult = result.value;
+		return this.callResult.length;
 	}
 
 	callResultWrite(ptr: number, length: number) {
