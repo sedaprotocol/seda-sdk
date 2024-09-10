@@ -1,4 +1,8 @@
-import { wasi_process } from "@assemblyscript/wasi-shim/assembly/wasi_process";
+import {
+	lazyArgv,
+	lazyEnv,
+	wasi_process,
+} from "@assemblyscript/wasi-shim/assembly/wasi_process";
 import { execution_result } from "./bindings/seda_v1";
 import { Bytes } from "./bytes";
 import { decodeHex } from "./hex";
@@ -6,6 +10,9 @@ import { VM_MODE_DR, VM_MODE_ENV_KEY, VM_MODE_TALLY } from "./vm-modes";
 
 const POSIX_SUCCESS_CODE = u8(0);
 const POSIX_ERROR_CODE = u8(1);
+
+const argv = lazyArgv();
+const env = lazyEnv();
 
 export default class Process {
 	/**
@@ -20,7 +27,7 @@ export default class Process {
 	 * ```
 	 */
 	static args(): string[] {
-		return wasi_process.argv;
+		return argv;
 	}
 
 	/**
@@ -35,7 +42,7 @@ export default class Process {
 	 * ```
 	 */
 	static envs(): Map<string, string> {
-		return wasi_process.env;
+		return env;
 	}
 
 	/**

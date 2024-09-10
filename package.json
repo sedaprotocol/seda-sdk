@@ -14,7 +14,8 @@
 	"private": true,
 	"type": "module",
 	"overrides": {
-		"@types/glob": "file:./libs/glob-types/"
+		"@types/glob": "file:./libs/glob-types/",
+		"@assemblyscript/wasi-shim": "git+https://github.com/sedaprotocol/wasi-shim.git"
 	},
 	"devDependencies": {
 		"@as-pect/cli": "^8.1.0",

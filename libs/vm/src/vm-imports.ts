@@ -158,7 +158,7 @@ export default class VmImports {
 			this.callResult = new Uint8Array();
 			return 0;
 		}
-    
+
 		this.callResult = result.value;
 		return this.callResult.length;
 	}
