@@ -58,7 +58,7 @@ export default class Process {
 	 * ```
 	 */
 	static getInputs(): Bytes {
-		// Data at index 0 is the dr/tally inputs encoded as hex
+		// Data at index 1 is the dr/tally inputs encoded as hex
 		const data = Process.args().at(1);
 
 		return Bytes.fromBytes(decodeHex(data));

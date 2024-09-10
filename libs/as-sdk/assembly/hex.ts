@@ -2,7 +2,7 @@ export function encodeHex(array: Uint8Array): string {
 	let hex = "";
 
 	for (let i = 0; i < array.length; i++) {
-		hex += array[i].toString(16);
+		hex += array[i].toString(16).padStart(2, "0");
 	}
 
 	return hex;
