@@ -1,6 +1,5 @@
 import { JSON } from "json-as/assembly";
 import { jsonArrToUint8Array } from "./json-utils";
-import { toString } from "./string-utils";
 
 export interface FromBuffer<T> {
 	fromBuffer(buffer: Uint8Array): T;
@@ -12,6 +11,7 @@ class PromiseStatusResult {
 	Rejected!: u8[] | null;
 }
 
+@json
 export class PromiseStatus<F, R> {
 	private constructor(
 		private fulfilled: F | null,
@@ -69,29 +69,4 @@ export class PromiseStatus<F, R> {
 
 		return rejected;
 	}
-
-	toString(): string {
-		const display = new PromiseStatusDisplay();
-
-		if (this.fulfilled !== null) {
-			display.fulfilled = toString(this.fulfilled);
-		}
-
-		if (this.rejected !== null) {
-			display.rejected = toString(this.rejected);
-		}
-
-		return JSON.stringify(display);
-	}
-}
-
-@json
-class PromiseStatusDisplay {
-	type: string = "PromiseStatusDisplay";
-
-	@omitnull()
-	fulfilled: string | null = null;
-
-	@omitnull()
-	rejected: string | null = null;
 }
