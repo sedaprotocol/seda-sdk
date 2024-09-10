@@ -23,7 +23,7 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Check formatting
-        run: bun run fmt
+        run: bunx biome check .
 
       - name: Build projects
         run: bun run build
