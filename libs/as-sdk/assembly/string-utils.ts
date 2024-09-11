@@ -1,3 +1,5 @@
+import { encodeHex } from "./hex";
+
 export interface ToString {
 	toString(): string;
 }
@@ -12,6 +14,16 @@ export interface ToString {
 export function toString<T = string>(message: T): string {
 	if (message === null) {
 		return "null";
+	}
+
+	if (message instanceof ArrayBuffer) {
+		return `ArrayBuffer(0x${encodeHex(Uint8Array.wrap(message))})`;
+	}
+
+	// @ts-expect-error We're testing for the method before calling it
+	if (isDefined(message.buffer) && message.buffer instanceof ArrayBuffer) {
+		// @ts-expect-error We're testing for the method before calling it
+		return `TypedArray(0x${encodeHex(Uint8Array.wrap(message.buffer))})`;
 	}
 
 	// @ts-expect-error We're testing for the method before calling it
