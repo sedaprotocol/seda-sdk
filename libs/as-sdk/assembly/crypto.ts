@@ -1,19 +1,18 @@
 import { call_result_write, secp256k1_verify } from "./bindings/seda_v1";
 import { Bytes } from "./bytes";
-import { PromiseStatus } from "./promise";
 
 export function secp256k1Verify(
 	message: Bytes,
 	signature: Bytes,
 	publicKey: Bytes,
 ): bool {
-	const messageBuffer = message.buffer();
+	const messageBuffer = message.buffer;
 	const messagePtr = changetype<usize>(messageBuffer);
 
-	const signatureBuffer = signature.buffer();
+	const signatureBuffer = signature.buffer;
 	const signaturePtr = changetype<usize>(signatureBuffer);
 
-	const publicKeyBuffer = publicKey.buffer();
+	const publicKeyBuffer = publicKey.buffer;
 	const publicKeyPtr = changetype<usize>(publicKeyBuffer);
 
 	// Call secp256k1_verify and get the response length

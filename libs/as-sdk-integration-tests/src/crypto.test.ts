@@ -1,9 +1,6 @@
-import { beforeEach, describe, expect, it, mock } from "bun:test";
+import { describe, expect, it } from "bun:test";
 import { readFile } from "node:fs/promises";
 import { executeDrWasm } from "@seda/dev-tools";
-import { Response } from "node-fetch";
-
-const mockHttpFetch = mock();
 
 describe("Crypto", () => {
 	it("Test valid Secp256k1 signature", async () => {

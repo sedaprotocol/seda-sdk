@@ -38,7 +38,7 @@ export class Bytes {
 		return true;
 	}
 
-	buffer(): ArrayBuffer {
+	get buffer(): ArrayBuffer {
 		return this.value.buffer;
 	}
 
@@ -76,6 +76,10 @@ export class Bytes {
 
 	static empty(): Bytes {
 		return new Bytes(new Uint8Array(0));
+	}
+
+	get length(): i32 {
+		return this.value.length;
 	}
 
 	slice(begin: i32 = 0, end: i32 = i32.MAX_VALUE): Bytes {
