@@ -1,7 +1,7 @@
 {
 	"name": "@seda-protocol/as-sdk",
 	"type": "module",
-	"version": "0.0.8",
+	"version": "0.0.9",
 	"types": "./assembly/index.ts",
 	"dependencies": {
 		"@assemblyscript/wasi-shim": "git+https://github.com/sedaprotocol/wasi-shim.git",
