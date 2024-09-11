@@ -30,7 +30,7 @@ export default class Tally {
 	 * @see {@link getReveals}
 	 * @returns All reveals from the Oracle Program execution phase.
 	 */
-	static getAllReveals(): RevealResult[] {
+	static getUnfilteredReveals(): RevealResult[] {
 		const encodedReveals = Process.args().at(REVEALS_ARGUMENT_POSITION);
 		const reveals = JSON.parse<RevealBody[]>(encodedReveals);
 
@@ -66,7 +66,7 @@ export default class Tally {
 	 * @returns The reveals which were in consensus
 	 */
 	static getReveals(): RevealResult[] {
-		const revealResults = Tally.getAllReveals();
+		const revealResults = Tally.getUnfilteredReveals();
 
 		return revealResults.filter(
 			(revealResult) => revealResult.in_consensus === 0,

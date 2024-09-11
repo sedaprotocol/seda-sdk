@@ -3,7 +3,7 @@ import { Bytes, OracleProgram, Process, Tally } from "../../as-sdk/assembly";
 
 export class TestTallyVmReveals extends OracleProgram {
 	tally(): void {
-		const reveals = Tally.getAllReveals();
+		const reveals = Tally.getUnfilteredReveals();
 
 		Process.success(Bytes.fromUtf8String(JSON.stringify(reveals)));
 	}
