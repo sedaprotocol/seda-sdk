@@ -1,4 +1,9 @@
 import { Bytes, Process } from "../../as-sdk/assembly/index";
+import {
+	TestBytesSliceNoArguments,
+	TestBytesSliceOnlyStart,
+	TestBytesSliceStartEnd,
+} from "./bytes";
 import { TestSecp256k1VerifyInvalid, TestSecp256k1VerifyValid } from "./crypto";
 import {
 	TestBytesHexEncodeDecode,
@@ -36,6 +41,12 @@ if (args === "testHttpRejection") {
 	new TestSecp256k1VerifyValid().run();
 } else if (args === "testSecp256k1VerifyInvalid") {
 	new TestSecp256k1VerifyInvalid().run();
+} else if (args === "testBytesSliceNoArguments") {
+	new TestBytesSliceNoArguments().run();
+} else if (args === "testBytesSliceOnlyStart") {
+	new TestBytesSliceOnlyStart().run();
+} else if (args === "testBytesSliceStartEnd") {
+	new TestBytesSliceStartEnd().run();
 } else if (args === "testBytesHexEncodeDecode") {
 	new TestBytesHexEncodeDecode().run();
 } else if (args === "testBytesPrefixedHexDecode") {

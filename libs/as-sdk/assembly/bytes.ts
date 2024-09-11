@@ -77,4 +77,9 @@ export class Bytes {
 	static empty(): Bytes {
 		return new Bytes(new Uint8Array(0));
 	}
+
+	slice(begin: i32 = 0, end: i32 = i32.MAX_VALUE): Bytes {
+		const byteSlice = this.value.slice(begin, end);
+		return new Bytes(byteSlice);
+	}
 }
