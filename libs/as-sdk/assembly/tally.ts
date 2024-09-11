@@ -46,8 +46,8 @@ export default class Tally {
 			revealResults.push({
 				exit_code: reveal.exit_code,
 				gas_used: reveal.gas_used,
-				reveal: Bytes.fromBytes(jsonArrToUint8Array(reveal.reveal)),
-				salt: Bytes.fromBytes(jsonArrToUint8Array(reveal.salt)),
+				reveal: Bytes.fromByteArray(jsonArrToUint8Array(reveal.reveal)),
+				salt: Bytes.fromByteArray(jsonArrToUint8Array(reveal.salt)),
 				in_consensus: consensus.at(index),
 			});
 		}

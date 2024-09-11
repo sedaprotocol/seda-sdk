@@ -5,7 +5,7 @@ export class TestTallyVmReveals extends OracleProgram {
 	tally(): void {
 		const reveals = Tally.getReveals();
 
-		Process.success(Bytes.fromString(JSON.stringify(reveals)));
+		Process.success(Bytes.fromUtf8String(JSON.stringify(reveals)));
 	}
 }
 
@@ -13,6 +13,6 @@ export class TestTallyVmRevealsFiltered extends OracleProgram {
 	tally(): void {
 		const reveals = Tally.getConsensusReveals();
 
-		Process.success(Bytes.fromString(JSON.stringify(reveals)));
+		Process.success(Bytes.fromUtf8String(JSON.stringify(reveals)));
 	}
 }

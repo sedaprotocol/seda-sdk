@@ -17,6 +17,6 @@ export class TestProxyHttpFetch extends OracleProgram {
 			Process.error(response.unwrapRejected().bytes);
 		}
 
-		Process.error(Bytes.fromString("Something went wrong.."), 20);
+		Process.error(Bytes.fromUtf8String("Something went wrong.."), 20);
 	}
 }

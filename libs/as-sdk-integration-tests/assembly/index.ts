@@ -1,6 +1,10 @@
 import { Bytes, Process } from "../../as-sdk/assembly/index";
 import { TestSecp256k1VerifyInvalid, TestSecp256k1VerifyValid } from "./crypto";
-import { TestHexEncodeDecode } from "./hex";
+import {
+	TestBytesHexEncodeDecode,
+	TestBytesPrefixedHexDecode,
+	TestHexInputEncodeDecode,
+} from "./encoding";
 import {
 	TestHttpRejection,
 	TestHttpSuccess,
@@ -32,9 +36,13 @@ if (args === "testHttpRejection") {
 	new TestSecp256k1VerifyValid().run();
 } else if (args === "testSecp256k1VerifyInvalid") {
 	new TestSecp256k1VerifyInvalid().run();
+} else if (args === "testBytesHexEncodeDecode") {
+	new TestBytesHexEncodeDecode().run();
+} else if (args === "testBytesPrefixedHexDecode") {
+	new TestBytesPrefixedHexDecode().run();
 	// Pretty iffy condition, not sure how else we can check for this though
 } else if (Process.getInputs().value.length === 26) {
-	new TestHexEncodeDecode().run();
+	new TestHexInputEncodeDecode().run();
 }
 
-Process.error(Bytes.fromString("No argument given"));
+Process.error(Bytes.fromUtf8String("No argument given"));

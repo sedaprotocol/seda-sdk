@@ -9,14 +9,14 @@ export class OracleProgram {
 	 * Meant to be overridden if the oracle program needs to execute logic in the execution phase.
 	 */
 	execution(): void {
-		Process.error(Bytes.fromString("Execution not implemented"));
+		Process.error(Bytes.fromUtf8String("Execution not implemented"));
 	}
 
 	/**
 	 * Meant to be overridden if the oracle program needs to execute logic in the tally phase.
 	 */
 	tally(): void {
-		Process.error(Bytes.fromString("Tally not implemented"));
+		Process.error(Bytes.fromUtf8String("Tally not implemented"));
 	}
 
 	/**

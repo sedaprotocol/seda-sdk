@@ -68,9 +68,9 @@ class PlanetProgram extends OracleProgram {
       const planet = JSON.parse<SwPlanet>(data);
 
       // Exits the program (with an exit code of 0) and sets the Data Request result to the planet name
-      Process.success(Bytes.fromString(planet.name));
+      Process.success(Bytes.fromUtf8String(planet.name));
     } else {
-      Process.error(Bytes.fromString('Error while fetching'));
+      Process.error(Bytes.fromUtf8String('Error while fetching'));
     }
   }
 }

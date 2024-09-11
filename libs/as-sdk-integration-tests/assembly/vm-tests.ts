@@ -7,11 +7,11 @@ import {
 
 export class TestTallyVmMode extends OracleProgram {
 	execution(): void {
-		Process.error(Bytes.fromString("dr"));
+		Process.error(Bytes.fromUtf8String("dr"));
 	}
 
 	tally(): void {
-		Process.success(Bytes.fromString("tally"));
+		Process.success(Bytes.fromUtf8String("tally"));
 	}
 }
 
@@ -23,7 +23,7 @@ export class TestTallyVmHttp extends OracleProgram {
 
 		if (fulfilled !== null) {
 			Process.error(
-				Bytes.fromString("this should not be allowed in tally mode"),
+				Bytes.fromUtf8String("this should not be allowed in tally mode"),
 			);
 		}
 

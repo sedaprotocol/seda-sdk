@@ -24,9 +24,9 @@ class PlanetProgram extends OracleProgram {
       const data = String.UTF8.decode(fulfilled.bytes.buffer);
       const planet = JSON.parse<SwPlanet>(data);
 
-      Process.success(Bytes.fromString(planet.name));
+      Process.success(Bytes.fromUtf8String(planet.name));
     } else {
-      Process.error(Bytes.fromString('Error while fetching'));
+      Process.error(Bytes.fromUtf8String('Error while fetching'));
     }
   }
 }

@@ -61,7 +61,7 @@ export default class Process {
 		// Data at index 1 is the dr/tally inputs encoded as hex
 		const data = Process.args().at(1);
 
-		return Bytes.fromBytes(decodeHex(data));
+		return Bytes.fromByteArray(decodeHex(data));
 	}
 
 	/**
@@ -115,7 +115,7 @@ export default class Process {
 	 * ```ts
 	 * const result = "{\"price\": \"10.23\"}";
 	 *
-	 * Process.success(Bytes.fromString(result));
+	 * Process.success(Bytes.fromUtf8String(result));
 	 * ```
 	 */
 	static success(result: Bytes): void {
@@ -132,7 +132,7 @@ export default class Process {
 	 * ```ts
 	 * const error = "Failed to fetch data from https://example.com";
 	 *
-	 * Process.error(Bytes.fromString(error));
+	 * Process.error(Bytes.fromUtf8String(error));
 	 * ```
 	 */
 	static error(result: Bytes, code: u8 = POSIX_ERROR_CODE): void {

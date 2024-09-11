@@ -1,3 +1,8 @@
+/**
+ * Encodes a byte array as a hexidecimal string without '0x' prefix.
+ * @param array The byte array to encode.
+ * @returns Hex encoded representation of the byte array without '0x' prefix.
+ */
 export function encodeHex(array: Uint8Array): string {
 	let hex = "";
 
@@ -8,7 +13,13 @@ export function encodeHex(array: Uint8Array): string {
 	return hex;
 }
 
-export function decodeHex(data: string): Uint8Array {
+/**
+ * Decodes a hexidecimal string to raw bytes. Ignores any '0x' prefix.
+ * @param input The string to decode as hex.
+ * @returns The decoded byte array.
+ */
+export function decodeHex(input: string): Uint8Array {
+	const data = input.replace("0x", "");
 	const array = new Uint8Array(data.length >>> 1);
 
 	for (let i = 0; i < data.length >>> 1; ++i) {

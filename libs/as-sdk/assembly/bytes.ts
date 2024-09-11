@@ -46,13 +46,32 @@ export class Bytes {
 		return String.UTF8.decode(this.value.buffer);
 	}
 
-	static fromString(payload: string): Bytes {
-		const msg = String.UTF8.encode(payload);
-		return new Bytes(Uint8Array.wrap(msg));
+	static fromUtf8String(payload: string): Bytes {
+		const data = String.UTF8.encode(payload);
+		return new Bytes(Uint8Array.wrap(data));
 	}
 
-	static fromBytes(payload: Uint8Array): Bytes {
+	toByteArray(): Uint8Array {
+		return this.value;
+	}
+
+	static fromByteArray(payload: Uint8Array): Bytes {
 		return new Bytes(payload);
+	}
+
+	/**
+	 * Encodes the bytes as a hexidecimal string without '0x' prefix.
+	 */
+	toHexString(): string {
+		return encodeHex(this.value);
+	}
+
+	/**
+	 * Decodes a hexidecimal string to Bytes. Ignores any '0x' prefix.
+	 */
+	static fromHexString(payload: string): Bytes {
+		const data = decodeHex(payload);
+		return new Bytes(data);
 	}
 
 	static empty(): Bytes {

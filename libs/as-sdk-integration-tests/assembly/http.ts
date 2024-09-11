@@ -10,9 +10,9 @@ export class TestHttpRejection extends OracleProgram {
 		const response = httpFetch("example.com/");
 
 		if (response.isRejected()) {
-			Process.success(Bytes.fromString("rejected"));
+			Process.success(Bytes.fromUtf8String("rejected"));
 		} else {
-			Process.error(Bytes.fromString("Test failed"));
+			Process.error(Bytes.fromUtf8String("Test failed"));
 		}
 	}
 }
@@ -29,7 +29,7 @@ export class TestHttpSuccess extends OracleProgram {
 			Process.error(response.unwrapRejected().bytes);
 		}
 
-		Process.error(Bytes.fromString("Something went wrong.."), 20);
+		Process.error(Bytes.fromUtf8String("Something went wrong.."), 20);
 	}
 }
 
@@ -39,7 +39,7 @@ export class TestPostHttpSuccess extends OracleProgram {
 		headers.set("content-type", "application/json");
 
 		const response = httpFetch("https://jsonplaceholder.typicode.com/posts", {
-			body: Bytes.fromString(
+			body: Bytes.fromUtf8String(
 				`{"title":"Test SDK","body":"Don't forget to test some integrations."}`,
 			),
 			method: "POST",
@@ -54,6 +54,6 @@ export class TestPostHttpSuccess extends OracleProgram {
 			Process.error(response.unwrap().bytes);
 		}
 
-		Process.error(Bytes.fromString("Something went wrong.."), 20);
+		Process.error(Bytes.fromUtf8String("Something went wrong.."), 20);
 	}
 }
