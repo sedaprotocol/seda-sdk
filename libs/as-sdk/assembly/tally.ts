@@ -24,7 +24,13 @@ export class RevealResult {
 }
 
 export default class Tally {
-	static getReveals(): RevealResult[] {
+	/**
+	 * Get the reveal data from the Oracle Program execution phase. This method also includes reveals which were not in
+	 * consensus. Use getReveals to only receive reveals which were in consensus.
+	 * @see {@link getReveals}
+	 * @returns All reveals from the Oracle Program execution phase.
+	 */
+	static getAllReveals(): RevealResult[] {
 		const encodedReveals = Process.args().at(REVEALS_ARGUMENT_POSITION);
 		const reveals = JSON.parse<RevealBody[]>(encodedReveals);
 
@@ -55,8 +61,12 @@ export default class Tally {
 		return revealResults;
 	}
 
-	static getConsensusReveals(): RevealResult[] {
-		const revealResults = Tally.getReveals();
+	/**
+	 * Get the reveal data from the Oracle Program execution phase over which consensus was reached.
+	 * @returns The reveals which were in consensus
+	 */
+	static getReveals(): RevealResult[] {
+		const revealResults = Tally.getAllReveals();
 
 		return revealResults.filter(
 			(revealResult) => revealResult.in_consensus === 0,
