@@ -118,7 +118,7 @@ export default class VmImports {
 
 	secp256k1Verify(
 		messagePtr: number,
-		messageLength: number,
+		messageLength: bigint,
 		signaturePtr: number,
 		signatureLength: number,
 		publicKeyPtr: number,
@@ -126,7 +126,10 @@ export default class VmImports {
 	) {
 		const message = Buffer.from(
 			new Uint8Array(
-				this.memory?.buffer.slice(messagePtr, messagePtr + messageLength) ?? [],
+				this.memory?.buffer.slice(
+					messagePtr,
+					messagePtr + Number(messageLength),
+				) ?? [],
 			),
 		);
 		const signature = Buffer.from(
