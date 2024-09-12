@@ -5,7 +5,7 @@ import {
 
 const DEFAULT_VERSION = "0.0.1";
 const DEFAULT_REPLICATION_FACTOR = 1;
-const DEFAULT_GAS_LIMIT = 300_000;
+const DEFAULT_GAS_LIMIT = 5_000_000_000;
 const DEFAULT_GAS_PRICE = 1;
 const DEFAULT_MEMO = new Uint8Array([]);
 
