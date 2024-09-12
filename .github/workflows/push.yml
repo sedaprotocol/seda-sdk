@@ -12,11 +12,11 @@ jobs:
       pages: write
       id-token: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - uses: oven-sh/setup-bun@v1
+      - uses: oven-sh/setup-bun@v2
         with:
-          bun-version: 1.1.13
+          bun-version: 1.1.27
 
       - name: 📥 Install dependencies
         run: bun install --frozen-lockfile
@@ -28,16 +28,16 @@ jobs:
         run: bun run test
 
       - name: 📄 Setup Pages
-        uses: actions/configure-pages@v3
+        uses: actions/configure-pages@v5
 
       - name: 📚 Create docs
         run: bun run docs
 
       - name: 🆙 Upload artifact
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-pages-artifact@v3
         with:
           path: "./docs"
 
       - name: 📄 Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v2
+        uses: actions/deploy-pages@v4
