@@ -8,7 +8,7 @@
 		"cli": "bun run libs/dev-tools/bin/index.js",
 		"fmt": "bunx biome check --write .",
 		"test": "bun run build && NODE_OPTIONS=--experimental-vm-modules nx run-many --all --target=test",
-		"docs": "typedoc libs/as-sdk/assembly/index.ts --tsconfig ./libs/as-sdk/assembly/tsconfig.json --skipErrorChecking",
+		"docs": "bun run tools/typedoc/generate.ts",
 		"cli:generate": "cd libs/cli/proto && npx buf generate"
 	},
 	"private": true,
