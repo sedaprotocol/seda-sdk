@@ -25,28 +25,31 @@
 
 Collection of packages which allow you to build SEDA Data Requests:
 
-- [vm](./libs/vm/README.md) - Virtual Machine which can run Data Request WASM binaries
-- [as-sdk](./libs/as-sdk/README.md) - [AssemblyScript](https://www.assemblyscript.org/) SDK
-- [cli](./libs/cli/README.md) - Command Line Interface for uploading and listing Data Request binaries
+- [as-sdk](./libs/as-sdk/README.md) - [AssemblyScript](https://www.assemblyscript.org/) SDK to help building Oracle Programs
+- [dev-tools](./libs/dev-tools/README.md) - Command Line Interface for uploading and listing Oracle Programs
+- [vm](./libs/vm/README.md) - Virtual Machine which can run Oracle Programs locally for testing
 
 # Quick getting started
 
 The easiest way to get started it by using our [starter kit](https://github.com/sedaprotocol/seda-sdk-starter-template) this has all the tools installed that you need:
 
 - AssemblyScript
-- SEDA SDK
-- SEDA CLI
-- SEDA VM
+- JSON-AS
 - WASI
+- SEDA SDK
+- SEDA Dev Tools
+- SEDA VM
 
-In our `assembly/index.ts` we have the following example:
+For API documentation check [the TypeDocs](https://sedaprotocol.github.io/seda-sdk/index.html), and for guides and examples check <LINK_HERE>.
+
+## Example
+
+Below is an example of an Oracle Program that retrieves the name of a planet in the SWAPI database.
 
 ```ts
-import { Process, httpFetch, OracleProgram, Bytes } from '@seda-protocol/as-sdk/assembly';
-import { JSON } from 'json-as/assembly';
+import { Process, httpFetch, OracleProgram, Bytes, JSON } from '@seda-protocol/as-sdk/assembly';
 
-// Our SWAPI JSON schema, since in AssemblyScript we need to define our shape beforehand
-// @ts-expect-error
+// The JSON schema of the response we're expecting, since in AssemblyScript we need to deserialize JSON into structured objects
 @json
 class SwPlanet {
   name!: string;
@@ -54,17 +57,16 @@ class SwPlanet {
 
 class PlanetProgram extends OracleProgram {
   execution() {
+    const input = Process.getInputs().toUtf8String();
+
     // HTTP Fetch to the SWAPI
-    const response = httpFetch('https://swapi.dev/api/planets/1/');
+    const response = httpFetch(`https://swapi.dev/api/planets/${input}`);
 
-    // Returns either fulfilled or rejected based on the status code
-    const fulfilled = response.fulfilled;
+    if (response.isFulfilled()) {
+      // We need to unwrap the response Bytes and convert them to a string before we can parse it as JSON.
+      const data = response.unwrap().toUtf8String();
 
-    if (fulfilled !== null) {
-      // Converts our buffer to a string
-      const data = String.UTF8.decode(fulfilled.bytes.buffer);
-
-      // Parses the JSON to our schema
+      // Parses the JSON string into the structured object we defined.
       const planet = JSON.parse<SwPlanet>(data);
 
       // Exits the program (with an exit code of 0) and sets the Data Request result to the planet name
@@ -78,27 +80,27 @@ class PlanetProgram extends OracleProgram {
 new PlanetProgram().run();
 ```
 
-And in order to test this we have to use a JS testing suite (In our starting kit we use Jest, but any suite should work). We use the `@seda-protocol/vm` package for this. Which runs the binary in the context of a SEDA Data Request:
+## Testing
 
-```js
-import { callVm } from '@seda-protocol/vm';
+In order to test this we can use a JS testing suite (we use Bun:test in this repository and the starter kits, but any runner should work). We use the `@seda-protocol/dev-tools` package for this, which runs the Oracle Program in a similar environment as it would on the SEDA network:
+
+```ts
+import { executeDrWasm } from '@seda-protocol/dev-tools';
 import { readFile } from 'node:fs/promises';
 
 const WASM_PATH = 'build/debug.wasm';
 
-describe('Oracel Program: execution', () => {
+describe('Oracle Program: execution', () => {
   it('should be able to run', async () => {
     const wasmBinary = await readFile(WASM_PATH);
 
     // Calls our SEDA VM
-    const vmResult = await callVm({
-      // Arguments passed to the VM
-      args: [],
-      // Environment variables passed to the VM
-      envs: {},
-      // The WASM binary in bytes
-      binary: new Uint8Array(wasmBinary),
-    });
+    const vmResult = await executeDrWasm(
+      // The wasm file
+      wasmBinary,
+      // Inputs for the Oracle Program
+      Buffer.from('1'),
+    );
 
     expect(vmResult.exitCode).toBe(0);
     expect(vmResult.resultAsString).toBe('Tatooine');

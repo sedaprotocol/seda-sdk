@@ -1,14 +1,13 @@
 # AssemblyScript SDK
 
-SDK for creating Oracle Programs on the SEDA chain
+SDK for creating Oracle Programs on the SEDA chain.
 
-For API documentation please see our docs: https://sedaprotocol.github.io/seda-sdk/
+For guides an examples on how to use this SDK see our documentation: <LINK_HERE>
 
-## Example
+## Preview
 
 ```ts
-import { Process, httpFetch, Bytes, OracleProgram } from '@seda-protocol/as-sdk/assembly';
-import { JSON } from 'json-as/assembly';
+import { Process, httpFetch, Bytes, OracleProgram, Console, JSON } from "@seda-protocol/as-sdk/assembly";
 
 @json
 class SwPlanet {
@@ -17,16 +16,16 @@ class SwPlanet {
 
 class PlanetProgram extends OracleProgram {
   execute(): void {
-    const response = httpFetch('https://swapi.dev/api/planets/1/');
-    const fulfilled = response.fulfilled;
+    const response = httpFetch("https://swapi.dev/api/planets/1/");
 
-    if (fulfilled !== null) {
-      const data = String.UTF8.decode(fulfilled.bytes.buffer);
-      const planet = JSON.parse<SwPlanet>(data);
+    if (response.isFulfilled()) {
+      const planet = JSON.parse<SwPlanet>(response.unwrap().toUtf8String());
+
+      Console.log(planet);
 
       Process.success(Bytes.fromUtf8String(planet.name));
     } else {
-      Process.error(Bytes.fromUtf8String('Error while fetching'));
+      Process.error(Bytes.fromUtf8String("Error while fetching"));
     }
   }
 }
