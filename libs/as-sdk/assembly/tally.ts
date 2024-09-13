@@ -7,23 +7,57 @@ const REVEALS_ARGUMENT_POSITION = 2;
 const CONSENSUS_ARGUMENT_POSITION = 3;
 
 @json
-export class RevealBody {
+class RevealBody {
 	salt!: u8[];
 	exit_code!: u8;
 	gas_used!: string;
 	reveal!: u8[];
 }
 
+/**
+ * A revealed report from an overlay node. Includes the exit code and output of the executed Oracle Program, as
+ * well as some other data from the overlay node.
+ *
+ * @category Tally
+ */
 @json
 export class RevealResult {
+	/**
+	 * Entropy added by the overlay node to prevent other overlay nodes from copying the result.
+	 */
 	salt!: Bytes;
-	exit_code!: u8;
-	gas_used!: string;
+
+	/**
+	 * POSIX compatible exit code that was returned by the execution phase of the Oracle Program.
+	 */
+	exitCode!: u8;
+
+	/**
+	 * Gas units consumed by the overlay node while executing the Oracle Program.
+	 */
+	gasUsed!: string;
+
+	/**
+	 * The ouput of the execution phase of the Oracle Program.
+	 */
 	reveal!: Bytes;
-	in_consensus!: u8;
+
+	/**
+	 * Flag indicating whether this reveal result was in consensus. See {@linkcode Tally.getUnfilteredReveals} to access
+	 * all reveals, including the ones which were not in consensus.
+	 */
+	inConsensus!: boolean;
 }
 
+/**
+ * Helper class to retrieve the reveal data submitted by the overlay nodes that participated in the Data Request execution.
+ *
+ * @category Tally
+ */
 export default class Tally {
+	/** @hidden */
+	private constructor() {}
+
 	/**
 	 * Get the reveal data from the Oracle Program execution phase. This method also includes reveals which were not in
 	 * consensus. Use getReveals to only receive reveals which were in consensus.
@@ -50,11 +84,11 @@ export default class Tally {
 			const reveal = reveals[index];
 
 			revealResults.push({
-				exit_code: reveal.exit_code,
-				gas_used: reveal.gas_used,
+				exitCode: reveal.exit_code,
+				gasUsed: reveal.gas_used,
 				reveal: Bytes.fromByteArray(jsonArrToUint8Array(reveal.reveal)),
 				salt: Bytes.fromByteArray(jsonArrToUint8Array(reveal.salt)),
-				in_consensus: consensus.at(index),
+				inConsensus: consensus.at(index) === 0,
 			});
 		}
 
@@ -68,8 +102,6 @@ export default class Tally {
 	static getReveals(): RevealResult[] {
 		const revealResults = Tally.getUnfilteredReveals();
 
-		return revealResults.filter(
-			(revealResult) => revealResult.in_consensus === 0,
-		);
+		return revealResults.filter((revealResult) => revealResult.inConsensus);
 	}
 }

@@ -86,7 +86,7 @@ describe("TallyVm", () => {
 		);
 	});
 
-	it("should be able to parse the reveals", async () => {
+	it("should be able to parse the reveals and return the unfiltered reveals", async () => {
 		const wasmBinary = await readFile(
 			"dist/libs/as-sdk-integration-tests/debug.wasm",
 		);
@@ -104,6 +104,12 @@ describe("TallyVm", () => {
 				result: JSON.stringify({ data: "grandpa_shark" }),
 				inConsensus: true,
 			},
+			{
+				exitCode: 0,
+				gasUsed: 12,
+				result: JSON.stringify({ data: "grandma_shark" }),
+				inConsensus: false,
+			},
 		];
 
 		const result = await executeTallyWasm(
@@ -114,7 +120,7 @@ describe("TallyVm", () => {
 
 		expect(result.exitCode).toBe(0);
 		expect(result.resultAsString).toBe(
-			'[{"salt":{"type":"hex","value":"736564615f73646b"},"exit_code":0,"gas_used":"200000","reveal":{"type":"hex","value":"7b2264617461223a22626162795f736861726b227d"},"in_consensus":0},{"salt":{"type":"hex","value":"736564615f73646b"},"exit_code":1,"gas_used":"1336","reveal":{"type":"hex","value":"7b2264617461223a226772616e6470615f736861726b227d"},"in_consensus":0}]',
+			'[{"salt":{"type":"hex","value":"736564615f73646b"},"exitCode":0,"gasUsed":"200000","reveal":{"type":"hex","value":"7b2264617461223a22626162795f736861726b227d"},"inConsensus":true},{"salt":{"type":"hex","value":"736564615f73646b"},"exitCode":1,"gasUsed":"1336","reveal":{"type":"hex","value":"7b2264617461223a226772616e6470615f736861726b227d"},"inConsensus":true},{"salt":{"type":"hex","value":"736564615f73646b"},"exitCode":0,"gasUsed":"12","reveal":{"type":"hex","value":"7b2264617461223a226772616e646d615f736861726b227d"},"inConsensus":false}]',
 		);
 	});
 
@@ -140,7 +146,6 @@ describe("TallyVm", () => {
 				exitCode: 0,
 				gasUsed: 1346,
 				result: JSON.stringify({ data: "cousin_shark" }),
-
 				inConsensus: true,
 			},
 		];
@@ -153,7 +158,7 @@ describe("TallyVm", () => {
 
 		expect(result.exitCode).toBe(0);
 		expect(result.resultAsString).toBe(
-			'[{"salt":{"type":"hex","value":"736564615f73646b"},"exit_code":0,"gas_used":"1336","reveal":{"type":"hex","value":"7b2264617461223a226772616e6470615f736861726b227d"},"in_consensus":0},{"salt":{"type":"hex","value":"736564615f73646b"},"exit_code":0,"gas_used":"1346","reveal":{"type":"hex","value":"7b2264617461223a22636f7573696e5f736861726b227d"},"in_consensus":0}]',
+			'[{"salt":{"type":"hex","value":"736564615f73646b"},"exitCode":0,"gasUsed":"1336","reveal":{"type":"hex","value":"7b2264617461223a226772616e6470615f736861726b227d"},"inConsensus":true},{"salt":{"type":"hex","value":"736564615f73646b"},"exitCode":0,"gasUsed":"1346","reveal":{"type":"hex","value":"7b2264617461223a22636f7573696e5f736861726b227d"},"inConsensus":true}]',
 		);
 	});
 });

@@ -14,7 +14,7 @@ export { proxyHttpFetch } from "./proxy-http";
 export { JSON } from "json-as/assembly";
 export { PromiseStatus } from "./promise";
 export { Process, Tally };
-export { RevealBody } from "./tally";
+export { RevealResult } from "./tally";
 export { Console } from "./console";
 export { Bytes } from "./bytes";
 export { decodeHex, encodeHex } from "./hex";
