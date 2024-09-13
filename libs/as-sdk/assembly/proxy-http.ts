@@ -23,6 +23,8 @@ export class ProxyHttpFetchAction extends HttpFetchAction {
 /**
  * Calls a Data Proxy Node the same way httpFetch does, but checks the signature and
  *
+ * @category HTTP
+ *
  * @param url The URL of the Data Proxy Node you want to access
  * @param publicKey Optional: The public key of the proxy node, verifies if the signature came from this public key
  * @param options Optional: Allows you to set headers, method, body

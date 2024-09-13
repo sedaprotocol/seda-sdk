@@ -1,7 +1,9 @@
 /**
- * Encodes a byte array as a hexidecimal string without '0x' prefix.
+ * Encode a byte array as a hexidecimal string without '0x' prefix. Take a look at
+ * {@linkcode Bytes.toHexString} for dealing with bytes and encoding/decoding.
+ *
+ * @category Bytes
  * @param array The byte array to encode.
- * @returns Hex encoded representation of the byte array without '0x' prefix.
  */
 export function encodeHex(array: Uint8Array): string {
 	let hex = "";
@@ -14,9 +16,11 @@ export function encodeHex(array: Uint8Array): string {
 }
 
 /**
- * Decodes a hexidecimal string to raw bytes. Ignores any '0x' prefix.
+ * Decode a hexidecimal string to raw bytes. Ignores any '0x' prefix. Take a look at
+ * {@linkcode Bytes.fromHexString} for dealing with bytes and encoding/decoding.
+ *
+ * @category Bytes
  * @param input The string to decode as hex.
- * @returns The decoded byte array.
  */
 export function decodeHex(input: string): Uint8Array {
 	const data = input.replace("0x", "");

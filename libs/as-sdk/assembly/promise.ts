@@ -11,13 +11,21 @@ class PromiseStatusResult {
 	Rejected!: u8[] | null;
 }
 
+/**
+ * A class which represents the outcome of an action which can either succeed or fail.
+ * See {@linkcode httpFetch} for an example on how it can be used.
+ */
 @json
 export class PromiseStatus<F, R> {
+	/** @hidden */
 	private constructor(
+		/** @hidden */
 		private fulfilled: F | null,
+		/** @hidden */
 		private rejected: R | null,
 	) {}
 
+	/** @hidden */
 	static fromStr<F extends FromBuffer<F>, R extends FromBuffer<R>>(
 		promiseStatus: string,
 		fulfilled: F,
@@ -42,14 +50,27 @@ export class PromiseStatus<F, R> {
 		return new PromiseStatus(fulfilledResult, rejectedResult);
 	}
 
+	/**
+	 * Check whether this promise is rejected. When true use {@linkcode unwrapRejected} to access
+	 * the rejected class.
+	 */
 	isRejected(): bool {
 		return this.rejected !== null;
 	}
 
+	/**
+	 * Check whether this promise is fulfilled. When true use {@linkcode unwrap} to access
+	 * the fulfilled class.
+	 */
 	isFulfilled(): bool {
 		return this.fulfilled !== null;
 	}
 
+	/**
+	 * Access the fulfilled data serialised into the class set as the fulfilled class. Check {@linkcode isFulfilled}
+	 * before calling this method.
+	 * @throws when unwrapping a rejected Promise
+	 */
 	unwrap(): F {
 		const fulfilled = this.fulfilled;
 
@@ -59,7 +80,11 @@ export class PromiseStatus<F, R> {
 
 		return fulfilled;
 	}
-
+	/**
+	 * Access the rejected data serialised into the class set as the rejected class. Check {@linkcode isRejected}
+	 * before calling this method.
+	 * @throws when unwrapping a fulfilled Promise
+	 */
 	unwrapRejected(): R {
 		const rejected = this.rejected;
 

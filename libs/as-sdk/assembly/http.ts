@@ -1,7 +1,6 @@
 import { JSON } from "json-as/assembly";
 import { call_result_write, http_fetch } from "./bindings/seda_v1";
 import { Bytes } from "./bytes";
-import { Console } from "./console";
 import { bytesToJsonArray, jsonArrToUint8Array } from "./json-utils";
 import { FromBuffer, PromiseStatus } from "./promise";
 
@@ -15,10 +14,17 @@ export class SerializableHttpResponse {
 }
 
 /**
- * Response of an httpFetch call
+ * The response of an {@linkcode httpFetch} call. Contains all the information returned by the
+ * requested endpoint.
+ *
+ * @category HTTP
  */
 @json
 export class HttpResponse implements FromBuffer<HttpResponse> {
+	/** @hidden */
+	// biome-ignore lint/complexity/noUselessConstructor: <explanation>
+	constructor() {}
+
 	/**
 	 * The response body result. This can be used to convert to JSON, text, etc.
 	 */
@@ -36,10 +42,11 @@ export class HttpResponse implements FromBuffer<HttpResponse> {
 	 */
 	public status: i64 = 0;
 	/**
-	 * The headers returned
+	 * The response headers
 	 */
 	public headers: Map<string, string> = new Map();
 
+	/** @hidden */
 	static fromSerializable(value: SerializableHttpResponse): HttpResponse {
 		const response = new HttpResponse();
 
@@ -76,6 +83,7 @@ export class HttpResponse implements FromBuffer<HttpResponse> {
 		return response;
 	}
 
+	/** @hidden */
 	fromBuffer(buffer: Uint8Array): HttpResponse {
 		const value = JSON.parse<SerializableHttpResponse>(
 			String.UTF8.decode(buffer.buffer),
@@ -85,10 +93,14 @@ export class HttpResponse implements FromBuffer<HttpResponse> {
 	}
 }
 
-export type HttpFetchMethod = string;
+/**
+ * @hidden As it's not relevant for the generated documentation
+ */
+export type HttpFetchMethod = "Get";
 
 /**
- * HTTP Fetch options
+ * Request options to pass to {@linkcode httpFetch}.
+ *
  * @example
  * ```ts
  * const headers = new Map<string, string>();
@@ -97,16 +109,16 @@ export type HttpFetchMethod = string;
  * const options = new HttpFetchOptions();
  * options.method = "Post";
  * options.headers = headers;
- * // Do something with the body
- * options.body = new Uint8Array(10);
+ * options.body = Bytes.fromUtf8String('{"value":"test"}');
  *
  * const response = httpFetch("https://swapi.dev/api/planets/1/", options);
  * ```
+ * @category HTTP
  */
 @json
 export class HttpFetchOptions {
 	/**
-	 * HTTP Method (Get, Post, Patch, etc.)
+	 * HTTP method: "GET", "POST", "PATCH", etc.
 	 */
 	method: HttpFetchMethod = "Get";
 
@@ -147,16 +159,17 @@ export class HttpFetchAction {
 /**
  * Executes a HTTP call (similiar to the Fetch API from the Web API)
  *
- * @param {string} url The URL which to call
- * @param {HttpFetchOptions} options Options to modify the behaviour of the HTTP call
- * @returns {PromiseStatus<HttpResponse, HttpResponse>} Returns a HttpResponse instance for both fulfilled and rejected case with info about the HTTP call
+ * @category HTTP
+ *
+ * @param url The URL to send the request to
+ * @param options Options to modify the behaviour of the HTTP call
+ * @returns Returns a HttpResponse instance for both fulfilled and rejected case with info about the HTTP call
  * @example
  * ```ts
  * const response = httpFetch("https://swapi.dev/api/planets/1/");
- * const fulfilled = response.fulfilled;
  *
- * if (fulfilled !== null) {
- *   const data = String.UTF8.decode(fulfilled.bytes.buffer);
+ * if (response.isFulfilled()) {
+ *   const data = response.unwrap().bytes.toUtf8String();
  *   // Do something with data
  * } else {
  *   // Error occured

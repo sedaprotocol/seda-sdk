@@ -7,14 +7,40 @@ class InnerBytes {
 	value!: string;
 }
 
+/**
+ * A class to make dealing with bytes easier. Allows to quickly convert between UTF-8,
+ * hexadecimal, and byte array representations of data.
+ *
+ * @category Bytes
+ * @example
+ * ```ts
+	const input = Bytes.fromHexString("6574682d75736463");
+
+	const pairsString = input.toUtf8String();
+
+	Console.log(pairsString); // eth-usdc
+ * ```
+ */
 export class Bytes {
+	/**
+	 * @hidden Just used as a hint when logging Bytes.
+	 */
 	type: string = "hex";
+	/**
+	 * The underlying byte array. Can also be accessed through {@linkcode toByteArray}.
+	 */
 	value: Uint8Array;
 
+	/**
+	 * @hidden Should only be constructed through static methods.
+	 */
 	private constructor(value: Uint8Array) {
 		this.value = value;
 	}
 
+	/**
+	 * @hidden Required for JSON-AS (de)serialization.
+	 */
 	__SERIALIZE(): string {
 		const inner = new InnerBytes();
 		inner.value = encodeHex(this.value);
@@ -22,8 +48,14 @@ export class Bytes {
 		return JSON.stringify(inner);
 	}
 
+	/**
+	 * @hidden Required for JSON-AS (de)serialization.
+	 */
 	__INITIALIZE(): void {}
 
+	/**
+	 * @hidden Required for JSON-AS (de)serialization.
+	 */
 	__DESERIALIZE(
 		data: string,
 		_key_start: i32,
@@ -38,50 +70,164 @@ export class Bytes {
 		return true;
 	}
 
+	/**
+	 * The underlying {@link ArrayBuffer} in case you need to manipulate it directly.
+	 * Most likely {@linkcode toUtf8String} or {@linkcode toHexString} is the better choice.
+	 *
+	 * @example
+	 * ```ts
+		const input = Bytes.fromHexString("6574682d75736463");
+
+		Console.log(String.UTF8.decode(input.buffer);); // eth-usdc
+	 * ```
+	 */
 	get buffer(): ArrayBuffer {
 		return this.value.buffer;
 	}
 
+	/**
+	 * Decode this Bytes instance as a UTF-8 string.
+	 *
+	 * @example
+	 * ```ts
+		const input = Bytes.fromHexString("6574682d75736463");
+		const pairsString = input.toUtf8String();
+
+		const pairsList = pairsString.split("-");
+		const a = pairsList[0];
+		const b = pairsList[1];
+
+		Console.log(a); // eth
+		Console.log(b); // usdc
+	 * ```
+	 */
 	toUtf8String(): string {
 		return String.UTF8.decode(this.value.buffer);
 	}
 
+	/**
+	 * Encode a given string as UTF-8 bytes.
+	 *
+	 * @example
+	 * ```ts
+		const output = Bytes.fromUtf8String("winner");
+
+		// Exit the program with the UTF-8 encoded bytes as the output.
+		Process.success(output);
+	 * ```
+	 */
 	static fromUtf8String(payload: string): Bytes {
 		const data = String.UTF8.encode(payload);
 		return new Bytes(Uint8Array.wrap(data));
 	}
 
+	/**
+	 * The underlying byte array in case you need to use it directly.
+	 * Can also be accessed through {@linkcode value}.
+	 *
+	 * @example
+	 * ```ts
+		const data = Bytes.fromHexString("6574682d75736463");
+
+		const byteArray = data.toByteArray();
+		Console.log(byteArray.length); // 8
+	 * ```
+	 */
 	toByteArray(): Uint8Array {
 		return this.value;
 	}
 
+	/**
+	 * Wrap an existing byte array in Bytes.
+	 *
+	 * @example
+	 * ```ts
+		import { decode } from "as-base64";
+
+		const data = decode("aGVsbG8gc2VkYQ==");
+		Console.log(data.toUtf8String()); // "hello seda"
+	 * ```
+	 */
 	static fromByteArray(payload: Uint8Array): Bytes {
 		return new Bytes(payload);
 	}
 
 	/**
-	 * Encodes the bytes as a hexidecimal string without '0x' prefix.
+	 * Encode the bytes as a hexidecimal string without '0x' prefix.
+	 *
+	 * @example
+	 * ```ts
+		const data = Bytes.fromUtf8String("eth-usdc");
+
+		const dataAsHex = data.toHexString();
+		Console.log(dataAsHex); // "6574682d75736463"
+	 * ```
 	 */
 	toHexString(): string {
 		return encodeHex(this.value);
 	}
 
 	/**
-	 * Decodes a hexidecimal string to Bytes. Ignores any '0x' prefix.
+	 * Decode a hexidecimal string to Bytes. Ignores any '0x' prefix.
+	 *
+	 * @example
+	 * ```ts
+		const data = Bytes.fromHexString("6574682d75736463");
+		// Equivalent to
+		const dataWithPrefix = Bytes.fromHexString("0x6574682d75736463");
+
+		Console.log(data.toUtf8String); // "eth-usdc"
+		Console.log(dataWithPrefix.toUtf8String); // "eth-usdc"
+	 * ```
 	 */
 	static fromHexString(payload: string): Bytes {
 		const data = decodeHex(payload);
 		return new Bytes(data);
 	}
 
+	/**
+	 * Create an empty bytes instance.
+	 */
 	static empty(): Bytes {
 		return new Bytes(new Uint8Array(0));
 	}
 
+	/**
+	 * The length of the underlying byte array.
+	 *
+	 * @example
+	 * ```ts
+		const data = Bytes.fromHexString("6574682d75736463");
+
+		Console.log(data.length); // 8
+	 * ```
+	 */
 	get length(): i32 {
 		return this.value.length;
 	}
 
+	/**
+	 * Create a new Bytes instance from a slice of the original instance.
+	 *
+	 * @example
+	 * ```ts
+		const data = Bytes.fromHexString("68656c6c6f2073656461");
+
+		// Without begin and end it returns a new copy
+		const copy = data.slice();
+		Console.log(copy.toUtf8String()); // "hello seda"
+
+		// Without end it starts the slice at begin and copies until the end
+		const noEnd = data.slice(6);
+		Console.log(noEnd.toUtf8String()); // "seda"
+
+		// Without begin and end it returns a new copy
+		const beginAndEnd = data.slice(1, 5);
+		Console.log(beginAndEnd.toUtf8String()); // "ello"
+	 * ```
+	 * @param begin Inclusive beginning of the slice to copy
+	 * @param end Exclusive end of the slice to copy
+	 */
 	slice(begin: i32 = 0, end: i32 = i32.MAX_VALUE): Bytes {
 		const byteSlice = this.value.slice(begin, end);
 		return new Bytes(byteSlice);

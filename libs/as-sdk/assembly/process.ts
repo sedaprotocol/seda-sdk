@@ -5,7 +5,6 @@ import {
 } from "@assemblyscript/wasi-shim/assembly/wasi_process";
 import { execution_result } from "./bindings/seda_v1";
 import { Bytes } from "./bytes";
-import { decodeHex } from "./hex";
 import { VM_MODE_DR, VM_MODE_ENV_KEY, VM_MODE_TALLY } from "./vm-modes";
 
 const POSIX_SUCCESS_CODE = u8(0);
@@ -14,7 +13,15 @@ const POSIX_ERROR_CODE = u8(1);
 const argv = lazyArgv();
 const env = lazyEnv();
 
+/**
+ * A set of methods to interact with the process in which the Oracle Program is running.
+ *
+ * @category Program
+ */
 export default class Process {
+	/** @hidden */
+	private constructor() {}
+
 	/**
 	 * Gets all the input arguments from the Data Request
 	 * First argument (index: 0) is the binary hash
@@ -52,7 +59,7 @@ export default class Process {
 	 * @example
 	 * ```ts
 	 * const inputs = Process.getInputs();
-	 * const inputAsString = String.UTF8.decode(inputs.buffer);
+	 * const inputAsString = inputs.toUtf8String();
 	 *
 	 * console.log(inputAsString);
 	 * ```
@@ -61,7 +68,7 @@ export default class Process {
 		// Data at index 1 is the dr/tally inputs encoded as hex
 		const data = Process.args().at(1);
 
-		return Bytes.fromByteArray(decodeHex(data));
+		return Bytes.fromHexString(data);
 	}
 
 	/**

@@ -1,3 +1,21 @@
+/**
+ * The AssemblyScript SDK provides various helpers and utilities for creating Oracle Programs on the SEDA network.
+ *
+ * @categoryDescription Program
+ * Tools to help structure an Oracle Program.
+ *
+ * @categoryDescription Bytes
+ * Functions and classes to help dealing with encoding/decoding of data.
+ *
+ * @categoryDescription HTTP
+ * Functions and classes used to make HTTP requests from an Oracle Program.
+ *
+ * @categoryDescription Tally
+ * Classes to retrieve the execution reports from the overlay nodes.
+ *
+ * @module @seda-protocol/as-sdk
+ */
+
 import Process from "./process";
 import Tally from "./tally";
 

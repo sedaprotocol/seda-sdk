@@ -2,7 +2,23 @@ import { Bytes } from "./bytes";
 import Process from "./process";
 
 /**
- * A class meant to be extended with the custom implementation of an Oracle Program.
+ * A class meant to be extended with the custom implementation of an Oracle Program. Takes care of
+ * executing the correct code depending on the phase of the Data Request.
+ *
+ * @category Program
+ * @example
+ * ```ts
+	class MyOracleProgram extends OracleProgram {
+		execution(): void {
+			Process.success(Bytes.fromUtf8String("Hello from execution phase"));
+		}
+		tally(): void {
+			Process.success(Bytes.fromUtf8String("Hello from tally phase"));
+		}
+	}
+
+	new MyOracleProgram().run();
+ * ```
  */
 export class OracleProgram {
 	/**
