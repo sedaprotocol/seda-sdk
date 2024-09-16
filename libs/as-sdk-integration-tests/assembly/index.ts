@@ -56,7 +56,7 @@ if (args === "testHttpRejection") {
 } else if (args === "testBytesHexEncodeDecode") {
 	new TestBytesHexEncodeDecode().run();
 } else if (args === "testBytesPrefixedHexDecode") {
-	new TestBytesHexEncodeDecode().run();
+	new TestBytesPrefixedHexDecode().run();
 } else if (args.startsWith("testBytesJSON")) {
 	new TestBytesJSON().run();
 	// Pretty iffy condition, not sure how else we can check for this though

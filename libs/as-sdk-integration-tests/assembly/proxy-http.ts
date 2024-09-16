@@ -1,22 +1,13 @@
-import {
-	Bytes,
-	OracleProgram,
-	Process,
-	proxyHttpFetch,
-} from "../../as-sdk/assembly";
+import { OracleProgram, Process, proxyHttpFetch } from "../../as-sdk/assembly";
 
 export class TestProxyHttpFetch extends OracleProgram {
 	execution(): void {
 		const response = proxyHttpFetch("http://localhost:5384/proxy/planets/1");
 
-		if (response.isFulfilled()) {
-			Process.success(response.unwrap().bytes);
+		if (response.ok) {
+			Process.success(response.bytes);
 		}
 
-		if (response.isRejected()) {
-			Process.error(response.unwrapRejected().bytes);
-		}
-
-		Process.error(Bytes.fromUtf8String("Something went wrong.."), 20);
+		Process.error(response.bytes);
 	}
 }

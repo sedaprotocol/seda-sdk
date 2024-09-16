@@ -29,12 +29,23 @@ export class ProxyHttpFetchAction extends HttpFetchAction {
  * @param publicKey Optional: The public key of the proxy node, verifies if the signature came from this public key
  * @param options Optional: Allows you to set headers, method, body
  * @returns Promise with information about the response
+ * @example
+ * ```ts
+ * const response = proxyHttpFetch("https://swapi.dev/api/planets/1/");
+ *
+ * if (response.ok) {
+ *   const data = response.bytes.toUtf8String();
+ *   // Do something with data
+ * } else {
+ *   // Error occured
+ * }
+ * ```
  */
 export function proxyHttpFetch(
 	url: string,
 	publicKey: string | null = null,
 	options: HttpFetchOptions = new HttpFetchOptions(),
-): PromiseStatus<HttpResponse, HttpResponse> {
+): HttpResponse {
 	const action = new ProxyHttpFetchAction(url, publicKey, options);
 	const actionStr = JSON.stringify(action);
 
@@ -49,9 +60,15 @@ export function proxyHttpFetch(
 
 	const response = String.UTF8.decode(responseBuffer);
 
-	return PromiseStatus.fromStr(
+	const promise = PromiseStatus.fromStr(
 		response,
 		new HttpResponse(),
 		new HttpResponse(),
 	);
+
+	if (promise.isFulfilled()) {
+		return promise.unwrap();
+	}
+
+	return promise.unwrapRejected();
 }

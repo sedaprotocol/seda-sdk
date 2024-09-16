@@ -9,7 +9,7 @@ export class TestHttpRejection extends OracleProgram {
 	execution(): void {
 		const response = httpFetch("example.com/");
 
-		if (response.isRejected()) {
+		if (!response.ok) {
 			Process.success(Bytes.fromUtf8String("rejected"));
 		} else {
 			Process.error(Bytes.fromUtf8String("Test failed"));
@@ -29,8 +29,8 @@ export class TestHttpSuccess extends OracleProgram {
 	execution(): void {
 		const response = httpFetch("https://jsonplaceholder.typicode.com/todos/1");
 
-		if (response.isFulfilled()) {
-			const data = response.unwrap().bytes.toJSON<TodoResponse>();
+		if (response.ok) {
+			const data = response.bytes.toJSON<TodoResponse>();
 			Process.success(
 				Bytes.fromUtf8String(
 					`${data.userId}:${data.id}:${data.title}:${data.completed}`,
@@ -38,11 +38,7 @@ export class TestHttpSuccess extends OracleProgram {
 			);
 		}
 
-		if (response.isRejected()) {
-			Process.error(response.unwrapRejected().bytes);
-		}
-
-		Process.error(Bytes.fromUtf8String("Something went wrong.."), 20);
+		Process.error(response.bytes);
 	}
 }
 
@@ -66,17 +62,13 @@ export class TestPostHttpSuccess extends OracleProgram {
 			headers,
 		});
 
-		if (response.isFulfilled()) {
-			const data = response.unwrap().bytes.toJSON<PostResponse>();
+		if (response.ok) {
+			const data = response.bytes.toJSON<PostResponse>();
 			Process.success(
 				Bytes.fromUtf8String(`${data.id}:${data.title}:${data.body}`),
 			);
 		}
 
-		if (response.isRejected()) {
-			Process.error(response.unwrap().bytes);
-		}
-
-		Process.error(Bytes.fromUtf8String("Something went wrong.."), 20);
+		Process.error(response.bytes);
 	}
 }

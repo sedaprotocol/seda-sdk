@@ -18,8 +18,8 @@ class PlanetProgram extends OracleProgram {
   execute(): void {
     const response = httpFetch("https://swapi.dev/api/planets/1/");
 
-    if (response.isFulfilled()) {
-      const planet = JSON.parse<SwPlanet>(response.unwrap().toUtf8String());
+    if (response.ok) {
+      const planet = response.bytes.toJSON<SwPlanet>();
 
       Console.log(planet);
 

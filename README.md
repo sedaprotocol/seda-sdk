@@ -62,12 +62,9 @@ class PlanetProgram extends OracleProgram {
     // HTTP Fetch to the SWAPI
     const response = httpFetch(`https://swapi.dev/api/planets/${input}`);
 
-    if (response.isFulfilled()) {
-      // We need to unwrap the response Bytes and convert them to a string before we can parse it as JSON.
-      const data = response.unwrap().toUtf8String();
-
-      // Parses the JSON string into the structured object we defined.
-      const planet = JSON.parse<SwPlanet>(data);
+    if (response.ok) {
+      // We need to parse the response Bytes as the expected JSON.
+      const planet = response.bytes.toJSON<SwPlanet>();
 
       // Exits the program (with an exit code of 0) and sets the Data Request result to the planet name
       Process.success(Bytes.fromUtf8String(planet.name));

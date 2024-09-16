@@ -175,8 +175,8 @@ export class HttpFetchAction {
  * ```ts
  * const response = httpFetch("https://swapi.dev/api/planets/1/");
  *
- * if (response.isFulfilled()) {
- *   const data = response.unwrap().bytes.toUtf8String();
+ * if (response.ok) {
+ *   const data = response.bytes.toUtf8String();
  *   // Do something with data
  * } else {
  *   // Error occured
@@ -186,7 +186,7 @@ export class HttpFetchAction {
 export function httpFetch(
 	url: string,
 	options: HttpFetchOptions = new HttpFetchOptions(),
-): PromiseStatus<HttpResponse, HttpResponse> {
+): HttpResponse {
 	const action = new HttpFetchAction(url, options);
 	const actionStr = JSON.stringify(action);
 
@@ -201,9 +201,15 @@ export function httpFetch(
 
 	const response = String.UTF8.decode(responseBuffer);
 
-	return PromiseStatus.fromStr(
+	const promise = PromiseStatus.fromStr(
 		response,
 		new HttpResponse(),
 		new HttpResponse(),
 	);
+
+	if (promise.isFulfilled()) {
+		return promise.unwrap();
+	}
+
+	return promise.unwrapRejected();
 }
