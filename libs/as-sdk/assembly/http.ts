@@ -46,6 +46,13 @@ export class HttpResponse implements FromBuffer<HttpResponse> {
 	 */
 	public headers: Map<string, string> = new Map();
 
+	/**
+	 * Convenience property representing if the request ended normally
+	 */
+	get ok(): boolean {
+		return this.status >= 200 && this.status < 300;
+	}
+
 	/** @hidden */
 	static fromSerializable(value: SerializableHttpResponse): HttpResponse {
 		const response = new HttpResponse();
