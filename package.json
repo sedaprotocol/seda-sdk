@@ -7,7 +7,7 @@
 		"build": "nx run-many --all --target=build",
 		"cli": "bun run libs/dev-tools/bin/index.js",
 		"fmt": "bunx biome check --write .",
-		"test": "bun run build && NODE_OPTIONS=--experimental-vm-modules nx run-many --all --target=test",
+		"test": "nx run-many --all --target=test",
 		"docs": "bun run tools/typedoc/generate.ts",
 		"cli:generate": "cd libs/cli/proto && npx buf generate"
 	},
