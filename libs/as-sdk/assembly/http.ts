@@ -103,7 +103,7 @@ export class HttpResponse implements FromBuffer<HttpResponse> {
 /**
  * @hidden As it's not relevant for the generated documentation
  */
-export type HttpFetchMethod = "Get";
+export type HttpFetchMethod = string;
 
 /**
  * Request options to pass to {@linkcode httpFetch}.
