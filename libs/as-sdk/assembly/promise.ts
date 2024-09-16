@@ -94,4 +94,33 @@ export class PromiseStatus<F, R> {
 
 		return rejected;
 	}
+
+	/**
+	 * Execute a callback only if the promiseStatus was fulfilled.
+	 * @returns the PromiseStatus instance for method chaining
+	 */
+	// biome-ignore lint/suspicious/noThenProperty: we're emulating the Promises DX in AssemblyScript.
+	then(thenFn: (fulfilled: F) => void): PromiseStatus<F, R> {
+		const fulfilled = this.fulfilled;
+
+		if (fulfilled !== null) {
+			thenFn(fulfilled);
+		}
+
+		return this;
+	}
+
+	/**
+	 * Execute a callback only if the promiseStatus was rejected.
+	 * @returns the PromiseStatus instance for method chaining
+	 */
+	catch(catchFn: (rejected: R) => void): PromiseStatus<F, R> {
+		const rejected = this.rejected;
+
+		if (rejected !== null) {
+			catchFn(rejected);
+		}
+
+		return this;
+	}
 }
