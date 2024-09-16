@@ -232,4 +232,51 @@ export class Bytes {
 		const byteSlice = this.value.slice(begin, end);
 		return new Bytes(byteSlice);
 	}
+
+	/**
+	 * Attempts to deserialize the Bytes into the '@json' annotated class `<T>`.
+	 * @example
+	 * ```ts
+		@json
+		class Data {
+			id!: i64;
+			value!: string;
+		}
+
+		const data = Bytes.fromString("{"id":1,"value":"test"}");
+
+		const responseData = data.toJSON<Data>();
+
+		Console.log(responseData.value); // "test"
+	 * ```
+	 * @returns an instance of '@json' annotated class <T>
+	 */
+	toJSON<T>(): T {
+		return JSON.parse<T>(this.toUtf8String());
+	}
+
+	/**
+	 * Serialises a '@json' annotated class (`<T>`) as a string and returns the Bytes representation
+	 * of that string.
+	 *
+	 * @example
+	 * ```ts
+		@json
+		class Data {
+			id!: i64;
+			value!: string;
+		}
+
+		const data = new Data();
+		data.id = 1;
+		data.value = "test";
+
+		Process.success(Bytes.fromJSON<Data>(data)); // Sets "{"id":1,"value":"test"}" in bytes as the result
+	 * ```
+	 * @param data an instance of the '@json' annotated class <T>
+	 */
+	static fromJSON<T>(data: T): Bytes {
+		const serialized = JSON.stringify<T>(data);
+		return Bytes.fromUtf8String(serialized);
+	}
 }

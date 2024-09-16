@@ -31,3 +31,38 @@ export class TestBytesSliceStartEnd extends OracleProgram {
 		Process.success(copy);
 	}
 }
+
+@json
+class NestedItem {
+	id!: i64;
+	value!: string;
+}
+@json
+class Test {
+	id!: i64;
+	value!: string;
+	important!: boolean;
+	list!: string[];
+	nested!: NestedItem;
+}
+@json
+class Output {
+	id!: i64;
+	firstList!: string;
+	nestedValue!: string;
+}
+
+export class TestBytesJSON extends OracleProgram {
+	execution(): void {
+		const input = Process.getInputs();
+
+		// Input starts with "testBytesJSON:"
+		const data = input.slice(14).toJSON<Test>();
+		const output = new Output();
+		output.id = data.id;
+		output.firstList = data.list.at(0);
+		output.nestedValue = data.nested.value;
+
+		Process.success(Bytes.fromJSON(output));
+	}
+}

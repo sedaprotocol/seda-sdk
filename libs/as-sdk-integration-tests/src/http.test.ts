@@ -22,7 +22,7 @@ describe("Http", () => {
 		);
 
 		expect(result.exitCode).toBe(0);
-		expect(result.result).toEqual(new TextEncoder().encode("rejected"));
+		expect(result.resultAsString).toEqual("rejected");
 	});
 
 	it("Test mocked SDK HTTP Success", async () => {
@@ -30,7 +30,14 @@ describe("Http", () => {
 			"dist/libs/as-sdk-integration-tests/debug.wasm",
 		);
 
-		const mockResponse = new Response("mock_ok", { statusText: "mock_ok" });
+		const mockResponse = new Response(
+			JSON.stringify({
+				userId: 200,
+				id: 999,
+				title: "mocked",
+				completed: true,
+			}),
+		);
 		mockHttpFetch.mockResolvedValue(mockResponse);
 
 		const result = await executeDrWasm(
@@ -40,7 +47,7 @@ describe("Http", () => {
 		);
 
 		expect(result.exitCode).toBe(0);
-		expect(result.result).toEqual(new TextEncoder().encode("mock_ok"));
+		expect(result.resultAsString).toEqual("200:999:mocked:true");
 	});
 
 	// Possibly flakey as it relies on internet connectivity and an external service
@@ -54,20 +61,7 @@ describe("Http", () => {
 		);
 
 		expect(result.exitCode).toBe(0);
-		expect(result.result).toEqual(
-			new TextEncoder().encode(
-				JSON.stringify(
-					{
-						userId: 1,
-						id: 1,
-						title: "delectus aut autem",
-						completed: false,
-					},
-					undefined,
-					2,
-				),
-			),
-		);
+		expect(result.resultAsString).toEqual("1:1:delectus aut autem:false");
 	});
 
 	// Possibly flakey as it relies on internet connectivity and an external service
@@ -81,18 +75,8 @@ describe("Http", () => {
 		);
 
 		expect(result.exitCode).toBe(0);
-		expect(result.result).toEqual(
-			new TextEncoder().encode(
-				JSON.stringify(
-					{
-						title: "Test SDK",
-						body: "Don't forget to test some integrations.",
-						id: 101,
-					},
-					undefined,
-					2,
-				),
-			),
+		expect(result.resultAsString).toEqual(
+			"101:Test SDK:Don't forget to test some integrations.",
 		);
 	});
 

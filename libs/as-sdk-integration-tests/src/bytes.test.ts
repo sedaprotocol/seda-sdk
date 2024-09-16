@@ -38,4 +38,27 @@ describe("bytes", () => {
 			expect(result.resultAsString).toEqual("Slice");
 		});
 	});
+
+	describe("json", () => {
+		it("should be possible to parse Bytes as JSON and output Bytes as JSON", async () => {
+			const input = JSON.stringify({
+				id: 1,
+				value: "none",
+				important: false,
+				list: ["first", "second"],
+				nested: {
+					id: 999,
+					value: "some",
+				},
+			});
+			const result = await executeDrWasm(
+				wasmBinary,
+				Buffer.from(`testBytesJSON:${input}`),
+			);
+
+			expect(result.resultAsString).toEqual(
+				'{"id":1,"firstList":"first","nestedValue":"some"}',
+			);
+		});
+	});
 });

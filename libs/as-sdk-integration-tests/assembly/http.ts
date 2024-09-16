@@ -17,12 +17,25 @@ export class TestHttpRejection extends OracleProgram {
 	}
 }
 
+@json
+class TodoResponse {
+	userId!: i64;
+	id!: i64;
+	title!: string;
+	completed!: boolean;
+}
+
 export class TestHttpSuccess extends OracleProgram {
 	execution(): void {
 		const response = httpFetch("https://jsonplaceholder.typicode.com/todos/1");
 
 		if (response.isFulfilled()) {
-			Process.success(response.unwrap().bytes);
+			const data = response.unwrap().bytes.toJSON<TodoResponse>();
+			Process.success(
+				Bytes.fromUtf8String(
+					`${data.userId}:${data.id}:${data.title}:${data.completed}`,
+				),
+			);
 		}
 
 		if (response.isRejected()) {
@@ -31,6 +44,13 @@ export class TestHttpSuccess extends OracleProgram {
 
 		Process.error(Bytes.fromUtf8String("Something went wrong.."), 20);
 	}
+}
+
+@json
+class PostResponse {
+	title!: string;
+	body!: string;
+	id!: i64;
 }
 
 export class TestPostHttpSuccess extends OracleProgram {
@@ -47,7 +67,10 @@ export class TestPostHttpSuccess extends OracleProgram {
 		});
 
 		if (response.isFulfilled()) {
-			Process.success(response.unwrap().bytes);
+			const data = response.unwrap().bytes.toJSON<PostResponse>();
+			Process.success(
+				Bytes.fromUtf8String(`${data.id}:${data.title}:${data.body}`),
+			);
 		}
 
 		if (response.isRejected()) {

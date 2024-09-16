@@ -1,5 +1,6 @@
 import { Bytes, Process } from "../../as-sdk/assembly/index";
 import {
+	TestBytesJSON,
 	TestBytesSliceNoArguments,
 	TestBytesSliceOnlyStart,
 	TestBytesSliceStartEnd,
@@ -55,7 +56,9 @@ if (args === "testHttpRejection") {
 } else if (args === "testBytesHexEncodeDecode") {
 	new TestBytesHexEncodeDecode().run();
 } else if (args === "testBytesPrefixedHexDecode") {
-	new TestBytesPrefixedHexDecode().run();
+	new TestBytesHexEncodeDecode().run();
+} else if (args.startsWith("testBytesJSON")) {
+	new TestBytesJSON().run();
 	// Pretty iffy condition, not sure how else we can check for this though
 } else if (Process.getInputs().value.length === 26) {
 	new TestHexInputEncodeDecode().run();
