@@ -116,6 +116,28 @@ export default class VmImports {
 		}
 	}
 
+	keccak256(messagePtr: number, messageLength: number) {
+		const message = Buffer.from(
+			new Uint8Array(
+				this.memory?.buffer.slice(messagePtr, messagePtr + messageLength) ?? [],
+			),
+		);
+
+		const result = trySync(() => keccak256(message));
+
+		if (result.isErr) {
+			console.error(
+				`[${this.processId}] - @keccak256: ${message}`,
+				result.error,
+			);
+			this.callResult = new Uint8Array();
+			return 0;
+		}
+
+		this.callResult = result.value;
+		return this.callResult.length;
+	}
+
 	secp256k1Verify(
 		messagePtr: number,
 		messageLength: bigint,
@@ -191,6 +213,7 @@ export default class VmImports {
 				proxy_http_fetch: this.httpFetch.bind(this),
 				http_fetch: this.httpFetch.bind(this),
 				secp256k1_verify: this.secp256k1Verify.bind(this),
+				keccak256: this.keccak256.bind(this),
 				call_result_write: this.callResultWrite.bind(this),
 				execution_result: this.executionResult.bind(this),
 			},
