@@ -1,7 +1,7 @@
 {
 	"name": "@seda-protocol/vm",
 	"type": "module",
-	"version": "0.0.3",
+	"version": "0.0.4",
 	"dependencies": {
 		"@wasmer/wasi": "^1.2.2",
 		"true-myth": "^7.3.0",
