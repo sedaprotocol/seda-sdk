@@ -23,3 +23,5 @@ export declare function secp256k1_verify(
 	public_key: usize,
 	public_key_length: u32,
 ): u8;
+
+export declare function keccak256(message: usize, message_length: u32): u32;

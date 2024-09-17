@@ -1,9 +1,14 @@
-import { call_result_write, secp256k1_verify } from "./bindings/seda_v1";
+import {
+	call_result_write,
+	keccak256 as host_keccak256,
+	secp256k1_verify,
+} from "./bindings/seda_v1";
 import { Bytes } from "./bytes";
 
 /**
  * Verify whether a message was signed with the private key belonging to the public key.
  *
+ * @category Crypto
  * @example
  * ```ts
 	const message = Bytes.fromUtf8String("Hello, SEDA!");
@@ -56,4 +61,31 @@ export function secp256k1Verify(
 
 	// Return true if the response is [1] (valid)
 	return responseArray[0] === 1;
+}
+
+/**
+ * Calculate the keccak256 hash of the input bytes.
+ *
+ * @category Crypto
+ * @example
+ * ```ts
+	const message = Bytes.fromUtf8String("Hello, SEDA!");
+
+	const hash = keccak256(message);
+
+	Console.log(hash.toHexString()); // "5faa8e7e66ee9174b800ee6506e8af494f0e945cd99b03d8bc834ae446fe0e1c"
+ * ```
+ * @param message the data that needs to be hashed
+ */
+export function keccak256(message: Bytes): Bytes {
+	const messageBuffer = message.buffer;
+	const messagePtr = changetype<usize>(messageBuffer);
+
+	const responseLength = host_keccak256(messagePtr, messageBuffer.byteLength);
+	const responseBuffer = new ArrayBuffer(responseLength);
+	const responseBufferPtr = changetype<usize>(responseBuffer);
+	call_result_write(responseBufferPtr, responseLength);
+
+	const responseArray = Uint8Array.wrap(responseBuffer);
+	return Bytes.fromByteArray(responseArray);
 }

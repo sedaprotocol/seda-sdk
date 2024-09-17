@@ -3,6 +3,7 @@ import {
 	OracleProgram,
 	Process,
 	decodeHex,
+	keccak256,
 	secp256k1Verify,
 } from "../../as-sdk/assembly";
 
@@ -49,5 +50,15 @@ export class TestSecp256k1VerifyInvalid extends OracleProgram {
 		} else {
 			Process.error(Bytes.fromUtf8String("invalid secp256k1 signature"));
 		}
+	}
+}
+
+export class TestKeccak256 extends OracleProgram {
+	execution(): void {
+		const message = Process.getInputs();
+
+		const result = keccak256(message);
+
+		Process.success(Bytes.fromUtf8String(result.toHexString()));
 	}
 }

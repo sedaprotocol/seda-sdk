@@ -13,6 +13,9 @@
  * @categoryDescription Tally
  * Classes to retrieve the execution reports from the overlay nodes.
  *
+ * @categoryDescription Crypto
+ * Functions to calculate hashes and verify cryptographic signatures.
+ *
  * @module @seda-protocol/as-sdk
  */
 
@@ -37,4 +40,4 @@ export { Console } from "./console";
 export { Bytes } from "./bytes";
 export { decodeHex, encodeHex } from "./hex";
 export { OracleProgram } from "./oracle-program";
-export { secp256k1Verify } from "./crypto";
+export { secp256k1Verify, keccak256 } from "./crypto";

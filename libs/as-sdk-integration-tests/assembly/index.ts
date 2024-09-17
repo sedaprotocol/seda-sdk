@@ -8,7 +8,11 @@ import {
 	TestBytesStaticConcat,
 } from "./bytes";
 import { TestLogBuffer, TestLogByteArray } from "./console";
-import { TestSecp256k1VerifyInvalid, TestSecp256k1VerifyValid } from "./crypto";
+import {
+	TestKeccak256,
+	TestSecp256k1VerifyInvalid,
+	TestSecp256k1VerifyValid,
+} from "./crypto";
 import {
 	TestBytesHexEncodeDecode,
 	TestBytesPrefixedHexDecode,
@@ -45,6 +49,8 @@ if (args === "testHttpRejection") {
 	new TestSecp256k1VerifyValid().run();
 } else if (args === "testSecp256k1VerifyInvalid") {
 	new TestSecp256k1VerifyInvalid().run();
+} else if (args === "testKeccak256") {
+	new TestKeccak256().run();
 } else if (args === "testLogBuffer") {
 	new TestLogBuffer().run();
 } else if (args === "testLogByteArray") {
