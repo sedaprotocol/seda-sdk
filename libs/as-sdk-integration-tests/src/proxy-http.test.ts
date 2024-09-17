@@ -5,16 +5,16 @@ import { Response } from "node-fetch";
 
 const mockHttpFetch = mock();
 
+const wasmBinary = await readFile(
+	"dist/libs/as-sdk-integration-tests/debug.wasm",
+);
+
 describe("ProxyHttp", () => {
 	beforeEach(() => {
 		mockHttpFetch.mockReset();
 	});
 
 	it.skip("should allow proxy_http_fetch which have a valid signature", async () => {
-		const wasmBinary = await readFile(
-			"dist/libs/as-sdk-integration-tests/debug.wasm",
-		);
-
 		const mockResponse = new Response('"Tatooine"', {
 			headers: {
 				"x-seda-signature":
@@ -37,10 +37,6 @@ describe("ProxyHttp", () => {
 	});
 
 	it.skip("should reject if the proxy_http_fetch has an invalid signature", async () => {
-		const wasmBinary = await readFile(
-			"dist/libs/as-sdk-integration-tests/debug.wasm",
-		);
-
 		const mockResponse = new Response('"Tatooine"', {
 			statusText: "mock_ok",
 			headers: {
@@ -62,6 +58,19 @@ describe("ProxyHttp", () => {
 		expect(result.exitCode).toBe(1);
 		expect(result.result).toEqual(
 			new TextEncoder().encode("Invalid signature"),
+		);
+	});
+});
+
+describe("generateProxyHttpSigningMessage", () => {
+	it("should generate the expected message", async () => {
+		const result = await executeDrWasm(
+			wasmBinary,
+			Buffer.from("testGenerateProxyMessage"),
+		);
+
+		expect(result.resultAsString).toBe(
+			"edba3f8cfcd4165f73cd4641ced2b2ec0d3ba4338e3eec30edd58777d86b53b25a61babeb76c554783ca90a1a250e84f1b703409fdff33c217ab64dd51f05199c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a4706db57ed7cc68d9897b06df02ed002ce206633eec05690d504d61789ae87db019",
 		);
 	});
 });

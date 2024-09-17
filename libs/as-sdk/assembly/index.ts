@@ -29,7 +29,7 @@ export {
 	HttpResponse,
 } from "./http";
 
-export { proxyHttpFetch } from "./proxy-http";
+export { proxyHttpFetch, generateProxyHttpSigningMessage } from "./proxy-http";
 
 // Export library so consumers don't need to reimport it themselves
 export { JSON } from "json-as/assembly";

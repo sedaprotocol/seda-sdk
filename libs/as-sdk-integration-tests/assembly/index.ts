@@ -23,7 +23,7 @@ import {
 	TestHttpSuccess,
 	TestPostHttpSuccess,
 } from "./http";
-import { TestProxyHttpFetch } from "./proxy-http";
+import { TestGenerateProxyMessage, TestProxyHttpFetch } from "./proxy-http";
 import { TestTallyVmReveals, TestTallyVmRevealsFiltered } from "./tally";
 import { TestTallyVmHttp, TestTallyVmMode } from "./vm-tests";
 
@@ -45,6 +45,8 @@ if (args === "testHttpRejection") {
 	new TestTallyVmRevealsFiltered().run();
 } else if (args === "testProxyHttpFetch") {
 	new TestProxyHttpFetch().run();
+} else if (args === "testGenerateProxyMessage") {
+	new TestGenerateProxyMessage().run();
 } else if (args === "testSecp256k1VerifyValid") {
 	new TestSecp256k1VerifyValid().run();
 } else if (args === "testSecp256k1VerifyInvalid") {
