@@ -32,6 +32,34 @@ export class TestBytesSliceStartEnd extends OracleProgram {
 	}
 }
 
+export class TestBytesConcat extends OracleProgram {
+	execution(): void {
+		const input = Process.getInputs();
+
+		// Input starts with "testBytesConcat:"
+		const data = input.slice(16);
+
+		const result = Bytes.fromUtf8String("Hello, ").concat(data);
+
+		Process.success(result);
+	}
+}
+
+export class TestBytesStaticConcat extends OracleProgram {
+	execution(): void {
+		const input = Process.getInputs();
+
+		// Input starts with "TestBytesStaticConcat:"
+		const start = input.slice(0, 21);
+		const middle = input.slice(21, 22);
+		const end = input.slice(22);
+
+		const result = Bytes.concat([end, middle, start]);
+
+		Process.success(result);
+	}
+}
+
 @json
 class NestedItem {
 	id!: i64;

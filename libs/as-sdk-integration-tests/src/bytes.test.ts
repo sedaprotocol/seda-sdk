@@ -7,6 +7,26 @@ const wasmBinary = await readFile(
 );
 
 describe("bytes", () => {
+	describe("concat", () => {
+		it("should concatenate 2 Bytes instances in a new one", async () => {
+			const result = await executeDrWasm(
+				wasmBinary,
+				Buffer.from("testBytesConcat:world!"),
+			);
+
+			expect(result.resultAsString).toBe("Hello, world!");
+		});
+
+		it("should allow passing an array of bytes to the static method and concatenate them", async () => {
+			const result = await executeDrWasm(
+				wasmBinary,
+				Buffer.from("testBytesStaticConcat:swap"),
+			);
+
+			expect(result.resultAsString).toBe("swap:testBytesStaticConcat");
+		});
+	});
+
 	describe("slice", () => {
 		it("should return a new bytes instance when called without arguments", async () => {
 			const result = await executeDrWasm(

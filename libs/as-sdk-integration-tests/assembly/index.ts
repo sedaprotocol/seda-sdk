@@ -1,9 +1,11 @@
 import { Bytes, Process } from "../../as-sdk/assembly/index";
 import {
+	TestBytesConcat,
 	TestBytesJSON,
 	TestBytesSliceNoArguments,
 	TestBytesSliceOnlyStart,
 	TestBytesSliceStartEnd,
+	TestBytesStaticConcat,
 } from "./bytes";
 import { TestLogBuffer, TestLogByteArray } from "./console";
 import { TestSecp256k1VerifyInvalid, TestSecp256k1VerifyValid } from "./crypto";
@@ -53,6 +55,10 @@ if (args === "testHttpRejection") {
 	new TestBytesSliceOnlyStart().run();
 } else if (args === "testBytesSliceStartEnd") {
 	new TestBytesSliceStartEnd().run();
+} else if (args.startsWith("testBytesConcat")) {
+	new TestBytesConcat().run();
+} else if (args.startsWith("testBytesStaticConcat")) {
+	new TestBytesStaticConcat().run();
 } else if (args === "testBytesHexEncodeDecode") {
 	new TestBytesHexEncodeDecode().run();
 } else if (args === "testBytesPrefixedHexDecode") {

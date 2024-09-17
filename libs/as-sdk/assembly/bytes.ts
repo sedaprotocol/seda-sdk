@@ -234,6 +234,41 @@ export class Bytes {
 	}
 
 	/**
+	 * Create a new Bytes instance which is a combination of the first instance and the argument.
+	 *
+	 * @example
+	 * ```ts
+		const part1 = Bytes.fromUtf8String("Hello, ");
+		const part2 = Bytes.fromUtf8String("world!");
+
+		const combined = part1.concat(part2);
+
+		Console.log(combined.toUtf8String()); // "Hello, world!"
+	 * ```
+	 * @param bytes the bytes to add to this instance
+	 */
+	concat(bytes: Bytes): Bytes {
+		return Bytes.concat([this, bytes]);
+	}
+
+	static concat(bytes: Bytes[]): Bytes {
+		const newLength = bytes.reduce(
+			(total, current) => total + current.length,
+			0,
+		);
+		const newByteArray = new Uint8Array(newLength);
+
+		let offset = 0;
+		for (let index = 0; index < bytes.length; index++) {
+			const current = bytes[index];
+			newByteArray.set(current.value, offset);
+			offset = offset + current.length;
+		}
+
+		return Bytes.fromByteArray(newByteArray);
+	}
+
+	/**
 	 * Attempts to deserialize the Bytes into the '@json' annotated class `<T>`.
 	 * @example
 	 * ```ts
