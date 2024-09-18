@@ -314,4 +314,77 @@ export class Bytes {
 		const serialized = JSON.stringify<T>(data);
 		return Bytes.fromUtf8String(serialized);
 	}
+
+	/**
+	 * Creates a new Bytes instance from a number <T>
+	 * <T> supports any number type (i8, u8, i16, u16, i32, u32, i64 and u64)
+	 *
+	 * @example
+	 * ```
+	 * const number = Bytes.fromNumber<u32>(10);
+	 * Console.log(number.toHexString()); // Outputs: 0a000000
+	 *
+	 * const bigEndianNumber = Bytes.fromNumber<u32>(10, true);
+	 * Console.log(number.toHexString()); // Outputs: 0000000a
+	 * ```
+	 *
+	 * @param number the number you want to convert to a Bytes instance
+	 * @param bigEndian if you want to store the number as big-endian. Defaults to little-endian
+	 */
+	static fromNumber<T = u64>(number: T, bigEndian: bool = false): Bytes {
+		const sizeOfNumber = sizeof<T>();
+		const buffer = new ArrayBuffer(sizeOfNumber as i32);
+		const bufferPtr = changetype<usize>(buffer);
+
+		store<T>(bufferPtr, number);
+
+		// reverse the uint8array to make it big endian
+		if (bigEndian) {
+			return Bytes.fromByteArray(Uint8Array.wrap(buffer).reverse());
+		}
+
+		return Bytes.fromByteArray(Uint8Array.wrap(buffer));
+	}
+
+	/**
+	 * Convert the Bytes instance to the number <T>
+	 * T supports any number type (i8, u8, i16, u16, i32, u32, i64 and u64)
+	 *
+	 * @example
+	 * ```
+	 * const littleEndianBytes = Bytes.fromHexString("0x0a000000");
+	 * const num1 = littleEndianBytes.toNumber<u32>();
+	 *
+	 * Console.log(num1); // Outputs: 10
+	 *
+	 * const bigEndianBytes = Bytes.fromHexString("0x00000000000000f3");
+	 * const number = bigEndianBytes.toNumber<u64>(true);
+	 *
+	 * Console.log(number); // Outputs: 243
+	 * ```
+	 *
+	 * @param bigEndian if the Bytes instance should be read as big-endian (defaults to little-endian)
+	 */
+	toNumber<T = u64>(bigEndian: bool = false): T {
+		const sizeOfNumber = sizeof<T>();
+		
+		// Make sure the byte amount is exactly the amount required for an integer
+		// Otherwise we could interpret the bytes wrong
+		if ((this.length as usize) !== sizeOfNumber) {
+			const typeName = nameof<T>();
+			throw new Error(
+				`Type ${typeName} has a byte length of ${sizeOfNumber}, but the Bytes instance has a length of ${this.length}`,
+			);
+		}
+
+		let typedArray = this.value.slice();
+
+		if (bigEndian) {
+			// Numbers in WASM memory are represented in little-endian
+			typedArray = typedArray.reverse();
+		}
+
+		const bufPtr = changetype<usize>(typedArray.buffer);
+		return load<T>(bufPtr);
+	}
 }

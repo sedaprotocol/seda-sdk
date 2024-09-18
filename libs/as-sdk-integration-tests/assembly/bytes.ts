@@ -94,3 +94,31 @@ export class TestBytesJSON extends OracleProgram {
 		Process.success(Bytes.fromJSON(output));
 	}
 }
+
+export class TestBytesToNumber extends OracleProgram {
+	execution(): void {
+		const input = Bytes.fromHexString("0xfe");
+		const number = input.toNumber<u8>();
+
+		// Check if we can use big endian numbers
+		const inputu64 = Bytes.fromHexString("0x00000000000000f3");
+		const numberU64 = inputu64.toNumber<u64>(true);
+
+		const result = `${number.toString()}:${numberU64.toString()}`;
+		Process.success(Bytes.fromUtf8String(result));
+	}
+}
+
+export class TestNumberToBytes extends OracleProgram {
+	execution(): void {
+		const num1 = Bytes.fromNumber<u64>(133798);
+		const num2 = Bytes.fromNumber<u64>(133798, true);
+
+		// Convert both back
+		const result1 = num1.toNumber();
+		const result2 = num2.toNumber(true);
+
+		const result = `${num1.toHexString()}:${num2.toHexString()}:${result1}:${result2}`;
+		Process.success(Bytes.fromUtf8String(result));
+	}
+}

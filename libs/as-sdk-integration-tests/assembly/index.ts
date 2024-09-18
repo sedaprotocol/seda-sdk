@@ -6,6 +6,8 @@ import {
 	TestBytesSliceOnlyStart,
 	TestBytesSliceStartEnd,
 	TestBytesStaticConcat,
+	TestBytesToNumber,
+	TestNumberToBytes,
 } from "./bytes";
 import { TestLogBuffer, TestLogByteArray } from "./console";
 import {
@@ -76,6 +78,10 @@ if (args === "testHttpRejection") {
 	// Pretty iffy condition, not sure how else we can check for this though
 } else if (Process.getInputs().value.length === 26) {
 	new TestHexInputEncodeDecode().run();
+} else if (args === "testBytesToNumber") {
+	new TestBytesToNumber().run();
+} else if (args === "testNumberToBytes") {
+	new TestNumberToBytes().run();
 }
 
 Process.error(Bytes.fromUtf8String("No argument given"));

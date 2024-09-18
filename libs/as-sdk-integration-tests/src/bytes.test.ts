@@ -81,4 +81,28 @@ describe("bytes", () => {
 			);
 		});
 	});
+
+	describe("toNumber", () => {
+		it("should be able to parse a number to a type", async () => {
+			const result = await executeDrWasm(
+				wasmBinary,
+				Buffer.from("testBytesToNumber"),
+			);
+
+			expect(result.resultAsString).toBe("254:243");
+		});
+	});
+
+	describe("fromNumber", () => {
+		it("should convert a number to a bytes object", async () => {
+			const result = await executeDrWasm(
+				wasmBinary,
+				Buffer.from("testNumberToBytes"),
+			);
+
+			expect(result.resultAsString).toBe(
+				"a60a020000000000:0000000000020aa6:133798:133798",
+			);
+		});
+	});
 });
