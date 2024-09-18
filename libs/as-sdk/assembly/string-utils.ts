@@ -12,7 +12,7 @@ export interface ToString {
  * @returns
  */
 export function toString<T = string>(message: T): string {
-	if (message === null) {
+	if (!isFloat(message) && message === null) {
 		return "null";
 	}
 

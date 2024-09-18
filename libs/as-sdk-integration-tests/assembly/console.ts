@@ -19,3 +19,20 @@ export class TestLogByteArray extends OracleProgram {
 		Process.exit(0);
 	}
 }
+
+export class TestLogNull extends OracleProgram {
+	execution(): void {
+		Console.log(null);
+
+		Process.exit(0);
+	}
+}
+
+export class TestLogFloat extends OracleProgram {
+	execution(): void {
+		const float: f32 = 0.32;
+		Console.log(float);
+
+		Process.exit(0);
+	}
+}

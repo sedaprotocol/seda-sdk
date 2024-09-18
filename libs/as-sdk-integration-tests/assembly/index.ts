@@ -9,7 +9,12 @@ import {
 	TestBytesToNumber,
 	TestNumberToBytes,
 } from "./bytes";
-import { TestLogBuffer, TestLogByteArray } from "./console";
+import {
+	TestLogBuffer,
+	TestLogByteArray,
+	TestLogFloat,
+	TestLogNull,
+} from "./console";
 import {
 	TestKeccak256,
 	TestSecp256k1VerifyInvalid,
@@ -82,6 +87,10 @@ if (args === "testHttpRejection") {
 	new TestBytesToNumber().run();
 } else if (args === "testNumberToBytes") {
 	new TestNumberToBytes().run();
+} else if (args === "testLogNull") {
+	new TestLogNull().run();
+} else if (args === "testLogFloat") {
+	new TestLogFloat().run();
 }
 
 Process.error(Bytes.fromUtf8String("No argument given"));

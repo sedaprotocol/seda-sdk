@@ -24,4 +24,16 @@ describe("console", () => {
 
 		expect(result.stdout).toEqual("TypedArray(0x54797065644172726179)\n");
 	});
+
+	it("should print a float value", async () => {
+		const result = await executeDrWasm(wasmBinary, Buffer.from("testLogFloat"));
+
+		expect(result.stdout).toEqual("0.3199999928474426\n");
+	});
+
+	it("should print a null value", async () => {
+		const result = await executeDrWasm(wasmBinary, Buffer.from("testLogNull"));
+
+		expect(result.stdout).toEqual("null\n");
+	});
 });
