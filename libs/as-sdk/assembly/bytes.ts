@@ -367,7 +367,7 @@ export class Bytes {
 	 */
 	toNumber<T = u64>(bigEndian: bool = false): T {
 		const sizeOfNumber = sizeof<T>();
-		
+
 		// Make sure the byte amount is exactly the amount required for an integer
 		// Otherwise we could interpret the bytes wrong
 		if ((this.length as usize) !== sizeOfNumber) {
