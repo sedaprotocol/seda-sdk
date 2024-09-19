@@ -24,12 +24,15 @@ const DataResultSchema = pipe(
 		seda_payload: string(),
 	}),
 	transform((result) => {
+		const resultBuffer = Buffer.from(result.result, "base64");
+
 		return {
 			version: result.version,
 			drId: result.dr_id,
 			consensus: result.consensus,
 			exitCode: result.exit_code,
-			result: base64Decode(result.result),
+			result: `0x${resultBuffer.toString("hex")}`,
+			resultAsUtf8: resultBuffer.toString(),
 			blockHeight: result.block_height,
 			gasUsed: result.gas_used,
 			paybackAddress: base64Decode(result.payback_address),
