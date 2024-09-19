@@ -331,7 +331,7 @@ export class Bytes {
 	 * @param number the number you want to convert to a Bytes instance
 	 * @param bigEndian if you want to store the number as big-endian. Defaults to little-endian
 	 */
-	static fromNumber<T = u64>(number: T, bigEndian: bool = false): Bytes {
+	static fromNumber<T>(number: T, bigEndian: bool = false): Bytes {
 		const sizeOfNumber = sizeof<T>();
 		const buffer = new ArrayBuffer(sizeOfNumber as i32);
 		const bufferPtr = changetype<usize>(buffer);
@@ -365,7 +365,7 @@ export class Bytes {
 	 *
 	 * @param bigEndian if the Bytes instance should be read as big-endian (defaults to little-endian)
 	 */
-	toNumber<T = u64>(bigEndian: bool = false): T {
+	toNumber<T>(bigEndian: bool = false): T {
 		const sizeOfNumber = sizeof<T>();
 
 		// Make sure the byte amount is exactly the amount required for an integer

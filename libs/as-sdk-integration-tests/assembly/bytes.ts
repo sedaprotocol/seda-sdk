@@ -111,12 +111,12 @@ export class TestBytesToNumber extends OracleProgram {
 
 export class TestNumberToBytes extends OracleProgram {
 	execution(): void {
-		const num1 = Bytes.fromNumber<u64>(133798);
-		const num2 = Bytes.fromNumber<u64>(133798, true);
+		const num1 = Bytes.fromNumber<u64>(u64.MAX_VALUE);
+		const num2 = Bytes.fromNumber<i64>(i64.MIN_VALUE, true);
 
 		// Convert both back
-		const result1 = num1.toNumber();
-		const result2 = num2.toNumber(true);
+		const result1 = num1.toNumber<u64>();
+		const result2 = num2.toNumber<i64>(true);
 
 		const result = `${num1.toHexString()}:${num2.toHexString()}:${result1}:${result2}`;
 		Process.success(Bytes.fromUtf8String(result));
