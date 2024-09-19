@@ -1,11 +1,13 @@
 import { Bytes, Process } from "../../as-sdk/assembly/index";
 import {
+	TestBigNumberToBytes,
 	TestBytesConcat,
 	TestBytesJSON,
 	TestBytesSliceNoArguments,
 	TestBytesSliceOnlyStart,
 	TestBytesSliceStartEnd,
 	TestBytesStaticConcat,
+	TestBytesToBigNumber,
 	TestBytesToNumber,
 	TestNumberToBytes,
 } from "./bytes";
@@ -87,6 +89,10 @@ if (args === "testHttpRejection") {
 	new TestBytesToNumber().run();
 } else if (args === "testNumberToBytes") {
 	new TestNumberToBytes().run();
+} else if (args === "testBytesToBigNumber") {
+	new TestBytesToBigNumber().run();
+} else if (args === "testBigNumberToBytes") {
+	new TestBigNumberToBytes().run();
 } else if (args === "testLogNull") {
 	new TestLogNull().run();
 } else if (args === "testLogFloat") {

@@ -1,3 +1,4 @@
+import { u128, u256 } from "as-bignum/assembly";
 import { JSON } from "json-as";
 import { decodeHex, encodeHex } from "./hex";
 
@@ -317,7 +318,7 @@ export class Bytes {
 
 	/**
 	 * Creates a new Bytes instance from a number <T>
-	 * <T> supports any number type (i8, u8, i16, u16, i32, u32, i64 and u64)
+	 * <T> supports any number type (i8, u8, i16, u16, i32, u32, i64, u64, u128, and u256)
 	 *
 	 * @example
 	 * ```
@@ -332,6 +333,13 @@ export class Bytes {
 	 * @param bigEndian if you want to store the number as big-endian. Defaults to little-endian
 	 */
 	static fromNumber<T>(number: T, bigEndian: bool = false): Bytes {
+		if (number instanceof u128 || number instanceof u256) {
+			const bytes = number.toBytes(bigEndian);
+			const byteArray = new Uint8Array(bytes.length);
+			byteArray.set(bytes);
+			return Bytes.fromByteArray(byteArray);
+		}
+
 		const sizeOfNumber = sizeof<T>();
 		const buffer = new ArrayBuffer(sizeOfNumber as i32);
 		const bufferPtr = changetype<usize>(buffer);
@@ -348,7 +356,8 @@ export class Bytes {
 
 	/**
 	 * Convert the Bytes instance to the number <T>
-	 * T supports any number type (i8, u8, i16, u16, i32, u32, i64 and u64)
+	 * T supports the following number types: (i8, u8, i16, u16, i32, u32, i64 and u64)
+	 * for u128 and u256 see {@linkcode Bytes.toU128} and {@linkcode Bytes.toU256}
 	 *
 	 * @example
 	 * ```
@@ -367,15 +376,7 @@ export class Bytes {
 	 */
 	toNumber<T>(bigEndian: bool = false): T {
 		const sizeOfNumber = sizeof<T>();
-
-		// Make sure the byte amount is exactly the amount required for an integer
-		// Otherwise we could interpret the bytes wrong
-		if ((this.length as usize) !== sizeOfNumber) {
-			const typeName = nameof<T>();
-			throw new Error(
-				`Type ${typeName} has a byte length of ${sizeOfNumber}, but the Bytes instance has a length of ${this.length}`,
-			);
-		}
+		this.validateNumberByteLength<T>(sizeOfNumber);
 
 		let typedArray = this.value.slice();
 
@@ -386,5 +387,70 @@ export class Bytes {
 
 		const bufPtr = changetype<usize>(typedArray.buffer);
 		return load<T>(bufPtr);
+	}
+
+	/**
+	 * Convert the Bytes instance to a u128 number
+	 * for smaller number types see {@linkcode Bytes.toNumber}
+	 * for u256 see {@linkcode Bytes.toU256}
+	 *
+	 * @example
+	 * ```
+	 * const littleEndianBytes = Bytes.fromHexString("0x0000000000000000000000003ade68b1");
+	 * const num1 = littleEndianBytes.toU128();
+	 *
+	 * Console.log(num1); // Outputs: 235817861417383168075506718003194494976
+	 *
+	 * const bigEndianBytes = Bytes.fromHexString("0x0000000000000000000000003ade68b1");
+	 * const number = bigEndianBytes.toU128(true);
+	 *
+	 * Console.log(number); // Outputs: 987654321
+	 * ```
+	 *
+	 * @param bigEndian if the Bytes instance should be read as big-endian (defaults to little-endian)
+	 */
+	toU128(bigEndian: bool = false): u128 {
+		const sizeOfNumber = offsetof<u128>();
+		this.validateNumberByteLength<u128>(sizeOfNumber);
+
+		return u128.fromBytes(this.value, bigEndian);
+	}
+
+	/**
+	 * Convert the Bytes instance to a u256 number
+	 * for smaller number types see {@linkcode Bytes.toNumber}
+	 * for u128 see {@linkcode Bytes.toU128}
+	 *
+	 * @example
+	 * ```
+	 * const littleEndianBytes = Bytes.fromHexString("0x00000000000000000000000000000000000000000000000000000000075bcd15");
+	 * const num1 = littleEndianBytes.toU256();
+	 *
+	 * Console.log(num1); // Outputs: 9861401716165347554763518477098801055286775394839307868237211366843748450304
+	 *
+	 * const bigEndianBytes = Bytes.fromHexString("0x00000000000000000000000000000000000000000000000000000000075bcd15");
+	 * const number = bigEndianBytes.toU256(true);
+	 *
+	 * Console.log(number); // Outputs: 123456789
+	 * ```
+	 *
+	 * @param bigEndian if the Bytes instance should be read as big-endian (defaults to little-endian)
+	 */
+	toU256(bigEndian: bool = false): u256 {
+		const sizeOfNumber = offsetof<u256>();
+		this.validateNumberByteLength<u256>(sizeOfNumber);
+
+		return u256.fromBytes(this.value, bigEndian);
+	}
+
+	// Make sure the byte amount is exactly the amount required for an integer
+	// Otherwise we could interpret the bytes wrong
+	private validateNumberByteLength<T>(sizeOfNumber: usize): void {
+		if ((this.length as usize) !== sizeOfNumber) {
+			const typeName = nameof<T>();
+			throw new Error(
+				`Type ${typeName} has a byte length of ${sizeOfNumber}, but the Bytes instance has a length of ${this.length}`,
+			);
+		}
 	}
 }

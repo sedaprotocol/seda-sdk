@@ -1,4 +1,11 @@
-import { Bytes, Console, OracleProgram, Process } from "../../as-sdk/assembly";
+import {
+	Bytes,
+	Console,
+	OracleProgram,
+	Process,
+	u128,
+	u256,
+} from "../../as-sdk/assembly";
 
 export class TestBytesSliceNoArguments extends OracleProgram {
 	execution(): void {
@@ -119,6 +126,39 @@ export class TestNumberToBytes extends OracleProgram {
 		const result2 = num2.toNumber<i64>(true);
 
 		const result = `${num1.toHexString()}:${num2.toHexString()}:${result1}:${result2}`;
+		Process.success(Bytes.fromUtf8String(result));
+	}
+}
+
+export class TestBigNumberToBytes extends OracleProgram {
+	execution(): void {
+		const num1 = Bytes.fromNumber<u128>(u128.Max);
+		const num2 = Bytes.fromNumber<u128>(u128.from(987654321), true);
+		const num3 = Bytes.fromNumber<u256>(u256.Max);
+		const num4 = Bytes.fromNumber<u256>(u256.from(123456789), true);
+
+		// Convert everything back
+		const result1 = num1.toU128();
+		const result2 = num2.toU128(true);
+		const result3 = num3.toU256();
+		const result4 = num4.toU256(true);
+
+		const result = `${num1.toHexString()}:${result1.toString()},${num2.toHexString()}:${result2},${num3.toHexString()}:${result3},${num4.toHexString()}:${result4}`;
+		Process.success(Bytes.fromUtf8String(result));
+	}
+}
+
+export class TestBytesToBigNumber extends OracleProgram {
+	execution(): void {
+		const input = Bytes.fromHexString("0x0000000000000000000000003ade68b1");
+		const number = input.toU128();
+
+		const inputU256 = Bytes.fromHexString(
+			"0x00000000000000000000000000000000000000000000000000000000075bcd15",
+		);
+		const numberU256 = inputU256.toU256(true);
+
+		const result = `${number.toString()}:${numberU256.toString()}`;
 		Process.success(Bytes.fromUtf8String(result));
 	}
 }

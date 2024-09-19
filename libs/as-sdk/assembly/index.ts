@@ -31,8 +31,6 @@ export {
 
 export { proxyHttpFetch, generateProxyHttpSigningMessage } from "./proxy-http";
 
-// Export library so consumers don't need to reimport it themselves
-export { JSON } from "json-as/assembly";
 export { PromiseStatus } from "./promise";
 export { Process, Tally };
 export { RevealResult } from "./tally";
@@ -41,3 +39,7 @@ export { Bytes } from "./bytes";
 export { decodeHex, encodeHex } from "./hex";
 export { OracleProgram } from "./oracle-program";
 export { secp256k1Verify, keccak256 } from "./crypto";
+
+// Export library so consumers don't need to reimport it themselves
+export { JSON } from "json-as/assembly";
+export { u128, u256 } from "as-bignum/assembly";

@@ -105,4 +105,30 @@ describe("bytes", () => {
 			);
 		});
 	});
+
+	describe("fromBigNumber", () => {
+		it("should convert a big number to Bytes", async () => {
+			const result = await executeDrWasm(
+				wasmBinary,
+				Buffer.from("testBigNumberToBytes"),
+			);
+
+			expect(result.resultAsString).toBe(
+				"ffffffffffffffffffffffffffffffff:340282366920938463463374607431768211455,0000000000000000000000003ade68b1:987654321,ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff:115792089237316195423570985008687907853269984665640564039457584007913129639935,00000000000000000000000000000000000000000000000000000000075bcd15:123456789",
+			);
+		});
+	});
+
+	describe("toBigNumber", () => {
+		it("should be able to parse Bytes as a big number", async () => {
+			const result = await executeDrWasm(
+				wasmBinary,
+				Buffer.from("testBytesToBigNumber"),
+			);
+
+			expect(result.resultAsString).toBe(
+				"235817861417383168075506718003194494976:123456789",
+			);
+		});
+	});
 });
