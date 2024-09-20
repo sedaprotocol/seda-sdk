@@ -31,7 +31,7 @@ Collection of packages which allow you to build SEDA Data Requests:
 
 # Quick getting started
 
-The easiest way to get started it by using our [starter kit](https://github.com/sedaprotocol/seda-sdk-starter-template) this has all the tools installed that you need:
+The easiest way to get started it by using our [starter kit](https://github.com/sedaprotocol/seda-request-starter-kit) this has all the tools installed that you need:
 
 - AssemblyScript
 - JSON-AS
@@ -47,7 +47,7 @@ For API documentation check [the TypeDocs](https://sedaprotocol.github.io/seda-s
 Below is an example of an Oracle Program that retrieves the name of a planet in the SWAPI database.
 
 ```ts
-import { Process, httpFetch, OracleProgram, Bytes, JSON } from '@seda-protocol/as-sdk/assembly';
+import { Process, httpFetch, OracleProgram, Bytes, JSON } from "@seda-protocol/as-sdk/assembly";
 
 // The JSON schema of the response we're expecting, since in AssemblyScript we need to deserialize JSON into structured objects
 @json
@@ -69,7 +69,7 @@ class PlanetProgram extends OracleProgram {
       // Exits the program (with an exit code of 0) and sets the Data Request result to the planet name
       Process.success(Bytes.fromUtf8String(planet.name));
     } else {
-      Process.error(Bytes.fromUtf8String('Error while fetching'));
+      Process.error(Bytes.fromUtf8String("Error while fetching"));
     }
   }
 }
@@ -82,13 +82,13 @@ new PlanetProgram().run();
 In order to test this we can use a JS testing suite (we use Bun:test in this repository and the starter kits, but any runner should work). We use the `@seda-protocol/dev-tools` package for this, which runs the Oracle Program in a similar environment as it would on the SEDA network:
 
 ```ts
-import { executeDrWasm } from '@seda-protocol/dev-tools';
-import { readFile } from 'node:fs/promises';
+import { executeDrWasm } from "@seda-protocol/dev-tools";
+import { readFile } from "node:fs/promises";
 
-const WASM_PATH = 'build/debug.wasm';
+const WASM_PATH = "build/debug.wasm";
 
-describe('Oracle Program: execution', () => {
-  it('should be able to run', async () => {
+describe("Oracle Program: execution", () => {
+  it("should be able to run", async () => {
     const wasmBinary = await readFile(WASM_PATH);
 
     // Calls our SEDA VM
@@ -96,11 +96,11 @@ describe('Oracle Program: execution', () => {
       // The wasm file
       wasmBinary,
       // Inputs for the Oracle Program
-      Buffer.from('1'),
+      Buffer.from("1")
     );
 
     expect(vmResult.exitCode).toBe(0);
-    expect(vmResult.resultAsString).toBe('Tatooine');
+    expect(vmResult.resultAsString).toBe("Tatooine");
   });
 });
 ```

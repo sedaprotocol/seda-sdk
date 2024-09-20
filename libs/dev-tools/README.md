@@ -6,7 +6,7 @@ The SEDA dev tools includes a CLI to interact with the SEDA chain as well as a c
 
 Command Line Interface (CLI) for the SEDA SDK. Allows you to upload list and show information about Data Request binaries.
 
-This guide assumes you have already a package.json in place and a wasm binary. If not you can use our [starter template](https://github.com/sedaprotocol/seda-sdk-starter-template), which already has all dependencies you need.
+This guide assumes you have already a package.json in place and a wasm binary. If not you can use our [starter template](https://github.com/sedaprotocol/seda-request-starter-kit), which already has all dependencies you need.
 
 First add the SEDA SDK dev tools to your `devDependencies`:
 
