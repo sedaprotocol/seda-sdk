@@ -6,6 +6,9 @@
 		"build": "bunx buf generate",
 		"prepublish": "bun run build"
 	},
+	"devDependencies": {
+		"ts-proto": "^1.181.2"
+	},
 	"dependencies": {
 		"protobufjs": "^7.4.0"
 	},
