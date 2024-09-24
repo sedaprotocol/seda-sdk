@@ -24,7 +24,7 @@ export default class Process {
 
 	/**
 	 * Gets all the input arguments from the Data Request
-	 * First argument (index: 0) is the binary hash
+	 * First argument (index: 0) is the Oracle Program ID
 	 * Second argument (index: 1) is the input of the Data Request
 	 *
 	 * @returns {string[]} An array of input arguments

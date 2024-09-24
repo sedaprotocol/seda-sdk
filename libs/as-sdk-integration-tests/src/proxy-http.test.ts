@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it, mock } from "bun:test";
 import { readFile } from "node:fs/promises";
-import { executeDrWasm } from "@seda/dev-tools";
+import { testOracleProgramExecution } from "@seda/dev-tools";
 import { Response } from "node-fetch";
 
 const mockHttpFetch = mock();
 
-const wasmBinary = await readFile(
+const oracleProgram = await readFile(
 	"dist/libs/as-sdk-integration-tests/debug.wasm",
 );
 
@@ -26,8 +26,8 @@ describe("ProxyHttp", () => {
 
 		mockHttpFetch.mockResolvedValue(mockResponse);
 
-		const result = await executeDrWasm(
-			wasmBinary,
+		const result = await testOracleProgramExecution(
+			oracleProgram,
 			Buffer.from("testProxyHttpFetch"),
 			mockHttpFetch,
 		);
@@ -49,8 +49,8 @@ describe("ProxyHttp", () => {
 
 		mockHttpFetch.mockResolvedValue(mockResponse);
 
-		const result = await executeDrWasm(
-			wasmBinary,
+		const result = await testOracleProgramExecution(
+			oracleProgram,
 			Buffer.from("testProxyHttpFetch"),
 			mockHttpFetch,
 		);
@@ -64,8 +64,8 @@ describe("ProxyHttp", () => {
 
 describe("generateProxyHttpSigningMessage", () => {
 	it("should generate the expected message", async () => {
-		const result = await executeDrWasm(
-			wasmBinary,
+		const result = await testOracleProgramExecution(
+			oracleProgram,
 			Buffer.from("testGenerateProxyMessage"),
 		);
 

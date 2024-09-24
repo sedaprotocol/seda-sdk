@@ -82,19 +82,19 @@ new PlanetProgram().run();
 In order to test this we can use a JS testing suite (we use Bun:test in this repository and the starter kits, but any runner should work). We use the `@seda-protocol/dev-tools` package for this, which runs the Oracle Program in a similar environment as it would on the SEDA network:
 
 ```ts
-import { executeDrWasm } from "@seda-protocol/dev-tools";
+import { testOracleProgramExecution } from "@seda-protocol/dev-tools";
 import { readFile } from "node:fs/promises";
 
 const WASM_PATH = "build/debug.wasm";
 
 describe("Oracle Program: execution", () => {
   it("should be able to run", async () => {
-    const wasmBinary = await readFile(WASM_PATH);
+    const oracleProgram = await readFile(WASM_PATH);
 
     // Calls our SEDA VM
-    const vmResult = await executeDrWasm(
-      // The wasm file
-      wasmBinary,
+    const vmResult = await testOracleProgramExecution(
+      // The bytes of the Oracle Program
+      oracleProgram,
       // Inputs for the Oracle Program
       Buffer.from("1")
     );

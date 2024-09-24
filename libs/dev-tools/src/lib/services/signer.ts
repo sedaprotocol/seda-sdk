@@ -2,7 +2,7 @@ import {
 	DirectSecp256k1HdWallet,
 	type OfflineSigner,
 } from "@cosmjs/proto-signing";
-import { createWasmQueryClient } from "@dev-tools/services/wasm/query-client";
+import { createWasmQueryClient } from "@dev-tools/services/oracle-program/query-client";
 import { tryAsync } from "@dev-tools/utils/try-async";
 import {
 	AUTO_CORE_CONTRACT_VALUE,

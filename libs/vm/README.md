@@ -1,6 +1,6 @@
 # SEDA VM
 
-Virtual Machine used for testing your Data Request using JavaScript
+Virtual Machine used for testing your Oracle Program using JavaScript
 
 # Getting started
 
@@ -20,14 +20,14 @@ const WASM_PATH = "build/debug.wasm";
 
 describe("index.ts", () => {
   it("should be able to run", async () => {
-    const wasmBinary = await readFile(WASM_PATH);
+    const oracleProgram = await readFile(WASM_PATH);
     const vmResult = await callVm({
       // Arguments passed to the VM
       args: [],
       // Environment variables passed to the VM
       envs: {},
-      // The WASM binary in bytes
-      binary: new Uint8Array(wasmBinary),
+      // The bytes of the Oracle Program
+      binary: new Uint8Array(oracleProgram),
     });
 
     expect(vmResult.exitCode).toBe(0);

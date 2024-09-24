@@ -6,11 +6,11 @@ import { signAndSendTx } from "../sign-and-send-tx";
 import type { ISigner } from "../signer";
 import { createSigningClient } from "../signing-client";
 
-export async function uploadWasmBinary(
+export async function uploadOracleProgram(
 	signer: ISigner,
-	wasmBinary: Buffer,
+	oracleProgram: Buffer,
 	gasOptions: GasOptions,
-): Promise<Result<{ tx: string; wasmHash: string }, unknown>> {
+): Promise<Result<{ tx: string; oracleProgramId: string }, unknown>> {
 	const sigingClientResult = await createSigningClient(signer);
 	if (sigingClientResult.isErr) {
 		return Result.err(sigingClientResult.error);
@@ -22,7 +22,7 @@ export async function uploadWasmBinary(
 		typeUrl: "/sedachain.wasm_storage.v1.MsgStoreDataRequestWasm",
 		value: sedachain.wasm_storage.v1.MsgStoreDataRequestWasm.fromPartial({
 			sender: address,
-			wasm: await gzip(wasmBinary),
+			wasm: await gzip(oracleProgram),
 		}),
 	};
 
@@ -48,6 +48,6 @@ export async function uploadWasmBinary(
 
 	return Result.ok({
 		tx: response.value.transactionHash,
-		wasmHash: messageResponse.hash,
+		oracleProgramId: messageResponse.hash,
 	});
 }

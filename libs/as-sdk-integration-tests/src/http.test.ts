@@ -1,9 +1,12 @@
 import { beforeEach, describe, expect, it, mock } from "bun:test";
 import { readFile } from "node:fs/promises";
-import { executeDrWasm } from "@seda/dev-tools";
+import { testOracleProgramExecution } from "@seda/dev-tools";
 import { Response } from "node-fetch";
 
 const mockHttpFetch = mock();
+const oracleProgram = await readFile(
+	"dist/libs/as-sdk-integration-tests/debug.wasm",
+);
 
 describe("Http", () => {
 	beforeEach(() => {
@@ -11,12 +14,8 @@ describe("Http", () => {
 	});
 
 	it("Test SDK HTTP Rejection", async () => {
-		const wasmBinary = await readFile(
-			"dist/libs/as-sdk-integration-tests/debug.wasm",
-		);
-
-		const result = await executeDrWasm(
-			wasmBinary,
+		const result = await testOracleProgramExecution(
+			oracleProgram,
 			Buffer.from("testHttpRejection"),
 			mockHttpFetch,
 		);
@@ -26,10 +25,6 @@ describe("Http", () => {
 	});
 
 	it("Test mocked SDK HTTP Success", async () => {
-		const wasmBinary = await readFile(
-			"dist/libs/as-sdk-integration-tests/debug.wasm",
-		);
-
 		const mockResponse = new Response(
 			JSON.stringify({
 				userId: 200,
@@ -40,8 +35,8 @@ describe("Http", () => {
 		);
 		mockHttpFetch.mockResolvedValue(mockResponse);
 
-		const result = await executeDrWasm(
-			wasmBinary,
+		const result = await testOracleProgramExecution(
+			oracleProgram,
 			Buffer.from("testHttpSuccess"),
 			mockHttpFetch,
 		);
@@ -52,11 +47,8 @@ describe("Http", () => {
 
 	// Possibly flakey as it relies on internet connectivity and an external service
 	it("Test SDK HTTP Success", async () => {
-		const wasmBinary = await readFile(
-			"dist/libs/as-sdk-integration-tests/debug.wasm",
-		);
-		const result = await executeDrWasm(
-			wasmBinary,
+		const result = await testOracleProgramExecution(
+			oracleProgram,
 			Buffer.from("testHttpSuccess"),
 		);
 
@@ -66,11 +58,8 @@ describe("Http", () => {
 
 	// Possibly flakey as it relies on internet connectivity and an external service
 	it("Test SDK HTTP POST Success", async () => {
-		const wasmBinary = await readFile(
-			"dist/libs/as-sdk-integration-tests/debug.wasm",
-		);
-		const result = await executeDrWasm(
-			wasmBinary,
+		const result = await testOracleProgramExecution(
+			oracleProgram,
 			Buffer.from("testPostHttpSuccess"),
 		);
 
@@ -80,8 +69,8 @@ describe("Http", () => {
 		);
 	});
 
-	it("should exit when an invalid WASM binary is given", async () => {
-		const result = await executeDrWasm(
+	it("should exit when an invalid Oracle Program is given", async () => {
+		const result = await testOracleProgramExecution(
 			Buffer.from(new Uint8Array([0, 97, 115, 109])),
 			Buffer.from("testHttpSuccess"),
 		);

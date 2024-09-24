@@ -1,8 +1,8 @@
 export { buildSigningConfig } from "@dev-tools/services/config";
 export { Signer, type ISigner } from "@dev-tools/services/signer";
 
-export { uploadWasmBinary } from "@dev-tools/services/wasm/upload-wasm-binary";
-export { getWasmBinary } from "@dev-tools/services/wasm/get-wasm-binary";
+export { uploadOracleProgram } from "@dev-tools/services/oracle-program/upload-oracle-program";
+export { getOracleProgram } from "@dev-tools/services/oracle-program/get-oracle-program";
 
 export { postDataRequest } from "@dev-tools/services/dr/post-data-request";
 export { postDataRequestBundle } from "@dev-tools/services/dr/post-data-request-bundle";
@@ -17,5 +17,4 @@ export { postAndAwaitDataRequestBundle } from "@dev-tools/services/dr/post-and-a
 
 export * from "./lib/testing/create-mock-reveal";
 export * from "./lib/testing/create-mock-tally-args";
-export * from "./lib/testing/execute-dr-wasm";
-export * from "./lib/testing/execute-tally-wasm";
+export * from "./lib/testing/test-oracle-program";

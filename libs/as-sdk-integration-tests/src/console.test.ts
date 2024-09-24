@@ -1,15 +1,15 @@
 import { describe, expect, it } from "bun:test";
 import { readFile } from "node:fs/promises";
-import { executeDrWasm } from "@seda/dev-tools";
+import { testOracleProgramExecution } from "@seda/dev-tools";
 
-const wasmBinary = await readFile(
+const oracleProgram = await readFile(
 	"dist/libs/as-sdk-integration-tests/debug.wasm",
 );
 
 describe("console", () => {
 	it("should print a hex representation of a raw buffer", async () => {
-		const result = await executeDrWasm(
-			wasmBinary,
+		const result = await testOracleProgramExecution(
+			oracleProgram,
 			Buffer.from("testLogBuffer"),
 		);
 
@@ -17,8 +17,8 @@ describe("console", () => {
 	});
 
 	it("should print a hex representation of a Uint8Array", async () => {
-		const result = await executeDrWasm(
-			wasmBinary,
+		const result = await testOracleProgramExecution(
+			oracleProgram,
 			Buffer.from("testLogByteArray"),
 		);
 
@@ -26,13 +26,19 @@ describe("console", () => {
 	});
 
 	it("should print a float value", async () => {
-		const result = await executeDrWasm(wasmBinary, Buffer.from("testLogFloat"));
+		const result = await testOracleProgramExecution(
+			oracleProgram,
+			Buffer.from("testLogFloat"),
+		);
 
 		expect(result.stdout).toEqual("0.3199999928474426\n");
 	});
 
 	it("should print a null value", async () => {
-		const result = await executeDrWasm(wasmBinary, Buffer.from("testLogNull"));
+		const result = await testOracleProgramExecution(
+			oracleProgram,
+			Buffer.from("testLogNull"),
+		);
 
 		expect(result.stdout).toEqual("null\n");
 	});

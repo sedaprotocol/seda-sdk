@@ -1,16 +1,16 @@
 import { describe, expect, it } from "bun:test";
 import { readFile } from "node:fs/promises";
-import { executeDrWasm } from "@seda/dev-tools";
+import { testOracleProgramExecution } from "@seda/dev-tools";
 
-const wasmBinary = await readFile(
+const oracleProgram = await readFile(
 	"dist/libs/as-sdk-integration-tests/debug.wasm",
 );
 
 describe("bytes", () => {
 	describe("concat", () => {
 		it("should concatenate 2 Bytes instances in a new one", async () => {
-			const result = await executeDrWasm(
-				wasmBinary,
+			const result = await testOracleProgramExecution(
+				oracleProgram,
 				Buffer.from("testBytesConcat:world!"),
 			);
 
@@ -18,8 +18,8 @@ describe("bytes", () => {
 		});
 
 		it("should allow passing an array of bytes to the static method and concatenate them", async () => {
-			const result = await executeDrWasm(
-				wasmBinary,
+			const result = await testOracleProgramExecution(
+				oracleProgram,
 				Buffer.from("testBytesStaticConcat:swap"),
 			);
 
@@ -29,8 +29,8 @@ describe("bytes", () => {
 
 	describe("slice", () => {
 		it("should return a new bytes instance when called without arguments", async () => {
-			const result = await executeDrWasm(
-				wasmBinary,
+			const result = await testOracleProgramExecution(
+				oracleProgram,
 				Buffer.from("testBytesSliceNoArguments"),
 			);
 
@@ -41,8 +41,8 @@ describe("bytes", () => {
 		});
 
 		it("should return a new bytes instance when called with just the start", async () => {
-			const result = await executeDrWasm(
-				wasmBinary,
+			const result = await testOracleProgramExecution(
+				oracleProgram,
 				Buffer.from("testBytesSliceOnlyStart"),
 			);
 
@@ -50,8 +50,8 @@ describe("bytes", () => {
 		});
 
 		it("should return a new bytes instance when called with start and end", async () => {
-			const result = await executeDrWasm(
-				wasmBinary,
+			const result = await testOracleProgramExecution(
+				oracleProgram,
 				Buffer.from("testBytesSliceStartEnd"),
 			);
 
@@ -71,8 +71,8 @@ describe("bytes", () => {
 					value: "some",
 				},
 			});
-			const result = await executeDrWasm(
-				wasmBinary,
+			const result = await testOracleProgramExecution(
+				oracleProgram,
 				Buffer.from(`testBytesJSON:${input}`),
 			);
 
@@ -84,8 +84,8 @@ describe("bytes", () => {
 
 	describe("toNumber", () => {
 		it("should be able to parse a number to a type", async () => {
-			const result = await executeDrWasm(
-				wasmBinary,
+			const result = await testOracleProgramExecution(
+				oracleProgram,
 				Buffer.from("testBytesToNumber"),
 			);
 
@@ -95,8 +95,8 @@ describe("bytes", () => {
 
 	describe("fromNumber", () => {
 		it("should convert a number to a bytes object", async () => {
-			const result = await executeDrWasm(
-				wasmBinary,
+			const result = await testOracleProgramExecution(
+				oracleProgram,
 				Buffer.from("testNumberToBytes"),
 			);
 
@@ -108,8 +108,8 @@ describe("bytes", () => {
 
 	describe("fromBigNumber", () => {
 		it("should convert a big number to Bytes", async () => {
-			const result = await executeDrWasm(
-				wasmBinary,
+			const result = await testOracleProgramExecution(
+				oracleProgram,
 				Buffer.from("testBigNumberToBytes"),
 			);
 
@@ -121,8 +121,8 @@ describe("bytes", () => {
 
 	describe("toBigNumber", () => {
 		it("should be able to parse Bytes as a big number", async () => {
-			const result = await executeDrWasm(
-				wasmBinary,
+			const result = await testOracleProgramExecution(
+				oracleProgram,
 				Buffer.from("testBytesToBigNumber"),
 			);
 

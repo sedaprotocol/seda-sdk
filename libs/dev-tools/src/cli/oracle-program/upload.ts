@@ -12,17 +12,14 @@ import {
 	updateSpinnerText,
 } from "@dev-tools/cli-utils/spinner";
 import { buildSigningConfig } from "@dev-tools/services/config";
+import { getOracleProgram } from "@dev-tools/services/oracle-program/get-oracle-program";
+import { uploadOracleProgram } from "@dev-tools/services/oracle-program/upload-oracle-program";
 import { Signer } from "@dev-tools/services/signer";
-import { getWasmBinary } from "@dev-tools/services/wasm/get-wasm-binary";
-import { uploadWasmBinary } from "@dev-tools/services/wasm/upload-wasm-binary";
 import { tryAsync } from "@dev-tools/utils/try-async";
 
 export const upload = new Command("upload");
-upload.description("upload a Data Request WASM binary to the SEDA chain.");
-upload.argument(
-	"<wasm-filepath>",
-	"File path of the Data Request WASM binary.",
-);
+upload.description("upload an Oracle Program to the SEDA chain.");
+upload.argument("<wasm-filepath>", "File path of the Oracle Program.");
 addGasOptionsToCommand(upload);
 upload.action(async () => {
 	const gasOptions = getGasOptionsFromCommand(upload);
@@ -35,33 +32,38 @@ upload.action(async () => {
 		process.exit(1);
 	}
 
-	updateSpinnerText("Uploading Data Request WASM binary to the SEDA network");
+	updateSpinnerText("Uploading Oracle Program to the SEDA network");
 
 	const filePath = upload.args[0];
-	const wasmBinary = await tryAsync(async () => readFile(filePath));
-	if (wasmBinary.isErr) {
+	const oracleProgram = await tryAsync(async () => readFile(filePath));
+	if (oracleProgram.isErr) {
 		spinnerError(`Failed to read file "${filePath}"`);
-		console.error(wasmBinary.error);
+		console.error(oracleProgram.error);
 		process.exit(1);
 	}
 
-	const drWasmId = keccak256(wasmBinary.value);
-	const wasm = await getWasmBinary(signer.value, drWasmId);
+	const oracleProgramId = keccak256(oracleProgram.value);
+	const existingOracleProgram = await getOracleProgram(
+		signer.value,
+		oracleProgramId,
+	);
 
-	if (wasm.isOk) {
-		if (wasm.value.isJust) {
-			// There is already a binary with the same hash on chain
+	if (existingOracleProgram.isOk) {
+		if (existingOracleProgram.value.isJust) {
+			// There is already an Oracle Program with the same hash on chain
 			spinnerSuccess();
 			console.table({
-				wasmHash: Buffer.from(wasm.value.value.hash).toString("hex"),
+				oracleProgramId: Buffer.from(
+					existingOracleProgram.value.value.oracleProgramId,
+				).toString("hex"),
 			});
 			process.exit(0);
 		}
 	}
 
-	const response = await uploadWasmBinary(
+	const response = await uploadOracleProgram(
 		signer.value,
-		wasmBinary.value,
+		oracleProgram.value,
 		gasOptions,
 	);
 

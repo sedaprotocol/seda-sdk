@@ -2,14 +2,14 @@
 import { Command } from "commander";
 import { version } from "../../package.json";
 import { RPC_ENV_KEY } from "../lib/services/config";
+import { oracleProgram } from "./oracle-program";
 import { spinnerError, stopSpinner } from "./utils/spinner";
-import { wasm } from "./wasm";
 
 const program = new Command()
 	.description("SEDA SDK Command Line Interface (CLI)")
 	.version(version)
 	.addHelpText("after", "\r")
-	.addCommand(wasm)
+	.addCommand(oracleProgram)
 	.option(
 		"-r, --rpc [string]",
 		`SEDA CometBFT RPC Endpoint. Attempts to reads '${RPC_ENV_KEY}' env variable if not passed.`,

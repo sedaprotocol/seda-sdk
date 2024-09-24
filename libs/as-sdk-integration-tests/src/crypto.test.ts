@@ -1,15 +1,15 @@
 import { describe, expect, it } from "bun:test";
 import { readFile } from "node:fs/promises";
-import { executeDrWasm } from "@seda/dev-tools";
+import { testOracleProgramExecution } from "@seda/dev-tools";
 
-const wasmBinary = await readFile(
+const oracleProgram = await readFile(
 	"dist/libs/as-sdk-integration-tests/debug.wasm",
 );
 
 describe("Crypto", () => {
 	it("Test valid Secp256k1 signature", async () => {
-		const result = await executeDrWasm(
-			wasmBinary,
+		const result = await testOracleProgramExecution(
+			oracleProgram,
 			Buffer.from("testSecp256k1VerifyValid"),
 		);
 
@@ -17,8 +17,8 @@ describe("Crypto", () => {
 	});
 
 	it("Test invalid Secp256k1 signature", async () => {
-		const result = await executeDrWasm(
-			wasmBinary,
+		const result = await testOracleProgramExecution(
+			oracleProgram,
 			Buffer.from("testSecp256k1VerifyInvalid"),
 		);
 
@@ -27,8 +27,8 @@ describe("Crypto", () => {
 
 	describe("keccak256", () => {
 		it("should hash the input bytes correctly", async () => {
-			const result = await executeDrWasm(
-				wasmBinary,
+			const result = await testOracleProgramExecution(
+				oracleProgram,
 				Buffer.from("testKeccak256"),
 			);
 

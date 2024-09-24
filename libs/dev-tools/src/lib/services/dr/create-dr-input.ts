@@ -13,21 +13,21 @@ export type PostDataRequestInput = {
 	version?: string;
 
 	/**
-	 * Hash of the uploaded Data Request binary Id
+	 * Hash of the uploaded Oracle Program
 	 */
-	drBinaryId: string;
+	oracleProgramId: string;
 	/**
-	 * Inputs encoded in bytes. Input depends on the Data Request WASM binary you are calling
+	 * Inputs encoded in bytes. Input depends on the Oracle Program you are calling
 	 */
 	drInputs: Uint8Array;
 
 	/**
-	 * Hash of the uploaded Tally binary Id
-	 * Defaults to the same hash as drBinaryId
+	 * Hash of the uploaded Tally Oracle Program
+	 * Defaults to the value of oracleProgramId
 	 */
-	tallyBinaryId?: string;
+	tallyOracleProgramId?: string;
 	/**
-	 * Inputs encoded in bytes. Input depends on the Tally WASM binary you are calling
+	 * Inputs encoded in bytes. Input depends on the Tally Oracle Program you are calling
 	 */
 	tallyInputs: Uint8Array;
 
@@ -66,10 +66,10 @@ export type PostDataRequestInput = {
 export function createPostedDataRequest(input: PostDataRequestInput) {
 	const version = input.version ?? DEFAULT_VERSION;
 
-	const dr_binary_id = input.drBinaryId;
+	const dr_binary_id = input.oracleProgramId;
 	const dr_inputs = base64Encode(input.drInputs);
 
-	const tally_binary_id = input.tallyBinaryId ?? input.drBinaryId;
+	const tally_binary_id = input.tallyOracleProgramId ?? input.oracleProgramId;
 	const tally_inputs = base64Encode(input.tallyInputs);
 
 	const replication_factor =

@@ -20,7 +20,7 @@ CURRENT_FILE_PATH.base = "worker.js";
 const DEFAULT_WORKER_PATH = format(CURRENT_FILE_PATH);
 
 /**
- * Executes the given WASM binary as if it were a Data Request
+ * Executes the given WASM binary as if it were an Oracle Program
  *
  * @param callData The call data passed to the VM
  * @param workerUrl URL of the compiled worker.js

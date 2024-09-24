@@ -3,17 +3,18 @@ import { readFile } from "node:fs/promises";
 import { TallyVmAdapter, callVm } from "@seda-protocol/vm";
 import {
 	createMockTallyArgs,
-	executeDrWasm,
-	executeTallyWasm,
+	testOracleProgramExecution,
+	testOracleProgramTally,
 } from "@seda/dev-tools";
+
+const oracleProgram = await readFile(
+	"dist/libs/as-sdk-integration-tests/debug.wasm",
+);
 
 describe("TallyVm", () => {
 	it("should run in dr vm mode by default", async () => {
-		const wasmBinary = await readFile(
-			"dist/libs/as-sdk-integration-tests/debug.wasm",
-		);
-		const result = await executeDrWasm(
-			wasmBinary,
+		const result = await testOracleProgramExecution(
+			oracleProgram,
 			Buffer.from("testTallyVmMode"),
 		);
 
@@ -22,11 +23,8 @@ describe("TallyVm", () => {
 	});
 
 	it("should run in tally vm mode with the adapter", async () => {
-		const wasmBinary = await readFile(
-			"dist/libs/as-sdk-integration-tests/debug.wasm",
-		);
-		const result = await executeTallyWasm(
-			wasmBinary,
+		const result = await testOracleProgramTally(
+			oracleProgram,
 			Buffer.from("testTallyVmMode"),
 			[],
 		);
@@ -36,11 +34,8 @@ describe("TallyVm", () => {
 	});
 
 	it("should fail to make an http call", async () => {
-		const wasmBinary = await readFile(
-			"dist/libs/as-sdk-integration-tests/debug.wasm",
-		);
-		const result = await executeTallyWasm(
-			wasmBinary,
+		const result = await testOracleProgramTally(
+			oracleProgram,
 			Buffer.from("testTallyVmHttp"),
 			[],
 		);
@@ -50,10 +45,6 @@ describe("TallyVm", () => {
 	});
 
 	it("should fail when the reveals and consensus arrays are not the same length", async () => {
-		const wasmBinary = await readFile(
-			"dist/libs/as-sdk-integration-tests/debug.wasm",
-		);
-
 		const args = createMockTallyArgs(Buffer.from("testTallyVmReveals"), [
 			{
 				exitCode: 0,
@@ -73,7 +64,7 @@ describe("TallyVm", () => {
 		const result = await callVm(
 			{
 				args,
-				binary: wasmBinary,
+				binary: oracleProgram,
 				envs: {},
 			},
 			undefined,
@@ -87,10 +78,6 @@ describe("TallyVm", () => {
 	});
 
 	it("should be able to parse the reveals and return the unfiltered reveals", async () => {
-		const wasmBinary = await readFile(
-			"dist/libs/as-sdk-integration-tests/debug.wasm",
-		);
-
 		const reports = [
 			{
 				exitCode: 0,
@@ -112,8 +99,8 @@ describe("TallyVm", () => {
 			},
 		];
 
-		const result = await executeTallyWasm(
-			wasmBinary,
+		const result = await testOracleProgramTally(
+			oracleProgram,
 			Buffer.from("testTallyVmReveals"),
 			reports,
 		);
@@ -125,10 +112,6 @@ describe("TallyVm", () => {
 	});
 
 	it("should provide a convenience method to filter out outliers.", async () => {
-		const wasmBinary = await readFile(
-			"dist/libs/as-sdk-integration-tests/debug.wasm",
-		);
-
 		const reports = [
 			{
 				exitCode: 1,
@@ -150,8 +133,8 @@ describe("TallyVm", () => {
 			},
 		];
 
-		const result = await executeTallyWasm(
-			wasmBinary,
+		const result = await testOracleProgramTally(
+			oracleProgram,
 			Buffer.from("testTallyVmRevealsFiltered"),
 			reports,
 		);

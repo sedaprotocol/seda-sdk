@@ -37,21 +37,21 @@ You can apply the following options to all CLI commands:
 
 - --rpc - The SEDA chain RPC to use
 
-## WASM commands
+## Oracle Program commands
 
-Commands that allow you to interact with the Data Request binaries.
+Commands that allow you to interact with the Oracle Programs.
 
-### Uploading a Data Request binary
+### Uploading an Oracle Program
 
-Allows you to upload a Data Request binary to the SEDA chain.
+Allows you to upload an Oracle Program to the SEDA chain.
 
 Example:
 
 ```sh
-npx seda-sdk wasm upload <INSERT_PATH_TO_WASM> --rpc <INSERT_SEDA_CHAIN_RPC>
+npx seda-sdk oracle-program upload <INSERT_PATH_TO_WASM> --rpc <INSERT_SEDA_CHAIN_RPC>
 ```
 
-This will return the `wasm hash` which you can use for Data Requests.
+This will return the `Oracle Program ID` which you can use for Data Requests.
 
 You can apply the following options:
 
@@ -59,22 +59,22 @@ You can apply the following options:
 - --gas-adjustment - Used to scale the gas estimate with gas 'auto'. (default: 1.3)
 - --gas-price - Price per unit of gas in aseda. (default: 10000000000)
 
-### Data Request binary details
+### Oracle Program details
 
-Shows all the details of an uploaded Data Request binary. The Data Request binary id is the hash of the WASM binary (which you receive from the upload command).
+Shows all the details of an uploaded Oracle Program. The Oracle Program id is the hash of the WASM binary (which you receive from the upload command).
 
 Example:
 
 ```sh
-npx seda-sdk wasm show <INSERT_DR_WASM_BINRAY_ID> --rpc <INSERT_SEDA_CHAIN_RPC>
+npx seda-sdk oracle-program show <INSERT_ORACLE_PROGRAM_ID> --rpc <INSERT_SEDA_CHAIN_RPC>
 ```
 
-### List Data Request binaries
+### List Oracle Programs
 
-Shows all the WASM binaries to the SEDA chain.
+Shows all the Oracle Programs to the SEDA chain.
 
 Example:
 
 ```sh
-npx seda-sdk wasm list --rpc <INSERT_SEDA_CHAIN_RPC>
+npx seda-sdk oracle-program list --rpc <INSERT_SEDA_CHAIN_RPC>
 ```
