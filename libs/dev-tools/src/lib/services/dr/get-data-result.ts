@@ -41,10 +41,12 @@ const DataResultSchema = pipe(
 	}),
 );
 
+export type DataRequestResult = InferOutput<typeof DataResultSchema>;
+
 export async function getDataResult(
 	signer: ISigner,
 	drId: string,
-): Promise<InferOutput<typeof DataResultSchema>> {
+): Promise<DataRequestResult> {
 	const sigingClientResult = await createSigningClient(signer);
 	if (sigingClientResult.isErr) {
 		throw sigingClientResult.error;

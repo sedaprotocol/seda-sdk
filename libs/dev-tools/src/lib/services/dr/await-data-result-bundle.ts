@@ -1,7 +1,7 @@
 import type { ISigner } from "@dev-tools/services/signer";
 import { createSigningClient } from "@dev-tools/services/signing-client";
 import { tryAsync } from "@dev-tools/utils/try-async";
-import { getDataResult } from "./get-data-result";
+import { getDataResultBundle } from "./get-data-result-bundle";
 
 type Opts = {
 	/** Defaults to 60 seconds. */
@@ -10,9 +10,9 @@ type Opts = {
 	pollingIntervalSeconds: number;
 };
 
-export async function awaitDataResult(
+export async function awaitDataResultBundle(
 	signer: ISigner,
-	drId: string,
+	drIds: string[],
 	opts: Opts = { timeoutSeconds: 60, pollingIntervalSeconds: 10 },
 ) {
 	const sigingClientResult = await createSigningClient(signer);
@@ -22,15 +22,17 @@ export async function awaitDataResult(
 	const timeoutTime = Date.now() + opts.timeoutSeconds * 1000;
 
 	while (Date.now() < timeoutTime) {
-		const result = await tryAsync(async () => getDataResult(signer, drId));
-		if (!result.isErr && result.value !== null) {
+		const result = await tryAsync(async () =>
+			getDataResultBundle(signer, drIds),
+		);
+		if (!result.isErr && result.value.every((r) => r.result !== null)) {
 			return result.value;
 		}
 		await sleep(opts.pollingIntervalSeconds * 1000);
 	}
 
 	throw new Error(
-		`Timeout: DR "${drId}" took longer than ${opts.timeoutSeconds} seconds to execute.`,
+		`Timeout: bundled data requests took longer than ${opts.timeoutSeconds} seconds to execute.`,
 	);
 }
 

@@ -2,7 +2,11 @@ import assert from "node:assert";
 import type { ISigner } from "../signer";
 import { createSigningClient } from "../signing-client";
 
-type DataRequestStatus = "pending" | "committing" | "revealing" | "resolved";
+export type DataRequestStatus =
+	| "pending"
+	| "committing"
+	| "revealing"
+	| "resolved";
 
 export async function getDataRequestStatus(
 	signer: ISigner,
