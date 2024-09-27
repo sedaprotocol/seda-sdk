@@ -3,7 +3,7 @@ import {
 	type OfflineSigner,
 } from "@cosmjs/proto-signing";
 import { createWasmQueryClient } from "@dev-tools/services/oracle-program/query-client";
-import { tryAsync } from "@dev-tools/utils/try-async";
+import { tryAsync } from "@seda-protocol/utils";
 import {
 	AUTO_CORE_CONTRACT_VALUE,
 	type SigningConfig,

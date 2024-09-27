@@ -1,7 +1,7 @@
 import * as Secp256k1 from "@noble/secp256k1";
+import { trySync } from "@seda-protocol/utils";
 import { Maybe } from "true-myth";
 import { keccak256, secp256k1Verify } from "./services/crypto";
-import { trySync } from "./services/try";
 import { type HttpFetchAction, HttpFetchResponse } from "./types/vm-actions";
 import { PromiseStatus } from "./types/vm-promise";
 import { WorkerToHost } from "./worker-host-communication.js";

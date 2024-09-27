@@ -1,6 +1,6 @@
 import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
-import { tryAsync } from "@dev-tools/utils/try-async";
 import { sedachain } from "@seda-protocol/proto-messages";
+import { tryAsync } from "@seda-protocol/utils";
 import { MsgExecuteContractResponse } from "cosmjs-types/cosmwasm/wasm/v1/tx";
 import { Result } from "true-myth";
 import type { ISigner } from "./signer";

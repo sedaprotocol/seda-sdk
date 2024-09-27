@@ -1,6 +1,3 @@
-import { Command } from "commander";
-import { Maybe } from "true-myth";
-
 import {
 	spinnerError,
 	spinnerSuccess,
@@ -8,7 +5,9 @@ import {
 } from "@dev-tools/cli-utils/spinner";
 import { buildQueryConfig } from "@dev-tools/services/config";
 import { createWasmQueryClient } from "@dev-tools/services/oracle-program/query-client";
-import { tryAsync } from "@dev-tools/utils/try-async";
+import { tryAsync } from "@seda-protocol/utils";
+import { Command } from "commander";
+import { Maybe } from "true-myth";
 
 export const show = new Command("show");
 show.description("show an Oracle Program in the SEDA chain");

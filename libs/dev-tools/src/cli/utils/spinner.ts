@@ -19,9 +19,13 @@ export const stopSpinner = () => {
 	}
 };
 
-export const spinnerError = (message?: string) => {
+export const spinnerError = (message?: unknown) => {
 	if (spinner.isSpinning) {
-		spinner.fail(message);
+		if (typeof message === "string" || message?.toString) {
+			spinner.fail(`${message}`);
+		} else {
+			spinner.fail("Unknown error");
+		}
 	}
 };
 

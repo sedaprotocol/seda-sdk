@@ -1,4 +1,4 @@
-import { tryAsync } from "@dev-tools/utils/try-async";
+import { tryAsync } from "@seda-protocol/utils";
 import { Maybe, Result } from "true-myth";
 import type { ISigner } from "../signer";
 import { createWasmQueryClient } from "./query-client";
@@ -14,7 +14,7 @@ export async function getOracleProgram(
 			bytecode: Uint8Array;
 			expirationHeight: number;
 		}>,
-		string
+		unknown
 	>
 > {
 	const queryClient = await tryAsync(

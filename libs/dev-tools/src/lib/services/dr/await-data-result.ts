@@ -1,6 +1,6 @@
 import type { ISigner } from "@dev-tools/services/signer";
 import { createSigningClient } from "@dev-tools/services/signing-client";
-import { tryAsync } from "@dev-tools/utils/try-async";
+import { tryAsync } from "@seda-protocol/utils";
 import { getDataResult } from "./get-data-result";
 
 type Opts = {

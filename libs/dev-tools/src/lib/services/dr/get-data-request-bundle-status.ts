@@ -1,4 +1,4 @@
-import { tryAsync } from "@dev-tools/utils/try-async";
+import { tryAsync } from "@seda-protocol/utils";
 import type { ISigner } from "../signer";
 import {
 	type DataRequestStatus,
@@ -8,7 +8,7 @@ import {
 type StatusBatchResponse = {
 	drId: string;
 	status: DataRequestStatus | null;
-	error?: string;
+	error?: unknown;
 };
 
 export async function getDataRequestBundleStatus(

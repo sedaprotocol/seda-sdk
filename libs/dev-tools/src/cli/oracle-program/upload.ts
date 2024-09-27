@@ -15,7 +15,7 @@ import { buildSigningConfig } from "@dev-tools/services/config";
 import { getOracleProgram } from "@dev-tools/services/oracle-program/get-oracle-program";
 import { uploadOracleProgram } from "@dev-tools/services/oracle-program/upload-oracle-program";
 import { Signer } from "@dev-tools/services/signer";
-import { tryAsync } from "@dev-tools/utils/try-async";
+import { tryAsync } from "@seda-protocol/utils";
 
 export const upload = new Command("upload");
 upload.description("upload an Oracle Program to the SEDA chain.");

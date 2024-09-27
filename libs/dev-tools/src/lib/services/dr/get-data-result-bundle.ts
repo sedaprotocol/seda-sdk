@@ -1,11 +1,11 @@
-import { tryAsync } from "@dev-tools/utils/try-async";
+import { tryAsync } from "@seda-protocol/utils";
 import type { ISigner } from "../signer";
 import { type DataRequestResult, getDataResult } from "./get-data-result";
 
 type ResultBatchResponse = {
 	drId: string;
 	result: DataRequestResult | null;
-	error?: string;
+	error?: unknown;
 };
 
 export async function getDataResultBundle(
