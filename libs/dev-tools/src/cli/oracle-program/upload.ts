@@ -53,9 +53,7 @@ upload.action(async () => {
 			// There is already an Oracle Program with the same hash on chain
 			spinnerSuccess();
 			console.table({
-				oracleProgramId: Buffer.from(
-					existingOracleProgram.value.value.oracleProgramId,
-				).toString("hex"),
+				oracleProgramId: existingOracleProgram.value.value.oracleProgramId,
 			});
 			process.exit(0);
 		}
