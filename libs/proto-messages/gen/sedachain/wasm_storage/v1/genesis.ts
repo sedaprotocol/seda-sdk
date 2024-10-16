@@ -8,10 +8,7 @@
 import _m0 from "protobufjs/minimal";
 import { DataRequestWasm, ExecutorWasm, Params } from "./wasm_storage";
 
-/**
- * GenesisState defines the wasm module's genesis state(i.e wasms stored at
- * genesis.)
- */
+/** GenesisState defines wasm-storage module's genesis state. */
 export interface GenesisState {
   params: Params | undefined;
   dataRequestWasms: DataRequestWasm[];

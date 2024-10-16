@@ -5,8 +5,9 @@
 
 /* eslint-disable */
 
+export * as batching from "./index.sedachain.batching";
 export * as data_proxy from "./index.sedachain.data_proxy";
-export * as randomness from "./index.sedachain.randomness";
+export * as pubkey from "./index.sedachain.pubkey";
 export * as staking from "./index.sedachain.staking";
 export * as vesting from "./index.sedachain.vesting";
 export * as wasm_storage from "./index.sedachain.wasm_storage";
