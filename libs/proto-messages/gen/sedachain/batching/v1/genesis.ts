@@ -7,7 +7,7 @@
 /* eslint-disable */
 import Long from "long";
 import _m0 from "protobufjs/minimal";
-import { Batch, Params, TreeEntries } from "./batching";
+import { Batch, DataResult, Params, TreeEntries } from "./batching";
 
 /** GenesisState defines the batching module's genesis state. */
 export interface GenesisState {
@@ -18,11 +18,29 @@ export interface GenesisState {
   currentBatchNumber: number;
   batches: Batch[];
   treeEntries: TreeEntries[];
+  dataResults: DataResult[];
+  batchAssignments: BatchAssignment[];
   params: Params | undefined;
 }
 
+/**
+ * BatchAssignment represents a batch assignment for genesis export
+ * and import.
+ */
+export interface BatchAssignment {
+  batchNumber: number;
+  dataRequestId: string;
+}
+
 function createBaseGenesisState(): GenesisState {
-  return { currentBatchNumber: 0, batches: [], treeEntries: [], params: undefined };
+  return {
+    currentBatchNumber: 0,
+    batches: [],
+    treeEntries: [],
+    dataResults: [],
+    batchAssignments: [],
+    params: undefined,
+  };
 }
 
 export const GenesisState = {
@@ -36,8 +54,14 @@ export const GenesisState = {
     for (const v of message.treeEntries) {
       TreeEntries.encode(v!, writer.uint32(26).fork()).ldelim();
     }
+    for (const v of message.dataResults) {
+      DataResult.encode(v!, writer.uint32(34).fork()).ldelim();
+    }
+    for (const v of message.batchAssignments) {
+      BatchAssignment.encode(v!, writer.uint32(42).fork()).ldelim();
+    }
     if (message.params !== undefined) {
-      Params.encode(message.params, writer.uint32(34).fork()).ldelim();
+      Params.encode(message.params, writer.uint32(50).fork()).ldelim();
     }
     return writer;
   },
@@ -75,6 +99,20 @@ export const GenesisState = {
             break;
           }
 
+          message.dataResults.push(DataResult.decode(reader, reader.uint32()));
+          continue;
+        case 5:
+          if (tag !== 42) {
+            break;
+          }
+
+          message.batchAssignments.push(BatchAssignment.decode(reader, reader.uint32()));
+          continue;
+        case 6:
+          if (tag !== 50) {
+            break;
+          }
+
           message.params = Params.decode(reader, reader.uint32());
           continue;
       }
@@ -93,6 +131,12 @@ export const GenesisState = {
       treeEntries: globalThis.Array.isArray(object?.treeEntries)
         ? object.treeEntries.map((e: any) => TreeEntries.fromJSON(e))
         : [],
+      dataResults: globalThis.Array.isArray(object?.dataResults)
+        ? object.dataResults.map((e: any) => DataResult.fromJSON(e))
+        : [],
+      batchAssignments: globalThis.Array.isArray(object?.batchAssignments)
+        ? object.batchAssignments.map((e: any) => BatchAssignment.fromJSON(e))
+        : [],
       params: isSet(object.params) ? Params.fromJSON(object.params) : undefined,
     };
   },
@@ -108,6 +152,12 @@ export const GenesisState = {
     if (message.treeEntries?.length) {
       obj.treeEntries = message.treeEntries.map((e) => TreeEntries.toJSON(e));
     }
+    if (message.dataResults?.length) {
+      obj.dataResults = message.dataResults.map((e) => DataResult.toJSON(e));
+    }
+    if (message.batchAssignments?.length) {
+      obj.batchAssignments = message.batchAssignments.map((e) => BatchAssignment.toJSON(e));
+    }
     if (message.params !== undefined) {
       obj.params = Params.toJSON(message.params);
     }
@@ -122,9 +172,85 @@ export const GenesisState = {
     message.currentBatchNumber = object.currentBatchNumber ?? 0;
     message.batches = object.batches?.map((e) => Batch.fromPartial(e)) || [];
     message.treeEntries = object.treeEntries?.map((e) => TreeEntries.fromPartial(e)) || [];
+    message.dataResults = object.dataResults?.map((e) => DataResult.fromPartial(e)) || [];
+    message.batchAssignments = object.batchAssignments?.map((e) => BatchAssignment.fromPartial(e)) || [];
     message.params = (object.params !== undefined && object.params !== null)
       ? Params.fromPartial(object.params)
       : undefined;
+    return message;
+  },
+};
+
+function createBaseBatchAssignment(): BatchAssignment {
+  return { batchNumber: 0, dataRequestId: "" };
+}
+
+export const BatchAssignment = {
+  encode(message: BatchAssignment, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.batchNumber !== 0) {
+      writer.uint32(8).uint64(message.batchNumber);
+    }
+    if (message.dataRequestId !== "") {
+      writer.uint32(18).string(message.dataRequestId);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): BatchAssignment {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseBatchAssignment();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 8) {
+            break;
+          }
+
+          message.batchNumber = longToNumber(reader.uint64() as Long);
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.dataRequestId = reader.string();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): BatchAssignment {
+    return {
+      batchNumber: isSet(object.batchNumber) ? globalThis.Number(object.batchNumber) : 0,
+      dataRequestId: isSet(object.dataRequestId) ? globalThis.String(object.dataRequestId) : "",
+    };
+  },
+
+  toJSON(message: BatchAssignment): unknown {
+    const obj: any = {};
+    if (message.batchNumber !== 0) {
+      obj.batchNumber = Math.round(message.batchNumber);
+    }
+    if (message.dataRequestId !== "") {
+      obj.dataRequestId = message.dataRequestId;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<BatchAssignment>): BatchAssignment {
+    return BatchAssignment.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<BatchAssignment>): BatchAssignment {
+    const message = createBaseBatchAssignment();
+    message.batchNumber = object.batchNumber ?? 0;
+    message.dataRequestId = object.dataRequestId ?? "";
     return message;
   },
 };

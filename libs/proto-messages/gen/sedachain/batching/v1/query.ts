@@ -7,7 +7,7 @@
 /* eslint-disable */
 import Long from "long";
 import _m0 from "protobufjs/minimal";
-import { Batch, BatchSignatures, TreeEntries } from "./batching";
+import { Batch, BatchSignatures, DataResult, TreeEntries } from "./batching";
 
 /** The request message for QueryBatch RPC. */
 export interface QueryBatchRequest {
@@ -56,6 +56,26 @@ export interface QueryBatchSignaturesRequest {
 /** The response message for QueryQueryBatchSignatures RPC. */
 export interface QueryBatchSignaturesResponse {
   batchSigs: BatchSignatures[];
+}
+
+/** The request message for QueryDataResult RPC. */
+export interface QueryDataResultRequest {
+  dataRequestId: string;
+}
+
+/** The response message for QueryDataResult RPC. */
+export interface QueryDataResultResponse {
+  dataResult: DataResult | undefined;
+}
+
+/** The request message for QueryBatchAssignment RPC. */
+export interface QueryBatchAssignmentRequest {
+  dataRequestId: string;
+}
+
+/** The response message for QueryBatchAssignment RPC. */
+export interface QueryBatchAssignmentResponse {
+  batchNumber: number;
 }
 
 function createBaseQueryBatchRequest(): QueryBatchRequest {
@@ -622,6 +642,236 @@ export const QueryBatchSignaturesResponse = {
   },
 };
 
+function createBaseQueryDataResultRequest(): QueryDataResultRequest {
+  return { dataRequestId: "" };
+}
+
+export const QueryDataResultRequest = {
+  encode(message: QueryDataResultRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.dataRequestId !== "") {
+      writer.uint32(10).string(message.dataRequestId);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryDataResultRequest {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryDataResultRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.dataRequestId = reader.string();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryDataResultRequest {
+    return { dataRequestId: isSet(object.dataRequestId) ? globalThis.String(object.dataRequestId) : "" };
+  },
+
+  toJSON(message: QueryDataResultRequest): unknown {
+    const obj: any = {};
+    if (message.dataRequestId !== "") {
+      obj.dataRequestId = message.dataRequestId;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<QueryDataResultRequest>): QueryDataResultRequest {
+    return QueryDataResultRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<QueryDataResultRequest>): QueryDataResultRequest {
+    const message = createBaseQueryDataResultRequest();
+    message.dataRequestId = object.dataRequestId ?? "";
+    return message;
+  },
+};
+
+function createBaseQueryDataResultResponse(): QueryDataResultResponse {
+  return { dataResult: undefined };
+}
+
+export const QueryDataResultResponse = {
+  encode(message: QueryDataResultResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.dataResult !== undefined) {
+      DataResult.encode(message.dataResult, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryDataResultResponse {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryDataResultResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.dataResult = DataResult.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryDataResultResponse {
+    return { dataResult: isSet(object.dataResult) ? DataResult.fromJSON(object.dataResult) : undefined };
+  },
+
+  toJSON(message: QueryDataResultResponse): unknown {
+    const obj: any = {};
+    if (message.dataResult !== undefined) {
+      obj.dataResult = DataResult.toJSON(message.dataResult);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<QueryDataResultResponse>): QueryDataResultResponse {
+    return QueryDataResultResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<QueryDataResultResponse>): QueryDataResultResponse {
+    const message = createBaseQueryDataResultResponse();
+    message.dataResult = (object.dataResult !== undefined && object.dataResult !== null)
+      ? DataResult.fromPartial(object.dataResult)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseQueryBatchAssignmentRequest(): QueryBatchAssignmentRequest {
+  return { dataRequestId: "" };
+}
+
+export const QueryBatchAssignmentRequest = {
+  encode(message: QueryBatchAssignmentRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.dataRequestId !== "") {
+      writer.uint32(10).string(message.dataRequestId);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryBatchAssignmentRequest {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryBatchAssignmentRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.dataRequestId = reader.string();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryBatchAssignmentRequest {
+    return { dataRequestId: isSet(object.dataRequestId) ? globalThis.String(object.dataRequestId) : "" };
+  },
+
+  toJSON(message: QueryBatchAssignmentRequest): unknown {
+    const obj: any = {};
+    if (message.dataRequestId !== "") {
+      obj.dataRequestId = message.dataRequestId;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<QueryBatchAssignmentRequest>): QueryBatchAssignmentRequest {
+    return QueryBatchAssignmentRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<QueryBatchAssignmentRequest>): QueryBatchAssignmentRequest {
+    const message = createBaseQueryBatchAssignmentRequest();
+    message.dataRequestId = object.dataRequestId ?? "";
+    return message;
+  },
+};
+
+function createBaseQueryBatchAssignmentResponse(): QueryBatchAssignmentResponse {
+  return { batchNumber: 0 };
+}
+
+export const QueryBatchAssignmentResponse = {
+  encode(message: QueryBatchAssignmentResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.batchNumber !== 0) {
+      writer.uint32(8).uint64(message.batchNumber);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryBatchAssignmentResponse {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryBatchAssignmentResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 8) {
+            break;
+          }
+
+          message.batchNumber = longToNumber(reader.uint64() as Long);
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryBatchAssignmentResponse {
+    return { batchNumber: isSet(object.batchNumber) ? globalThis.Number(object.batchNumber) : 0 };
+  },
+
+  toJSON(message: QueryBatchAssignmentResponse): unknown {
+    const obj: any = {};
+    if (message.batchNumber !== 0) {
+      obj.batchNumber = Math.round(message.batchNumber);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<QueryBatchAssignmentResponse>): QueryBatchAssignmentResponse {
+    return QueryBatchAssignmentResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<QueryBatchAssignmentResponse>): QueryBatchAssignmentResponse {
+    const message = createBaseQueryBatchAssignmentResponse();
+    message.batchNumber = object.batchNumber ?? 0;
+    return message;
+  },
+};
+
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** Batch returns a batch given the batch number. */
@@ -637,6 +887,16 @@ export interface Query {
    * and the
    */
   BatchSignatures(request: QueryBatchSignaturesRequest): Promise<QueryBatchSignaturesResponse>;
+  /**
+   * DataResult returns a data result given its associated data request's
+   * ID.
+   */
+  DataResult(request: QueryDataResultRequest): Promise<QueryDataResultResponse>;
+  /**
+   * BatchAssignment returns the batch number that a given data request
+   * has been assigned to.
+   */
+  BatchAssignment(request: QueryBatchAssignmentRequest): Promise<QueryBatchAssignmentResponse>;
 }
 
 export const QueryServiceName = "sedachain.batching.v1.Query";
@@ -651,6 +911,8 @@ export class QueryClientImpl implements Query {
     this.Batches = this.Batches.bind(this);
     this.TreeEntries = this.TreeEntries.bind(this);
     this.BatchSignatures = this.BatchSignatures.bind(this);
+    this.DataResult = this.DataResult.bind(this);
+    this.BatchAssignment = this.BatchAssignment.bind(this);
   }
   Batch(request: QueryBatchRequest): Promise<QueryBatchResponse> {
     const data = QueryBatchRequest.encode(request).finish();
@@ -680,6 +942,18 @@ export class QueryClientImpl implements Query {
     const data = QueryBatchSignaturesRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "BatchSignatures", data);
     return promise.then((data) => QueryBatchSignaturesResponse.decode(_m0.Reader.create(data)));
+  }
+
+  DataResult(request: QueryDataResultRequest): Promise<QueryDataResultResponse> {
+    const data = QueryDataResultRequest.encode(request).finish();
+    const promise = this.rpc.request(this.service, "DataResult", data);
+    return promise.then((data) => QueryDataResultResponse.decode(_m0.Reader.create(data)));
+  }
+
+  BatchAssignment(request: QueryBatchAssignmentRequest): Promise<QueryBatchAssignmentResponse> {
+    const data = QueryBatchAssignmentRequest.encode(request).finish();
+    const promise = this.rpc.request(this.service, "BatchAssignment", data);
+    return promise.then((data) => QueryBatchAssignmentResponse.decode(_m0.Reader.create(data)));
   }
 }
 
