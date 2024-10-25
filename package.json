@@ -49,7 +49,7 @@
 		"@cosmjs/proto-signing": "^0.32.4",
 		"@cosmjs/stargate": "^0.32.4",
 		"@noble/secp256k1": "2.1.0",
-		"@seda-protocol/utils": "^1.0.0",
+		"@seda-protocol/utils": "^1.2.0",
 		"@types/node-gzip": "^1.1.1",
 		"@wasmer/wasi": "^1.2.2",
 		"as-bignum": "^0.3.1",
@@ -63,9 +63,9 @@
 		"node-gzip": "^1.1.2",
 		"ora": "^7.0.1",
 		"protobufjs": "7.2.5",
-		"true-myth": "^7.3.0",
+		"true-myth": "^8.0.1",
 		"tslib": "^2.3.0",
-		"valibot": "^0.35.0",
+		"valibot": "^0.42.1",
 		"visitor-as": "0.11.4"
 	}
 }
