@@ -21,8 +21,8 @@ export async function createSigningClient(
 	}
 
 	signingClientResult.value.registry.register(
-		"/sedachain.wasm_storage.v1.MsgStoreDataRequestWasm",
-		sedachain.wasm_storage.v1.MsgStoreDataRequestWasm,
+		"/sedachain.wasm_storage.v1.MsgStoreOracleProgram",
+		sedachain.wasm_storage.v1.MsgStoreOracleProgram,
 	);
 
 	signingClientResult.value.registry.register(

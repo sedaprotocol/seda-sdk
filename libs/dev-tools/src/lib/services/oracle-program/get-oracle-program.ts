@@ -1,7 +1,7 @@
 import { tryAsync } from "@seda-protocol/utils";
 import { Maybe, Result } from "true-myth";
 import type { ISigner } from "../signer";
-import { createWasmQueryClient } from "./query-client";
+import { createWasmStorageQueryClient } from "./query-client";
 
 export async function getOracleProgram(
 	signer: ISigner,
@@ -19,7 +19,7 @@ export async function getOracleProgram(
 > {
 	const queryClient = await tryAsync(
 		async () =>
-			await createWasmQueryClient({
+			await createWasmStorageQueryClient({
 				rpc: signer.getEndpoint(),
 			}),
 	);
@@ -30,7 +30,7 @@ export async function getOracleProgram(
 
 	const oracleProgram = await tryAsync(
 		async () =>
-			await queryClient.value.DataRequestWasm({
+			await queryClient.value.OracleProgram({
 				hash: id,
 			}),
 	);
@@ -39,11 +39,11 @@ export async function getOracleProgram(
 		return Result.err(oracleProgram.error);
 	}
 
-	const result = Maybe.of(oracleProgram.value.wasm).map((wasm) => ({
+	const result = Maybe.of(oracleProgram.value.oracleProgram).map((oracleProgram) => ({
 		oracleProgramId: id,
-		addedAt: wasm.addedAt,
-		bytecode: wasm.bytecode,
-		expirationHeight: wasm.expirationHeight,
+		addedAt: oracleProgram.addedAt,
+		bytecode: oracleProgram.bytecode,
+		expirationHeight: oracleProgram.expirationHeight,
 	}));
 
 	return Result.ok(result);

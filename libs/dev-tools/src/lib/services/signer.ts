@@ -2,7 +2,7 @@ import {
 	DirectSecp256k1HdWallet,
 	type OfflineSigner,
 } from "@cosmjs/proto-signing";
-import { createWasmQueryClient } from "@dev-tools/services/oracle-program/query-client";
+import { createWasmStorageQueryClient } from "@dev-tools/services/oracle-program/query-client";
 import { tryAsync } from "@seda-protocol/utils";
 import {
 	AUTO_CORE_CONTRACT_VALUE,
@@ -74,7 +74,7 @@ async function resolveCoreContractAddress(config: SigningConfig) {
 		return config.contract;
 	}
 
-	const queryClient = await createWasmQueryClient(config);
+	const queryClient = await createWasmStorageQueryClient(config);
 
 	const response = await tryAsync(async () =>
 		queryClient.CoreContractRegistry({}),

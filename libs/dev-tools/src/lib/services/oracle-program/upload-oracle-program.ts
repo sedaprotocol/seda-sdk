@@ -19,8 +19,8 @@ export async function uploadOracleProgram(
 	const { client: sigingClient, address } = sigingClientResult.value;
 
 	const message = {
-		typeUrl: "/sedachain.wasm_storage.v1.MsgStoreDataRequestWasm",
-		value: sedachain.wasm_storage.v1.MsgStoreDataRequestWasm.fromPartial({
+		typeUrl: "/sedachain.wasm_storage.v1.MsgStoreOracleProgram",
+		value: sedachain.wasm_storage.v1.MsgStoreOracleProgram.fromPartial({
 			sender: address,
 			wasm: await gzip(oracleProgram),
 		}),
@@ -42,7 +42,7 @@ export async function uploadOracleProgram(
 	}
 
 	const messageResponse =
-		sedachain.wasm_storage.v1.MsgStoreDataRequestWasmResponse.decode(
+		sedachain.wasm_storage.v1.MsgStoreOracleProgramResponse.decode(
 			response.value.msgResponses[0].value,
 		);
 
