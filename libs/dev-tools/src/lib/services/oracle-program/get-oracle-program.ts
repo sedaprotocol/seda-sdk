@@ -39,12 +39,14 @@ export async function getOracleProgram(
 		return Result.err(oracleProgram.error);
 	}
 
-	const result = Maybe.of(oracleProgram.value.oracleProgram).map((oracleProgram) => ({
-		oracleProgramId: id,
-		addedAt: oracleProgram.addedAt,
-		bytecode: oracleProgram.bytecode,
-		expirationHeight: oracleProgram.expirationHeight,
-	}));
+	const result = Maybe.of(oracleProgram.value.oracleProgram).map(
+		(oracleProgram) => ({
+			oracleProgramId: id,
+			addedAt: oracleProgram.addedAt,
+			bytecode: oracleProgram.bytecode,
+			expirationHeight: oracleProgram.expirationHeight,
+		}),
+	);
 
 	return Result.ok(result);
 }

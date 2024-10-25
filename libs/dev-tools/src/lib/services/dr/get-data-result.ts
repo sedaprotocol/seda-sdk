@@ -1,6 +1,9 @@
+import { tryAsync } from "@seda-protocol/utils";
+import { Maybe } from "true-myth";
 import {
 	type InferOutput,
 	boolean,
+	custom,
 	number,
 	object,
 	parse,
@@ -8,35 +11,35 @@ import {
 	string,
 	transform,
 } from "valibot";
-import type { ISigner } from "../signer";
-import { createSigningClient } from "../signing-client";
+import type { QueryConfig } from "../config";
+import { createBatchingQueryClient } from "./query-client";
 
 const DataResultSchema = pipe(
 	object({
 		version: string(),
-		dr_id: string(),
+		drId: string(),
 		consensus: boolean(),
-		exit_code: number(),
-		result: string(),
-		block_height: number(),
-		gas_used: string(),
-		payback_address: string(),
-		seda_payload: string(),
+		exitCode: number(),
+		result: custom<Uint8Array>((input) => input instanceof Uint8Array),
+		blockHeight: number(),
+		gasUsed: number(),
+		paybackAddress: string(),
+		sedaPayload: string(),
 	}),
 	transform((result) => {
-		const resultBuffer = Buffer.from(result.result, "base64");
+		const resultBuffer = Buffer.from(result.result);
 
 		return {
 			version: result.version,
-			drId: result.dr_id,
+			drId: result.drId,
 			consensus: result.consensus,
-			exitCode: result.exit_code,
+			exitCode: result.exitCode,
 			result: `0x${resultBuffer.toString("hex")}`,
 			resultAsUtf8: resultBuffer.toString(),
-			blockHeight: result.block_height,
-			gasUsed: result.gas_used,
-			paybackAddress: base64Decode(result.payback_address),
-			sedaPayload: base64Decode(result.seda_payload),
+			blockHeight: result.blockHeight,
+			gasUsed: result.gasUsed,
+			paybackAddress: base64Decode(result.paybackAddress),
+			sedaPayload: base64Decode(result.sedaPayload),
 		};
 	}),
 );
@@ -44,26 +47,31 @@ const DataResultSchema = pipe(
 export type DataRequestResult = InferOutput<typeof DataResultSchema>;
 
 export async function getDataResult(
-	signer: ISigner,
+	queryConfig: QueryConfig,
 	drId: string,
 ): Promise<DataRequestResult> {
-	const sigingClientResult = await createSigningClient(signer);
-	if (sigingClientResult.isErr) {
-		throw sigingClientResult.error;
+	const batchingQueryClient = await createBatchingQueryClient(queryConfig);
+
+	const drResult = (
+		await tryAsync(
+			batchingQueryClient.DataResult({
+				dataRequestId: drId,
+			}),
+		)
+	).map((res) => Maybe.of(res.dataResult));
+
+	if (drResult.isErr) {
+		if (drResult.error.message.includes("not found")) {
+			throw new Error(`No DR found for id: "${drId}"`);
+		}
+		throw drResult.error;
 	}
 
-	const { client: sigingClient } = sigingClientResult.value;
-	const contract = signer.getCoreContractAddress();
-
-	const drResult = await sigingClient.queryContractSmart(contract, {
-		get_data_result: { dr_id: drId },
-	});
-
-	if (drResult === null) {
+	if (drResult.value.isNothing || drResult.value.value.drId === "") {
 		throw new Error(`No DR found for id: "${drId}"`);
 	}
 
-	return parse(DataResultSchema, drResult);
+	return parse(DataResultSchema, drResult.value.value);
 }
 
 function base64Decode(data: string): string {

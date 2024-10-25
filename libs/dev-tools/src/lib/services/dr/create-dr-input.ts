@@ -13,21 +13,21 @@ export type PostDataRequestInput = {
 	version?: string;
 
 	/**
-	 * Hash of the uploaded Oracle Program
+	 * Hash of the uploaded Oracle Program that should run the execution phase.
 	 */
-	oracleProgramId: string;
+	execProgramId: string;
 	/**
-	 * Inputs encoded in bytes. Input depends on the Oracle Program you are calling
+	 * Execution phase inputs encoded as bytes. Input depends on the Oracle Program specified in execProgramId.
 	 */
-	drInputs: Uint8Array;
+	execInputs: Uint8Array;
 
 	/**
-	 * Hash of the uploaded Tally Oracle Program
-	 * Defaults to the value of oracleProgramId
+	 * Hash of the uploaded Tally Oracle Program that should run the tally phase.
+	 * Defaults to the value of execProgramId.
 	 */
-	tallyOracleProgramId?: string;
+	tallyProgramId?: string;
 	/**
-	 * Inputs encoded in bytes. Input depends on the Tally Oracle Program you are calling
+	 * Inputs encoded in bytes. Input depends on the Tally Oracle Program specified in tallyProgramId.
 	 */
 	tallyInputs: Uint8Array;
 
@@ -66,10 +66,10 @@ export type PostDataRequestInput = {
 export function createPostedDataRequest(input: PostDataRequestInput) {
 	const version = input.version ?? DEFAULT_VERSION;
 
-	const dr_binary_id = input.oracleProgramId;
-	const dr_inputs = base64Encode(input.drInputs);
+	const exec_program_id = input.execProgramId;
+	const exec_inputs = base64Encode(input.execInputs);
 
-	const tally_binary_id = input.tallyOracleProgramId ?? input.oracleProgramId;
+	const tally_program_id = input.tallyProgramId ?? input.execProgramId;
 	const tally_inputs = base64Encode(input.tallyInputs);
 
 	const replication_factor =
@@ -79,16 +79,16 @@ export function createPostedDataRequest(input: PostDataRequestInput) {
 		encodeConsensusFilter(input.consensusOptions),
 	);
 
-	const gas_limit = (input.gasLimit ?? DEFAULT_GAS_LIMIT).toString();
+	const gas_limit = input.gasLimit ?? DEFAULT_GAS_LIMIT;
 	const gas_price = (input.gasPrice ?? DEFAULT_GAS_PRICE).toString();
 
 	const memo = base64Encode(input.memo ?? DEFAULT_MEMO);
 
 	return {
 		version,
-		dr_binary_id,
-		dr_inputs,
-		tally_binary_id,
+		exec_program_id,
+		exec_inputs,
+		tally_program_id,
 		tally_inputs,
 		replication_factor,
 		consensus_filter,

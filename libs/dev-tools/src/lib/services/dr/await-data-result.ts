@@ -1,4 +1,4 @@
-import type { ISigner } from "@dev-tools/services/signer";
+import type { QueryConfig } from "@dev-tools/services/config";
 import { createSigningClient } from "@dev-tools/services/signing-client";
 import { tryAsync } from "@seda-protocol/utils";
 import { getDataResult } from "./get-data-result";
@@ -11,18 +11,14 @@ type Opts = {
 };
 
 export async function awaitDataResult(
-	signer: ISigner,
+	queryConfig: QueryConfig,
 	drId: string,
 	opts: Opts = { timeoutSeconds: 60, pollingIntervalSeconds: 10 },
 ) {
-	const sigingClientResult = await createSigningClient(signer);
-	if (sigingClientResult.isErr) {
-		throw sigingClientResult.error;
-	}
 	const timeoutTime = Date.now() + opts.timeoutSeconds * 1000;
 
 	while (Date.now() < timeoutTime) {
-		const result = await tryAsync(async () => getDataResult(signer, drId));
+		const result = await tryAsync(async () => getDataResult(queryConfig, drId));
 		if (!result.isErr && result.value !== null) {
 			return result.value;
 		}

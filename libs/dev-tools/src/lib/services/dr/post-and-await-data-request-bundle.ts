@@ -19,7 +19,7 @@ export async function postAndAwaitDataRequestBundle(
 	);
 
 	const dataResults = await awaitDataResultBundle(
-		signer,
+		{ rpc: signer.getEndpoint() },
 		postDrResponse.drIds,
 		awaitOptions,
 	);
