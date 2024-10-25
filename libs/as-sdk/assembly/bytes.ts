@@ -72,6 +72,23 @@ export class Bytes {
 	}
 
 	/**
+	 * @hidden Required for JSON-AS (de)serialization.
+	 */
+	__DESERIALIZE_SAFE(
+		data: string,
+		_key_start: i32,
+		_key_end: i32,
+		_outerLoopIndex: i32,
+		_numberValueIndex: i32,
+	): bool {
+		const innerBytes = JSON.parseSafe<InnerBytes>(data);
+		const buffer = decodeHex(innerBytes.value);
+		this.value = buffer;
+
+		return true;
+	}
+
+	/**
 	 * The underlying {@link ArrayBuffer} in case you need to manipulate it directly.
 	 * Most likely {@linkcode toUtf8String} or {@linkcode toHexString} is the better choice.
 	 *
@@ -288,7 +305,7 @@ export class Bytes {
 	 * @returns an instance of '@json' annotated class <T>
 	 */
 	toJSON<T>(): T {
-		return JSON.parse<T>(this.toUtf8String());
+		return JSON.parseSafe<T>(this.toUtf8String());
 	}
 
 	/**

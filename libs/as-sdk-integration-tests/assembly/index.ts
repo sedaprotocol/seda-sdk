@@ -32,6 +32,7 @@ import {
 	TestHttpSuccess,
 	TestPostHttpSuccess,
 } from "./http";
+import { TestInvalidAttribute } from "./invalid-json";
 import { TestGenerateProxyMessage, TestProxyHttpFetch } from "./proxy-http";
 import { TestTallyVmReveals, TestTallyVmRevealsFiltered } from "./tally";
 import { TestTallyVmHttp, TestTallyVmMode } from "./vm-tests";
@@ -97,6 +98,8 @@ if (args === "testHttpRejection") {
 	new TestLogNull().run();
 } else if (args === "testLogFloat") {
 	new TestLogFloat().run();
+} else if (args === "testInvalidAttribute") {
+	new TestInvalidAttribute().run();
 }
 
 Process.error(Bytes.fromUtf8String("No argument given"));
