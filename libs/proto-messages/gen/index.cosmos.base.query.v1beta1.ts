@@ -5,5 +5,4 @@
 
 /* eslint-disable */
 
-export * as query from "./index.cosmos.base.query";
-export * as v1beta1 from "./index.cosmos.base.v1beta1";
+export * from "./cosmos/base/query/v1beta1/pagination";

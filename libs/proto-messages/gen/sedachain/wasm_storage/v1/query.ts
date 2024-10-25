@@ -6,25 +6,29 @@
 
 /* eslint-disable */
 import _m0 from "protobufjs/minimal";
-import { DataRequestWasm, ExecutorWasm } from "./wasm_storage";
+import { PageRequest, PageResponse } from "../../../cosmos/base/query/v1beta1/pagination";
+import { ExecutorWasm, OracleProgram } from "./wasm_storage";
 
-/** The request message for QueryDataRequestWasm RPC. */
-export interface QueryDataRequestWasmRequest {
+/** The request message for QueryOracleProgram RPC. */
+export interface QueryOracleProgramRequest {
   hash: string;
 }
 
-/** The response message for QueryDataRequestWasm RPC. */
-export interface QueryDataRequestWasmResponse {
-  wasm: DataRequestWasm | undefined;
+/** The response message for QueryOracleProgram RPC. */
+export interface QueryOracleProgramResponse {
+  oracleProgram: OracleProgram | undefined;
 }
 
-/** The request message for QueryDataRequestWasms RPC. */
-export interface QueryDataRequestWasmsRequest {
+/** The request message for QueryOraclePrograms RPC. */
+export interface QueryOracleProgramsRequest {
+  /** pagination defines an optional pagination for the request. */
+  pagination: PageRequest | undefined;
 }
 
-/** The response message for QueryDataRequestWasms RPC. */
-export interface QueryDataRequestWasmsResponse {
+/** The response message for QueryOraclePrograms RPC. */
+export interface QueryOracleProgramsResponse {
   list: string[];
+  pagination: PageResponse | undefined;
 }
 
 /** The request message for QueryExecutorWasm RPC. */
@@ -55,22 +59,22 @@ export interface QueryCoreContractRegistryResponse {
   address: string;
 }
 
-function createBaseQueryDataRequestWasmRequest(): QueryDataRequestWasmRequest {
+function createBaseQueryOracleProgramRequest(): QueryOracleProgramRequest {
   return { hash: "" };
 }
 
-export const QueryDataRequestWasmRequest = {
-  encode(message: QueryDataRequestWasmRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const QueryOracleProgramRequest = {
+  encode(message: QueryOracleProgramRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.hash !== "") {
       writer.uint32(10).string(message.hash);
     }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): QueryDataRequestWasmRequest {
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryOracleProgramRequest {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseQueryDataRequestWasmRequest();
+    const message = createBaseQueryOracleProgramRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -90,11 +94,11 @@ export const QueryDataRequestWasmRequest = {
     return message;
   },
 
-  fromJSON(object: any): QueryDataRequestWasmRequest {
+  fromJSON(object: any): QueryOracleProgramRequest {
     return { hash: isSet(object.hash) ? globalThis.String(object.hash) : "" };
   },
 
-  toJSON(message: QueryDataRequestWasmRequest): unknown {
+  toJSON(message: QueryOracleProgramRequest): unknown {
     const obj: any = {};
     if (message.hash !== "") {
       obj.hash = message.hash;
@@ -102,32 +106,32 @@ export const QueryDataRequestWasmRequest = {
     return obj;
   },
 
-  create(base?: DeepPartial<QueryDataRequestWasmRequest>): QueryDataRequestWasmRequest {
-    return QueryDataRequestWasmRequest.fromPartial(base ?? {});
+  create(base?: DeepPartial<QueryOracleProgramRequest>): QueryOracleProgramRequest {
+    return QueryOracleProgramRequest.fromPartial(base ?? {});
   },
-  fromPartial(object: DeepPartial<QueryDataRequestWasmRequest>): QueryDataRequestWasmRequest {
-    const message = createBaseQueryDataRequestWasmRequest();
+  fromPartial(object: DeepPartial<QueryOracleProgramRequest>): QueryOracleProgramRequest {
+    const message = createBaseQueryOracleProgramRequest();
     message.hash = object.hash ?? "";
     return message;
   },
 };
 
-function createBaseQueryDataRequestWasmResponse(): QueryDataRequestWasmResponse {
-  return { wasm: undefined };
+function createBaseQueryOracleProgramResponse(): QueryOracleProgramResponse {
+  return { oracleProgram: undefined };
 }
 
-export const QueryDataRequestWasmResponse = {
-  encode(message: QueryDataRequestWasmResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.wasm !== undefined) {
-      DataRequestWasm.encode(message.wasm, writer.uint32(10).fork()).ldelim();
+export const QueryOracleProgramResponse = {
+  encode(message: QueryOracleProgramResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.oracleProgram !== undefined) {
+      OracleProgram.encode(message.oracleProgram, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): QueryDataRequestWasmResponse {
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryOracleProgramResponse {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseQueryDataRequestWasmResponse();
+    const message = createBaseQueryOracleProgramResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -136,7 +140,7 @@ export const QueryDataRequestWasmResponse = {
             break;
           }
 
-          message.wasm = DataRequestWasm.decode(reader, reader.uint32());
+          message.oracleProgram = OracleProgram.decode(reader, reader.uint32());
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -147,46 +151,56 @@ export const QueryDataRequestWasmResponse = {
     return message;
   },
 
-  fromJSON(object: any): QueryDataRequestWasmResponse {
-    return { wasm: isSet(object.wasm) ? DataRequestWasm.fromJSON(object.wasm) : undefined };
+  fromJSON(object: any): QueryOracleProgramResponse {
+    return { oracleProgram: isSet(object.oracleProgram) ? OracleProgram.fromJSON(object.oracleProgram) : undefined };
   },
 
-  toJSON(message: QueryDataRequestWasmResponse): unknown {
+  toJSON(message: QueryOracleProgramResponse): unknown {
     const obj: any = {};
-    if (message.wasm !== undefined) {
-      obj.wasm = DataRequestWasm.toJSON(message.wasm);
+    if (message.oracleProgram !== undefined) {
+      obj.oracleProgram = OracleProgram.toJSON(message.oracleProgram);
     }
     return obj;
   },
 
-  create(base?: DeepPartial<QueryDataRequestWasmResponse>): QueryDataRequestWasmResponse {
-    return QueryDataRequestWasmResponse.fromPartial(base ?? {});
+  create(base?: DeepPartial<QueryOracleProgramResponse>): QueryOracleProgramResponse {
+    return QueryOracleProgramResponse.fromPartial(base ?? {});
   },
-  fromPartial(object: DeepPartial<QueryDataRequestWasmResponse>): QueryDataRequestWasmResponse {
-    const message = createBaseQueryDataRequestWasmResponse();
-    message.wasm = (object.wasm !== undefined && object.wasm !== null)
-      ? DataRequestWasm.fromPartial(object.wasm)
+  fromPartial(object: DeepPartial<QueryOracleProgramResponse>): QueryOracleProgramResponse {
+    const message = createBaseQueryOracleProgramResponse();
+    message.oracleProgram = (object.oracleProgram !== undefined && object.oracleProgram !== null)
+      ? OracleProgram.fromPartial(object.oracleProgram)
       : undefined;
     return message;
   },
 };
 
-function createBaseQueryDataRequestWasmsRequest(): QueryDataRequestWasmsRequest {
-  return {};
+function createBaseQueryOracleProgramsRequest(): QueryOracleProgramsRequest {
+  return { pagination: undefined };
 }
 
-export const QueryDataRequestWasmsRequest = {
-  encode(_: QueryDataRequestWasmsRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const QueryOracleProgramsRequest = {
+  encode(message: QueryOracleProgramsRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+    }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): QueryDataRequestWasmsRequest {
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryOracleProgramsRequest {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseQueryDataRequestWasmsRequest();
+    const message = createBaseQueryOracleProgramsRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -196,40 +210,49 @@ export const QueryDataRequestWasmsRequest = {
     return message;
   },
 
-  fromJSON(_: any): QueryDataRequestWasmsRequest {
-    return {};
+  fromJSON(object: any): QueryOracleProgramsRequest {
+    return { pagination: isSet(object.pagination) ? PageRequest.fromJSON(object.pagination) : undefined };
   },
 
-  toJSON(_: QueryDataRequestWasmsRequest): unknown {
+  toJSON(message: QueryOracleProgramsRequest): unknown {
     const obj: any = {};
+    if (message.pagination !== undefined) {
+      obj.pagination = PageRequest.toJSON(message.pagination);
+    }
     return obj;
   },
 
-  create(base?: DeepPartial<QueryDataRequestWasmsRequest>): QueryDataRequestWasmsRequest {
-    return QueryDataRequestWasmsRequest.fromPartial(base ?? {});
+  create(base?: DeepPartial<QueryOracleProgramsRequest>): QueryOracleProgramsRequest {
+    return QueryOracleProgramsRequest.fromPartial(base ?? {});
   },
-  fromPartial(_: DeepPartial<QueryDataRequestWasmsRequest>): QueryDataRequestWasmsRequest {
-    const message = createBaseQueryDataRequestWasmsRequest();
+  fromPartial(object: DeepPartial<QueryOracleProgramsRequest>): QueryOracleProgramsRequest {
+    const message = createBaseQueryOracleProgramsRequest();
+    message.pagination = (object.pagination !== undefined && object.pagination !== null)
+      ? PageRequest.fromPartial(object.pagination)
+      : undefined;
     return message;
   },
 };
 
-function createBaseQueryDataRequestWasmsResponse(): QueryDataRequestWasmsResponse {
-  return { list: [] };
+function createBaseQueryOracleProgramsResponse(): QueryOracleProgramsResponse {
+  return { list: [], pagination: undefined };
 }
 
-export const QueryDataRequestWasmsResponse = {
-  encode(message: QueryDataRequestWasmsResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const QueryOracleProgramsResponse = {
+  encode(message: QueryOracleProgramsResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     for (const v of message.list) {
       writer.uint32(10).string(v!);
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): QueryDataRequestWasmsResponse {
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryOracleProgramsResponse {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseQueryDataRequestWasmsResponse();
+    const message = createBaseQueryOracleProgramsResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -240,6 +263,13 @@ export const QueryDataRequestWasmsResponse = {
 
           message.list.push(reader.string());
           continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -249,24 +279,33 @@ export const QueryDataRequestWasmsResponse = {
     return message;
   },
 
-  fromJSON(object: any): QueryDataRequestWasmsResponse {
-    return { list: globalThis.Array.isArray(object?.list) ? object.list.map((e: any) => globalThis.String(e)) : [] };
+  fromJSON(object: any): QueryOracleProgramsResponse {
+    return {
+      list: globalThis.Array.isArray(object?.list) ? object.list.map((e: any) => globalThis.String(e)) : [],
+      pagination: isSet(object.pagination) ? PageResponse.fromJSON(object.pagination) : undefined,
+    };
   },
 
-  toJSON(message: QueryDataRequestWasmsResponse): unknown {
+  toJSON(message: QueryOracleProgramsResponse): unknown {
     const obj: any = {};
     if (message.list?.length) {
       obj.list = message.list;
     }
+    if (message.pagination !== undefined) {
+      obj.pagination = PageResponse.toJSON(message.pagination);
+    }
     return obj;
   },
 
-  create(base?: DeepPartial<QueryDataRequestWasmsResponse>): QueryDataRequestWasmsResponse {
-    return QueryDataRequestWasmsResponse.fromPartial(base ?? {});
+  create(base?: DeepPartial<QueryOracleProgramsResponse>): QueryOracleProgramsResponse {
+    return QueryOracleProgramsResponse.fromPartial(base ?? {});
   },
-  fromPartial(object: DeepPartial<QueryDataRequestWasmsResponse>): QueryDataRequestWasmsResponse {
-    const message = createBaseQueryDataRequestWasmsResponse();
+  fromPartial(object: DeepPartial<QueryOracleProgramsResponse>): QueryOracleProgramsResponse {
+    const message = createBaseQueryOracleProgramsResponse();
     message.list = object.list?.map((e) => e) || [];
+    message.pagination = (object.pagination !== undefined && object.pagination !== null)
+      ? PageResponse.fromPartial(object.pagination)
+      : undefined;
     return message;
   },
 };
@@ -589,10 +628,10 @@ export const QueryCoreContractRegistryResponse = {
 
 /** Query defines the gRPC querier service. */
 export interface Query {
-  /** DataRequestWasm returns a data request wasm given its hash. */
-  DataRequestWasm(request: QueryDataRequestWasmRequest): Promise<QueryDataRequestWasmResponse>;
-  /** DataRequestWasms returns all data request wasms. */
-  DataRequestWasms(request: QueryDataRequestWasmsRequest): Promise<QueryDataRequestWasmsResponse>;
+  /** OracleProgram returns an oracle program given its hash. */
+  OracleProgram(request: QueryOracleProgramRequest): Promise<QueryOracleProgramResponse>;
+  /** OraclePrograms returns all oracle programs. */
+  OraclePrograms(request: QueryOracleProgramsRequest): Promise<QueryOracleProgramsResponse>;
   /** ExecutorWasm returns an executor wasm given its hash. */
   ExecutorWasm(request: QueryExecutorWasmRequest): Promise<QueryExecutorWasmResponse>;
   /** ExecutorWasms returns all executor wasms. */
@@ -608,22 +647,22 @@ export class QueryClientImpl implements Query {
   constructor(rpc: Rpc, opts?: { service?: string }) {
     this.service = opts?.service || QueryServiceName;
     this.rpc = rpc;
-    this.DataRequestWasm = this.DataRequestWasm.bind(this);
-    this.DataRequestWasms = this.DataRequestWasms.bind(this);
+    this.OracleProgram = this.OracleProgram.bind(this);
+    this.OraclePrograms = this.OraclePrograms.bind(this);
     this.ExecutorWasm = this.ExecutorWasm.bind(this);
     this.ExecutorWasms = this.ExecutorWasms.bind(this);
     this.CoreContractRegistry = this.CoreContractRegistry.bind(this);
   }
-  DataRequestWasm(request: QueryDataRequestWasmRequest): Promise<QueryDataRequestWasmResponse> {
-    const data = QueryDataRequestWasmRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "DataRequestWasm", data);
-    return promise.then((data) => QueryDataRequestWasmResponse.decode(_m0.Reader.create(data)));
+  OracleProgram(request: QueryOracleProgramRequest): Promise<QueryOracleProgramResponse> {
+    const data = QueryOracleProgramRequest.encode(request).finish();
+    const promise = this.rpc.request(this.service, "OracleProgram", data);
+    return promise.then((data) => QueryOracleProgramResponse.decode(_m0.Reader.create(data)));
   }
 
-  DataRequestWasms(request: QueryDataRequestWasmsRequest): Promise<QueryDataRequestWasmsResponse> {
-    const data = QueryDataRequestWasmsRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "DataRequestWasms", data);
-    return promise.then((data) => QueryDataRequestWasmsResponse.decode(_m0.Reader.create(data)));
+  OraclePrograms(request: QueryOracleProgramsRequest): Promise<QueryOracleProgramsResponse> {
+    const data = QueryOracleProgramsRequest.encode(request).finish();
+    const promise = this.rpc.request(this.service, "OraclePrograms", data);
+    return promise.then((data) => QueryOracleProgramsResponse.decode(_m0.Reader.create(data)));
   }
 
   ExecutorWasm(request: QueryExecutorWasmRequest): Promise<QueryExecutorWasmResponse> {

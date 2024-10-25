@@ -9,21 +9,21 @@ import Long from "long";
 import _m0 from "protobufjs/minimal";
 import { Timestamp } from "../../../google/protobuf/timestamp";
 
-/** DataRequestWasm represents a wasm used for data requests. */
-export interface DataRequestWasm {
+/** OracleProgram is a wasm used for data request. */
+export interface OracleProgram {
   hash: Uint8Array;
   bytecode: Uint8Array;
   addedAt:
     | Date
     | undefined;
   /**
-   * ExpirationHeight represents the block height at which the data request
-   * wasm will be pruned. The value of zero means no expiration.
+   * ExpirationHeight represents the block height at which the oracle
+   * program will be pruned. The value of zero means no expiration.
    */
   expirationHeight: number;
 }
 
-/** ExecutorWasm represents a wasm used for some execution in the protocol. */
+/** ExecutorWasm is a wasm used by some component in the protocol. */
 export interface ExecutorWasm {
   hash: Uint8Array;
   bytecode: Uint8Array;
@@ -40,12 +40,12 @@ export interface Params {
   wasmTtl: number;
 }
 
-function createBaseDataRequestWasm(): DataRequestWasm {
+function createBaseOracleProgram(): OracleProgram {
   return { hash: new Uint8Array(0), bytecode: new Uint8Array(0), addedAt: undefined, expirationHeight: 0 };
 }
 
-export const DataRequestWasm = {
-  encode(message: DataRequestWasm, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const OracleProgram = {
+  encode(message: OracleProgram, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.hash.length !== 0) {
       writer.uint32(10).bytes(message.hash);
     }
@@ -61,10 +61,10 @@ export const DataRequestWasm = {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): DataRequestWasm {
+  decode(input: _m0.Reader | Uint8Array, length?: number): OracleProgram {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseDataRequestWasm();
+    const message = createBaseOracleProgram();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -105,7 +105,7 @@ export const DataRequestWasm = {
     return message;
   },
 
-  fromJSON(object: any): DataRequestWasm {
+  fromJSON(object: any): OracleProgram {
     return {
       hash: isSet(object.hash) ? bytesFromBase64(object.hash) : new Uint8Array(0),
       bytecode: isSet(object.bytecode) ? bytesFromBase64(object.bytecode) : new Uint8Array(0),
@@ -114,7 +114,7 @@ export const DataRequestWasm = {
     };
   },
 
-  toJSON(message: DataRequestWasm): unknown {
+  toJSON(message: OracleProgram): unknown {
     const obj: any = {};
     if (message.hash.length !== 0) {
       obj.hash = base64FromBytes(message.hash);
@@ -131,11 +131,11 @@ export const DataRequestWasm = {
     return obj;
   },
 
-  create(base?: DeepPartial<DataRequestWasm>): DataRequestWasm {
-    return DataRequestWasm.fromPartial(base ?? {});
+  create(base?: DeepPartial<OracleProgram>): OracleProgram {
+    return OracleProgram.fromPartial(base ?? {});
   },
-  fromPartial(object: DeepPartial<DataRequestWasm>): DataRequestWasm {
-    const message = createBaseDataRequestWasm();
+  fromPartial(object: DeepPartial<OracleProgram>): OracleProgram {
+    const message = createBaseOracleProgram();
     message.hash = object.hash ?? new Uint8Array(0);
     message.bytecode = object.bytecode ?? new Uint8Array(0);
     message.addedAt = object.addedAt ?? undefined;

@@ -21,8 +21,13 @@ export interface Batch {
   /** block_height is the height at which the batch was created. */
   blockHeight: number;
   /**
-   * data_result_root is the hex-encoded root of the data result
+   * current_data_result_root is the hex-encoded root of the data result
    * merkle tree.
+   */
+  currentDataResultRoot: string;
+  /**
+   * data_result_root is the hex-encoded "super root" of the previous
+   * data result and current data result roots.
    */
   dataResultRoot: string;
   /**
@@ -61,7 +66,6 @@ export interface TreeEntries {
  */
 export interface BatchSignatures {
   validatorAddr: string;
-  votingPower: number;
   signatures: Uint8Array;
 }
 
@@ -108,6 +112,7 @@ function createBaseBatch(): Batch {
   return {
     batchNumber: 0,
     blockHeight: 0,
+    currentDataResultRoot: "",
     dataResultRoot: "",
     validatorRoot: "",
     batchId: new Uint8Array(0),
@@ -123,17 +128,20 @@ export const Batch = {
     if (message.blockHeight !== 0) {
       writer.uint32(16).int64(message.blockHeight);
     }
+    if (message.currentDataResultRoot !== "") {
+      writer.uint32(26).string(message.currentDataResultRoot);
+    }
     if (message.dataResultRoot !== "") {
-      writer.uint32(26).string(message.dataResultRoot);
+      writer.uint32(34).string(message.dataResultRoot);
     }
     if (message.validatorRoot !== "") {
-      writer.uint32(34).string(message.validatorRoot);
+      writer.uint32(42).string(message.validatorRoot);
     }
     if (message.batchId.length !== 0) {
-      writer.uint32(42).bytes(message.batchId);
+      writer.uint32(50).bytes(message.batchId);
     }
     if (message.provingMedatada.length !== 0) {
-      writer.uint32(50).bytes(message.provingMedatada);
+      writer.uint32(58).bytes(message.provingMedatada);
     }
     return writer;
   },
@@ -164,24 +172,31 @@ export const Batch = {
             break;
           }
 
-          message.dataResultRoot = reader.string();
+          message.currentDataResultRoot = reader.string();
           continue;
         case 4:
           if (tag !== 34) {
             break;
           }
 
-          message.validatorRoot = reader.string();
+          message.dataResultRoot = reader.string();
           continue;
         case 5:
           if (tag !== 42) {
             break;
           }
 
-          message.batchId = reader.bytes();
+          message.validatorRoot = reader.string();
           continue;
         case 6:
           if (tag !== 50) {
+            break;
+          }
+
+          message.batchId = reader.bytes();
+          continue;
+        case 7:
+          if (tag !== 58) {
             break;
           }
 
@@ -200,6 +215,7 @@ export const Batch = {
     return {
       batchNumber: isSet(object.batchNumber) ? globalThis.Number(object.batchNumber) : 0,
       blockHeight: isSet(object.blockHeight) ? globalThis.Number(object.blockHeight) : 0,
+      currentDataResultRoot: isSet(object.currentDataResultRoot) ? globalThis.String(object.currentDataResultRoot) : "",
       dataResultRoot: isSet(object.dataResultRoot) ? globalThis.String(object.dataResultRoot) : "",
       validatorRoot: isSet(object.validatorRoot) ? globalThis.String(object.validatorRoot) : "",
       batchId: isSet(object.batchId) ? bytesFromBase64(object.batchId) : new Uint8Array(0),
@@ -214,6 +230,9 @@ export const Batch = {
     }
     if (message.blockHeight !== 0) {
       obj.blockHeight = Math.round(message.blockHeight);
+    }
+    if (message.currentDataResultRoot !== "") {
+      obj.currentDataResultRoot = message.currentDataResultRoot;
     }
     if (message.dataResultRoot !== "") {
       obj.dataResultRoot = message.dataResultRoot;
@@ -237,6 +256,7 @@ export const Batch = {
     const message = createBaseBatch();
     message.batchNumber = object.batchNumber ?? 0;
     message.blockHeight = object.blockHeight ?? 0;
+    message.currentDataResultRoot = object.currentDataResultRoot ?? "";
     message.dataResultRoot = object.dataResultRoot ?? "";
     message.validatorRoot = object.validatorRoot ?? "";
     message.batchId = object.batchId ?? new Uint8Array(0);
@@ -339,7 +359,7 @@ export const TreeEntries = {
 };
 
 function createBaseBatchSignatures(): BatchSignatures {
-  return { validatorAddr: "", votingPower: 0, signatures: new Uint8Array(0) };
+  return { validatorAddr: "", signatures: new Uint8Array(0) };
 }
 
 export const BatchSignatures = {
@@ -347,11 +367,8 @@ export const BatchSignatures = {
     if (message.validatorAddr !== "") {
       writer.uint32(10).string(message.validatorAddr);
     }
-    if (message.votingPower !== 0) {
-      writer.uint32(16).int64(message.votingPower);
-    }
     if (message.signatures.length !== 0) {
-      writer.uint32(26).bytes(message.signatures);
+      writer.uint32(18).bytes(message.signatures);
     }
     return writer;
   },
@@ -371,14 +388,7 @@ export const BatchSignatures = {
           message.validatorAddr = reader.string();
           continue;
         case 2:
-          if (tag !== 16) {
-            break;
-          }
-
-          message.votingPower = longToNumber(reader.int64() as Long);
-          continue;
-        case 3:
-          if (tag !== 26) {
+          if (tag !== 18) {
             break;
           }
 
@@ -396,7 +406,6 @@ export const BatchSignatures = {
   fromJSON(object: any): BatchSignatures {
     return {
       validatorAddr: isSet(object.validatorAddr) ? globalThis.String(object.validatorAddr) : "",
-      votingPower: isSet(object.votingPower) ? globalThis.Number(object.votingPower) : 0,
       signatures: isSet(object.signatures) ? bytesFromBase64(object.signatures) : new Uint8Array(0),
     };
   },
@@ -405,9 +414,6 @@ export const BatchSignatures = {
     const obj: any = {};
     if (message.validatorAddr !== "") {
       obj.validatorAddr = message.validatorAddr;
-    }
-    if (message.votingPower !== 0) {
-      obj.votingPower = Math.round(message.votingPower);
     }
     if (message.signatures.length !== 0) {
       obj.signatures = base64FromBytes(message.signatures);
@@ -421,7 +427,6 @@ export const BatchSignatures = {
   fromPartial(object: DeepPartial<BatchSignatures>): BatchSignatures {
     const message = createBaseBatchSignatures();
     message.validatorAddr = object.validatorAddr ?? "";
-    message.votingPower = object.votingPower ?? 0;
     message.signatures = object.signatures ?? new Uint8Array(0);
     return message;
   },

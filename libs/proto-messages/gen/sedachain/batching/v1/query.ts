@@ -7,6 +7,7 @@
 /* eslint-disable */
 import Long from "long";
 import _m0 from "protobufjs/minimal";
+import { PageRequest, PageResponse } from "../../../cosmos/base/query/v1beta1/pagination";
 import { Batch, BatchSignatures, DataResult, TreeEntries } from "./batching";
 
 /** The request message for QueryBatch RPC. */
@@ -31,11 +32,14 @@ export interface QueryBatchForHeightResponse {
 
 /** The request message for QueryBatches RPC. */
 export interface QueryBatchesRequest {
+  /** pagination defines an optional pagination for the request. */
+  pagination: PageRequest | undefined;
 }
 
 /** The response message for QueryBatches RPC. */
 export interface QueryBatchesResponse {
   batches: Batch[];
+  pagination: PageResponse | undefined;
 }
 
 /** The request message for QueryTreeEntries RPC. */
@@ -307,11 +311,14 @@ export const QueryBatchForHeightResponse = {
 };
 
 function createBaseQueryBatchesRequest(): QueryBatchesRequest {
-  return {};
+  return { pagination: undefined };
 }
 
 export const QueryBatchesRequest = {
-  encode(_: QueryBatchesRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+  encode(message: QueryBatchesRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+    }
     return writer;
   },
 
@@ -322,6 +329,13 @@ export const QueryBatchesRequest = {
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -331,32 +345,41 @@ export const QueryBatchesRequest = {
     return message;
   },
 
-  fromJSON(_: any): QueryBatchesRequest {
-    return {};
+  fromJSON(object: any): QueryBatchesRequest {
+    return { pagination: isSet(object.pagination) ? PageRequest.fromJSON(object.pagination) : undefined };
   },
 
-  toJSON(_: QueryBatchesRequest): unknown {
+  toJSON(message: QueryBatchesRequest): unknown {
     const obj: any = {};
+    if (message.pagination !== undefined) {
+      obj.pagination = PageRequest.toJSON(message.pagination);
+    }
     return obj;
   },
 
   create(base?: DeepPartial<QueryBatchesRequest>): QueryBatchesRequest {
     return QueryBatchesRequest.fromPartial(base ?? {});
   },
-  fromPartial(_: DeepPartial<QueryBatchesRequest>): QueryBatchesRequest {
+  fromPartial(object: DeepPartial<QueryBatchesRequest>): QueryBatchesRequest {
     const message = createBaseQueryBatchesRequest();
+    message.pagination = (object.pagination !== undefined && object.pagination !== null)
+      ? PageRequest.fromPartial(object.pagination)
+      : undefined;
     return message;
   },
 };
 
 function createBaseQueryBatchesResponse(): QueryBatchesResponse {
-  return { batches: [] };
+  return { batches: [], pagination: undefined };
 }
 
 export const QueryBatchesResponse = {
   encode(message: QueryBatchesResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     for (const v of message.batches) {
       Batch.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
@@ -375,6 +398,13 @@ export const QueryBatchesResponse = {
 
           message.batches.push(Batch.decode(reader, reader.uint32()));
           continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -387,6 +417,7 @@ export const QueryBatchesResponse = {
   fromJSON(object: any): QueryBatchesResponse {
     return {
       batches: globalThis.Array.isArray(object?.batches) ? object.batches.map((e: any) => Batch.fromJSON(e)) : [],
+      pagination: isSet(object.pagination) ? PageResponse.fromJSON(object.pagination) : undefined,
     };
   },
 
@@ -394,6 +425,9 @@ export const QueryBatchesResponse = {
     const obj: any = {};
     if (message.batches?.length) {
       obj.batches = message.batches.map((e) => Batch.toJSON(e));
+    }
+    if (message.pagination !== undefined) {
+      obj.pagination = PageResponse.toJSON(message.pagination);
     }
     return obj;
   },
@@ -404,6 +438,9 @@ export const QueryBatchesResponse = {
   fromPartial(object: DeepPartial<QueryBatchesResponse>): QueryBatchesResponse {
     const message = createBaseQueryBatchesResponse();
     message.batches = object.batches?.map((e) => Batch.fromPartial(e)) || [];
+    message.pagination = (object.pagination !== undefined && object.pagination !== null)
+      ? PageResponse.fromPartial(object.pagination)
+      : undefined;
     return message;
   },
 };

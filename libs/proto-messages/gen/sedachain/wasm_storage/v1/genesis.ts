@@ -6,18 +6,18 @@
 
 /* eslint-disable */
 import _m0 from "protobufjs/minimal";
-import { DataRequestWasm, ExecutorWasm, Params } from "./wasm_storage";
+import { ExecutorWasm, OracleProgram, Params } from "./wasm_storage";
 
 /** GenesisState defines wasm-storage module's genesis state. */
 export interface GenesisState {
   params: Params | undefined;
-  dataRequestWasms: DataRequestWasm[];
+  oraclePrograms: OracleProgram[];
   executorWasms: ExecutorWasm[];
   coreContractRegistry: string;
 }
 
 function createBaseGenesisState(): GenesisState {
-  return { params: undefined, dataRequestWasms: [], executorWasms: [], coreContractRegistry: "" };
+  return { params: undefined, oraclePrograms: [], executorWasms: [], coreContractRegistry: "" };
 }
 
 export const GenesisState = {
@@ -25,8 +25,8 @@ export const GenesisState = {
     if (message.params !== undefined) {
       Params.encode(message.params, writer.uint32(10).fork()).ldelim();
     }
-    for (const v of message.dataRequestWasms) {
-      DataRequestWasm.encode(v!, writer.uint32(18).fork()).ldelim();
+    for (const v of message.oraclePrograms) {
+      OracleProgram.encode(v!, writer.uint32(18).fork()).ldelim();
     }
     for (const v of message.executorWasms) {
       ExecutorWasm.encode(v!, writer.uint32(26).fork()).ldelim();
@@ -56,7 +56,7 @@ export const GenesisState = {
             break;
           }
 
-          message.dataRequestWasms.push(DataRequestWasm.decode(reader, reader.uint32()));
+          message.oraclePrograms.push(OracleProgram.decode(reader, reader.uint32()));
           continue;
         case 3:
           if (tag !== 26) {
@@ -84,8 +84,8 @@ export const GenesisState = {
   fromJSON(object: any): GenesisState {
     return {
       params: isSet(object.params) ? Params.fromJSON(object.params) : undefined,
-      dataRequestWasms: globalThis.Array.isArray(object?.dataRequestWasms)
-        ? object.dataRequestWasms.map((e: any) => DataRequestWasm.fromJSON(e))
+      oraclePrograms: globalThis.Array.isArray(object?.oraclePrograms)
+        ? object.oraclePrograms.map((e: any) => OracleProgram.fromJSON(e))
         : [],
       executorWasms: globalThis.Array.isArray(object?.executorWasms)
         ? object.executorWasms.map((e: any) => ExecutorWasm.fromJSON(e))
@@ -99,8 +99,8 @@ export const GenesisState = {
     if (message.params !== undefined) {
       obj.params = Params.toJSON(message.params);
     }
-    if (message.dataRequestWasms?.length) {
-      obj.dataRequestWasms = message.dataRequestWasms.map((e) => DataRequestWasm.toJSON(e));
+    if (message.oraclePrograms?.length) {
+      obj.oraclePrograms = message.oraclePrograms.map((e) => OracleProgram.toJSON(e));
     }
     if (message.executorWasms?.length) {
       obj.executorWasms = message.executorWasms.map((e) => ExecutorWasm.toJSON(e));
@@ -119,7 +119,7 @@ export const GenesisState = {
     message.params = (object.params !== undefined && object.params !== null)
       ? Params.fromPartial(object.params)
       : undefined;
-    message.dataRequestWasms = object.dataRequestWasms?.map((e) => DataRequestWasm.fromPartial(e)) || [];
+    message.oraclePrograms = object.oraclePrograms?.map((e) => OracleProgram.fromPartial(e)) || [];
     message.executorWasms = object.executorWasms?.map((e) => ExecutorWasm.fromPartial(e)) || [];
     message.coreContractRegistry = object.coreContractRegistry ?? "";
     return message;
