@@ -6,16 +6,15 @@
 
 /* eslint-disable */
 import _m0 from "protobufjs/minimal";
-import { Any } from "../../../google/protobuf/any";
 
 /** IndexPubKeyPair defines an index - public key pair. */
 export interface IndexedPubKey {
   index: number;
-  pubKey: Any | undefined;
+  pubKey: Uint8Array;
 }
 
 function createBaseIndexedPubKey(): IndexedPubKey {
-  return { index: 0, pubKey: undefined };
+  return { index: 0, pubKey: new Uint8Array(0) };
 }
 
 export const IndexedPubKey = {
@@ -23,8 +22,8 @@ export const IndexedPubKey = {
     if (message.index !== 0) {
       writer.uint32(8).uint32(message.index);
     }
-    if (message.pubKey !== undefined) {
-      Any.encode(message.pubKey, writer.uint32(18).fork()).ldelim();
+    if (message.pubKey.length !== 0) {
+      writer.uint32(18).bytes(message.pubKey);
     }
     return writer;
   },
@@ -48,7 +47,7 @@ export const IndexedPubKey = {
             break;
           }
 
-          message.pubKey = Any.decode(reader, reader.uint32());
+          message.pubKey = reader.bytes();
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -62,7 +61,7 @@ export const IndexedPubKey = {
   fromJSON(object: any): IndexedPubKey {
     return {
       index: isSet(object.index) ? globalThis.Number(object.index) : 0,
-      pubKey: isSet(object.pubKey) ? Any.fromJSON(object.pubKey) : undefined,
+      pubKey: isSet(object.pubKey) ? bytesFromBase64(object.pubKey) : new Uint8Array(0),
     };
   },
 
@@ -71,8 +70,8 @@ export const IndexedPubKey = {
     if (message.index !== 0) {
       obj.index = Math.round(message.index);
     }
-    if (message.pubKey !== undefined) {
-      obj.pubKey = Any.toJSON(message.pubKey);
+    if (message.pubKey.length !== 0) {
+      obj.pubKey = base64FromBytes(message.pubKey);
     }
     return obj;
   },
@@ -83,12 +82,35 @@ export const IndexedPubKey = {
   fromPartial(object: DeepPartial<IndexedPubKey>): IndexedPubKey {
     const message = createBaseIndexedPubKey();
     message.index = object.index ?? 0;
-    message.pubKey = (object.pubKey !== undefined && object.pubKey !== null)
-      ? Any.fromPartial(object.pubKey)
-      : undefined;
+    message.pubKey = object.pubKey ?? new Uint8Array(0);
     return message;
   },
 };
+
+function bytesFromBase64(b64: string): Uint8Array {
+  if ((globalThis as any).Buffer) {
+    return Uint8Array.from(globalThis.Buffer.from(b64, "base64"));
+  } else {
+    const bin = globalThis.atob(b64);
+    const arr = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; ++i) {
+      arr[i] = bin.charCodeAt(i);
+    }
+    return arr;
+  }
+}
+
+function base64FromBytes(arr: Uint8Array): string {
+  if ((globalThis as any).Buffer) {
+    return globalThis.Buffer.from(arr).toString("base64");
+  } else {
+    const bin: string[] = [];
+    arr.forEach((byte) => {
+      bin.push(globalThis.String.fromCharCode(byte));
+    });
+    return globalThis.btoa(bin.join(""));
+  }
+}
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 

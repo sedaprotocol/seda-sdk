@@ -9,7 +9,7 @@
 		"fmt": "bunx biome check --write .",
 		"test": "nx run-many --all --target=test",
 		"docs": "bun run tools/typedoc/generate.ts",
-		"cli:generate": "cd libs/cli/proto && npx buf generate"
+		"proto:generate": "cd libs/proto-messages/proto && npx buf generate"
 	},
 	"private": true,
 	"type": "module",
