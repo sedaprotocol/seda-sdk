@@ -17,9 +17,9 @@ export interface Batch {
    * batch_number is a unique identifier of the batch incremented
    * every time a batch is created.
    */
-  batchNumber: number;
+  batchNumber: bigint;
   /** block_height is the height at which the batch was created. */
-  blockHeight: number;
+  blockHeight: bigint;
   /**
    * current_data_result_root is the hex-encoded root of the data result
    * merkle tree.
@@ -47,7 +47,7 @@ export interface Batch {
  */
 export interface TreeEntries {
   /** batch_number is the identifier of the batch the tree entries from. */
-  batchNumber: number;
+  batchNumber: bigint;
   /**
    * data_result_entries are the entries (unhashed leaf contents) of
    * the data result tree.
@@ -87,11 +87,11 @@ export interface DataResult {
   /** version is a semantic version string. */
   version: string;
   /** block_height is the height at which the data request was tallied. */
-  blockHeight: number;
+  blockHeight: bigint;
   /** exit_code is the exit code of the tally wasm binary execution. */
   exitCode: number;
   /** gas_used is the gas used by the data request execution. */
-  gasUsed: number;
+  gasUsed: bigint;
   /** result is the result of the tally wasm binary execution. */
   result: Uint8Array;
   /** payback_address is the payback address set by the relayer. */
@@ -110,8 +110,8 @@ export interface DataResult {
 
 function createBaseBatch(): Batch {
   return {
-    batchNumber: 0,
-    blockHeight: 0,
+    batchNumber: 0n,
+    blockHeight: 0n,
     currentDataResultRoot: "",
     dataResultRoot: "",
     validatorRoot: "",
@@ -122,11 +122,17 @@ function createBaseBatch(): Batch {
 
 export const Batch = {
   encode(message: Batch, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.batchNumber !== 0) {
-      writer.uint32(8).uint64(message.batchNumber);
+    if (message.batchNumber !== 0n) {
+      if (BigInt.asUintN(64, message.batchNumber) !== message.batchNumber) {
+        throw new globalThis.Error("value provided for field message.batchNumber of type uint64 too large");
+      }
+      writer.uint32(8).uint64(message.batchNumber.toString());
     }
-    if (message.blockHeight !== 0) {
-      writer.uint32(16).int64(message.blockHeight);
+    if (message.blockHeight !== 0n) {
+      if (BigInt.asIntN(64, message.blockHeight) !== message.blockHeight) {
+        throw new globalThis.Error("value provided for field message.blockHeight of type int64 too large");
+      }
+      writer.uint32(16).int64(message.blockHeight.toString());
     }
     if (message.currentDataResultRoot !== "") {
       writer.uint32(26).string(message.currentDataResultRoot);
@@ -158,14 +164,14 @@ export const Batch = {
             break;
           }
 
-          message.batchNumber = longToNumber(reader.uint64() as Long);
+          message.batchNumber = longToBigint(reader.uint64() as Long);
           continue;
         case 2:
           if (tag !== 16) {
             break;
           }
 
-          message.blockHeight = longToNumber(reader.int64() as Long);
+          message.blockHeight = longToBigint(reader.int64() as Long);
           continue;
         case 3:
           if (tag !== 26) {
@@ -213,8 +219,8 @@ export const Batch = {
 
   fromJSON(object: any): Batch {
     return {
-      batchNumber: isSet(object.batchNumber) ? globalThis.Number(object.batchNumber) : 0,
-      blockHeight: isSet(object.blockHeight) ? globalThis.Number(object.blockHeight) : 0,
+      batchNumber: isSet(object.batchNumber) ? BigInt(object.batchNumber) : 0n,
+      blockHeight: isSet(object.blockHeight) ? BigInt(object.blockHeight) : 0n,
       currentDataResultRoot: isSet(object.currentDataResultRoot) ? globalThis.String(object.currentDataResultRoot) : "",
       dataResultRoot: isSet(object.dataResultRoot) ? globalThis.String(object.dataResultRoot) : "",
       validatorRoot: isSet(object.validatorRoot) ? globalThis.String(object.validatorRoot) : "",
@@ -225,11 +231,11 @@ export const Batch = {
 
   toJSON(message: Batch): unknown {
     const obj: any = {};
-    if (message.batchNumber !== 0) {
-      obj.batchNumber = Math.round(message.batchNumber);
+    if (message.batchNumber !== 0n) {
+      obj.batchNumber = message.batchNumber.toString();
     }
-    if (message.blockHeight !== 0) {
-      obj.blockHeight = Math.round(message.blockHeight);
+    if (message.blockHeight !== 0n) {
+      obj.blockHeight = message.blockHeight.toString();
     }
     if (message.currentDataResultRoot !== "") {
       obj.currentDataResultRoot = message.currentDataResultRoot;
@@ -254,8 +260,8 @@ export const Batch = {
   },
   fromPartial(object: DeepPartial<Batch>): Batch {
     const message = createBaseBatch();
-    message.batchNumber = object.batchNumber ?? 0;
-    message.blockHeight = object.blockHeight ?? 0;
+    message.batchNumber = object.batchNumber ?? 0n;
+    message.blockHeight = object.blockHeight ?? 0n;
     message.currentDataResultRoot = object.currentDataResultRoot ?? "";
     message.dataResultRoot = object.dataResultRoot ?? "";
     message.validatorRoot = object.validatorRoot ?? "";
@@ -266,13 +272,16 @@ export const Batch = {
 };
 
 function createBaseTreeEntries(): TreeEntries {
-  return { batchNumber: 0, dataResultEntries: [], validatorEntries: [] };
+  return { batchNumber: 0n, dataResultEntries: [], validatorEntries: [] };
 }
 
 export const TreeEntries = {
   encode(message: TreeEntries, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.batchNumber !== 0) {
-      writer.uint32(8).uint64(message.batchNumber);
+    if (message.batchNumber !== 0n) {
+      if (BigInt.asUintN(64, message.batchNumber) !== message.batchNumber) {
+        throw new globalThis.Error("value provided for field message.batchNumber of type uint64 too large");
+      }
+      writer.uint32(8).uint64(message.batchNumber.toString());
     }
     for (const v of message.dataResultEntries) {
       writer.uint32(18).bytes(v!);
@@ -295,7 +304,7 @@ export const TreeEntries = {
             break;
           }
 
-          message.batchNumber = longToNumber(reader.uint64() as Long);
+          message.batchNumber = longToBigint(reader.uint64() as Long);
           continue;
         case 2:
           if (tag !== 18) {
@@ -322,7 +331,7 @@ export const TreeEntries = {
 
   fromJSON(object: any): TreeEntries {
     return {
-      batchNumber: isSet(object.batchNumber) ? globalThis.Number(object.batchNumber) : 0,
+      batchNumber: isSet(object.batchNumber) ? BigInt(object.batchNumber) : 0n,
       dataResultEntries: globalThis.Array.isArray(object?.dataResultEntries)
         ? object.dataResultEntries.map((e: any) => bytesFromBase64(e))
         : [],
@@ -334,8 +343,8 @@ export const TreeEntries = {
 
   toJSON(message: TreeEntries): unknown {
     const obj: any = {};
-    if (message.batchNumber !== 0) {
-      obj.batchNumber = Math.round(message.batchNumber);
+    if (message.batchNumber !== 0n) {
+      obj.batchNumber = message.batchNumber.toString();
     }
     if (message.dataResultEntries?.length) {
       obj.dataResultEntries = message.dataResultEntries.map((e) => base64FromBytes(e));
@@ -351,7 +360,7 @@ export const TreeEntries = {
   },
   fromPartial(object: DeepPartial<TreeEntries>): TreeEntries {
     const message = createBaseTreeEntries();
-    message.batchNumber = object.batchNumber ?? 0;
+    message.batchNumber = object.batchNumber ?? 0n;
     message.dataResultEntries = object.dataResultEntries?.map((e) => e) || [];
     message.validatorEntries = object.validatorEntries?.map((e) => e) || [];
     return message;
@@ -498,9 +507,9 @@ function createBaseDataResult(): DataResult {
     id: "",
     drId: "",
     version: "",
-    blockHeight: 0,
+    blockHeight: 0n,
     exitCode: 0,
-    gasUsed: 0,
+    gasUsed: 0n,
     result: new Uint8Array(0),
     paybackAddress: "",
     sedaPayload: "",
@@ -519,14 +528,20 @@ export const DataResult = {
     if (message.version !== "") {
       writer.uint32(26).string(message.version);
     }
-    if (message.blockHeight !== 0) {
-      writer.uint32(32).uint64(message.blockHeight);
+    if (message.blockHeight !== 0n) {
+      if (BigInt.asUintN(64, message.blockHeight) !== message.blockHeight) {
+        throw new globalThis.Error("value provided for field message.blockHeight of type uint64 too large");
+      }
+      writer.uint32(32).uint64(message.blockHeight.toString());
     }
     if (message.exitCode !== 0) {
       writer.uint32(40).uint32(message.exitCode);
     }
-    if (message.gasUsed !== 0) {
-      writer.uint32(48).uint64(message.gasUsed);
+    if (message.gasUsed !== 0n) {
+      if (BigInt.asUintN(64, message.gasUsed) !== message.gasUsed) {
+        throw new globalThis.Error("value provided for field message.gasUsed of type uint64 too large");
+      }
+      writer.uint32(48).uint64(message.gasUsed.toString());
     }
     if (message.result.length !== 0) {
       writer.uint32(58).bytes(message.result);
@@ -576,7 +591,7 @@ export const DataResult = {
             break;
           }
 
-          message.blockHeight = longToNumber(reader.uint64() as Long);
+          message.blockHeight = longToBigint(reader.uint64() as Long);
           continue;
         case 5:
           if (tag !== 40) {
@@ -590,7 +605,7 @@ export const DataResult = {
             break;
           }
 
-          message.gasUsed = longToNumber(reader.uint64() as Long);
+          message.gasUsed = longToBigint(reader.uint64() as Long);
           continue;
         case 7:
           if (tag !== 58) {
@@ -634,9 +649,9 @@ export const DataResult = {
       id: isSet(object.id) ? globalThis.String(object.id) : "",
       drId: isSet(object.drId) ? globalThis.String(object.drId) : "",
       version: isSet(object.version) ? globalThis.String(object.version) : "",
-      blockHeight: isSet(object.blockHeight) ? globalThis.Number(object.blockHeight) : 0,
+      blockHeight: isSet(object.blockHeight) ? BigInt(object.blockHeight) : 0n,
       exitCode: isSet(object.exitCode) ? globalThis.Number(object.exitCode) : 0,
-      gasUsed: isSet(object.gasUsed) ? globalThis.Number(object.gasUsed) : 0,
+      gasUsed: isSet(object.gasUsed) ? BigInt(object.gasUsed) : 0n,
       result: isSet(object.result) ? bytesFromBase64(object.result) : new Uint8Array(0),
       paybackAddress: isSet(object.paybackAddress) ? globalThis.String(object.paybackAddress) : "",
       sedaPayload: isSet(object.sedaPayload) ? globalThis.String(object.sedaPayload) : "",
@@ -655,14 +670,14 @@ export const DataResult = {
     if (message.version !== "") {
       obj.version = message.version;
     }
-    if (message.blockHeight !== 0) {
-      obj.blockHeight = Math.round(message.blockHeight);
+    if (message.blockHeight !== 0n) {
+      obj.blockHeight = message.blockHeight.toString();
     }
     if (message.exitCode !== 0) {
       obj.exitCode = Math.round(message.exitCode);
     }
-    if (message.gasUsed !== 0) {
-      obj.gasUsed = Math.round(message.gasUsed);
+    if (message.gasUsed !== 0n) {
+      obj.gasUsed = message.gasUsed.toString();
     }
     if (message.result.length !== 0) {
       obj.result = base64FromBytes(message.result);
@@ -687,9 +702,9 @@ export const DataResult = {
     message.id = object.id ?? "";
     message.drId = object.drId ?? "";
     message.version = object.version ?? "";
-    message.blockHeight = object.blockHeight ?? 0;
+    message.blockHeight = object.blockHeight ?? 0n;
     message.exitCode = object.exitCode ?? 0;
-    message.gasUsed = object.gasUsed ?? 0;
+    message.gasUsed = object.gasUsed ?? 0n;
     message.result = object.result ?? new Uint8Array(0);
     message.paybackAddress = object.paybackAddress ?? "";
     message.sedaPayload = object.sedaPayload ?? "";
@@ -723,7 +738,7 @@ function base64FromBytes(arr: Uint8Array): string {
   }
 }
 
-type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
+type Builtin = Date | Function | Uint8Array | string | number | boolean | bigint | undefined;
 
 type DeepPartial<T> = T extends Builtin ? T
   : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
@@ -731,14 +746,8 @@ type DeepPartial<T> = T extends Builtin ? T
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
-function longToNumber(long: Long): number {
-  if (long.gt(globalThis.Number.MAX_SAFE_INTEGER)) {
-    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
-  }
-  if (long.lt(globalThis.Number.MIN_SAFE_INTEGER)) {
-    throw new globalThis.Error("Value is smaller than Number.MIN_SAFE_INTEGER");
-  }
-  return long.toNumber();
+function longToBigint(long: Long) {
+  return BigInt(long.toString());
 }
 
 if (_m0.util.Long !== Long) {

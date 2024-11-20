@@ -129,7 +129,7 @@ export interface Header {
   /** basic block info */
   version: Consensus | undefined;
   chainId: string;
-  height: number;
+  height: bigint;
   time:
     | Date
     | undefined;
@@ -173,7 +173,7 @@ export interface Data {
  */
 export interface Vote {
   type: SignedMsgType;
-  height: number;
+  height: bigint;
   round: number;
   /** zero if vote is nil. */
   blockId: BlockID | undefined;
@@ -185,7 +185,7 @@ export interface Vote {
 
 /** Commit contains the evidence that a block was committed by a set of validators. */
 export interface Commit {
-  height: number;
+  height: bigint;
   round: number;
   blockId: BlockID | undefined;
   signatures: CommitSig[];
@@ -201,7 +201,7 @@ export interface CommitSig {
 
 export interface Proposal {
   type: SignedMsgType;
-  height: number;
+  height: bigint;
   round: number;
   polRound: number;
   blockId: BlockID | undefined;
@@ -221,9 +221,9 @@ export interface LightBlock {
 
 export interface BlockMeta {
   blockId: BlockID | undefined;
-  blockSize: number;
+  blockSize: bigint;
   header: Header | undefined;
-  numTxs: number;
+  numTxs: bigint;
 }
 
 /** TxProof represents a Merkle proof of the presence of a transaction in the Merkle tree. */
@@ -476,7 +476,7 @@ function createBaseHeader(): Header {
   return {
     version: undefined,
     chainId: "",
-    height: 0,
+    height: 0n,
     time: undefined,
     lastBlockId: undefined,
     lastCommitHash: new Uint8Array(0),
@@ -499,8 +499,11 @@ export const Header = {
     if (message.chainId !== "") {
       writer.uint32(18).string(message.chainId);
     }
-    if (message.height !== 0) {
-      writer.uint32(24).int64(message.height);
+    if (message.height !== 0n) {
+      if (BigInt.asIntN(64, message.height) !== message.height) {
+        throw new globalThis.Error("value provided for field message.height of type int64 too large");
+      }
+      writer.uint32(24).int64(message.height.toString());
     }
     if (message.time !== undefined) {
       Timestamp.encode(toTimestamp(message.time), writer.uint32(34).fork()).ldelim();
@@ -564,7 +567,7 @@ export const Header = {
             break;
           }
 
-          message.height = longToNumber(reader.int64() as Long);
+          message.height = longToBigint(reader.int64() as Long);
           continue;
         case 4:
           if (tag !== 34) {
@@ -656,7 +659,7 @@ export const Header = {
     return {
       version: isSet(object.version) ? Consensus.fromJSON(object.version) : undefined,
       chainId: isSet(object.chainId) ? globalThis.String(object.chainId) : "",
-      height: isSet(object.height) ? globalThis.Number(object.height) : 0,
+      height: isSet(object.height) ? BigInt(object.height) : 0n,
       time: isSet(object.time) ? fromJsonTimestamp(object.time) : undefined,
       lastBlockId: isSet(object.lastBlockId) ? BlockID.fromJSON(object.lastBlockId) : undefined,
       lastCommitHash: isSet(object.lastCommitHash) ? bytesFromBase64(object.lastCommitHash) : new Uint8Array(0),
@@ -681,8 +684,8 @@ export const Header = {
     if (message.chainId !== "") {
       obj.chainId = message.chainId;
     }
-    if (message.height !== 0) {
-      obj.height = Math.round(message.height);
+    if (message.height !== 0n) {
+      obj.height = message.height.toString();
     }
     if (message.time !== undefined) {
       obj.time = message.time.toISOString();
@@ -729,7 +732,7 @@ export const Header = {
       ? Consensus.fromPartial(object.version)
       : undefined;
     message.chainId = object.chainId ?? "";
-    message.height = object.height ?? 0;
+    message.height = object.height ?? 0n;
     message.time = object.time ?? undefined;
     message.lastBlockId = (object.lastBlockId !== undefined && object.lastBlockId !== null)
       ? BlockID.fromPartial(object.lastBlockId)
@@ -807,7 +810,7 @@ export const Data = {
 function createBaseVote(): Vote {
   return {
     type: 0,
-    height: 0,
+    height: 0n,
     round: 0,
     blockId: undefined,
     timestamp: undefined,
@@ -822,8 +825,11 @@ export const Vote = {
     if (message.type !== 0) {
       writer.uint32(8).int32(message.type);
     }
-    if (message.height !== 0) {
-      writer.uint32(16).int64(message.height);
+    if (message.height !== 0n) {
+      if (BigInt.asIntN(64, message.height) !== message.height) {
+        throw new globalThis.Error("value provided for field message.height of type int64 too large");
+      }
+      writer.uint32(16).int64(message.height.toString());
     }
     if (message.round !== 0) {
       writer.uint32(24).int32(message.round);
@@ -865,7 +871,7 @@ export const Vote = {
             break;
           }
 
-          message.height = longToNumber(reader.int64() as Long);
+          message.height = longToBigint(reader.int64() as Long);
           continue;
         case 3:
           if (tag !== 24) {
@@ -921,7 +927,7 @@ export const Vote = {
   fromJSON(object: any): Vote {
     return {
       type: isSet(object.type) ? signedMsgTypeFromJSON(object.type) : 0,
-      height: isSet(object.height) ? globalThis.Number(object.height) : 0,
+      height: isSet(object.height) ? BigInt(object.height) : 0n,
       round: isSet(object.round) ? globalThis.Number(object.round) : 0,
       blockId: isSet(object.blockId) ? BlockID.fromJSON(object.blockId) : undefined,
       timestamp: isSet(object.timestamp) ? fromJsonTimestamp(object.timestamp) : undefined,
@@ -936,8 +942,8 @@ export const Vote = {
     if (message.type !== 0) {
       obj.type = signedMsgTypeToJSON(message.type);
     }
-    if (message.height !== 0) {
-      obj.height = Math.round(message.height);
+    if (message.height !== 0n) {
+      obj.height = message.height.toString();
     }
     if (message.round !== 0) {
       obj.round = Math.round(message.round);
@@ -966,7 +972,7 @@ export const Vote = {
   fromPartial(object: DeepPartial<Vote>): Vote {
     const message = createBaseVote();
     message.type = object.type ?? 0;
-    message.height = object.height ?? 0;
+    message.height = object.height ?? 0n;
     message.round = object.round ?? 0;
     message.blockId = (object.blockId !== undefined && object.blockId !== null)
       ? BlockID.fromPartial(object.blockId)
@@ -980,13 +986,16 @@ export const Vote = {
 };
 
 function createBaseCommit(): Commit {
-  return { height: 0, round: 0, blockId: undefined, signatures: [] };
+  return { height: 0n, round: 0, blockId: undefined, signatures: [] };
 }
 
 export const Commit = {
   encode(message: Commit, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.height !== 0) {
-      writer.uint32(8).int64(message.height);
+    if (message.height !== 0n) {
+      if (BigInt.asIntN(64, message.height) !== message.height) {
+        throw new globalThis.Error("value provided for field message.height of type int64 too large");
+      }
+      writer.uint32(8).int64(message.height.toString());
     }
     if (message.round !== 0) {
       writer.uint32(16).int32(message.round);
@@ -1012,7 +1021,7 @@ export const Commit = {
             break;
           }
 
-          message.height = longToNumber(reader.int64() as Long);
+          message.height = longToBigint(reader.int64() as Long);
           continue;
         case 2:
           if (tag !== 16) {
@@ -1046,7 +1055,7 @@ export const Commit = {
 
   fromJSON(object: any): Commit {
     return {
-      height: isSet(object.height) ? globalThis.Number(object.height) : 0,
+      height: isSet(object.height) ? BigInt(object.height) : 0n,
       round: isSet(object.round) ? globalThis.Number(object.round) : 0,
       blockId: isSet(object.blockId) ? BlockID.fromJSON(object.blockId) : undefined,
       signatures: globalThis.Array.isArray(object?.signatures)
@@ -1057,8 +1066,8 @@ export const Commit = {
 
   toJSON(message: Commit): unknown {
     const obj: any = {};
-    if (message.height !== 0) {
-      obj.height = Math.round(message.height);
+    if (message.height !== 0n) {
+      obj.height = message.height.toString();
     }
     if (message.round !== 0) {
       obj.round = Math.round(message.round);
@@ -1077,7 +1086,7 @@ export const Commit = {
   },
   fromPartial(object: DeepPartial<Commit>): Commit {
     const message = createBaseCommit();
-    message.height = object.height ?? 0;
+    message.height = object.height ?? 0n;
     message.round = object.round ?? 0;
     message.blockId = (object.blockId !== undefined && object.blockId !== null)
       ? BlockID.fromPartial(object.blockId)
@@ -1194,7 +1203,7 @@ export const CommitSig = {
 function createBaseProposal(): Proposal {
   return {
     type: 0,
-    height: 0,
+    height: 0n,
     round: 0,
     polRound: 0,
     blockId: undefined,
@@ -1208,8 +1217,11 @@ export const Proposal = {
     if (message.type !== 0) {
       writer.uint32(8).int32(message.type);
     }
-    if (message.height !== 0) {
-      writer.uint32(16).int64(message.height);
+    if (message.height !== 0n) {
+      if (BigInt.asIntN(64, message.height) !== message.height) {
+        throw new globalThis.Error("value provided for field message.height of type int64 too large");
+      }
+      writer.uint32(16).int64(message.height.toString());
     }
     if (message.round !== 0) {
       writer.uint32(24).int32(message.round);
@@ -1248,7 +1260,7 @@ export const Proposal = {
             break;
           }
 
-          message.height = longToNumber(reader.int64() as Long);
+          message.height = longToBigint(reader.int64() as Long);
           continue;
         case 3:
           if (tag !== 24) {
@@ -1297,7 +1309,7 @@ export const Proposal = {
   fromJSON(object: any): Proposal {
     return {
       type: isSet(object.type) ? signedMsgTypeFromJSON(object.type) : 0,
-      height: isSet(object.height) ? globalThis.Number(object.height) : 0,
+      height: isSet(object.height) ? BigInt(object.height) : 0n,
       round: isSet(object.round) ? globalThis.Number(object.round) : 0,
       polRound: isSet(object.polRound) ? globalThis.Number(object.polRound) : 0,
       blockId: isSet(object.blockId) ? BlockID.fromJSON(object.blockId) : undefined,
@@ -1311,8 +1323,8 @@ export const Proposal = {
     if (message.type !== 0) {
       obj.type = signedMsgTypeToJSON(message.type);
     }
-    if (message.height !== 0) {
-      obj.height = Math.round(message.height);
+    if (message.height !== 0n) {
+      obj.height = message.height.toString();
     }
     if (message.round !== 0) {
       obj.round = Math.round(message.round);
@@ -1338,7 +1350,7 @@ export const Proposal = {
   fromPartial(object: DeepPartial<Proposal>): Proposal {
     const message = createBaseProposal();
     message.type = object.type ?? 0;
-    message.height = object.height ?? 0;
+    message.height = object.height ?? 0n;
     message.round = object.round ?? 0;
     message.polRound = object.polRound ?? 0;
     message.blockId = (object.blockId !== undefined && object.blockId !== null)
@@ -1507,7 +1519,7 @@ export const LightBlock = {
 };
 
 function createBaseBlockMeta(): BlockMeta {
-  return { blockId: undefined, blockSize: 0, header: undefined, numTxs: 0 };
+  return { blockId: undefined, blockSize: 0n, header: undefined, numTxs: 0n };
 }
 
 export const BlockMeta = {
@@ -1515,14 +1527,20 @@ export const BlockMeta = {
     if (message.blockId !== undefined) {
       BlockID.encode(message.blockId, writer.uint32(10).fork()).ldelim();
     }
-    if (message.blockSize !== 0) {
-      writer.uint32(16).int64(message.blockSize);
+    if (message.blockSize !== 0n) {
+      if (BigInt.asIntN(64, message.blockSize) !== message.blockSize) {
+        throw new globalThis.Error("value provided for field message.blockSize of type int64 too large");
+      }
+      writer.uint32(16).int64(message.blockSize.toString());
     }
     if (message.header !== undefined) {
       Header.encode(message.header, writer.uint32(26).fork()).ldelim();
     }
-    if (message.numTxs !== 0) {
-      writer.uint32(32).int64(message.numTxs);
+    if (message.numTxs !== 0n) {
+      if (BigInt.asIntN(64, message.numTxs) !== message.numTxs) {
+        throw new globalThis.Error("value provided for field message.numTxs of type int64 too large");
+      }
+      writer.uint32(32).int64(message.numTxs.toString());
     }
     return writer;
   },
@@ -1546,7 +1564,7 @@ export const BlockMeta = {
             break;
           }
 
-          message.blockSize = longToNumber(reader.int64() as Long);
+          message.blockSize = longToBigint(reader.int64() as Long);
           continue;
         case 3:
           if (tag !== 26) {
@@ -1560,7 +1578,7 @@ export const BlockMeta = {
             break;
           }
 
-          message.numTxs = longToNumber(reader.int64() as Long);
+          message.numTxs = longToBigint(reader.int64() as Long);
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -1574,9 +1592,9 @@ export const BlockMeta = {
   fromJSON(object: any): BlockMeta {
     return {
       blockId: isSet(object.blockId) ? BlockID.fromJSON(object.blockId) : undefined,
-      blockSize: isSet(object.blockSize) ? globalThis.Number(object.blockSize) : 0,
+      blockSize: isSet(object.blockSize) ? BigInt(object.blockSize) : 0n,
       header: isSet(object.header) ? Header.fromJSON(object.header) : undefined,
-      numTxs: isSet(object.numTxs) ? globalThis.Number(object.numTxs) : 0,
+      numTxs: isSet(object.numTxs) ? BigInt(object.numTxs) : 0n,
     };
   },
 
@@ -1585,14 +1603,14 @@ export const BlockMeta = {
     if (message.blockId !== undefined) {
       obj.blockId = BlockID.toJSON(message.blockId);
     }
-    if (message.blockSize !== 0) {
-      obj.blockSize = Math.round(message.blockSize);
+    if (message.blockSize !== 0n) {
+      obj.blockSize = message.blockSize.toString();
     }
     if (message.header !== undefined) {
       obj.header = Header.toJSON(message.header);
     }
-    if (message.numTxs !== 0) {
-      obj.numTxs = Math.round(message.numTxs);
+    if (message.numTxs !== 0n) {
+      obj.numTxs = message.numTxs.toString();
     }
     return obj;
   },
@@ -1605,11 +1623,11 @@ export const BlockMeta = {
     message.blockId = (object.blockId !== undefined && object.blockId !== null)
       ? BlockID.fromPartial(object.blockId)
       : undefined;
-    message.blockSize = object.blockSize ?? 0;
+    message.blockSize = object.blockSize ?? 0n;
     message.header = (object.header !== undefined && object.header !== null)
       ? Header.fromPartial(object.header)
       : undefined;
-    message.numTxs = object.numTxs ?? 0;
+    message.numTxs = object.numTxs ?? 0n;
     return message;
   },
 };
@@ -1728,7 +1746,7 @@ function base64FromBytes(arr: Uint8Array): string {
   }
 }
 
-type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
+type Builtin = Date | Function | Uint8Array | string | number | boolean | bigint | undefined;
 
 type DeepPartial<T> = T extends Builtin ? T
   : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
@@ -1737,13 +1755,13 @@ type DeepPartial<T> = T extends Builtin ? T
   : Partial<T>;
 
 function toTimestamp(date: Date): Timestamp {
-  const seconds = Math.trunc(date.getTime() / 1_000);
+  const seconds = BigInt(Math.trunc(date.getTime() / 1_000));
   const nanos = (date.getTime() % 1_000) * 1_000_000;
   return { seconds, nanos };
 }
 
 function fromTimestamp(t: Timestamp): Date {
-  let millis = (t.seconds || 0) * 1_000;
+  let millis = (globalThis.Number(t.seconds.toString()) || 0) * 1_000;
   millis += (t.nanos || 0) / 1_000_000;
   return new globalThis.Date(millis);
 }
@@ -1758,14 +1776,8 @@ function fromJsonTimestamp(o: any): Date {
   }
 }
 
-function longToNumber(long: Long): number {
-  if (long.gt(globalThis.Number.MAX_SAFE_INTEGER)) {
-    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
-  }
-  if (long.lt(globalThis.Number.MIN_SAFE_INTEGER)) {
-    throw new globalThis.Error("Value is smaller than Number.MIN_SAFE_INTEGER");
-  }
-  return long.toNumber();
+function longToBigint(long: Long) {
+  return BigInt(long.toString());
 }
 
 if (_m0.util.Long !== Long) {

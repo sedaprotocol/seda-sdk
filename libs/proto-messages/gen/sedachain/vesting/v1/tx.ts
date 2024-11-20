@@ -15,7 +15,7 @@ export interface MsgCreateVestingAccount {
   toAddress: string;
   amount: Coin[];
   /** end of vesting as unix time (in seconds). */
-  endTime: number;
+  endTime: bigint;
   /** if true, leave funder field empty and disable clawback */
   disableClawback: boolean;
 }
@@ -43,7 +43,7 @@ export interface MsgClawbackResponse {
 }
 
 function createBaseMsgCreateVestingAccount(): MsgCreateVestingAccount {
-  return { fromAddress: "", toAddress: "", amount: [], endTime: 0, disableClawback: false };
+  return { fromAddress: "", toAddress: "", amount: [], endTime: 0n, disableClawback: false };
 }
 
 export const MsgCreateVestingAccount = {
@@ -57,8 +57,11 @@ export const MsgCreateVestingAccount = {
     for (const v of message.amount) {
       Coin.encode(v!, writer.uint32(26).fork()).ldelim();
     }
-    if (message.endTime !== 0) {
-      writer.uint32(32).int64(message.endTime);
+    if (message.endTime !== 0n) {
+      if (BigInt.asIntN(64, message.endTime) !== message.endTime) {
+        throw new globalThis.Error("value provided for field message.endTime of type int64 too large");
+      }
+      writer.uint32(32).int64(message.endTime.toString());
     }
     if (message.disableClawback !== false) {
       writer.uint32(40).bool(message.disableClawback);
@@ -99,7 +102,7 @@ export const MsgCreateVestingAccount = {
             break;
           }
 
-          message.endTime = longToNumber(reader.int64() as Long);
+          message.endTime = longToBigint(reader.int64() as Long);
           continue;
         case 5:
           if (tag !== 40) {
@@ -122,7 +125,7 @@ export const MsgCreateVestingAccount = {
       fromAddress: isSet(object.fromAddress) ? globalThis.String(object.fromAddress) : "",
       toAddress: isSet(object.toAddress) ? globalThis.String(object.toAddress) : "",
       amount: globalThis.Array.isArray(object?.amount) ? object.amount.map((e: any) => Coin.fromJSON(e)) : [],
-      endTime: isSet(object.endTime) ? globalThis.Number(object.endTime) : 0,
+      endTime: isSet(object.endTime) ? BigInt(object.endTime) : 0n,
       disableClawback: isSet(object.disableClawback) ? globalThis.Boolean(object.disableClawback) : false,
     };
   },
@@ -138,8 +141,8 @@ export const MsgCreateVestingAccount = {
     if (message.amount?.length) {
       obj.amount = message.amount.map((e) => Coin.toJSON(e));
     }
-    if (message.endTime !== 0) {
-      obj.endTime = Math.round(message.endTime);
+    if (message.endTime !== 0n) {
+      obj.endTime = message.endTime.toString();
     }
     if (message.disableClawback !== false) {
       obj.disableClawback = message.disableClawback;
@@ -155,7 +158,7 @@ export const MsgCreateVestingAccount = {
     message.fromAddress = object.fromAddress ?? "";
     message.toAddress = object.toAddress ?? "";
     message.amount = object.amount?.map((e) => Coin.fromPartial(e)) || [];
-    message.endTime = object.endTime ?? 0;
+    message.endTime = object.endTime ?? 0n;
     message.disableClawback = object.disableClawback ?? false;
     return message;
   },
@@ -408,7 +411,7 @@ interface Rpc {
   request(service: string, method: string, data: Uint8Array): Promise<Uint8Array>;
 }
 
-type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
+type Builtin = Date | Function | Uint8Array | string | number | boolean | bigint | undefined;
 
 type DeepPartial<T> = T extends Builtin ? T
   : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
@@ -416,14 +419,8 @@ type DeepPartial<T> = T extends Builtin ? T
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
-function longToNumber(long: Long): number {
-  if (long.gt(globalThis.Number.MAX_SAFE_INTEGER)) {
-    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
-  }
-  if (long.lt(globalThis.Number.MIN_SAFE_INTEGER)) {
-    throw new globalThis.Error("Value is smaller than Number.MIN_SAFE_INTEGER");
-  }
-  return long.toNumber();
+function longToBigint(long: Long) {
+  return BigInt(long.toString());
 }
 
 if (_m0.util.Long !== Long) {

@@ -78,7 +78,7 @@ export interface MsgTransferAdminResponse {
 
 /** Returns the height after which the fee update will go into effect. */
 export interface MsgEditDataProxyResponse {
-  feeUpdateHeight: number;
+  feeUpdateHeight: bigint;
 }
 
 /** The request message for the UpdateParams method. */
@@ -541,13 +541,16 @@ export const MsgTransferAdminResponse = {
 };
 
 function createBaseMsgEditDataProxyResponse(): MsgEditDataProxyResponse {
-  return { feeUpdateHeight: 0 };
+  return { feeUpdateHeight: 0n };
 }
 
 export const MsgEditDataProxyResponse = {
   encode(message: MsgEditDataProxyResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.feeUpdateHeight !== 0) {
-      writer.uint32(8).int64(message.feeUpdateHeight);
+    if (message.feeUpdateHeight !== 0n) {
+      if (BigInt.asIntN(64, message.feeUpdateHeight) !== message.feeUpdateHeight) {
+        throw new globalThis.Error("value provided for field message.feeUpdateHeight of type int64 too large");
+      }
+      writer.uint32(8).int64(message.feeUpdateHeight.toString());
     }
     return writer;
   },
@@ -564,7 +567,7 @@ export const MsgEditDataProxyResponse = {
             break;
           }
 
-          message.feeUpdateHeight = longToNumber(reader.int64() as Long);
+          message.feeUpdateHeight = longToBigint(reader.int64() as Long);
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -576,13 +579,13 @@ export const MsgEditDataProxyResponse = {
   },
 
   fromJSON(object: any): MsgEditDataProxyResponse {
-    return { feeUpdateHeight: isSet(object.feeUpdateHeight) ? globalThis.Number(object.feeUpdateHeight) : 0 };
+    return { feeUpdateHeight: isSet(object.feeUpdateHeight) ? BigInt(object.feeUpdateHeight) : 0n };
   },
 
   toJSON(message: MsgEditDataProxyResponse): unknown {
     const obj: any = {};
-    if (message.feeUpdateHeight !== 0) {
-      obj.feeUpdateHeight = Math.round(message.feeUpdateHeight);
+    if (message.feeUpdateHeight !== 0n) {
+      obj.feeUpdateHeight = message.feeUpdateHeight.toString();
     }
     return obj;
   },
@@ -592,7 +595,7 @@ export const MsgEditDataProxyResponse = {
   },
   fromPartial(object: DeepPartial<MsgEditDataProxyResponse>): MsgEditDataProxyResponse {
     const message = createBaseMsgEditDataProxyResponse();
-    message.feeUpdateHeight = object.feeUpdateHeight ?? 0;
+    message.feeUpdateHeight = object.feeUpdateHeight ?? 0n;
     return message;
   },
 };
@@ -769,7 +772,7 @@ interface Rpc {
   request(service: string, method: string, data: Uint8Array): Promise<Uint8Array>;
 }
 
-type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
+type Builtin = Date | Function | Uint8Array | string | number | boolean | bigint | undefined;
 
 type DeepPartial<T> = T extends Builtin ? T
   : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
@@ -777,14 +780,8 @@ type DeepPartial<T> = T extends Builtin ? T
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
-function longToNumber(long: Long): number {
-  if (long.gt(globalThis.Number.MAX_SAFE_INTEGER)) {
-    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
-  }
-  if (long.lt(globalThis.Number.MIN_SAFE_INTEGER)) {
-    throw new globalThis.Error("Value is smaller than Number.MIN_SAFE_INTEGER");
-  }
-  return long.toNumber();
+function longToBigint(long: Long) {
+  return BigInt(long.toString());
 }
 
 if (_m0.util.Long !== Long) {

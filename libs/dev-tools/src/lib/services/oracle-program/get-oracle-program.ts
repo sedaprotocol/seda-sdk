@@ -12,7 +12,7 @@ export async function getOracleProgram(
 			oracleProgramId: string;
 			addedAt: Date | undefined;
 			bytecode: Uint8Array;
-			expirationHeight: number;
+			expirationHeight: bigint;
 		}>,
 		unknown
 	>

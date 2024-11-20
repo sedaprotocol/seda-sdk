@@ -74,7 +74,7 @@ export interface Duration {
    * to +315,576,000,000 inclusive. Note: these bounds are computed from:
    * 60 sec/min * 60 min/hr * 24 hr/day * 365.25 days/year * 10000 years
    */
-  seconds: number;
+  seconds: bigint;
   /**
    * Signed fractions of a second at nanosecond resolution of the span
    * of time. Durations less than one second are represented with a 0
@@ -87,13 +87,16 @@ export interface Duration {
 }
 
 function createBaseDuration(): Duration {
-  return { seconds: 0, nanos: 0 };
+  return { seconds: 0n, nanos: 0 };
 }
 
 export const Duration = {
   encode(message: Duration, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.seconds !== 0) {
-      writer.uint32(8).int64(message.seconds);
+    if (message.seconds !== 0n) {
+      if (BigInt.asIntN(64, message.seconds) !== message.seconds) {
+        throw new globalThis.Error("value provided for field message.seconds of type int64 too large");
+      }
+      writer.uint32(8).int64(message.seconds.toString());
     }
     if (message.nanos !== 0) {
       writer.uint32(16).int32(message.nanos);
@@ -113,7 +116,7 @@ export const Duration = {
             break;
           }
 
-          message.seconds = longToNumber(reader.int64() as Long);
+          message.seconds = longToBigint(reader.int64() as Long);
           continue;
         case 2:
           if (tag !== 16) {
@@ -133,15 +136,15 @@ export const Duration = {
 
   fromJSON(object: any): Duration {
     return {
-      seconds: isSet(object.seconds) ? globalThis.Number(object.seconds) : 0,
+      seconds: isSet(object.seconds) ? BigInt(object.seconds) : 0n,
       nanos: isSet(object.nanos) ? globalThis.Number(object.nanos) : 0,
     };
   },
 
   toJSON(message: Duration): unknown {
     const obj: any = {};
-    if (message.seconds !== 0) {
-      obj.seconds = Math.round(message.seconds);
+    if (message.seconds !== 0n) {
+      obj.seconds = message.seconds.toString();
     }
     if (message.nanos !== 0) {
       obj.nanos = Math.round(message.nanos);
@@ -154,13 +157,13 @@ export const Duration = {
   },
   fromPartial(object: DeepPartial<Duration>): Duration {
     const message = createBaseDuration();
-    message.seconds = object.seconds ?? 0;
+    message.seconds = object.seconds ?? 0n;
     message.nanos = object.nanos ?? 0;
     return message;
   },
 };
 
-type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
+type Builtin = Date | Function | Uint8Array | string | number | boolean | bigint | undefined;
 
 type DeepPartial<T> = T extends Builtin ? T
   : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
@@ -168,14 +171,8 @@ type DeepPartial<T> = T extends Builtin ? T
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
-function longToNumber(long: Long): number {
-  if (long.gt(globalThis.Number.MAX_SAFE_INTEGER)) {
-    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
-  }
-  if (long.lt(globalThis.Number.MIN_SAFE_INTEGER)) {
-    throw new globalThis.Error("Value is smaller than Number.MIN_SAFE_INTEGER");
-  }
-  return long.toNumber();
+function longToBigint(long: Long) {
+  return BigInt(long.toString());
 }
 
 if (_m0.util.Long !== Long) {

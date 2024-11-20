@@ -20,7 +20,7 @@ export interface OracleProgram {
    * ExpirationHeight represents the block height at which the oracle
    * program will be pruned. The value of zero means no expiration.
    */
-  expirationHeight: number;
+  expirationHeight: bigint;
 }
 
 /** ExecutorWasm is a wasm used by some component in the protocol. */
@@ -32,16 +32,16 @@ export interface ExecutorWasm {
 
 /** Params to define the max wasm size allowed. */
 export interface Params {
-  maxWasmSize: number;
+  maxWasmSize: bigint;
   /**
    * WasmTTL represents the number of blocks a wasm's life is extended when it's
    * created or used.
    */
-  wasmTtl: number;
+  wasmTtl: bigint;
 }
 
 function createBaseOracleProgram(): OracleProgram {
-  return { hash: new Uint8Array(0), bytecode: new Uint8Array(0), addedAt: undefined, expirationHeight: 0 };
+  return { hash: new Uint8Array(0), bytecode: new Uint8Array(0), addedAt: undefined, expirationHeight: 0n };
 }
 
 export const OracleProgram = {
@@ -55,8 +55,11 @@ export const OracleProgram = {
     if (message.addedAt !== undefined) {
       Timestamp.encode(toTimestamp(message.addedAt), writer.uint32(26).fork()).ldelim();
     }
-    if (message.expirationHeight !== 0) {
-      writer.uint32(32).int64(message.expirationHeight);
+    if (message.expirationHeight !== 0n) {
+      if (BigInt.asIntN(64, message.expirationHeight) !== message.expirationHeight) {
+        throw new globalThis.Error("value provided for field message.expirationHeight of type int64 too large");
+      }
+      writer.uint32(32).int64(message.expirationHeight.toString());
     }
     return writer;
   },
@@ -94,7 +97,7 @@ export const OracleProgram = {
             break;
           }
 
-          message.expirationHeight = longToNumber(reader.int64() as Long);
+          message.expirationHeight = longToBigint(reader.int64() as Long);
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -110,7 +113,7 @@ export const OracleProgram = {
       hash: isSet(object.hash) ? bytesFromBase64(object.hash) : new Uint8Array(0),
       bytecode: isSet(object.bytecode) ? bytesFromBase64(object.bytecode) : new Uint8Array(0),
       addedAt: isSet(object.addedAt) ? fromJsonTimestamp(object.addedAt) : undefined,
-      expirationHeight: isSet(object.expirationHeight) ? globalThis.Number(object.expirationHeight) : 0,
+      expirationHeight: isSet(object.expirationHeight) ? BigInt(object.expirationHeight) : 0n,
     };
   },
 
@@ -125,8 +128,8 @@ export const OracleProgram = {
     if (message.addedAt !== undefined) {
       obj.addedAt = message.addedAt.toISOString();
     }
-    if (message.expirationHeight !== 0) {
-      obj.expirationHeight = Math.round(message.expirationHeight);
+    if (message.expirationHeight !== 0n) {
+      obj.expirationHeight = message.expirationHeight.toString();
     }
     return obj;
   },
@@ -139,7 +142,7 @@ export const OracleProgram = {
     message.hash = object.hash ?? new Uint8Array(0);
     message.bytecode = object.bytecode ?? new Uint8Array(0);
     message.addedAt = object.addedAt ?? undefined;
-    message.expirationHeight = object.expirationHeight ?? 0;
+    message.expirationHeight = object.expirationHeight ?? 0n;
     return message;
   },
 };
@@ -234,16 +237,22 @@ export const ExecutorWasm = {
 };
 
 function createBaseParams(): Params {
-  return { maxWasmSize: 0, wasmTtl: 0 };
+  return { maxWasmSize: 0n, wasmTtl: 0n };
 }
 
 export const Params = {
   encode(message: Params, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.maxWasmSize !== 0) {
-      writer.uint32(8).int64(message.maxWasmSize);
+    if (message.maxWasmSize !== 0n) {
+      if (BigInt.asIntN(64, message.maxWasmSize) !== message.maxWasmSize) {
+        throw new globalThis.Error("value provided for field message.maxWasmSize of type int64 too large");
+      }
+      writer.uint32(8).int64(message.maxWasmSize.toString());
     }
-    if (message.wasmTtl !== 0) {
-      writer.uint32(16).int64(message.wasmTtl);
+    if (message.wasmTtl !== 0n) {
+      if (BigInt.asIntN(64, message.wasmTtl) !== message.wasmTtl) {
+        throw new globalThis.Error("value provided for field message.wasmTtl of type int64 too large");
+      }
+      writer.uint32(16).int64(message.wasmTtl.toString());
     }
     return writer;
   },
@@ -260,14 +269,14 @@ export const Params = {
             break;
           }
 
-          message.maxWasmSize = longToNumber(reader.int64() as Long);
+          message.maxWasmSize = longToBigint(reader.int64() as Long);
           continue;
         case 2:
           if (tag !== 16) {
             break;
           }
 
-          message.wasmTtl = longToNumber(reader.int64() as Long);
+          message.wasmTtl = longToBigint(reader.int64() as Long);
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -280,18 +289,18 @@ export const Params = {
 
   fromJSON(object: any): Params {
     return {
-      maxWasmSize: isSet(object.maxWasmSize) ? globalThis.Number(object.maxWasmSize) : 0,
-      wasmTtl: isSet(object.wasmTtl) ? globalThis.Number(object.wasmTtl) : 0,
+      maxWasmSize: isSet(object.maxWasmSize) ? BigInt(object.maxWasmSize) : 0n,
+      wasmTtl: isSet(object.wasmTtl) ? BigInt(object.wasmTtl) : 0n,
     };
   },
 
   toJSON(message: Params): unknown {
     const obj: any = {};
-    if (message.maxWasmSize !== 0) {
-      obj.maxWasmSize = Math.round(message.maxWasmSize);
+    if (message.maxWasmSize !== 0n) {
+      obj.maxWasmSize = message.maxWasmSize.toString();
     }
-    if (message.wasmTtl !== 0) {
-      obj.wasmTtl = Math.round(message.wasmTtl);
+    if (message.wasmTtl !== 0n) {
+      obj.wasmTtl = message.wasmTtl.toString();
     }
     return obj;
   },
@@ -301,8 +310,8 @@ export const Params = {
   },
   fromPartial(object: DeepPartial<Params>): Params {
     const message = createBaseParams();
-    message.maxWasmSize = object.maxWasmSize ?? 0;
-    message.wasmTtl = object.wasmTtl ?? 0;
+    message.maxWasmSize = object.maxWasmSize ?? 0n;
+    message.wasmTtl = object.wasmTtl ?? 0n;
     return message;
   },
 };
@@ -332,7 +341,7 @@ function base64FromBytes(arr: Uint8Array): string {
   }
 }
 
-type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
+type Builtin = Date | Function | Uint8Array | string | number | boolean | bigint | undefined;
 
 type DeepPartial<T> = T extends Builtin ? T
   : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
@@ -341,13 +350,13 @@ type DeepPartial<T> = T extends Builtin ? T
   : Partial<T>;
 
 function toTimestamp(date: Date): Timestamp {
-  const seconds = Math.trunc(date.getTime() / 1_000);
+  const seconds = BigInt(Math.trunc(date.getTime() / 1_000));
   const nanos = (date.getTime() % 1_000) * 1_000_000;
   return { seconds, nanos };
 }
 
 function fromTimestamp(t: Timestamp): Date {
-  let millis = (t.seconds || 0) * 1_000;
+  let millis = (globalThis.Number(t.seconds.toString()) || 0) * 1_000;
   millis += (t.nanos || 0) / 1_000_000;
   return new globalThis.Date(millis);
 }
@@ -362,14 +371,8 @@ function fromJsonTimestamp(o: any): Date {
   }
 }
 
-function longToNumber(long: Long): number {
-  if (long.gt(globalThis.Number.MAX_SAFE_INTEGER)) {
-    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
-  }
-  if (long.lt(globalThis.Number.MIN_SAFE_INTEGER)) {
-    throw new globalThis.Error("Value is smaller than Number.MIN_SAFE_INTEGER");
-  }
-  return long.toNumber();
+function longToBigint(long: Long) {
+  return BigInt(long.toString());
 }
 
 if (_m0.util.Long !== Long) {

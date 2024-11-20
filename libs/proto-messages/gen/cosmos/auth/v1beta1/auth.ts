@@ -17,8 +17,8 @@ import { Any } from "../../../google/protobuf/any";
 export interface BaseAccount {
   address: string;
   pubKey: Any | undefined;
-  accountNumber: number;
-  sequence: number;
+  accountNumber: bigint;
+  sequence: bigint;
 }
 
 /** ModuleAccount defines an account for modules that holds coins on a pool. */
@@ -45,15 +45,15 @@ export interface ModuleCredential {
 
 /** Params defines the parameters for the auth module. */
 export interface Params {
-  maxMemoCharacters: number;
-  txSigLimit: number;
-  txSizeCostPerByte: number;
-  sigVerifyCostEd25519: number;
-  sigVerifyCostSecp256k1: number;
+  maxMemoCharacters: bigint;
+  txSigLimit: bigint;
+  txSizeCostPerByte: bigint;
+  sigVerifyCostEd25519: bigint;
+  sigVerifyCostSecp256k1: bigint;
 }
 
 function createBaseBaseAccount(): BaseAccount {
-  return { address: "", pubKey: undefined, accountNumber: 0, sequence: 0 };
+  return { address: "", pubKey: undefined, accountNumber: 0n, sequence: 0n };
 }
 
 export const BaseAccount = {
@@ -64,11 +64,17 @@ export const BaseAccount = {
     if (message.pubKey !== undefined) {
       Any.encode(message.pubKey, writer.uint32(18).fork()).ldelim();
     }
-    if (message.accountNumber !== 0) {
-      writer.uint32(24).uint64(message.accountNumber);
+    if (message.accountNumber !== 0n) {
+      if (BigInt.asUintN(64, message.accountNumber) !== message.accountNumber) {
+        throw new globalThis.Error("value provided for field message.accountNumber of type uint64 too large");
+      }
+      writer.uint32(24).uint64(message.accountNumber.toString());
     }
-    if (message.sequence !== 0) {
-      writer.uint32(32).uint64(message.sequence);
+    if (message.sequence !== 0n) {
+      if (BigInt.asUintN(64, message.sequence) !== message.sequence) {
+        throw new globalThis.Error("value provided for field message.sequence of type uint64 too large");
+      }
+      writer.uint32(32).uint64(message.sequence.toString());
     }
     return writer;
   },
@@ -99,14 +105,14 @@ export const BaseAccount = {
             break;
           }
 
-          message.accountNumber = longToNumber(reader.uint64() as Long);
+          message.accountNumber = longToBigint(reader.uint64() as Long);
           continue;
         case 4:
           if (tag !== 32) {
             break;
           }
 
-          message.sequence = longToNumber(reader.uint64() as Long);
+          message.sequence = longToBigint(reader.uint64() as Long);
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -121,8 +127,8 @@ export const BaseAccount = {
     return {
       address: isSet(object.address) ? globalThis.String(object.address) : "",
       pubKey: isSet(object.pubKey) ? Any.fromJSON(object.pubKey) : undefined,
-      accountNumber: isSet(object.accountNumber) ? globalThis.Number(object.accountNumber) : 0,
-      sequence: isSet(object.sequence) ? globalThis.Number(object.sequence) : 0,
+      accountNumber: isSet(object.accountNumber) ? BigInt(object.accountNumber) : 0n,
+      sequence: isSet(object.sequence) ? BigInt(object.sequence) : 0n,
     };
   },
 
@@ -134,11 +140,11 @@ export const BaseAccount = {
     if (message.pubKey !== undefined) {
       obj.pubKey = Any.toJSON(message.pubKey);
     }
-    if (message.accountNumber !== 0) {
-      obj.accountNumber = Math.round(message.accountNumber);
+    if (message.accountNumber !== 0n) {
+      obj.accountNumber = message.accountNumber.toString();
     }
-    if (message.sequence !== 0) {
-      obj.sequence = Math.round(message.sequence);
+    if (message.sequence !== 0n) {
+      obj.sequence = message.sequence.toString();
     }
     return obj;
   },
@@ -152,8 +158,8 @@ export const BaseAccount = {
     message.pubKey = (object.pubKey !== undefined && object.pubKey !== null)
       ? Any.fromPartial(object.pubKey)
       : undefined;
-    message.accountNumber = object.accountNumber ?? 0;
-    message.sequence = object.sequence ?? 0;
+    message.accountNumber = object.accountNumber ?? 0n;
+    message.sequence = object.sequence ?? 0n;
     return message;
   },
 };
@@ -329,30 +335,45 @@ export const ModuleCredential = {
 
 function createBaseParams(): Params {
   return {
-    maxMemoCharacters: 0,
-    txSigLimit: 0,
-    txSizeCostPerByte: 0,
-    sigVerifyCostEd25519: 0,
-    sigVerifyCostSecp256k1: 0,
+    maxMemoCharacters: 0n,
+    txSigLimit: 0n,
+    txSizeCostPerByte: 0n,
+    sigVerifyCostEd25519: 0n,
+    sigVerifyCostSecp256k1: 0n,
   };
 }
 
 export const Params = {
   encode(message: Params, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.maxMemoCharacters !== 0) {
-      writer.uint32(8).uint64(message.maxMemoCharacters);
+    if (message.maxMemoCharacters !== 0n) {
+      if (BigInt.asUintN(64, message.maxMemoCharacters) !== message.maxMemoCharacters) {
+        throw new globalThis.Error("value provided for field message.maxMemoCharacters of type uint64 too large");
+      }
+      writer.uint32(8).uint64(message.maxMemoCharacters.toString());
     }
-    if (message.txSigLimit !== 0) {
-      writer.uint32(16).uint64(message.txSigLimit);
+    if (message.txSigLimit !== 0n) {
+      if (BigInt.asUintN(64, message.txSigLimit) !== message.txSigLimit) {
+        throw new globalThis.Error("value provided for field message.txSigLimit of type uint64 too large");
+      }
+      writer.uint32(16).uint64(message.txSigLimit.toString());
     }
-    if (message.txSizeCostPerByte !== 0) {
-      writer.uint32(24).uint64(message.txSizeCostPerByte);
+    if (message.txSizeCostPerByte !== 0n) {
+      if (BigInt.asUintN(64, message.txSizeCostPerByte) !== message.txSizeCostPerByte) {
+        throw new globalThis.Error("value provided for field message.txSizeCostPerByte of type uint64 too large");
+      }
+      writer.uint32(24).uint64(message.txSizeCostPerByte.toString());
     }
-    if (message.sigVerifyCostEd25519 !== 0) {
-      writer.uint32(32).uint64(message.sigVerifyCostEd25519);
+    if (message.sigVerifyCostEd25519 !== 0n) {
+      if (BigInt.asUintN(64, message.sigVerifyCostEd25519) !== message.sigVerifyCostEd25519) {
+        throw new globalThis.Error("value provided for field message.sigVerifyCostEd25519 of type uint64 too large");
+      }
+      writer.uint32(32).uint64(message.sigVerifyCostEd25519.toString());
     }
-    if (message.sigVerifyCostSecp256k1 !== 0) {
-      writer.uint32(40).uint64(message.sigVerifyCostSecp256k1);
+    if (message.sigVerifyCostSecp256k1 !== 0n) {
+      if (BigInt.asUintN(64, message.sigVerifyCostSecp256k1) !== message.sigVerifyCostSecp256k1) {
+        throw new globalThis.Error("value provided for field message.sigVerifyCostSecp256k1 of type uint64 too large");
+      }
+      writer.uint32(40).uint64(message.sigVerifyCostSecp256k1.toString());
     }
     return writer;
   },
@@ -369,35 +390,35 @@ export const Params = {
             break;
           }
 
-          message.maxMemoCharacters = longToNumber(reader.uint64() as Long);
+          message.maxMemoCharacters = longToBigint(reader.uint64() as Long);
           continue;
         case 2:
           if (tag !== 16) {
             break;
           }
 
-          message.txSigLimit = longToNumber(reader.uint64() as Long);
+          message.txSigLimit = longToBigint(reader.uint64() as Long);
           continue;
         case 3:
           if (tag !== 24) {
             break;
           }
 
-          message.txSizeCostPerByte = longToNumber(reader.uint64() as Long);
+          message.txSizeCostPerByte = longToBigint(reader.uint64() as Long);
           continue;
         case 4:
           if (tag !== 32) {
             break;
           }
 
-          message.sigVerifyCostEd25519 = longToNumber(reader.uint64() as Long);
+          message.sigVerifyCostEd25519 = longToBigint(reader.uint64() as Long);
           continue;
         case 5:
           if (tag !== 40) {
             break;
           }
 
-          message.sigVerifyCostSecp256k1 = longToNumber(reader.uint64() as Long);
+          message.sigVerifyCostSecp256k1 = longToBigint(reader.uint64() as Long);
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -410,32 +431,30 @@ export const Params = {
 
   fromJSON(object: any): Params {
     return {
-      maxMemoCharacters: isSet(object.maxMemoCharacters) ? globalThis.Number(object.maxMemoCharacters) : 0,
-      txSigLimit: isSet(object.txSigLimit) ? globalThis.Number(object.txSigLimit) : 0,
-      txSizeCostPerByte: isSet(object.txSizeCostPerByte) ? globalThis.Number(object.txSizeCostPerByte) : 0,
-      sigVerifyCostEd25519: isSet(object.sigVerifyCostEd25519) ? globalThis.Number(object.sigVerifyCostEd25519) : 0,
-      sigVerifyCostSecp256k1: isSet(object.sigVerifyCostSecp256k1)
-        ? globalThis.Number(object.sigVerifyCostSecp256k1)
-        : 0,
+      maxMemoCharacters: isSet(object.maxMemoCharacters) ? BigInt(object.maxMemoCharacters) : 0n,
+      txSigLimit: isSet(object.txSigLimit) ? BigInt(object.txSigLimit) : 0n,
+      txSizeCostPerByte: isSet(object.txSizeCostPerByte) ? BigInt(object.txSizeCostPerByte) : 0n,
+      sigVerifyCostEd25519: isSet(object.sigVerifyCostEd25519) ? BigInt(object.sigVerifyCostEd25519) : 0n,
+      sigVerifyCostSecp256k1: isSet(object.sigVerifyCostSecp256k1) ? BigInt(object.sigVerifyCostSecp256k1) : 0n,
     };
   },
 
   toJSON(message: Params): unknown {
     const obj: any = {};
-    if (message.maxMemoCharacters !== 0) {
-      obj.maxMemoCharacters = Math.round(message.maxMemoCharacters);
+    if (message.maxMemoCharacters !== 0n) {
+      obj.maxMemoCharacters = message.maxMemoCharacters.toString();
     }
-    if (message.txSigLimit !== 0) {
-      obj.txSigLimit = Math.round(message.txSigLimit);
+    if (message.txSigLimit !== 0n) {
+      obj.txSigLimit = message.txSigLimit.toString();
     }
-    if (message.txSizeCostPerByte !== 0) {
-      obj.txSizeCostPerByte = Math.round(message.txSizeCostPerByte);
+    if (message.txSizeCostPerByte !== 0n) {
+      obj.txSizeCostPerByte = message.txSizeCostPerByte.toString();
     }
-    if (message.sigVerifyCostEd25519 !== 0) {
-      obj.sigVerifyCostEd25519 = Math.round(message.sigVerifyCostEd25519);
+    if (message.sigVerifyCostEd25519 !== 0n) {
+      obj.sigVerifyCostEd25519 = message.sigVerifyCostEd25519.toString();
     }
-    if (message.sigVerifyCostSecp256k1 !== 0) {
-      obj.sigVerifyCostSecp256k1 = Math.round(message.sigVerifyCostSecp256k1);
+    if (message.sigVerifyCostSecp256k1 !== 0n) {
+      obj.sigVerifyCostSecp256k1 = message.sigVerifyCostSecp256k1.toString();
     }
     return obj;
   },
@@ -445,11 +464,11 @@ export const Params = {
   },
   fromPartial(object: DeepPartial<Params>): Params {
     const message = createBaseParams();
-    message.maxMemoCharacters = object.maxMemoCharacters ?? 0;
-    message.txSigLimit = object.txSigLimit ?? 0;
-    message.txSizeCostPerByte = object.txSizeCostPerByte ?? 0;
-    message.sigVerifyCostEd25519 = object.sigVerifyCostEd25519 ?? 0;
-    message.sigVerifyCostSecp256k1 = object.sigVerifyCostSecp256k1 ?? 0;
+    message.maxMemoCharacters = object.maxMemoCharacters ?? 0n;
+    message.txSigLimit = object.txSigLimit ?? 0n;
+    message.txSizeCostPerByte = object.txSizeCostPerByte ?? 0n;
+    message.sigVerifyCostEd25519 = object.sigVerifyCostEd25519 ?? 0n;
+    message.sigVerifyCostSecp256k1 = object.sigVerifyCostSecp256k1 ?? 0n;
     return message;
   },
 };
@@ -479,7 +498,7 @@ function base64FromBytes(arr: Uint8Array): string {
   }
 }
 
-type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
+type Builtin = Date | Function | Uint8Array | string | number | boolean | bigint | undefined;
 
 type DeepPartial<T> = T extends Builtin ? T
   : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
@@ -487,14 +506,8 @@ type DeepPartial<T> = T extends Builtin ? T
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
-function longToNumber(long: Long): number {
-  if (long.gt(globalThis.Number.MAX_SAFE_INTEGER)) {
-    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
-  }
-  if (long.lt(globalThis.Number.MIN_SAFE_INTEGER)) {
-    throw new globalThis.Error("Value is smaller than Number.MIN_SAFE_INTEGER");
-  }
-  return long.toNumber();
+function longToBigint(long: Long) {
+  return BigInt(long.toString());
 }
 
 if (_m0.util.Long !== Long) {

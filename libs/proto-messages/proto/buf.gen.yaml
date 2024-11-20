@@ -11,3 +11,4 @@ plugins:
       - esModuleInterop=true
       - useExactTypes=false
       - outputIndex=true
+      - forceLong=bigint

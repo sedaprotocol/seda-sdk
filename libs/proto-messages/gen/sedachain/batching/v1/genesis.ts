@@ -15,7 +15,7 @@ export interface GenesisState {
    * current_batch_number is the batch number of the most recently-
    * created batch.
    */
-  currentBatchNumber: number;
+  currentBatchNumber: bigint;
   batches: Batch[];
   treeEntries: TreeEntries[];
   dataResults: DataResult[];
@@ -28,13 +28,13 @@ export interface GenesisState {
  * and import.
  */
 export interface BatchAssignment {
-  batchNumber: number;
+  batchNumber: bigint;
   dataRequestId: string;
 }
 
 function createBaseGenesisState(): GenesisState {
   return {
-    currentBatchNumber: 0,
+    currentBatchNumber: 0n,
     batches: [],
     treeEntries: [],
     dataResults: [],
@@ -45,8 +45,11 @@ function createBaseGenesisState(): GenesisState {
 
 export const GenesisState = {
   encode(message: GenesisState, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.currentBatchNumber !== 0) {
-      writer.uint32(8).uint64(message.currentBatchNumber);
+    if (message.currentBatchNumber !== 0n) {
+      if (BigInt.asUintN(64, message.currentBatchNumber) !== message.currentBatchNumber) {
+        throw new globalThis.Error("value provided for field message.currentBatchNumber of type uint64 too large");
+      }
+      writer.uint32(8).uint64(message.currentBatchNumber.toString());
     }
     for (const v of message.batches) {
       Batch.encode(v!, writer.uint32(18).fork()).ldelim();
@@ -78,7 +81,7 @@ export const GenesisState = {
             break;
           }
 
-          message.currentBatchNumber = longToNumber(reader.uint64() as Long);
+          message.currentBatchNumber = longToBigint(reader.uint64() as Long);
           continue;
         case 2:
           if (tag !== 18) {
@@ -126,7 +129,7 @@ export const GenesisState = {
 
   fromJSON(object: any): GenesisState {
     return {
-      currentBatchNumber: isSet(object.currentBatchNumber) ? globalThis.Number(object.currentBatchNumber) : 0,
+      currentBatchNumber: isSet(object.currentBatchNumber) ? BigInt(object.currentBatchNumber) : 0n,
       batches: globalThis.Array.isArray(object?.batches) ? object.batches.map((e: any) => Batch.fromJSON(e)) : [],
       treeEntries: globalThis.Array.isArray(object?.treeEntries)
         ? object.treeEntries.map((e: any) => TreeEntries.fromJSON(e))
@@ -143,8 +146,8 @@ export const GenesisState = {
 
   toJSON(message: GenesisState): unknown {
     const obj: any = {};
-    if (message.currentBatchNumber !== 0) {
-      obj.currentBatchNumber = Math.round(message.currentBatchNumber);
+    if (message.currentBatchNumber !== 0n) {
+      obj.currentBatchNumber = message.currentBatchNumber.toString();
     }
     if (message.batches?.length) {
       obj.batches = message.batches.map((e) => Batch.toJSON(e));
@@ -169,7 +172,7 @@ export const GenesisState = {
   },
   fromPartial(object: DeepPartial<GenesisState>): GenesisState {
     const message = createBaseGenesisState();
-    message.currentBatchNumber = object.currentBatchNumber ?? 0;
+    message.currentBatchNumber = object.currentBatchNumber ?? 0n;
     message.batches = object.batches?.map((e) => Batch.fromPartial(e)) || [];
     message.treeEntries = object.treeEntries?.map((e) => TreeEntries.fromPartial(e)) || [];
     message.dataResults = object.dataResults?.map((e) => DataResult.fromPartial(e)) || [];
@@ -182,13 +185,16 @@ export const GenesisState = {
 };
 
 function createBaseBatchAssignment(): BatchAssignment {
-  return { batchNumber: 0, dataRequestId: "" };
+  return { batchNumber: 0n, dataRequestId: "" };
 }
 
 export const BatchAssignment = {
   encode(message: BatchAssignment, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.batchNumber !== 0) {
-      writer.uint32(8).uint64(message.batchNumber);
+    if (message.batchNumber !== 0n) {
+      if (BigInt.asUintN(64, message.batchNumber) !== message.batchNumber) {
+        throw new globalThis.Error("value provided for field message.batchNumber of type uint64 too large");
+      }
+      writer.uint32(8).uint64(message.batchNumber.toString());
     }
     if (message.dataRequestId !== "") {
       writer.uint32(18).string(message.dataRequestId);
@@ -208,7 +214,7 @@ export const BatchAssignment = {
             break;
           }
 
-          message.batchNumber = longToNumber(reader.uint64() as Long);
+          message.batchNumber = longToBigint(reader.uint64() as Long);
           continue;
         case 2:
           if (tag !== 18) {
@@ -228,15 +234,15 @@ export const BatchAssignment = {
 
   fromJSON(object: any): BatchAssignment {
     return {
-      batchNumber: isSet(object.batchNumber) ? globalThis.Number(object.batchNumber) : 0,
+      batchNumber: isSet(object.batchNumber) ? BigInt(object.batchNumber) : 0n,
       dataRequestId: isSet(object.dataRequestId) ? globalThis.String(object.dataRequestId) : "",
     };
   },
 
   toJSON(message: BatchAssignment): unknown {
     const obj: any = {};
-    if (message.batchNumber !== 0) {
-      obj.batchNumber = Math.round(message.batchNumber);
+    if (message.batchNumber !== 0n) {
+      obj.batchNumber = message.batchNumber.toString();
     }
     if (message.dataRequestId !== "") {
       obj.dataRequestId = message.dataRequestId;
@@ -249,13 +255,13 @@ export const BatchAssignment = {
   },
   fromPartial(object: DeepPartial<BatchAssignment>): BatchAssignment {
     const message = createBaseBatchAssignment();
-    message.batchNumber = object.batchNumber ?? 0;
+    message.batchNumber = object.batchNumber ?? 0n;
     message.dataRequestId = object.dataRequestId ?? "";
     return message;
   },
 };
 
-type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
+type Builtin = Date | Function | Uint8Array | string | number | boolean | bigint | undefined;
 
 type DeepPartial<T> = T extends Builtin ? T
   : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
@@ -263,14 +269,8 @@ type DeepPartial<T> = T extends Builtin ? T
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
-function longToNumber(long: Long): number {
-  if (long.gt(globalThis.Number.MAX_SAFE_INTEGER)) {
-    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
-  }
-  if (long.lt(globalThis.Number.MIN_SAFE_INTEGER)) {
-    throw new globalThis.Error("Value is smaller than Number.MIN_SAFE_INTEGER");
-  }
-  return long.toNumber();
+function longToBigint(long: Long) {
+  return BigInt(long.toString());
 }
 
 if (_m0.util.Long !== Long) {

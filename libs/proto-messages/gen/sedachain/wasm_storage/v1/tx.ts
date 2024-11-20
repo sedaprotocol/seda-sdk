@@ -36,7 +36,7 @@ export interface MsgStoreExecutorWasmResponse {
 export interface MsgInstantiateCoreContract {
   sender: string;
   admin: string;
-  codeId: number;
+  codeId: bigint;
   label: string;
   msg: Uint8Array;
   funds: Coin[];
@@ -329,7 +329,7 @@ function createBaseMsgInstantiateCoreContract(): MsgInstantiateCoreContract {
   return {
     sender: "",
     admin: "",
-    codeId: 0,
+    codeId: 0n,
     label: "",
     msg: new Uint8Array(0),
     funds: [],
@@ -346,8 +346,11 @@ export const MsgInstantiateCoreContract = {
     if (message.admin !== "") {
       writer.uint32(18).string(message.admin);
     }
-    if (message.codeId !== 0) {
-      writer.uint32(24).uint64(message.codeId);
+    if (message.codeId !== 0n) {
+      if (BigInt.asUintN(64, message.codeId) !== message.codeId) {
+        throw new globalThis.Error("value provided for field message.codeId of type uint64 too large");
+      }
+      writer.uint32(24).uint64(message.codeId.toString());
     }
     if (message.label !== "") {
       writer.uint32(34).string(message.label);
@@ -393,7 +396,7 @@ export const MsgInstantiateCoreContract = {
             break;
           }
 
-          message.codeId = longToNumber(reader.uint64() as Long);
+          message.codeId = longToBigint(reader.uint64() as Long);
           continue;
         case 4:
           if (tag !== 34) {
@@ -443,7 +446,7 @@ export const MsgInstantiateCoreContract = {
     return {
       sender: isSet(object.sender) ? globalThis.String(object.sender) : "",
       admin: isSet(object.admin) ? globalThis.String(object.admin) : "",
-      codeId: isSet(object.codeId) ? globalThis.Number(object.codeId) : 0,
+      codeId: isSet(object.codeId) ? BigInt(object.codeId) : 0n,
       label: isSet(object.label) ? globalThis.String(object.label) : "",
       msg: isSet(object.msg) ? bytesFromBase64(object.msg) : new Uint8Array(0),
       funds: globalThis.Array.isArray(object?.funds) ? object.funds.map((e: any) => Coin.fromJSON(e)) : [],
@@ -460,8 +463,8 @@ export const MsgInstantiateCoreContract = {
     if (message.admin !== "") {
       obj.admin = message.admin;
     }
-    if (message.codeId !== 0) {
-      obj.codeId = Math.round(message.codeId);
+    if (message.codeId !== 0n) {
+      obj.codeId = message.codeId.toString();
     }
     if (message.label !== "") {
       obj.label = message.label;
@@ -488,7 +491,7 @@ export const MsgInstantiateCoreContract = {
     const message = createBaseMsgInstantiateCoreContract();
     message.sender = object.sender ?? "";
     message.admin = object.admin ?? "";
-    message.codeId = object.codeId ?? 0;
+    message.codeId = object.codeId ?? 0n;
     message.label = object.label ?? "";
     message.msg = object.msg ?? new Uint8Array(0);
     message.funds = object.funds?.map((e) => Coin.fromPartial(e)) || [];
@@ -755,7 +758,7 @@ function base64FromBytes(arr: Uint8Array): string {
   }
 }
 
-type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
+type Builtin = Date | Function | Uint8Array | string | number | boolean | bigint | undefined;
 
 type DeepPartial<T> = T extends Builtin ? T
   : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
@@ -763,14 +766,8 @@ type DeepPartial<T> = T extends Builtin ? T
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
-function longToNumber(long: Long): number {
-  if (long.gt(globalThis.Number.MAX_SAFE_INTEGER)) {
-    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
-  }
-  if (long.lt(globalThis.Number.MIN_SAFE_INTEGER)) {
-    throw new globalThis.Error("Value is smaller than Number.MIN_SAFE_INTEGER");
-  }
-  return long.toNumber();
+function longToBigint(long: Long) {
+  return BigInt(long.toString());
 }
 
 if (_m0.util.Long !== Long) {

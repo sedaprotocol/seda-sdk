@@ -19,10 +19,10 @@ list.action(async () => {
 
 	const queryResult = await wasmStorageQueryClient.OraclePrograms({
 		pagination: {
-			limit: 20,
+			limit: 20n,
 			countTotal: true,
 			key: new Uint8Array(),
-			offset: 0,
+			offset: 0n,
 			reverse: false,
 		},
 	});

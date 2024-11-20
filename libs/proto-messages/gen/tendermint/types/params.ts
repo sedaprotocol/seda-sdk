@@ -26,12 +26,12 @@ export interface BlockParams {
    * Max block size, in bytes.
    * Note: must be greater than 0
    */
-  maxBytes: number;
+  maxBytes: bigint;
   /**
    * Max gas per block.
    * Note: must be greater or equal to -1
    */
-  maxGas: number;
+  maxGas: bigint;
 }
 
 /** EvidenceParams determine how we handle evidence of malfeasance. */
@@ -42,7 +42,7 @@ export interface EvidenceParams {
    * The basic formula for calculating this is: MaxAgeDuration / {average block
    * time}.
    */
-  maxAgeNumBlocks: number;
+  maxAgeNumBlocks: bigint;
   /**
    * Max age of evidence, in time.
    *
@@ -58,7 +58,7 @@ export interface EvidenceParams {
    * and should fall comfortably under the max block bytes.
    * Default is 1048576 or 1MB
    */
-  maxBytes: number;
+  maxBytes: bigint;
 }
 
 /**
@@ -71,7 +71,7 @@ export interface ValidatorParams {
 
 /** VersionParams contains the ABCI application version. */
 export interface VersionParams {
-  app: number;
+  app: bigint;
 }
 
 /**
@@ -80,8 +80,8 @@ export interface VersionParams {
  * It is hashed into the Header.ConsensusHash.
  */
 export interface HashedParams {
-  blockMaxBytes: number;
-  blockMaxGas: number;
+  blockMaxBytes: bigint;
+  blockMaxGas: bigint;
 }
 
 function createBaseConsensusParams(): ConsensusParams {
@@ -197,16 +197,22 @@ export const ConsensusParams = {
 };
 
 function createBaseBlockParams(): BlockParams {
-  return { maxBytes: 0, maxGas: 0 };
+  return { maxBytes: 0n, maxGas: 0n };
 }
 
 export const BlockParams = {
   encode(message: BlockParams, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.maxBytes !== 0) {
-      writer.uint32(8).int64(message.maxBytes);
+    if (message.maxBytes !== 0n) {
+      if (BigInt.asIntN(64, message.maxBytes) !== message.maxBytes) {
+        throw new globalThis.Error("value provided for field message.maxBytes of type int64 too large");
+      }
+      writer.uint32(8).int64(message.maxBytes.toString());
     }
-    if (message.maxGas !== 0) {
-      writer.uint32(16).int64(message.maxGas);
+    if (message.maxGas !== 0n) {
+      if (BigInt.asIntN(64, message.maxGas) !== message.maxGas) {
+        throw new globalThis.Error("value provided for field message.maxGas of type int64 too large");
+      }
+      writer.uint32(16).int64(message.maxGas.toString());
     }
     return writer;
   },
@@ -223,14 +229,14 @@ export const BlockParams = {
             break;
           }
 
-          message.maxBytes = longToNumber(reader.int64() as Long);
+          message.maxBytes = longToBigint(reader.int64() as Long);
           continue;
         case 2:
           if (tag !== 16) {
             break;
           }
 
-          message.maxGas = longToNumber(reader.int64() as Long);
+          message.maxGas = longToBigint(reader.int64() as Long);
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -243,18 +249,18 @@ export const BlockParams = {
 
   fromJSON(object: any): BlockParams {
     return {
-      maxBytes: isSet(object.maxBytes) ? globalThis.Number(object.maxBytes) : 0,
-      maxGas: isSet(object.maxGas) ? globalThis.Number(object.maxGas) : 0,
+      maxBytes: isSet(object.maxBytes) ? BigInt(object.maxBytes) : 0n,
+      maxGas: isSet(object.maxGas) ? BigInt(object.maxGas) : 0n,
     };
   },
 
   toJSON(message: BlockParams): unknown {
     const obj: any = {};
-    if (message.maxBytes !== 0) {
-      obj.maxBytes = Math.round(message.maxBytes);
+    if (message.maxBytes !== 0n) {
+      obj.maxBytes = message.maxBytes.toString();
     }
-    if (message.maxGas !== 0) {
-      obj.maxGas = Math.round(message.maxGas);
+    if (message.maxGas !== 0n) {
+      obj.maxGas = message.maxGas.toString();
     }
     return obj;
   },
@@ -264,26 +270,32 @@ export const BlockParams = {
   },
   fromPartial(object: DeepPartial<BlockParams>): BlockParams {
     const message = createBaseBlockParams();
-    message.maxBytes = object.maxBytes ?? 0;
-    message.maxGas = object.maxGas ?? 0;
+    message.maxBytes = object.maxBytes ?? 0n;
+    message.maxGas = object.maxGas ?? 0n;
     return message;
   },
 };
 
 function createBaseEvidenceParams(): EvidenceParams {
-  return { maxAgeNumBlocks: 0, maxAgeDuration: undefined, maxBytes: 0 };
+  return { maxAgeNumBlocks: 0n, maxAgeDuration: undefined, maxBytes: 0n };
 }
 
 export const EvidenceParams = {
   encode(message: EvidenceParams, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.maxAgeNumBlocks !== 0) {
-      writer.uint32(8).int64(message.maxAgeNumBlocks);
+    if (message.maxAgeNumBlocks !== 0n) {
+      if (BigInt.asIntN(64, message.maxAgeNumBlocks) !== message.maxAgeNumBlocks) {
+        throw new globalThis.Error("value provided for field message.maxAgeNumBlocks of type int64 too large");
+      }
+      writer.uint32(8).int64(message.maxAgeNumBlocks.toString());
     }
     if (message.maxAgeDuration !== undefined) {
       Duration.encode(message.maxAgeDuration, writer.uint32(18).fork()).ldelim();
     }
-    if (message.maxBytes !== 0) {
-      writer.uint32(24).int64(message.maxBytes);
+    if (message.maxBytes !== 0n) {
+      if (BigInt.asIntN(64, message.maxBytes) !== message.maxBytes) {
+        throw new globalThis.Error("value provided for field message.maxBytes of type int64 too large");
+      }
+      writer.uint32(24).int64(message.maxBytes.toString());
     }
     return writer;
   },
@@ -300,7 +312,7 @@ export const EvidenceParams = {
             break;
           }
 
-          message.maxAgeNumBlocks = longToNumber(reader.int64() as Long);
+          message.maxAgeNumBlocks = longToBigint(reader.int64() as Long);
           continue;
         case 2:
           if (tag !== 18) {
@@ -314,7 +326,7 @@ export const EvidenceParams = {
             break;
           }
 
-          message.maxBytes = longToNumber(reader.int64() as Long);
+          message.maxBytes = longToBigint(reader.int64() as Long);
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -327,22 +339,22 @@ export const EvidenceParams = {
 
   fromJSON(object: any): EvidenceParams {
     return {
-      maxAgeNumBlocks: isSet(object.maxAgeNumBlocks) ? globalThis.Number(object.maxAgeNumBlocks) : 0,
+      maxAgeNumBlocks: isSet(object.maxAgeNumBlocks) ? BigInt(object.maxAgeNumBlocks) : 0n,
       maxAgeDuration: isSet(object.maxAgeDuration) ? Duration.fromJSON(object.maxAgeDuration) : undefined,
-      maxBytes: isSet(object.maxBytes) ? globalThis.Number(object.maxBytes) : 0,
+      maxBytes: isSet(object.maxBytes) ? BigInt(object.maxBytes) : 0n,
     };
   },
 
   toJSON(message: EvidenceParams): unknown {
     const obj: any = {};
-    if (message.maxAgeNumBlocks !== 0) {
-      obj.maxAgeNumBlocks = Math.round(message.maxAgeNumBlocks);
+    if (message.maxAgeNumBlocks !== 0n) {
+      obj.maxAgeNumBlocks = message.maxAgeNumBlocks.toString();
     }
     if (message.maxAgeDuration !== undefined) {
       obj.maxAgeDuration = Duration.toJSON(message.maxAgeDuration);
     }
-    if (message.maxBytes !== 0) {
-      obj.maxBytes = Math.round(message.maxBytes);
+    if (message.maxBytes !== 0n) {
+      obj.maxBytes = message.maxBytes.toString();
     }
     return obj;
   },
@@ -352,11 +364,11 @@ export const EvidenceParams = {
   },
   fromPartial(object: DeepPartial<EvidenceParams>): EvidenceParams {
     const message = createBaseEvidenceParams();
-    message.maxAgeNumBlocks = object.maxAgeNumBlocks ?? 0;
+    message.maxAgeNumBlocks = object.maxAgeNumBlocks ?? 0n;
     message.maxAgeDuration = (object.maxAgeDuration !== undefined && object.maxAgeDuration !== null)
       ? Duration.fromPartial(object.maxAgeDuration)
       : undefined;
-    message.maxBytes = object.maxBytes ?? 0;
+    message.maxBytes = object.maxBytes ?? 0n;
     return message;
   },
 };
@@ -423,13 +435,16 @@ export const ValidatorParams = {
 };
 
 function createBaseVersionParams(): VersionParams {
-  return { app: 0 };
+  return { app: 0n };
 }
 
 export const VersionParams = {
   encode(message: VersionParams, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.app !== 0) {
-      writer.uint32(8).uint64(message.app);
+    if (message.app !== 0n) {
+      if (BigInt.asUintN(64, message.app) !== message.app) {
+        throw new globalThis.Error("value provided for field message.app of type uint64 too large");
+      }
+      writer.uint32(8).uint64(message.app.toString());
     }
     return writer;
   },
@@ -446,7 +461,7 @@ export const VersionParams = {
             break;
           }
 
-          message.app = longToNumber(reader.uint64() as Long);
+          message.app = longToBigint(reader.uint64() as Long);
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -458,13 +473,13 @@ export const VersionParams = {
   },
 
   fromJSON(object: any): VersionParams {
-    return { app: isSet(object.app) ? globalThis.Number(object.app) : 0 };
+    return { app: isSet(object.app) ? BigInt(object.app) : 0n };
   },
 
   toJSON(message: VersionParams): unknown {
     const obj: any = {};
-    if (message.app !== 0) {
-      obj.app = Math.round(message.app);
+    if (message.app !== 0n) {
+      obj.app = message.app.toString();
     }
     return obj;
   },
@@ -474,22 +489,28 @@ export const VersionParams = {
   },
   fromPartial(object: DeepPartial<VersionParams>): VersionParams {
     const message = createBaseVersionParams();
-    message.app = object.app ?? 0;
+    message.app = object.app ?? 0n;
     return message;
   },
 };
 
 function createBaseHashedParams(): HashedParams {
-  return { blockMaxBytes: 0, blockMaxGas: 0 };
+  return { blockMaxBytes: 0n, blockMaxGas: 0n };
 }
 
 export const HashedParams = {
   encode(message: HashedParams, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.blockMaxBytes !== 0) {
-      writer.uint32(8).int64(message.blockMaxBytes);
+    if (message.blockMaxBytes !== 0n) {
+      if (BigInt.asIntN(64, message.blockMaxBytes) !== message.blockMaxBytes) {
+        throw new globalThis.Error("value provided for field message.blockMaxBytes of type int64 too large");
+      }
+      writer.uint32(8).int64(message.blockMaxBytes.toString());
     }
-    if (message.blockMaxGas !== 0) {
-      writer.uint32(16).int64(message.blockMaxGas);
+    if (message.blockMaxGas !== 0n) {
+      if (BigInt.asIntN(64, message.blockMaxGas) !== message.blockMaxGas) {
+        throw new globalThis.Error("value provided for field message.blockMaxGas of type int64 too large");
+      }
+      writer.uint32(16).int64(message.blockMaxGas.toString());
     }
     return writer;
   },
@@ -506,14 +527,14 @@ export const HashedParams = {
             break;
           }
 
-          message.blockMaxBytes = longToNumber(reader.int64() as Long);
+          message.blockMaxBytes = longToBigint(reader.int64() as Long);
           continue;
         case 2:
           if (tag !== 16) {
             break;
           }
 
-          message.blockMaxGas = longToNumber(reader.int64() as Long);
+          message.blockMaxGas = longToBigint(reader.int64() as Long);
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -526,18 +547,18 @@ export const HashedParams = {
 
   fromJSON(object: any): HashedParams {
     return {
-      blockMaxBytes: isSet(object.blockMaxBytes) ? globalThis.Number(object.blockMaxBytes) : 0,
-      blockMaxGas: isSet(object.blockMaxGas) ? globalThis.Number(object.blockMaxGas) : 0,
+      blockMaxBytes: isSet(object.blockMaxBytes) ? BigInt(object.blockMaxBytes) : 0n,
+      blockMaxGas: isSet(object.blockMaxGas) ? BigInt(object.blockMaxGas) : 0n,
     };
   },
 
   toJSON(message: HashedParams): unknown {
     const obj: any = {};
-    if (message.blockMaxBytes !== 0) {
-      obj.blockMaxBytes = Math.round(message.blockMaxBytes);
+    if (message.blockMaxBytes !== 0n) {
+      obj.blockMaxBytes = message.blockMaxBytes.toString();
     }
-    if (message.blockMaxGas !== 0) {
-      obj.blockMaxGas = Math.round(message.blockMaxGas);
+    if (message.blockMaxGas !== 0n) {
+      obj.blockMaxGas = message.blockMaxGas.toString();
     }
     return obj;
   },
@@ -547,13 +568,13 @@ export const HashedParams = {
   },
   fromPartial(object: DeepPartial<HashedParams>): HashedParams {
     const message = createBaseHashedParams();
-    message.blockMaxBytes = object.blockMaxBytes ?? 0;
-    message.blockMaxGas = object.blockMaxGas ?? 0;
+    message.blockMaxBytes = object.blockMaxBytes ?? 0n;
+    message.blockMaxGas = object.blockMaxGas ?? 0n;
     return message;
   },
 };
 
-type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
+type Builtin = Date | Function | Uint8Array | string | number | boolean | bigint | undefined;
 
 type DeepPartial<T> = T extends Builtin ? T
   : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
@@ -561,14 +582,8 @@ type DeepPartial<T> = T extends Builtin ? T
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
-function longToNumber(long: Long): number {
-  if (long.gt(globalThis.Number.MAX_SAFE_INTEGER)) {
-    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
-  }
-  if (long.lt(globalThis.Number.MIN_SAFE_INTEGER)) {
-    throw new globalThis.Error("Value is smaller than Number.MIN_SAFE_INTEGER");
-  }
-  return long.toNumber();
+function longToBigint(long: Long) {
+  return BigInt(long.toString());
 }
 
 if (_m0.util.Long !== Long) {

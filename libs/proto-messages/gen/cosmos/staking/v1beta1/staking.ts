@@ -185,7 +185,7 @@ export interface Validator {
     | Description
     | undefined;
   /** unbonding_height defines, if unbonding, the height at which this validator has begun unbonding. */
-  unbondingHeight: number;
+  unbondingHeight: bigint;
   /** unbonding_time defines, if unbonding, the min time for the validator to complete unbonding. */
   unbondingTime:
     | Date
@@ -201,9 +201,9 @@ export interface Validator {
    */
   minSelfDelegation: string;
   /** strictly positive if this validator's unbonding has been stopped by external modules */
-  unbondingOnHoldRefCount: number;
+  unbondingOnHoldRefCount: bigint;
   /** list of unbonding ids, each uniquely identifing an unbonding of this validator */
-  unbondingIds: number[];
+  unbondingIds: bigint[];
 }
 
 /** ValAddresses defines a repeated set of validator addresses. */
@@ -273,7 +273,7 @@ export interface UnbondingDelegation {
 /** UnbondingDelegationEntry defines an unbonding object with relevant metadata. */
 export interface UnbondingDelegationEntry {
   /** creation_height is the height which the unbonding took place. */
-  creationHeight: number;
+  creationHeight: bigint;
   /** completion_time is the unix time for unbonding completion. */
   completionTime:
     | Date
@@ -283,15 +283,15 @@ export interface UnbondingDelegationEntry {
   /** balance defines the tokens to receive at completion. */
   balance: string;
   /** Incrementing id that uniquely identifies this entry */
-  unbondingId: number;
+  unbondingId: bigint;
   /** Strictly positive if this entry's unbonding has been stopped by external modules */
-  unbondingOnHoldRefCount: number;
+  unbondingOnHoldRefCount: bigint;
 }
 
 /** RedelegationEntry defines a redelegation object with relevant metadata. */
 export interface RedelegationEntry {
   /** creation_height  defines the height which the redelegation took place. */
-  creationHeight: number;
+  creationHeight: bigint;
   /** completion_time defines the unix time for redelegation completion. */
   completionTime:
     | Date
@@ -301,9 +301,9 @@ export interface RedelegationEntry {
   /** shares_dst is the amount of destination-validator shares created by redelegation. */
   sharesDst: string;
   /** Incrementing id that uniquely identifies this entry */
-  unbondingId: number;
+  unbondingId: bigint;
   /** Strictly positive if this entry's unbonding has been stopped by external modules */
-  unbondingOnHoldRefCount: number;
+  unbondingOnHoldRefCount: bigint;
 }
 
 /**
@@ -754,11 +754,11 @@ function createBaseValidator(): Validator {
     tokens: "",
     delegatorShares: "",
     description: undefined,
-    unbondingHeight: 0,
+    unbondingHeight: 0n,
     unbondingTime: undefined,
     commission: undefined,
     minSelfDelegation: "",
-    unbondingOnHoldRefCount: 0,
+    unbondingOnHoldRefCount: 0n,
     unbondingIds: [],
   };
 }
@@ -786,8 +786,11 @@ export const Validator = {
     if (message.description !== undefined) {
       Description.encode(message.description, writer.uint32(58).fork()).ldelim();
     }
-    if (message.unbondingHeight !== 0) {
-      writer.uint32(64).int64(message.unbondingHeight);
+    if (message.unbondingHeight !== 0n) {
+      if (BigInt.asIntN(64, message.unbondingHeight) !== message.unbondingHeight) {
+        throw new globalThis.Error("value provided for field message.unbondingHeight of type int64 too large");
+      }
+      writer.uint32(64).int64(message.unbondingHeight.toString());
     }
     if (message.unbondingTime !== undefined) {
       Timestamp.encode(toTimestamp(message.unbondingTime), writer.uint32(74).fork()).ldelim();
@@ -798,12 +801,18 @@ export const Validator = {
     if (message.minSelfDelegation !== "") {
       writer.uint32(90).string(message.minSelfDelegation);
     }
-    if (message.unbondingOnHoldRefCount !== 0) {
-      writer.uint32(96).int64(message.unbondingOnHoldRefCount);
+    if (message.unbondingOnHoldRefCount !== 0n) {
+      if (BigInt.asIntN(64, message.unbondingOnHoldRefCount) !== message.unbondingOnHoldRefCount) {
+        throw new globalThis.Error("value provided for field message.unbondingOnHoldRefCount of type int64 too large");
+      }
+      writer.uint32(96).int64(message.unbondingOnHoldRefCount.toString());
     }
     writer.uint32(106).fork();
     for (const v of message.unbondingIds) {
-      writer.uint64(v);
+      if (BigInt.asUintN(64, v) !== v) {
+        throw new globalThis.Error("a value provided in array field unbondingIds of type uint64 is too large");
+      }
+      writer.uint64(v.toString());
     }
     writer.ldelim();
     return writer;
@@ -870,7 +879,7 @@ export const Validator = {
             break;
           }
 
-          message.unbondingHeight = longToNumber(reader.int64() as Long);
+          message.unbondingHeight = longToBigint(reader.int64() as Long);
           continue;
         case 9:
           if (tag !== 74) {
@@ -898,11 +907,11 @@ export const Validator = {
             break;
           }
 
-          message.unbondingOnHoldRefCount = longToNumber(reader.int64() as Long);
+          message.unbondingOnHoldRefCount = longToBigint(reader.int64() as Long);
           continue;
         case 13:
           if (tag === 104) {
-            message.unbondingIds.push(longToNumber(reader.uint64() as Long));
+            message.unbondingIds.push(longToBigint(reader.uint64() as Long));
 
             continue;
           }
@@ -910,7 +919,7 @@ export const Validator = {
           if (tag === 106) {
             const end2 = reader.uint32() + reader.pos;
             while (reader.pos < end2) {
-              message.unbondingIds.push(longToNumber(reader.uint64() as Long));
+              message.unbondingIds.push(longToBigint(reader.uint64() as Long));
             }
 
             continue;
@@ -935,15 +944,13 @@ export const Validator = {
       tokens: isSet(object.tokens) ? globalThis.String(object.tokens) : "",
       delegatorShares: isSet(object.delegatorShares) ? globalThis.String(object.delegatorShares) : "",
       description: isSet(object.description) ? Description.fromJSON(object.description) : undefined,
-      unbondingHeight: isSet(object.unbondingHeight) ? globalThis.Number(object.unbondingHeight) : 0,
+      unbondingHeight: isSet(object.unbondingHeight) ? BigInt(object.unbondingHeight) : 0n,
       unbondingTime: isSet(object.unbondingTime) ? fromJsonTimestamp(object.unbondingTime) : undefined,
       commission: isSet(object.commission) ? Commission.fromJSON(object.commission) : undefined,
       minSelfDelegation: isSet(object.minSelfDelegation) ? globalThis.String(object.minSelfDelegation) : "",
-      unbondingOnHoldRefCount: isSet(object.unbondingOnHoldRefCount)
-        ? globalThis.Number(object.unbondingOnHoldRefCount)
-        : 0,
+      unbondingOnHoldRefCount: isSet(object.unbondingOnHoldRefCount) ? BigInt(object.unbondingOnHoldRefCount) : 0n,
       unbondingIds: globalThis.Array.isArray(object?.unbondingIds)
-        ? object.unbondingIds.map((e: any) => globalThis.Number(e))
+        ? object.unbondingIds.map((e: any) => BigInt(e))
         : [],
     };
   },
@@ -971,8 +978,8 @@ export const Validator = {
     if (message.description !== undefined) {
       obj.description = Description.toJSON(message.description);
     }
-    if (message.unbondingHeight !== 0) {
-      obj.unbondingHeight = Math.round(message.unbondingHeight);
+    if (message.unbondingHeight !== 0n) {
+      obj.unbondingHeight = message.unbondingHeight.toString();
     }
     if (message.unbondingTime !== undefined) {
       obj.unbondingTime = message.unbondingTime.toISOString();
@@ -983,11 +990,11 @@ export const Validator = {
     if (message.minSelfDelegation !== "") {
       obj.minSelfDelegation = message.minSelfDelegation;
     }
-    if (message.unbondingOnHoldRefCount !== 0) {
-      obj.unbondingOnHoldRefCount = Math.round(message.unbondingOnHoldRefCount);
+    if (message.unbondingOnHoldRefCount !== 0n) {
+      obj.unbondingOnHoldRefCount = message.unbondingOnHoldRefCount.toString();
     }
     if (message.unbondingIds?.length) {
-      obj.unbondingIds = message.unbondingIds.map((e) => Math.round(e));
+      obj.unbondingIds = message.unbondingIds.map((e) => e.toString());
     }
     return obj;
   },
@@ -1008,13 +1015,13 @@ export const Validator = {
     message.description = (object.description !== undefined && object.description !== null)
       ? Description.fromPartial(object.description)
       : undefined;
-    message.unbondingHeight = object.unbondingHeight ?? 0;
+    message.unbondingHeight = object.unbondingHeight ?? 0n;
     message.unbondingTime = object.unbondingTime ?? undefined;
     message.commission = (object.commission !== undefined && object.commission !== null)
       ? Commission.fromPartial(object.commission)
       : undefined;
     message.minSelfDelegation = object.minSelfDelegation ?? "";
-    message.unbondingOnHoldRefCount = object.unbondingOnHoldRefCount ?? 0;
+    message.unbondingOnHoldRefCount = object.unbondingOnHoldRefCount ?? 0n;
     message.unbondingIds = object.unbondingIds?.map((e) => e) || [];
     return message;
   },
@@ -1544,19 +1551,22 @@ export const UnbondingDelegation = {
 
 function createBaseUnbondingDelegationEntry(): UnbondingDelegationEntry {
   return {
-    creationHeight: 0,
+    creationHeight: 0n,
     completionTime: undefined,
     initialBalance: "",
     balance: "",
-    unbondingId: 0,
-    unbondingOnHoldRefCount: 0,
+    unbondingId: 0n,
+    unbondingOnHoldRefCount: 0n,
   };
 }
 
 export const UnbondingDelegationEntry = {
   encode(message: UnbondingDelegationEntry, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.creationHeight !== 0) {
-      writer.uint32(8).int64(message.creationHeight);
+    if (message.creationHeight !== 0n) {
+      if (BigInt.asIntN(64, message.creationHeight) !== message.creationHeight) {
+        throw new globalThis.Error("value provided for field message.creationHeight of type int64 too large");
+      }
+      writer.uint32(8).int64(message.creationHeight.toString());
     }
     if (message.completionTime !== undefined) {
       Timestamp.encode(toTimestamp(message.completionTime), writer.uint32(18).fork()).ldelim();
@@ -1567,11 +1577,17 @@ export const UnbondingDelegationEntry = {
     if (message.balance !== "") {
       writer.uint32(34).string(message.balance);
     }
-    if (message.unbondingId !== 0) {
-      writer.uint32(40).uint64(message.unbondingId);
+    if (message.unbondingId !== 0n) {
+      if (BigInt.asUintN(64, message.unbondingId) !== message.unbondingId) {
+        throw new globalThis.Error("value provided for field message.unbondingId of type uint64 too large");
+      }
+      writer.uint32(40).uint64(message.unbondingId.toString());
     }
-    if (message.unbondingOnHoldRefCount !== 0) {
-      writer.uint32(48).int64(message.unbondingOnHoldRefCount);
+    if (message.unbondingOnHoldRefCount !== 0n) {
+      if (BigInt.asIntN(64, message.unbondingOnHoldRefCount) !== message.unbondingOnHoldRefCount) {
+        throw new globalThis.Error("value provided for field message.unbondingOnHoldRefCount of type int64 too large");
+      }
+      writer.uint32(48).int64(message.unbondingOnHoldRefCount.toString());
     }
     return writer;
   },
@@ -1588,7 +1604,7 @@ export const UnbondingDelegationEntry = {
             break;
           }
 
-          message.creationHeight = longToNumber(reader.int64() as Long);
+          message.creationHeight = longToBigint(reader.int64() as Long);
           continue;
         case 2:
           if (tag !== 18) {
@@ -1616,14 +1632,14 @@ export const UnbondingDelegationEntry = {
             break;
           }
 
-          message.unbondingId = longToNumber(reader.uint64() as Long);
+          message.unbondingId = longToBigint(reader.uint64() as Long);
           continue;
         case 6:
           if (tag !== 48) {
             break;
           }
 
-          message.unbondingOnHoldRefCount = longToNumber(reader.int64() as Long);
+          message.unbondingOnHoldRefCount = longToBigint(reader.int64() as Long);
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -1636,21 +1652,19 @@ export const UnbondingDelegationEntry = {
 
   fromJSON(object: any): UnbondingDelegationEntry {
     return {
-      creationHeight: isSet(object.creationHeight) ? globalThis.Number(object.creationHeight) : 0,
+      creationHeight: isSet(object.creationHeight) ? BigInt(object.creationHeight) : 0n,
       completionTime: isSet(object.completionTime) ? fromJsonTimestamp(object.completionTime) : undefined,
       initialBalance: isSet(object.initialBalance) ? globalThis.String(object.initialBalance) : "",
       balance: isSet(object.balance) ? globalThis.String(object.balance) : "",
-      unbondingId: isSet(object.unbondingId) ? globalThis.Number(object.unbondingId) : 0,
-      unbondingOnHoldRefCount: isSet(object.unbondingOnHoldRefCount)
-        ? globalThis.Number(object.unbondingOnHoldRefCount)
-        : 0,
+      unbondingId: isSet(object.unbondingId) ? BigInt(object.unbondingId) : 0n,
+      unbondingOnHoldRefCount: isSet(object.unbondingOnHoldRefCount) ? BigInt(object.unbondingOnHoldRefCount) : 0n,
     };
   },
 
   toJSON(message: UnbondingDelegationEntry): unknown {
     const obj: any = {};
-    if (message.creationHeight !== 0) {
-      obj.creationHeight = Math.round(message.creationHeight);
+    if (message.creationHeight !== 0n) {
+      obj.creationHeight = message.creationHeight.toString();
     }
     if (message.completionTime !== undefined) {
       obj.completionTime = message.completionTime.toISOString();
@@ -1661,11 +1675,11 @@ export const UnbondingDelegationEntry = {
     if (message.balance !== "") {
       obj.balance = message.balance;
     }
-    if (message.unbondingId !== 0) {
-      obj.unbondingId = Math.round(message.unbondingId);
+    if (message.unbondingId !== 0n) {
+      obj.unbondingId = message.unbondingId.toString();
     }
-    if (message.unbondingOnHoldRefCount !== 0) {
-      obj.unbondingOnHoldRefCount = Math.round(message.unbondingOnHoldRefCount);
+    if (message.unbondingOnHoldRefCount !== 0n) {
+      obj.unbondingOnHoldRefCount = message.unbondingOnHoldRefCount.toString();
     }
     return obj;
   },
@@ -1675,31 +1689,34 @@ export const UnbondingDelegationEntry = {
   },
   fromPartial(object: DeepPartial<UnbondingDelegationEntry>): UnbondingDelegationEntry {
     const message = createBaseUnbondingDelegationEntry();
-    message.creationHeight = object.creationHeight ?? 0;
+    message.creationHeight = object.creationHeight ?? 0n;
     message.completionTime = object.completionTime ?? undefined;
     message.initialBalance = object.initialBalance ?? "";
     message.balance = object.balance ?? "";
-    message.unbondingId = object.unbondingId ?? 0;
-    message.unbondingOnHoldRefCount = object.unbondingOnHoldRefCount ?? 0;
+    message.unbondingId = object.unbondingId ?? 0n;
+    message.unbondingOnHoldRefCount = object.unbondingOnHoldRefCount ?? 0n;
     return message;
   },
 };
 
 function createBaseRedelegationEntry(): RedelegationEntry {
   return {
-    creationHeight: 0,
+    creationHeight: 0n,
     completionTime: undefined,
     initialBalance: "",
     sharesDst: "",
-    unbondingId: 0,
-    unbondingOnHoldRefCount: 0,
+    unbondingId: 0n,
+    unbondingOnHoldRefCount: 0n,
   };
 }
 
 export const RedelegationEntry = {
   encode(message: RedelegationEntry, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.creationHeight !== 0) {
-      writer.uint32(8).int64(message.creationHeight);
+    if (message.creationHeight !== 0n) {
+      if (BigInt.asIntN(64, message.creationHeight) !== message.creationHeight) {
+        throw new globalThis.Error("value provided for field message.creationHeight of type int64 too large");
+      }
+      writer.uint32(8).int64(message.creationHeight.toString());
     }
     if (message.completionTime !== undefined) {
       Timestamp.encode(toTimestamp(message.completionTime), writer.uint32(18).fork()).ldelim();
@@ -1710,11 +1727,17 @@ export const RedelegationEntry = {
     if (message.sharesDst !== "") {
       writer.uint32(34).string(message.sharesDst);
     }
-    if (message.unbondingId !== 0) {
-      writer.uint32(40).uint64(message.unbondingId);
+    if (message.unbondingId !== 0n) {
+      if (BigInt.asUintN(64, message.unbondingId) !== message.unbondingId) {
+        throw new globalThis.Error("value provided for field message.unbondingId of type uint64 too large");
+      }
+      writer.uint32(40).uint64(message.unbondingId.toString());
     }
-    if (message.unbondingOnHoldRefCount !== 0) {
-      writer.uint32(48).int64(message.unbondingOnHoldRefCount);
+    if (message.unbondingOnHoldRefCount !== 0n) {
+      if (BigInt.asIntN(64, message.unbondingOnHoldRefCount) !== message.unbondingOnHoldRefCount) {
+        throw new globalThis.Error("value provided for field message.unbondingOnHoldRefCount of type int64 too large");
+      }
+      writer.uint32(48).int64(message.unbondingOnHoldRefCount.toString());
     }
     return writer;
   },
@@ -1731,7 +1754,7 @@ export const RedelegationEntry = {
             break;
           }
 
-          message.creationHeight = longToNumber(reader.int64() as Long);
+          message.creationHeight = longToBigint(reader.int64() as Long);
           continue;
         case 2:
           if (tag !== 18) {
@@ -1759,14 +1782,14 @@ export const RedelegationEntry = {
             break;
           }
 
-          message.unbondingId = longToNumber(reader.uint64() as Long);
+          message.unbondingId = longToBigint(reader.uint64() as Long);
           continue;
         case 6:
           if (tag !== 48) {
             break;
           }
 
-          message.unbondingOnHoldRefCount = longToNumber(reader.int64() as Long);
+          message.unbondingOnHoldRefCount = longToBigint(reader.int64() as Long);
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -1779,21 +1802,19 @@ export const RedelegationEntry = {
 
   fromJSON(object: any): RedelegationEntry {
     return {
-      creationHeight: isSet(object.creationHeight) ? globalThis.Number(object.creationHeight) : 0,
+      creationHeight: isSet(object.creationHeight) ? BigInt(object.creationHeight) : 0n,
       completionTime: isSet(object.completionTime) ? fromJsonTimestamp(object.completionTime) : undefined,
       initialBalance: isSet(object.initialBalance) ? globalThis.String(object.initialBalance) : "",
       sharesDst: isSet(object.sharesDst) ? globalThis.String(object.sharesDst) : "",
-      unbondingId: isSet(object.unbondingId) ? globalThis.Number(object.unbondingId) : 0,
-      unbondingOnHoldRefCount: isSet(object.unbondingOnHoldRefCount)
-        ? globalThis.Number(object.unbondingOnHoldRefCount)
-        : 0,
+      unbondingId: isSet(object.unbondingId) ? BigInt(object.unbondingId) : 0n,
+      unbondingOnHoldRefCount: isSet(object.unbondingOnHoldRefCount) ? BigInt(object.unbondingOnHoldRefCount) : 0n,
     };
   },
 
   toJSON(message: RedelegationEntry): unknown {
     const obj: any = {};
-    if (message.creationHeight !== 0) {
-      obj.creationHeight = Math.round(message.creationHeight);
+    if (message.creationHeight !== 0n) {
+      obj.creationHeight = message.creationHeight.toString();
     }
     if (message.completionTime !== undefined) {
       obj.completionTime = message.completionTime.toISOString();
@@ -1804,11 +1825,11 @@ export const RedelegationEntry = {
     if (message.sharesDst !== "") {
       obj.sharesDst = message.sharesDst;
     }
-    if (message.unbondingId !== 0) {
-      obj.unbondingId = Math.round(message.unbondingId);
+    if (message.unbondingId !== 0n) {
+      obj.unbondingId = message.unbondingId.toString();
     }
-    if (message.unbondingOnHoldRefCount !== 0) {
-      obj.unbondingOnHoldRefCount = Math.round(message.unbondingOnHoldRefCount);
+    if (message.unbondingOnHoldRefCount !== 0n) {
+      obj.unbondingOnHoldRefCount = message.unbondingOnHoldRefCount.toString();
     }
     return obj;
   },
@@ -1818,12 +1839,12 @@ export const RedelegationEntry = {
   },
   fromPartial(object: DeepPartial<RedelegationEntry>): RedelegationEntry {
     const message = createBaseRedelegationEntry();
-    message.creationHeight = object.creationHeight ?? 0;
+    message.creationHeight = object.creationHeight ?? 0n;
     message.completionTime = object.completionTime ?? undefined;
     message.initialBalance = object.initialBalance ?? "";
     message.sharesDst = object.sharesDst ?? "";
-    message.unbondingId = object.unbondingId ?? 0;
-    message.unbondingOnHoldRefCount = object.unbondingOnHoldRefCount ?? 0;
+    message.unbondingId = object.unbondingId ?? 0n;
+    message.unbondingOnHoldRefCount = object.unbondingOnHoldRefCount ?? 0n;
     return message;
   },
 };
@@ -2446,7 +2467,7 @@ export const ValidatorUpdates = {
   },
 };
 
-type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
+type Builtin = Date | Function | Uint8Array | string | number | boolean | bigint | undefined;
 
 type DeepPartial<T> = T extends Builtin ? T
   : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
@@ -2455,13 +2476,13 @@ type DeepPartial<T> = T extends Builtin ? T
   : Partial<T>;
 
 function toTimestamp(date: Date): Timestamp {
-  const seconds = Math.trunc(date.getTime() / 1_000);
+  const seconds = BigInt(Math.trunc(date.getTime() / 1_000));
   const nanos = (date.getTime() % 1_000) * 1_000_000;
   return { seconds, nanos };
 }
 
 function fromTimestamp(t: Timestamp): Date {
-  let millis = (t.seconds || 0) * 1_000;
+  let millis = (globalThis.Number(t.seconds.toString()) || 0) * 1_000;
   millis += (t.nanos || 0) / 1_000_000;
   return new globalThis.Date(millis);
 }
@@ -2476,14 +2497,8 @@ function fromJsonTimestamp(o: any): Date {
   }
 }
 
-function longToNumber(long: Long): number {
-  if (long.gt(globalThis.Number.MAX_SAFE_INTEGER)) {
-    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
-  }
-  if (long.lt(globalThis.Number.MIN_SAFE_INTEGER)) {
-    throw new globalThis.Error("Value is smaller than Number.MIN_SAFE_INTEGER");
-  }
-  return long.toNumber();
+function longToBigint(long: Long) {
+  return BigInt(long.toString());
 }
 
 if (_m0.util.Long !== Long) {

@@ -9,8 +9,8 @@ import Long from "long";
 import _m0 from "protobufjs/minimal";
 
 export interface Proof {
-  total: number;
-  index: number;
+  total: bigint;
+  index: bigint;
   leafHash: Uint8Array;
   aunts: Uint8Array[];
 }
@@ -45,16 +45,22 @@ export interface ProofOps {
 }
 
 function createBaseProof(): Proof {
-  return { total: 0, index: 0, leafHash: new Uint8Array(0), aunts: [] };
+  return { total: 0n, index: 0n, leafHash: new Uint8Array(0), aunts: [] };
 }
 
 export const Proof = {
   encode(message: Proof, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.total !== 0) {
-      writer.uint32(8).int64(message.total);
+    if (message.total !== 0n) {
+      if (BigInt.asIntN(64, message.total) !== message.total) {
+        throw new globalThis.Error("value provided for field message.total of type int64 too large");
+      }
+      writer.uint32(8).int64(message.total.toString());
     }
-    if (message.index !== 0) {
-      writer.uint32(16).int64(message.index);
+    if (message.index !== 0n) {
+      if (BigInt.asIntN(64, message.index) !== message.index) {
+        throw new globalThis.Error("value provided for field message.index of type int64 too large");
+      }
+      writer.uint32(16).int64(message.index.toString());
     }
     if (message.leafHash.length !== 0) {
       writer.uint32(26).bytes(message.leafHash);
@@ -77,14 +83,14 @@ export const Proof = {
             break;
           }
 
-          message.total = longToNumber(reader.int64() as Long);
+          message.total = longToBigint(reader.int64() as Long);
           continue;
         case 2:
           if (tag !== 16) {
             break;
           }
 
-          message.index = longToNumber(reader.int64() as Long);
+          message.index = longToBigint(reader.int64() as Long);
           continue;
         case 3:
           if (tag !== 26) {
@@ -111,8 +117,8 @@ export const Proof = {
 
   fromJSON(object: any): Proof {
     return {
-      total: isSet(object.total) ? globalThis.Number(object.total) : 0,
-      index: isSet(object.index) ? globalThis.Number(object.index) : 0,
+      total: isSet(object.total) ? BigInt(object.total) : 0n,
+      index: isSet(object.index) ? BigInt(object.index) : 0n,
       leafHash: isSet(object.leafHash) ? bytesFromBase64(object.leafHash) : new Uint8Array(0),
       aunts: globalThis.Array.isArray(object?.aunts) ? object.aunts.map((e: any) => bytesFromBase64(e)) : [],
     };
@@ -120,11 +126,11 @@ export const Proof = {
 
   toJSON(message: Proof): unknown {
     const obj: any = {};
-    if (message.total !== 0) {
-      obj.total = Math.round(message.total);
+    if (message.total !== 0n) {
+      obj.total = message.total.toString();
     }
-    if (message.index !== 0) {
-      obj.index = Math.round(message.index);
+    if (message.index !== 0n) {
+      obj.index = message.index.toString();
     }
     if (message.leafHash.length !== 0) {
       obj.leafHash = base64FromBytes(message.leafHash);
@@ -140,8 +146,8 @@ export const Proof = {
   },
   fromPartial(object: DeepPartial<Proof>): Proof {
     const message = createBaseProof();
-    message.total = object.total ?? 0;
-    message.index = object.index ?? 0;
+    message.total = object.total ?? 0n;
+    message.index = object.index ?? 0n;
     message.leafHash = object.leafHash ?? new Uint8Array(0);
     message.aunts = object.aunts?.map((e) => e) || [];
     return message;
@@ -482,7 +488,7 @@ function base64FromBytes(arr: Uint8Array): string {
   }
 }
 
-type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
+type Builtin = Date | Function | Uint8Array | string | number | boolean | bigint | undefined;
 
 type DeepPartial<T> = T extends Builtin ? T
   : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
@@ -490,14 +496,8 @@ type DeepPartial<T> = T extends Builtin ? T
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
-function longToNumber(long: Long): number {
-  if (long.gt(globalThis.Number.MAX_SAFE_INTEGER)) {
-    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
-  }
-  if (long.lt(globalThis.Number.MIN_SAFE_INTEGER)) {
-    throw new globalThis.Error("Value is smaller than Number.MIN_SAFE_INTEGER");
-  }
-  return long.toNumber();
+function longToBigint(long: Long) {
+  return BigInt(long.toString());
 }
 
 if (_m0.util.Long !== Long) {

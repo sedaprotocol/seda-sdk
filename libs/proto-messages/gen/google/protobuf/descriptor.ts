@@ -1210,8 +1210,8 @@ export interface UninterpretedOption {
    * identified it as during parsing. Exactly one of these should be set.
    */
   identifierValue?: string | undefined;
-  positiveIntValue?: number | undefined;
-  negativeIntValue?: number | undefined;
+  positiveIntValue?: bigint | undefined;
+  negativeIntValue?: bigint | undefined;
   doubleValue?: number | undefined;
   stringValue?: Uint8Array | undefined;
   aggregateValue?: string | undefined;
@@ -4270,8 +4270,8 @@ function createBaseUninterpretedOption(): UninterpretedOption {
   return {
     name: [],
     identifierValue: "",
-    positiveIntValue: 0,
-    negativeIntValue: 0,
+    positiveIntValue: 0n,
+    negativeIntValue: 0n,
     doubleValue: 0,
     stringValue: new Uint8Array(0),
     aggregateValue: "",
@@ -4286,11 +4286,17 @@ export const UninterpretedOption = {
     if (message.identifierValue !== undefined && message.identifierValue !== "") {
       writer.uint32(26).string(message.identifierValue);
     }
-    if (message.positiveIntValue !== undefined && message.positiveIntValue !== 0) {
-      writer.uint32(32).uint64(message.positiveIntValue);
+    if (message.positiveIntValue !== undefined && message.positiveIntValue !== 0n) {
+      if (BigInt.asUintN(64, message.positiveIntValue) !== message.positiveIntValue) {
+        throw new globalThis.Error("value provided for field message.positiveIntValue of type uint64 too large");
+      }
+      writer.uint32(32).uint64(message.positiveIntValue.toString());
     }
-    if (message.negativeIntValue !== undefined && message.negativeIntValue !== 0) {
-      writer.uint32(40).int64(message.negativeIntValue);
+    if (message.negativeIntValue !== undefined && message.negativeIntValue !== 0n) {
+      if (BigInt.asIntN(64, message.negativeIntValue) !== message.negativeIntValue) {
+        throw new globalThis.Error("value provided for field message.negativeIntValue of type int64 too large");
+      }
+      writer.uint32(40).int64(message.negativeIntValue.toString());
     }
     if (message.doubleValue !== undefined && message.doubleValue !== 0) {
       writer.uint32(49).double(message.doubleValue);
@@ -4330,14 +4336,14 @@ export const UninterpretedOption = {
             break;
           }
 
-          message.positiveIntValue = longToNumber(reader.uint64() as Long);
+          message.positiveIntValue = longToBigint(reader.uint64() as Long);
           continue;
         case 5:
           if (tag !== 40) {
             break;
           }
 
-          message.negativeIntValue = longToNumber(reader.int64() as Long);
+          message.negativeIntValue = longToBigint(reader.int64() as Long);
           continue;
         case 6:
           if (tag !== 49) {
@@ -4375,8 +4381,8 @@ export const UninterpretedOption = {
         ? object.name.map((e: any) => UninterpretedOption_NamePart.fromJSON(e))
         : [],
       identifierValue: isSet(object.identifierValue) ? globalThis.String(object.identifierValue) : "",
-      positiveIntValue: isSet(object.positiveIntValue) ? globalThis.Number(object.positiveIntValue) : 0,
-      negativeIntValue: isSet(object.negativeIntValue) ? globalThis.Number(object.negativeIntValue) : 0,
+      positiveIntValue: isSet(object.positiveIntValue) ? BigInt(object.positiveIntValue) : 0n,
+      negativeIntValue: isSet(object.negativeIntValue) ? BigInt(object.negativeIntValue) : 0n,
       doubleValue: isSet(object.doubleValue) ? globalThis.Number(object.doubleValue) : 0,
       stringValue: isSet(object.stringValue) ? bytesFromBase64(object.stringValue) : new Uint8Array(0),
       aggregateValue: isSet(object.aggregateValue) ? globalThis.String(object.aggregateValue) : "",
@@ -4391,11 +4397,11 @@ export const UninterpretedOption = {
     if (message.identifierValue !== undefined && message.identifierValue !== "") {
       obj.identifierValue = message.identifierValue;
     }
-    if (message.positiveIntValue !== undefined && message.positiveIntValue !== 0) {
-      obj.positiveIntValue = Math.round(message.positiveIntValue);
+    if (message.positiveIntValue !== undefined && message.positiveIntValue !== 0n) {
+      obj.positiveIntValue = message.positiveIntValue.toString();
     }
-    if (message.negativeIntValue !== undefined && message.negativeIntValue !== 0) {
-      obj.negativeIntValue = Math.round(message.negativeIntValue);
+    if (message.negativeIntValue !== undefined && message.negativeIntValue !== 0n) {
+      obj.negativeIntValue = message.negativeIntValue.toString();
     }
     if (message.doubleValue !== undefined && message.doubleValue !== 0) {
       obj.doubleValue = message.doubleValue;
@@ -4416,8 +4422,8 @@ export const UninterpretedOption = {
     const message = createBaseUninterpretedOption();
     message.name = object.name?.map((e) => UninterpretedOption_NamePart.fromPartial(e)) || [];
     message.identifierValue = object.identifierValue ?? "";
-    message.positiveIntValue = object.positiveIntValue ?? 0;
-    message.negativeIntValue = object.negativeIntValue ?? 0;
+    message.positiveIntValue = object.positiveIntValue ?? 0n;
+    message.negativeIntValue = object.negativeIntValue ?? 0n;
     message.doubleValue = object.doubleValue ?? 0;
     message.stringValue = object.stringValue ?? new Uint8Array(0);
     message.aggregateValue = object.aggregateValue ?? "";
@@ -4922,7 +4928,7 @@ function base64FromBytes(arr: Uint8Array): string {
   }
 }
 
-type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
+type Builtin = Date | Function | Uint8Array | string | number | boolean | bigint | undefined;
 
 type DeepPartial<T> = T extends Builtin ? T
   : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
@@ -4930,14 +4936,8 @@ type DeepPartial<T> = T extends Builtin ? T
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
-function longToNumber(long: Long): number {
-  if (long.gt(globalThis.Number.MAX_SAFE_INTEGER)) {
-    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
-  }
-  if (long.lt(globalThis.Number.MIN_SAFE_INTEGER)) {
-    throw new globalThis.Error("Value is smaller than Number.MIN_SAFE_INTEGER");
-  }
-  return long.toNumber();
+function longToBigint(long: Long) {
+  return BigInt(long.toString());
 }
 
 if (_m0.util.Long !== Long) {

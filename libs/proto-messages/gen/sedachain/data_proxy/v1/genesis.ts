@@ -25,7 +25,7 @@ export interface DataProxyConfig {
 /** FeeUpdateQueueRecord defines an entry in the data proxy update queue. */
 export interface FeeUpdateQueueRecord {
   dataProxyPubkey: Uint8Array;
-  updateHeight: number;
+  updateHeight: bigint;
 }
 
 function createBaseGenesisState(): GenesisState {
@@ -200,7 +200,7 @@ export const DataProxyConfig = {
 };
 
 function createBaseFeeUpdateQueueRecord(): FeeUpdateQueueRecord {
-  return { dataProxyPubkey: new Uint8Array(0), updateHeight: 0 };
+  return { dataProxyPubkey: new Uint8Array(0), updateHeight: 0n };
 }
 
 export const FeeUpdateQueueRecord = {
@@ -208,8 +208,11 @@ export const FeeUpdateQueueRecord = {
     if (message.dataProxyPubkey.length !== 0) {
       writer.uint32(10).bytes(message.dataProxyPubkey);
     }
-    if (message.updateHeight !== 0) {
-      writer.uint32(16).int64(message.updateHeight);
+    if (message.updateHeight !== 0n) {
+      if (BigInt.asIntN(64, message.updateHeight) !== message.updateHeight) {
+        throw new globalThis.Error("value provided for field message.updateHeight of type int64 too large");
+      }
+      writer.uint32(16).int64(message.updateHeight.toString());
     }
     return writer;
   },
@@ -233,7 +236,7 @@ export const FeeUpdateQueueRecord = {
             break;
           }
 
-          message.updateHeight = longToNumber(reader.int64() as Long);
+          message.updateHeight = longToBigint(reader.int64() as Long);
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -247,7 +250,7 @@ export const FeeUpdateQueueRecord = {
   fromJSON(object: any): FeeUpdateQueueRecord {
     return {
       dataProxyPubkey: isSet(object.dataProxyPubkey) ? bytesFromBase64(object.dataProxyPubkey) : new Uint8Array(0),
-      updateHeight: isSet(object.updateHeight) ? globalThis.Number(object.updateHeight) : 0,
+      updateHeight: isSet(object.updateHeight) ? BigInt(object.updateHeight) : 0n,
     };
   },
 
@@ -256,8 +259,8 @@ export const FeeUpdateQueueRecord = {
     if (message.dataProxyPubkey.length !== 0) {
       obj.dataProxyPubkey = base64FromBytes(message.dataProxyPubkey);
     }
-    if (message.updateHeight !== 0) {
-      obj.updateHeight = Math.round(message.updateHeight);
+    if (message.updateHeight !== 0n) {
+      obj.updateHeight = message.updateHeight.toString();
     }
     return obj;
   },
@@ -268,7 +271,7 @@ export const FeeUpdateQueueRecord = {
   fromPartial(object: DeepPartial<FeeUpdateQueueRecord>): FeeUpdateQueueRecord {
     const message = createBaseFeeUpdateQueueRecord();
     message.dataProxyPubkey = object.dataProxyPubkey ?? new Uint8Array(0);
-    message.updateHeight = object.updateHeight ?? 0;
+    message.updateHeight = object.updateHeight ?? 0n;
     return message;
   },
 };
@@ -298,7 +301,7 @@ function base64FromBytes(arr: Uint8Array): string {
   }
 }
 
-type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
+type Builtin = Date | Function | Uint8Array | string | number | boolean | bigint | undefined;
 
 type DeepPartial<T> = T extends Builtin ? T
   : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
@@ -306,14 +309,8 @@ type DeepPartial<T> = T extends Builtin ? T
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
-function longToNumber(long: Long): number {
-  if (long.gt(globalThis.Number.MAX_SAFE_INTEGER)) {
-    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
-  }
-  if (long.lt(globalThis.Number.MIN_SAFE_INTEGER)) {
-    throw new globalThis.Error("Value is smaller than Number.MIN_SAFE_INTEGER");
-  }
-  return long.toNumber();
+function longToBigint(long: Long) {
+  return BigInt(long.toString());
 }
 
 if (_m0.util.Long !== Long) {

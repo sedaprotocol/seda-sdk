@@ -14,7 +14,7 @@ import _m0 from "protobufjs/minimal";
  * updated in ResponseEndBlock.
  */
 export interface App {
-  protocol: number;
+  protocol: bigint;
   software: string;
 }
 
@@ -24,18 +24,21 @@ export interface App {
  * state transition machine.
  */
 export interface Consensus {
-  block: number;
-  app: number;
+  block: bigint;
+  app: bigint;
 }
 
 function createBaseApp(): App {
-  return { protocol: 0, software: "" };
+  return { protocol: 0n, software: "" };
 }
 
 export const App = {
   encode(message: App, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.protocol !== 0) {
-      writer.uint32(8).uint64(message.protocol);
+    if (message.protocol !== 0n) {
+      if (BigInt.asUintN(64, message.protocol) !== message.protocol) {
+        throw new globalThis.Error("value provided for field message.protocol of type uint64 too large");
+      }
+      writer.uint32(8).uint64(message.protocol.toString());
     }
     if (message.software !== "") {
       writer.uint32(18).string(message.software);
@@ -55,7 +58,7 @@ export const App = {
             break;
           }
 
-          message.protocol = longToNumber(reader.uint64() as Long);
+          message.protocol = longToBigint(reader.uint64() as Long);
           continue;
         case 2:
           if (tag !== 18) {
@@ -75,15 +78,15 @@ export const App = {
 
   fromJSON(object: any): App {
     return {
-      protocol: isSet(object.protocol) ? globalThis.Number(object.protocol) : 0,
+      protocol: isSet(object.protocol) ? BigInt(object.protocol) : 0n,
       software: isSet(object.software) ? globalThis.String(object.software) : "",
     };
   },
 
   toJSON(message: App): unknown {
     const obj: any = {};
-    if (message.protocol !== 0) {
-      obj.protocol = Math.round(message.protocol);
+    if (message.protocol !== 0n) {
+      obj.protocol = message.protocol.toString();
     }
     if (message.software !== "") {
       obj.software = message.software;
@@ -96,23 +99,29 @@ export const App = {
   },
   fromPartial(object: DeepPartial<App>): App {
     const message = createBaseApp();
-    message.protocol = object.protocol ?? 0;
+    message.protocol = object.protocol ?? 0n;
     message.software = object.software ?? "";
     return message;
   },
 };
 
 function createBaseConsensus(): Consensus {
-  return { block: 0, app: 0 };
+  return { block: 0n, app: 0n };
 }
 
 export const Consensus = {
   encode(message: Consensus, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.block !== 0) {
-      writer.uint32(8).uint64(message.block);
+    if (message.block !== 0n) {
+      if (BigInt.asUintN(64, message.block) !== message.block) {
+        throw new globalThis.Error("value provided for field message.block of type uint64 too large");
+      }
+      writer.uint32(8).uint64(message.block.toString());
     }
-    if (message.app !== 0) {
-      writer.uint32(16).uint64(message.app);
+    if (message.app !== 0n) {
+      if (BigInt.asUintN(64, message.app) !== message.app) {
+        throw new globalThis.Error("value provided for field message.app of type uint64 too large");
+      }
+      writer.uint32(16).uint64(message.app.toString());
     }
     return writer;
   },
@@ -129,14 +138,14 @@ export const Consensus = {
             break;
           }
 
-          message.block = longToNumber(reader.uint64() as Long);
+          message.block = longToBigint(reader.uint64() as Long);
           continue;
         case 2:
           if (tag !== 16) {
             break;
           }
 
-          message.app = longToNumber(reader.uint64() as Long);
+          message.app = longToBigint(reader.uint64() as Long);
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -148,19 +157,16 @@ export const Consensus = {
   },
 
   fromJSON(object: any): Consensus {
-    return {
-      block: isSet(object.block) ? globalThis.Number(object.block) : 0,
-      app: isSet(object.app) ? globalThis.Number(object.app) : 0,
-    };
+    return { block: isSet(object.block) ? BigInt(object.block) : 0n, app: isSet(object.app) ? BigInt(object.app) : 0n };
   },
 
   toJSON(message: Consensus): unknown {
     const obj: any = {};
-    if (message.block !== 0) {
-      obj.block = Math.round(message.block);
+    if (message.block !== 0n) {
+      obj.block = message.block.toString();
     }
-    if (message.app !== 0) {
-      obj.app = Math.round(message.app);
+    if (message.app !== 0n) {
+      obj.app = message.app.toString();
     }
     return obj;
   },
@@ -170,13 +176,13 @@ export const Consensus = {
   },
   fromPartial(object: DeepPartial<Consensus>): Consensus {
     const message = createBaseConsensus();
-    message.block = object.block ?? 0;
-    message.app = object.app ?? 0;
+    message.block = object.block ?? 0n;
+    message.app = object.app ?? 0n;
     return message;
   },
 };
 
-type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
+type Builtin = Date | Function | Uint8Array | string | number | boolean | bigint | undefined;
 
 type DeepPartial<T> = T extends Builtin ? T
   : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
@@ -184,14 +190,8 @@ type DeepPartial<T> = T extends Builtin ? T
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
-function longToNumber(long: Long): number {
-  if (long.gt(globalThis.Number.MAX_SAFE_INTEGER)) {
-    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
-  }
-  if (long.lt(globalThis.Number.MIN_SAFE_INTEGER)) {
-    throw new globalThis.Error("Value is smaller than Number.MIN_SAFE_INTEGER");
-  }
-  return long.toNumber();
+function longToBigint(long: Long) {
+  return BigInt(long.toString());
 }
 
 if (_m0.util.Long !== Long) {

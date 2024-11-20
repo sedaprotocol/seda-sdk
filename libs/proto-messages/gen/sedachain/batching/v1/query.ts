@@ -12,7 +12,7 @@ import { Batch, BatchSignatures, DataResult, TreeEntries } from "./batching";
 
 /** The request message for QueryBatch RPC. */
 export interface QueryBatchRequest {
-  batchNumber: number;
+  batchNumber: bigint;
 }
 
 /** The response message for QueryBatch RPC. */
@@ -22,7 +22,7 @@ export interface QueryBatchResponse {
 
 /** The request message for BatchForHeight RPC. */
 export interface QueryBatchForHeightRequest {
-  blockHeight: number;
+  blockHeight: bigint;
 }
 
 /** The response message for BatchForHeight RPC. */
@@ -44,7 +44,7 @@ export interface QueryBatchesResponse {
 
 /** The request message for QueryTreeEntries RPC. */
 export interface QueryTreeEntriesRequest {
-  batchNumber: number;
+  batchNumber: bigint;
 }
 
 /** The response message for QueryTreeEntries RPC. */
@@ -54,7 +54,7 @@ export interface QueryTreeEntriesResponse {
 
 /** The request message for QueryBatchSignaturesRequest RPC. */
 export interface QueryBatchSignaturesRequest {
-  batchNumber: number;
+  batchNumber: bigint;
 }
 
 /** The response message for QueryQueryBatchSignatures RPC. */
@@ -79,17 +79,20 @@ export interface QueryBatchAssignmentRequest {
 
 /** The response message for QueryBatchAssignment RPC. */
 export interface QueryBatchAssignmentResponse {
-  batchNumber: number;
+  batchNumber: bigint;
 }
 
 function createBaseQueryBatchRequest(): QueryBatchRequest {
-  return { batchNumber: 0 };
+  return { batchNumber: 0n };
 }
 
 export const QueryBatchRequest = {
   encode(message: QueryBatchRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.batchNumber !== 0) {
-      writer.uint32(8).uint64(message.batchNumber);
+    if (message.batchNumber !== 0n) {
+      if (BigInt.asUintN(64, message.batchNumber) !== message.batchNumber) {
+        throw new globalThis.Error("value provided for field message.batchNumber of type uint64 too large");
+      }
+      writer.uint32(8).uint64(message.batchNumber.toString());
     }
     return writer;
   },
@@ -106,7 +109,7 @@ export const QueryBatchRequest = {
             break;
           }
 
-          message.batchNumber = longToNumber(reader.uint64() as Long);
+          message.batchNumber = longToBigint(reader.uint64() as Long);
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -118,13 +121,13 @@ export const QueryBatchRequest = {
   },
 
   fromJSON(object: any): QueryBatchRequest {
-    return { batchNumber: isSet(object.batchNumber) ? globalThis.Number(object.batchNumber) : 0 };
+    return { batchNumber: isSet(object.batchNumber) ? BigInt(object.batchNumber) : 0n };
   },
 
   toJSON(message: QueryBatchRequest): unknown {
     const obj: any = {};
-    if (message.batchNumber !== 0) {
-      obj.batchNumber = Math.round(message.batchNumber);
+    if (message.batchNumber !== 0n) {
+      obj.batchNumber = message.batchNumber.toString();
     }
     return obj;
   },
@@ -134,7 +137,7 @@ export const QueryBatchRequest = {
   },
   fromPartial(object: DeepPartial<QueryBatchRequest>): QueryBatchRequest {
     const message = createBaseQueryBatchRequest();
-    message.batchNumber = object.batchNumber ?? 0;
+    message.batchNumber = object.batchNumber ?? 0n;
     return message;
   },
 };
@@ -197,13 +200,16 @@ export const QueryBatchResponse = {
 };
 
 function createBaseQueryBatchForHeightRequest(): QueryBatchForHeightRequest {
-  return { blockHeight: 0 };
+  return { blockHeight: 0n };
 }
 
 export const QueryBatchForHeightRequest = {
   encode(message: QueryBatchForHeightRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.blockHeight !== 0) {
-      writer.uint32(8).int64(message.blockHeight);
+    if (message.blockHeight !== 0n) {
+      if (BigInt.asIntN(64, message.blockHeight) !== message.blockHeight) {
+        throw new globalThis.Error("value provided for field message.blockHeight of type int64 too large");
+      }
+      writer.uint32(8).int64(message.blockHeight.toString());
     }
     return writer;
   },
@@ -220,7 +226,7 @@ export const QueryBatchForHeightRequest = {
             break;
           }
 
-          message.blockHeight = longToNumber(reader.int64() as Long);
+          message.blockHeight = longToBigint(reader.int64() as Long);
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -232,13 +238,13 @@ export const QueryBatchForHeightRequest = {
   },
 
   fromJSON(object: any): QueryBatchForHeightRequest {
-    return { blockHeight: isSet(object.blockHeight) ? globalThis.Number(object.blockHeight) : 0 };
+    return { blockHeight: isSet(object.blockHeight) ? BigInt(object.blockHeight) : 0n };
   },
 
   toJSON(message: QueryBatchForHeightRequest): unknown {
     const obj: any = {};
-    if (message.blockHeight !== 0) {
-      obj.blockHeight = Math.round(message.blockHeight);
+    if (message.blockHeight !== 0n) {
+      obj.blockHeight = message.blockHeight.toString();
     }
     return obj;
   },
@@ -248,7 +254,7 @@ export const QueryBatchForHeightRequest = {
   },
   fromPartial(object: DeepPartial<QueryBatchForHeightRequest>): QueryBatchForHeightRequest {
     const message = createBaseQueryBatchForHeightRequest();
-    message.blockHeight = object.blockHeight ?? 0;
+    message.blockHeight = object.blockHeight ?? 0n;
     return message;
   },
 };
@@ -446,13 +452,16 @@ export const QueryBatchesResponse = {
 };
 
 function createBaseQueryTreeEntriesRequest(): QueryTreeEntriesRequest {
-  return { batchNumber: 0 };
+  return { batchNumber: 0n };
 }
 
 export const QueryTreeEntriesRequest = {
   encode(message: QueryTreeEntriesRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.batchNumber !== 0) {
-      writer.uint32(8).uint64(message.batchNumber);
+    if (message.batchNumber !== 0n) {
+      if (BigInt.asUintN(64, message.batchNumber) !== message.batchNumber) {
+        throw new globalThis.Error("value provided for field message.batchNumber of type uint64 too large");
+      }
+      writer.uint32(8).uint64(message.batchNumber.toString());
     }
     return writer;
   },
@@ -469,7 +478,7 @@ export const QueryTreeEntriesRequest = {
             break;
           }
 
-          message.batchNumber = longToNumber(reader.uint64() as Long);
+          message.batchNumber = longToBigint(reader.uint64() as Long);
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -481,13 +490,13 @@ export const QueryTreeEntriesRequest = {
   },
 
   fromJSON(object: any): QueryTreeEntriesRequest {
-    return { batchNumber: isSet(object.batchNumber) ? globalThis.Number(object.batchNumber) : 0 };
+    return { batchNumber: isSet(object.batchNumber) ? BigInt(object.batchNumber) : 0n };
   },
 
   toJSON(message: QueryTreeEntriesRequest): unknown {
     const obj: any = {};
-    if (message.batchNumber !== 0) {
-      obj.batchNumber = Math.round(message.batchNumber);
+    if (message.batchNumber !== 0n) {
+      obj.batchNumber = message.batchNumber.toString();
     }
     return obj;
   },
@@ -497,7 +506,7 @@ export const QueryTreeEntriesRequest = {
   },
   fromPartial(object: DeepPartial<QueryTreeEntriesRequest>): QueryTreeEntriesRequest {
     const message = createBaseQueryTreeEntriesRequest();
-    message.batchNumber = object.batchNumber ?? 0;
+    message.batchNumber = object.batchNumber ?? 0n;
     return message;
   },
 };
@@ -562,13 +571,16 @@ export const QueryTreeEntriesResponse = {
 };
 
 function createBaseQueryBatchSignaturesRequest(): QueryBatchSignaturesRequest {
-  return { batchNumber: 0 };
+  return { batchNumber: 0n };
 }
 
 export const QueryBatchSignaturesRequest = {
   encode(message: QueryBatchSignaturesRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.batchNumber !== 0) {
-      writer.uint32(8).uint64(message.batchNumber);
+    if (message.batchNumber !== 0n) {
+      if (BigInt.asUintN(64, message.batchNumber) !== message.batchNumber) {
+        throw new globalThis.Error("value provided for field message.batchNumber of type uint64 too large");
+      }
+      writer.uint32(8).uint64(message.batchNumber.toString());
     }
     return writer;
   },
@@ -585,7 +597,7 @@ export const QueryBatchSignaturesRequest = {
             break;
           }
 
-          message.batchNumber = longToNumber(reader.uint64() as Long);
+          message.batchNumber = longToBigint(reader.uint64() as Long);
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -597,13 +609,13 @@ export const QueryBatchSignaturesRequest = {
   },
 
   fromJSON(object: any): QueryBatchSignaturesRequest {
-    return { batchNumber: isSet(object.batchNumber) ? globalThis.Number(object.batchNumber) : 0 };
+    return { batchNumber: isSet(object.batchNumber) ? BigInt(object.batchNumber) : 0n };
   },
 
   toJSON(message: QueryBatchSignaturesRequest): unknown {
     const obj: any = {};
-    if (message.batchNumber !== 0) {
-      obj.batchNumber = Math.round(message.batchNumber);
+    if (message.batchNumber !== 0n) {
+      obj.batchNumber = message.batchNumber.toString();
     }
     return obj;
   },
@@ -613,7 +625,7 @@ export const QueryBatchSignaturesRequest = {
   },
   fromPartial(object: DeepPartial<QueryBatchSignaturesRequest>): QueryBatchSignaturesRequest {
     const message = createBaseQueryBatchSignaturesRequest();
-    message.batchNumber = object.batchNumber ?? 0;
+    message.batchNumber = object.batchNumber ?? 0n;
     return message;
   },
 };
@@ -853,13 +865,16 @@ export const QueryBatchAssignmentRequest = {
 };
 
 function createBaseQueryBatchAssignmentResponse(): QueryBatchAssignmentResponse {
-  return { batchNumber: 0 };
+  return { batchNumber: 0n };
 }
 
 export const QueryBatchAssignmentResponse = {
   encode(message: QueryBatchAssignmentResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.batchNumber !== 0) {
-      writer.uint32(8).uint64(message.batchNumber);
+    if (message.batchNumber !== 0n) {
+      if (BigInt.asUintN(64, message.batchNumber) !== message.batchNumber) {
+        throw new globalThis.Error("value provided for field message.batchNumber of type uint64 too large");
+      }
+      writer.uint32(8).uint64(message.batchNumber.toString());
     }
     return writer;
   },
@@ -876,7 +891,7 @@ export const QueryBatchAssignmentResponse = {
             break;
           }
 
-          message.batchNumber = longToNumber(reader.uint64() as Long);
+          message.batchNumber = longToBigint(reader.uint64() as Long);
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -888,13 +903,13 @@ export const QueryBatchAssignmentResponse = {
   },
 
   fromJSON(object: any): QueryBatchAssignmentResponse {
-    return { batchNumber: isSet(object.batchNumber) ? globalThis.Number(object.batchNumber) : 0 };
+    return { batchNumber: isSet(object.batchNumber) ? BigInt(object.batchNumber) : 0n };
   },
 
   toJSON(message: QueryBatchAssignmentResponse): unknown {
     const obj: any = {};
-    if (message.batchNumber !== 0) {
-      obj.batchNumber = Math.round(message.batchNumber);
+    if (message.batchNumber !== 0n) {
+      obj.batchNumber = message.batchNumber.toString();
     }
     return obj;
   },
@@ -904,7 +919,7 @@ export const QueryBatchAssignmentResponse = {
   },
   fromPartial(object: DeepPartial<QueryBatchAssignmentResponse>): QueryBatchAssignmentResponse {
     const message = createBaseQueryBatchAssignmentResponse();
-    message.batchNumber = object.batchNumber ?? 0;
+    message.batchNumber = object.batchNumber ?? 0n;
     return message;
   },
 };
@@ -998,7 +1013,7 @@ interface Rpc {
   request(service: string, method: string, data: Uint8Array): Promise<Uint8Array>;
 }
 
-type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
+type Builtin = Date | Function | Uint8Array | string | number | boolean | bigint | undefined;
 
 type DeepPartial<T> = T extends Builtin ? T
   : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
@@ -1006,14 +1021,8 @@ type DeepPartial<T> = T extends Builtin ? T
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
-function longToNumber(long: Long): number {
-  if (long.gt(globalThis.Number.MAX_SAFE_INTEGER)) {
-    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
-  }
-  if (long.lt(globalThis.Number.MIN_SAFE_INTEGER)) {
-    throw new globalThis.Error("Value is smaller than Number.MIN_SAFE_INTEGER");
-  }
-  return long.toNumber();
+function longToBigint(long: Long) {
+  return BigInt(long.toString());
 }
 
 if (_m0.util.Long !== Long) {
