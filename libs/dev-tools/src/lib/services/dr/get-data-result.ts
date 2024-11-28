@@ -2,6 +2,7 @@ import { tryAsync } from "@seda-protocol/utils";
 import { Maybe } from "true-myth";
 import {
 	type InferOutput,
+	bigint,
 	boolean,
 	custom,
 	number,
@@ -16,13 +17,16 @@ import { createBatchingQueryClient } from "./query-client";
 
 const DataResultSchema = pipe(
 	object({
+		id: string(),
 		version: string(),
 		drId: string(),
+		drBlockHeight: bigint(),
 		consensus: boolean(),
 		exitCode: number(),
 		result: custom<Uint8Array>((input) => input instanceof Uint8Array),
-		blockHeight: number(),
-		gasUsed: number(),
+		blockHeight: bigint(),
+		blockTimestamp: bigint(),
+		gasUsed: bigint(),
 		paybackAddress: string(),
 		sedaPayload: string(),
 	}),
@@ -32,11 +36,13 @@ const DataResultSchema = pipe(
 		return {
 			version: result.version,
 			drId: result.drId,
+			drBlockHeight: result.drBlockHeight,
 			consensus: result.consensus,
 			exitCode: result.exitCode,
 			result: `0x${resultBuffer.toString("hex")}`,
 			resultAsUtf8: resultBuffer.toString(),
 			blockHeight: result.blockHeight,
+			blockTimestamp: new Date(Number(result.blockTimestamp * 1000n)),
 			gasUsed: result.gasUsed,
 			paybackAddress: base64Decode(result.paybackAddress),
 			sedaPayload: base64Decode(result.sedaPayload),

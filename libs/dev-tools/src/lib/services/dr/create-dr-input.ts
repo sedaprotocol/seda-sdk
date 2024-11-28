@@ -5,8 +5,8 @@ import {
 
 const DEFAULT_VERSION = "0.0.1";
 const DEFAULT_REPLICATION_FACTOR = 1;
-const DEFAULT_GAS_LIMIT = 5_000_000_000;
-const DEFAULT_GAS_PRICE = 1;
+const DEFAULT_GAS_LIMIT = 300_000_000_000_000;
+const DEFAULT_GAS_PRICE = 1n;
 const DEFAULT_MEMO = new Uint8Array([]);
 
 export type PostDataRequestInput = {
@@ -20,6 +20,11 @@ export type PostDataRequestInput = {
 	 * Execution phase inputs encoded as bytes. Input depends on the Oracle Program specified in execProgramId.
 	 */
 	execInputs: Uint8Array;
+	/**
+	 * Amount of gas units allowed for execution
+	 * Defaults to 300_000_000_000_000 (max gas limit)
+	 */
+	execGasLimit?: number;
 
 	/**
 	 * Hash of the uploaded Tally Oracle Program that should run the tally phase.
@@ -30,6 +35,11 @@ export type PostDataRequestInput = {
 	 * Inputs encoded in bytes. Input depends on the Tally Oracle Program specified in tallyProgramId.
 	 */
 	tallyInputs: Uint8Array;
+	/**
+	 * Amount of gas units allowed for tally
+	 * Defaults to 300_000_000_000_000 (max gas limit)
+	 */
+	tallyGasLimit?: number;
 
 	/**
 	 * Amount of overlay nodes required to execute this Data Request
@@ -46,15 +56,9 @@ export type PostDataRequestInput = {
 
 	/**
 	 * How much aseda you want to pay per gas unit
-	 * Defaults to 1
+	 * Defaults to 1n (bigint)
 	 */
-	gasPrice?: number;
-
-	/**
-	 * Amount of gas units allowed for execution
-	 * Defaults to 300_000
-	 */
-	gasLimit?: number;
+	gasPrice?: bigint;
 
 	/**
 	 * Memo field for any data you want to attach to the Data Request
@@ -79,7 +83,8 @@ export function createPostedDataRequest(input: PostDataRequestInput) {
 		encodeConsensusFilter(input.consensusOptions),
 	);
 
-	const gas_limit = input.gasLimit ?? DEFAULT_GAS_LIMIT;
+	const exec_gas_limit = input.execGasLimit ?? DEFAULT_GAS_LIMIT;
+	const tally_gas_limit = input.tallyGasLimit ?? DEFAULT_GAS_LIMIT;
 	const gas_price = (input.gasPrice ?? DEFAULT_GAS_PRICE).toString();
 
 	const memo = base64Encode(input.memo ?? DEFAULT_MEMO);
@@ -92,7 +97,8 @@ export function createPostedDataRequest(input: PostDataRequestInput) {
 		tally_inputs,
 		replication_factor,
 		consensus_filter,
-		gas_limit,
+		exec_gas_limit,
+		tally_gas_limit,
 		gas_price,
 		memo,
 	};
