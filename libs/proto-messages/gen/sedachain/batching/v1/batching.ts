@@ -37,27 +37,23 @@ export interface Batch {
   validatorRoot: string;
   /** batch_id is the Keccack-256 hash of the batch content. */
   batchId: Uint8Array;
-  /** proving_medatada is a field for additional proving data. */
-  provingMedatada: Uint8Array;
+  /** proving_metadata is a field for additional proving data. */
+  provingMetadata: Uint8Array;
 }
 
 /**
- * TreeEntries are the given batch's data result tree entries and
- * validator tree entries.
+ * DataResultTreeEntries is a list of data result tree entries for a
+ * given batch.
  */
-export interface TreeEntries {
-  /** batch_number is the identifier of the batch the tree entries from. */
-  batchNumber: bigint;
-  /**
-   * data_result_entries are the entries (unhashed leaf contents) of
-   * the data result tree.
-   */
-  dataResultEntries: Uint8Array[];
-  /**
-   * validator_entries are the entries (unhashed leaf contents) of
-   * the validator tree.
-   */
-  validatorEntries: Uint8Array[];
+export interface DataResultTreeEntries {
+  entries: Uint8Array[];
+}
+
+/** ValidatorTreeEntry is an entry in the validator tree. */
+export interface ValidatorTreeEntry {
+  validatorAddress: Uint8Array;
+  votingPowerPercent: number;
+  ethAddress: Uint8Array;
 }
 
 /**
@@ -65,17 +61,8 @@ export interface TreeEntries {
  * under various cryptographic schemes.
  */
 export interface BatchSignatures {
-  validatorAddr: string;
-  signatures: Uint8Array;
-}
-
-/** Params is a list of parameters which can be changed through governance. */
-export interface Params {
-  /**
-   * validator_set_trim_percent is the percentage of the validator
-   * set to store in the validator merkle tree in the batch.
-   */
-  validatorSetTrimPercent: number;
+  validatorAddress: Uint8Array;
+  secp256k1Signature: Uint8Array;
 }
 
 /** DataResult represents the result of a resolved data request. */
@@ -84,10 +71,17 @@ export interface DataResult {
   id: string;
   /** dr_id is the data request identifier. */
   drId: string;
+  /** dr_block_height is the height at which the data request was submitted. */
+  drBlockHeight: bigint;
   /** version is a semantic version string. */
   version: string;
   /** block_height is the height at which the data request was tallied. */
   blockHeight: bigint;
+  /**
+   * block_timestamp is the unix timestamp in seconds of when the data request
+   * was tallied.
+   */
+  blockTimestamp: bigint;
   /** exit_code is the exit code of the tally wasm binary execution. */
   exitCode: number;
   /** gas_used is the gas used by the data request execution. */
@@ -116,7 +110,7 @@ function createBaseBatch(): Batch {
     dataResultRoot: "",
     validatorRoot: "",
     batchId: new Uint8Array(0),
-    provingMedatada: new Uint8Array(0),
+    provingMetadata: new Uint8Array(0),
   };
 }
 
@@ -146,8 +140,8 @@ export const Batch = {
     if (message.batchId.length !== 0) {
       writer.uint32(50).bytes(message.batchId);
     }
-    if (message.provingMedatada.length !== 0) {
-      writer.uint32(58).bytes(message.provingMedatada);
+    if (message.provingMetadata.length !== 0) {
+      writer.uint32(58).bytes(message.provingMetadata);
     }
     return writer;
   },
@@ -206,7 +200,7 @@ export const Batch = {
             break;
           }
 
-          message.provingMedatada = reader.bytes();
+          message.provingMetadata = reader.bytes();
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -225,7 +219,7 @@ export const Batch = {
       dataResultRoot: isSet(object.dataResultRoot) ? globalThis.String(object.dataResultRoot) : "",
       validatorRoot: isSet(object.validatorRoot) ? globalThis.String(object.validatorRoot) : "",
       batchId: isSet(object.batchId) ? bytesFromBase64(object.batchId) : new Uint8Array(0),
-      provingMedatada: isSet(object.provingMedatada) ? bytesFromBase64(object.provingMedatada) : new Uint8Array(0),
+      provingMetadata: isSet(object.provingMetadata) ? bytesFromBase64(object.provingMetadata) : new Uint8Array(0),
     };
   },
 
@@ -249,8 +243,8 @@ export const Batch = {
     if (message.batchId.length !== 0) {
       obj.batchId = base64FromBytes(message.batchId);
     }
-    if (message.provingMedatada.length !== 0) {
-      obj.provingMedatada = base64FromBytes(message.provingMedatada);
+    if (message.provingMetadata.length !== 0) {
+      obj.provingMetadata = base64FromBytes(message.provingMetadata);
     }
     return obj;
   },
@@ -266,59 +260,36 @@ export const Batch = {
     message.dataResultRoot = object.dataResultRoot ?? "";
     message.validatorRoot = object.validatorRoot ?? "";
     message.batchId = object.batchId ?? new Uint8Array(0);
-    message.provingMedatada = object.provingMedatada ?? new Uint8Array(0);
+    message.provingMetadata = object.provingMetadata ?? new Uint8Array(0);
     return message;
   },
 };
 
-function createBaseTreeEntries(): TreeEntries {
-  return { batchNumber: 0n, dataResultEntries: [], validatorEntries: [] };
+function createBaseDataResultTreeEntries(): DataResultTreeEntries {
+  return { entries: [] };
 }
 
-export const TreeEntries = {
-  encode(message: TreeEntries, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.batchNumber !== 0n) {
-      if (BigInt.asUintN(64, message.batchNumber) !== message.batchNumber) {
-        throw new globalThis.Error("value provided for field message.batchNumber of type uint64 too large");
-      }
-      writer.uint32(8).uint64(message.batchNumber.toString());
-    }
-    for (const v of message.dataResultEntries) {
-      writer.uint32(18).bytes(v!);
-    }
-    for (const v of message.validatorEntries) {
-      writer.uint32(26).bytes(v!);
+export const DataResultTreeEntries = {
+  encode(message: DataResultTreeEntries, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.entries) {
+      writer.uint32(10).bytes(v!);
     }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): TreeEntries {
+  decode(input: _m0.Reader | Uint8Array, length?: number): DataResultTreeEntries {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseTreeEntries();
+    const message = createBaseDataResultTreeEntries();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          if (tag !== 8) {
+          if (tag !== 10) {
             break;
           }
 
-          message.batchNumber = longToBigint(reader.uint64() as Long);
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.dataResultEntries.push(reader.bytes());
-          continue;
-        case 3:
-          if (tag !== 26) {
-            break;
-          }
-
-          message.validatorEntries.push(reader.bytes());
+          message.entries.push(reader.bytes());
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -329,55 +300,130 @@ export const TreeEntries = {
     return message;
   },
 
-  fromJSON(object: any): TreeEntries {
+  fromJSON(object: any): DataResultTreeEntries {
     return {
-      batchNumber: isSet(object.batchNumber) ? BigInt(object.batchNumber) : 0n,
-      dataResultEntries: globalThis.Array.isArray(object?.dataResultEntries)
-        ? object.dataResultEntries.map((e: any) => bytesFromBase64(e))
-        : [],
-      validatorEntries: globalThis.Array.isArray(object?.validatorEntries)
-        ? object.validatorEntries.map((e: any) => bytesFromBase64(e))
-        : [],
+      entries: globalThis.Array.isArray(object?.entries) ? object.entries.map((e: any) => bytesFromBase64(e)) : [],
     };
   },
 
-  toJSON(message: TreeEntries): unknown {
+  toJSON(message: DataResultTreeEntries): unknown {
     const obj: any = {};
-    if (message.batchNumber !== 0n) {
-      obj.batchNumber = message.batchNumber.toString();
-    }
-    if (message.dataResultEntries?.length) {
-      obj.dataResultEntries = message.dataResultEntries.map((e) => base64FromBytes(e));
-    }
-    if (message.validatorEntries?.length) {
-      obj.validatorEntries = message.validatorEntries.map((e) => base64FromBytes(e));
+    if (message.entries?.length) {
+      obj.entries = message.entries.map((e) => base64FromBytes(e));
     }
     return obj;
   },
 
-  create(base?: DeepPartial<TreeEntries>): TreeEntries {
-    return TreeEntries.fromPartial(base ?? {});
+  create(base?: DeepPartial<DataResultTreeEntries>): DataResultTreeEntries {
+    return DataResultTreeEntries.fromPartial(base ?? {});
   },
-  fromPartial(object: DeepPartial<TreeEntries>): TreeEntries {
-    const message = createBaseTreeEntries();
-    message.batchNumber = object.batchNumber ?? 0n;
-    message.dataResultEntries = object.dataResultEntries?.map((e) => e) || [];
-    message.validatorEntries = object.validatorEntries?.map((e) => e) || [];
+  fromPartial(object: DeepPartial<DataResultTreeEntries>): DataResultTreeEntries {
+    const message = createBaseDataResultTreeEntries();
+    message.entries = object.entries?.map((e) => e) || [];
+    return message;
+  },
+};
+
+function createBaseValidatorTreeEntry(): ValidatorTreeEntry {
+  return { validatorAddress: new Uint8Array(0), votingPowerPercent: 0, ethAddress: new Uint8Array(0) };
+}
+
+export const ValidatorTreeEntry = {
+  encode(message: ValidatorTreeEntry, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.validatorAddress.length !== 0) {
+      writer.uint32(10).bytes(message.validatorAddress);
+    }
+    if (message.votingPowerPercent !== 0) {
+      writer.uint32(16).uint32(message.votingPowerPercent);
+    }
+    if (message.ethAddress.length !== 0) {
+      writer.uint32(26).bytes(message.ethAddress);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ValidatorTreeEntry {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseValidatorTreeEntry();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.validatorAddress = reader.bytes();
+          continue;
+        case 2:
+          if (tag !== 16) {
+            break;
+          }
+
+          message.votingPowerPercent = reader.uint32();
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.ethAddress = reader.bytes();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ValidatorTreeEntry {
+    return {
+      validatorAddress: isSet(object.validatorAddress) ? bytesFromBase64(object.validatorAddress) : new Uint8Array(0),
+      votingPowerPercent: isSet(object.votingPowerPercent) ? globalThis.Number(object.votingPowerPercent) : 0,
+      ethAddress: isSet(object.ethAddress) ? bytesFromBase64(object.ethAddress) : new Uint8Array(0),
+    };
+  },
+
+  toJSON(message: ValidatorTreeEntry): unknown {
+    const obj: any = {};
+    if (message.validatorAddress.length !== 0) {
+      obj.validatorAddress = base64FromBytes(message.validatorAddress);
+    }
+    if (message.votingPowerPercent !== 0) {
+      obj.votingPowerPercent = Math.round(message.votingPowerPercent);
+    }
+    if (message.ethAddress.length !== 0) {
+      obj.ethAddress = base64FromBytes(message.ethAddress);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<ValidatorTreeEntry>): ValidatorTreeEntry {
+    return ValidatorTreeEntry.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ValidatorTreeEntry>): ValidatorTreeEntry {
+    const message = createBaseValidatorTreeEntry();
+    message.validatorAddress = object.validatorAddress ?? new Uint8Array(0);
+    message.votingPowerPercent = object.votingPowerPercent ?? 0;
+    message.ethAddress = object.ethAddress ?? new Uint8Array(0);
     return message;
   },
 };
 
 function createBaseBatchSignatures(): BatchSignatures {
-  return { validatorAddr: "", signatures: new Uint8Array(0) };
+  return { validatorAddress: new Uint8Array(0), secp256k1Signature: new Uint8Array(0) };
 }
 
 export const BatchSignatures = {
   encode(message: BatchSignatures, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.validatorAddr !== "") {
-      writer.uint32(10).string(message.validatorAddr);
+    if (message.validatorAddress.length !== 0) {
+      writer.uint32(10).bytes(message.validatorAddress);
     }
-    if (message.signatures.length !== 0) {
-      writer.uint32(18).bytes(message.signatures);
+    if (message.secp256k1Signature.length !== 0) {
+      writer.uint32(18).bytes(message.secp256k1Signature);
     }
     return writer;
   },
@@ -394,14 +440,14 @@ export const BatchSignatures = {
             break;
           }
 
-          message.validatorAddr = reader.string();
+          message.validatorAddress = reader.bytes();
           continue;
         case 2:
           if (tag !== 18) {
             break;
           }
 
-          message.signatures = reader.bytes();
+          message.secp256k1Signature = reader.bytes();
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -414,18 +460,20 @@ export const BatchSignatures = {
 
   fromJSON(object: any): BatchSignatures {
     return {
-      validatorAddr: isSet(object.validatorAddr) ? globalThis.String(object.validatorAddr) : "",
-      signatures: isSet(object.signatures) ? bytesFromBase64(object.signatures) : new Uint8Array(0),
+      validatorAddress: isSet(object.validatorAddress) ? bytesFromBase64(object.validatorAddress) : new Uint8Array(0),
+      secp256k1Signature: isSet(object.secp256k1Signature)
+        ? bytesFromBase64(object.secp256k1Signature)
+        : new Uint8Array(0),
     };
   },
 
   toJSON(message: BatchSignatures): unknown {
     const obj: any = {};
-    if (message.validatorAddr !== "") {
-      obj.validatorAddr = message.validatorAddr;
+    if (message.validatorAddress.length !== 0) {
+      obj.validatorAddress = base64FromBytes(message.validatorAddress);
     }
-    if (message.signatures.length !== 0) {
-      obj.signatures = base64FromBytes(message.signatures);
+    if (message.secp256k1Signature.length !== 0) {
+      obj.secp256k1Signature = base64FromBytes(message.secp256k1Signature);
     }
     return obj;
   },
@@ -435,69 +483,8 @@ export const BatchSignatures = {
   },
   fromPartial(object: DeepPartial<BatchSignatures>): BatchSignatures {
     const message = createBaseBatchSignatures();
-    message.validatorAddr = object.validatorAddr ?? "";
-    message.signatures = object.signatures ?? new Uint8Array(0);
-    return message;
-  },
-};
-
-function createBaseParams(): Params {
-  return { validatorSetTrimPercent: 0 };
-}
-
-export const Params = {
-  encode(message: Params, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.validatorSetTrimPercent !== 0) {
-      writer.uint32(8).uint32(message.validatorSetTrimPercent);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): Params {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseParams();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 8) {
-            break;
-          }
-
-          message.validatorSetTrimPercent = reader.uint32();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): Params {
-    return {
-      validatorSetTrimPercent: isSet(object.validatorSetTrimPercent)
-        ? globalThis.Number(object.validatorSetTrimPercent)
-        : 0,
-    };
-  },
-
-  toJSON(message: Params): unknown {
-    const obj: any = {};
-    if (message.validatorSetTrimPercent !== 0) {
-      obj.validatorSetTrimPercent = Math.round(message.validatorSetTrimPercent);
-    }
-    return obj;
-  },
-
-  create(base?: DeepPartial<Params>): Params {
-    return Params.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<Params>): Params {
-    const message = createBaseParams();
-    message.validatorSetTrimPercent = object.validatorSetTrimPercent ?? 0;
+    message.validatorAddress = object.validatorAddress ?? new Uint8Array(0);
+    message.secp256k1Signature = object.secp256k1Signature ?? new Uint8Array(0);
     return message;
   },
 };
@@ -506,8 +493,10 @@ function createBaseDataResult(): DataResult {
   return {
     id: "",
     drId: "",
+    drBlockHeight: 0n,
     version: "",
     blockHeight: 0n,
+    blockTimestamp: 0n,
     exitCode: 0,
     gasUsed: 0n,
     result: new Uint8Array(0),
@@ -525,35 +514,47 @@ export const DataResult = {
     if (message.drId !== "") {
       writer.uint32(18).string(message.drId);
     }
+    if (message.drBlockHeight !== 0n) {
+      if (BigInt.asUintN(64, message.drBlockHeight) !== message.drBlockHeight) {
+        throw new globalThis.Error("value provided for field message.drBlockHeight of type uint64 too large");
+      }
+      writer.uint32(24).uint64(message.drBlockHeight.toString());
+    }
     if (message.version !== "") {
-      writer.uint32(26).string(message.version);
+      writer.uint32(34).string(message.version);
     }
     if (message.blockHeight !== 0n) {
       if (BigInt.asUintN(64, message.blockHeight) !== message.blockHeight) {
         throw new globalThis.Error("value provided for field message.blockHeight of type uint64 too large");
       }
-      writer.uint32(32).uint64(message.blockHeight.toString());
+      writer.uint32(40).uint64(message.blockHeight.toString());
+    }
+    if (message.blockTimestamp !== 0n) {
+      if (BigInt.asUintN(64, message.blockTimestamp) !== message.blockTimestamp) {
+        throw new globalThis.Error("value provided for field message.blockTimestamp of type uint64 too large");
+      }
+      writer.uint32(48).uint64(message.blockTimestamp.toString());
     }
     if (message.exitCode !== 0) {
-      writer.uint32(40).uint32(message.exitCode);
+      writer.uint32(56).uint32(message.exitCode);
     }
     if (message.gasUsed !== 0n) {
       if (BigInt.asUintN(64, message.gasUsed) !== message.gasUsed) {
         throw new globalThis.Error("value provided for field message.gasUsed of type uint64 too large");
       }
-      writer.uint32(48).uint64(message.gasUsed.toString());
+      writer.uint32(64).uint64(message.gasUsed.toString());
     }
     if (message.result.length !== 0) {
-      writer.uint32(58).bytes(message.result);
+      writer.uint32(74).bytes(message.result);
     }
     if (message.paybackAddress !== "") {
-      writer.uint32(66).string(message.paybackAddress);
+      writer.uint32(82).string(message.paybackAddress);
     }
     if (message.sedaPayload !== "") {
-      writer.uint32(74).string(message.sedaPayload);
+      writer.uint32(90).string(message.sedaPayload);
     }
     if (message.consensus !== false) {
-      writer.uint32(80).bool(message.consensus);
+      writer.uint32(96).bool(message.consensus);
     }
     return writer;
   },
@@ -580,56 +581,70 @@ export const DataResult = {
           message.drId = reader.string();
           continue;
         case 3:
-          if (tag !== 26) {
+          if (tag !== 24) {
+            break;
+          }
+
+          message.drBlockHeight = longToBigint(reader.uint64() as Long);
+          continue;
+        case 4:
+          if (tag !== 34) {
             break;
           }
 
           message.version = reader.string();
-          continue;
-        case 4:
-          if (tag !== 32) {
-            break;
-          }
-
-          message.blockHeight = longToBigint(reader.uint64() as Long);
           continue;
         case 5:
           if (tag !== 40) {
             break;
           }
 
-          message.exitCode = reader.uint32();
+          message.blockHeight = longToBigint(reader.uint64() as Long);
           continue;
         case 6:
           if (tag !== 48) {
             break;
           }
 
-          message.gasUsed = longToBigint(reader.uint64() as Long);
+          message.blockTimestamp = longToBigint(reader.uint64() as Long);
           continue;
         case 7:
-          if (tag !== 58) {
+          if (tag !== 56) {
             break;
           }
 
-          message.result = reader.bytes();
+          message.exitCode = reader.uint32();
           continue;
         case 8:
-          if (tag !== 66) {
+          if (tag !== 64) {
             break;
           }
 
-          message.paybackAddress = reader.string();
+          message.gasUsed = longToBigint(reader.uint64() as Long);
           continue;
         case 9:
           if (tag !== 74) {
             break;
           }
 
-          message.sedaPayload = reader.string();
+          message.result = reader.bytes();
           continue;
         case 10:
-          if (tag !== 80) {
+          if (tag !== 82) {
+            break;
+          }
+
+          message.paybackAddress = reader.string();
+          continue;
+        case 11:
+          if (tag !== 90) {
+            break;
+          }
+
+          message.sedaPayload = reader.string();
+          continue;
+        case 12:
+          if (tag !== 96) {
             break;
           }
 
@@ -648,8 +663,10 @@ export const DataResult = {
     return {
       id: isSet(object.id) ? globalThis.String(object.id) : "",
       drId: isSet(object.drId) ? globalThis.String(object.drId) : "",
+      drBlockHeight: isSet(object.drBlockHeight) ? BigInt(object.drBlockHeight) : 0n,
       version: isSet(object.version) ? globalThis.String(object.version) : "",
       blockHeight: isSet(object.blockHeight) ? BigInt(object.blockHeight) : 0n,
+      blockTimestamp: isSet(object.blockTimestamp) ? BigInt(object.blockTimestamp) : 0n,
       exitCode: isSet(object.exitCode) ? globalThis.Number(object.exitCode) : 0,
       gasUsed: isSet(object.gasUsed) ? BigInt(object.gasUsed) : 0n,
       result: isSet(object.result) ? bytesFromBase64(object.result) : new Uint8Array(0),
@@ -667,11 +684,17 @@ export const DataResult = {
     if (message.drId !== "") {
       obj.drId = message.drId;
     }
+    if (message.drBlockHeight !== 0n) {
+      obj.drBlockHeight = message.drBlockHeight.toString();
+    }
     if (message.version !== "") {
       obj.version = message.version;
     }
     if (message.blockHeight !== 0n) {
       obj.blockHeight = message.blockHeight.toString();
+    }
+    if (message.blockTimestamp !== 0n) {
+      obj.blockTimestamp = message.blockTimestamp.toString();
     }
     if (message.exitCode !== 0) {
       obj.exitCode = Math.round(message.exitCode);
@@ -701,8 +724,10 @@ export const DataResult = {
     const message = createBaseDataResult();
     message.id = object.id ?? "";
     message.drId = object.drId ?? "";
+    message.drBlockHeight = object.drBlockHeight ?? 0n;
     message.version = object.version ?? "";
     message.blockHeight = object.blockHeight ?? 0n;
+    message.blockTimestamp = object.blockTimestamp ?? 0n;
     message.exitCode = object.exitCode ?? 0;
     message.gasUsed = object.gasUsed ?? 0n;
     message.result = object.result ?? new Uint8Array(0);

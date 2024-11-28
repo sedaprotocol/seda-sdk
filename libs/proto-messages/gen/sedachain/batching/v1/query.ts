@@ -8,7 +8,8 @@
 import Long from "long";
 import _m0 from "protobufjs/minimal";
 import { PageRequest, PageResponse } from "../../../cosmos/base/query/v1beta1/pagination";
-import { Batch, BatchSignatures, DataResult, TreeEntries } from "./batching";
+import { Batch, BatchSignatures, DataResult, DataResultTreeEntries, ValidatorTreeEntry } from "./batching";
+import { BatchAssignment } from "./genesis";
 
 /** The request message for QueryBatch RPC. */
 export interface QueryBatchRequest {
@@ -18,6 +19,9 @@ export interface QueryBatchRequest {
 /** The response message for QueryBatch RPC. */
 export interface QueryBatchResponse {
   batch: Batch | undefined;
+  dataResultEntries: DataResultTreeEntries | undefined;
+  validatorEntries: ValidatorTreeEntry[];
+  batchSignatures: BatchSignatures[];
 }
 
 /** The request message for BatchForHeight RPC. */
@@ -33,33 +37,20 @@ export interface QueryBatchForHeightResponse {
 /** The request message for QueryBatches RPC. */
 export interface QueryBatchesRequest {
   /** pagination defines an optional pagination for the request. */
-  pagination: PageRequest | undefined;
+  pagination:
+    | PageRequest
+    | undefined;
+  /**
+   * with_unsigned indicates whether to return batches without
+   * signatures or not.
+   */
+  withUnsigned: boolean;
 }
 
 /** The response message for QueryBatches RPC. */
 export interface QueryBatchesResponse {
   batches: Batch[];
   pagination: PageResponse | undefined;
-}
-
-/** The request message for QueryTreeEntries RPC. */
-export interface QueryTreeEntriesRequest {
-  batchNumber: bigint;
-}
-
-/** The response message for QueryTreeEntries RPC. */
-export interface QueryTreeEntriesResponse {
-  entries: TreeEntries | undefined;
-}
-
-/** The request message for QueryBatchSignaturesRequest RPC. */
-export interface QueryBatchSignaturesRequest {
-  batchNumber: bigint;
-}
-
-/** The response message for QueryQueryBatchSignatures RPC. */
-export interface QueryBatchSignaturesResponse {
-  batchSigs: BatchSignatures[];
 }
 
 /** The request message for QueryDataResult RPC. */
@@ -70,16 +61,7 @@ export interface QueryDataResultRequest {
 /** The response message for QueryDataResult RPC. */
 export interface QueryDataResultResponse {
   dataResult: DataResult | undefined;
-}
-
-/** The request message for QueryBatchAssignment RPC. */
-export interface QueryBatchAssignmentRequest {
-  dataRequestId: string;
-}
-
-/** The response message for QueryBatchAssignment RPC. */
-export interface QueryBatchAssignmentResponse {
-  batchNumber: bigint;
+  batchAssignment: BatchAssignment | undefined;
 }
 
 function createBaseQueryBatchRequest(): QueryBatchRequest {
@@ -143,13 +125,22 @@ export const QueryBatchRequest = {
 };
 
 function createBaseQueryBatchResponse(): QueryBatchResponse {
-  return { batch: undefined };
+  return { batch: undefined, dataResultEntries: undefined, validatorEntries: [], batchSignatures: [] };
 }
 
 export const QueryBatchResponse = {
   encode(message: QueryBatchResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.batch !== undefined) {
       Batch.encode(message.batch, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.dataResultEntries !== undefined) {
+      DataResultTreeEntries.encode(message.dataResultEntries, writer.uint32(18).fork()).ldelim();
+    }
+    for (const v of message.validatorEntries) {
+      ValidatorTreeEntry.encode(v!, writer.uint32(26).fork()).ldelim();
+    }
+    for (const v of message.batchSignatures) {
+      BatchSignatures.encode(v!, writer.uint32(34).fork()).ldelim();
     }
     return writer;
   },
@@ -168,6 +159,27 @@ export const QueryBatchResponse = {
 
           message.batch = Batch.decode(reader, reader.uint32());
           continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.dataResultEntries = DataResultTreeEntries.decode(reader, reader.uint32());
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.validatorEntries.push(ValidatorTreeEntry.decode(reader, reader.uint32()));
+          continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.batchSignatures.push(BatchSignatures.decode(reader, reader.uint32()));
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -178,13 +190,33 @@ export const QueryBatchResponse = {
   },
 
   fromJSON(object: any): QueryBatchResponse {
-    return { batch: isSet(object.batch) ? Batch.fromJSON(object.batch) : undefined };
+    return {
+      batch: isSet(object.batch) ? Batch.fromJSON(object.batch) : undefined,
+      dataResultEntries: isSet(object.dataResultEntries)
+        ? DataResultTreeEntries.fromJSON(object.dataResultEntries)
+        : undefined,
+      validatorEntries: globalThis.Array.isArray(object?.validatorEntries)
+        ? object.validatorEntries.map((e: any) => ValidatorTreeEntry.fromJSON(e))
+        : [],
+      batchSignatures: globalThis.Array.isArray(object?.batchSignatures)
+        ? object.batchSignatures.map((e: any) => BatchSignatures.fromJSON(e))
+        : [],
+    };
   },
 
   toJSON(message: QueryBatchResponse): unknown {
     const obj: any = {};
     if (message.batch !== undefined) {
       obj.batch = Batch.toJSON(message.batch);
+    }
+    if (message.dataResultEntries !== undefined) {
+      obj.dataResultEntries = DataResultTreeEntries.toJSON(message.dataResultEntries);
+    }
+    if (message.validatorEntries?.length) {
+      obj.validatorEntries = message.validatorEntries.map((e) => ValidatorTreeEntry.toJSON(e));
+    }
+    if (message.batchSignatures?.length) {
+      obj.batchSignatures = message.batchSignatures.map((e) => BatchSignatures.toJSON(e));
     }
     return obj;
   },
@@ -195,6 +227,11 @@ export const QueryBatchResponse = {
   fromPartial(object: DeepPartial<QueryBatchResponse>): QueryBatchResponse {
     const message = createBaseQueryBatchResponse();
     message.batch = (object.batch !== undefined && object.batch !== null) ? Batch.fromPartial(object.batch) : undefined;
+    message.dataResultEntries = (object.dataResultEntries !== undefined && object.dataResultEntries !== null)
+      ? DataResultTreeEntries.fromPartial(object.dataResultEntries)
+      : undefined;
+    message.validatorEntries = object.validatorEntries?.map((e) => ValidatorTreeEntry.fromPartial(e)) || [];
+    message.batchSignatures = object.batchSignatures?.map((e) => BatchSignatures.fromPartial(e)) || [];
     return message;
   },
 };
@@ -317,13 +354,16 @@ export const QueryBatchForHeightResponse = {
 };
 
 function createBaseQueryBatchesRequest(): QueryBatchesRequest {
-  return { pagination: undefined };
+  return { pagination: undefined, withUnsigned: false };
 }
 
 export const QueryBatchesRequest = {
   encode(message: QueryBatchesRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.pagination !== undefined) {
       PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.withUnsigned !== false) {
+      writer.uint32(16).bool(message.withUnsigned);
     }
     return writer;
   },
@@ -342,6 +382,13 @@ export const QueryBatchesRequest = {
 
           message.pagination = PageRequest.decode(reader, reader.uint32());
           continue;
+        case 2:
+          if (tag !== 16) {
+            break;
+          }
+
+          message.withUnsigned = reader.bool();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -352,13 +399,19 @@ export const QueryBatchesRequest = {
   },
 
   fromJSON(object: any): QueryBatchesRequest {
-    return { pagination: isSet(object.pagination) ? PageRequest.fromJSON(object.pagination) : undefined };
+    return {
+      pagination: isSet(object.pagination) ? PageRequest.fromJSON(object.pagination) : undefined,
+      withUnsigned: isSet(object.withUnsigned) ? globalThis.Boolean(object.withUnsigned) : false,
+    };
   },
 
   toJSON(message: QueryBatchesRequest): unknown {
     const obj: any = {};
     if (message.pagination !== undefined) {
       obj.pagination = PageRequest.toJSON(message.pagination);
+    }
+    if (message.withUnsigned !== false) {
+      obj.withUnsigned = message.withUnsigned;
     }
     return obj;
   },
@@ -371,6 +424,7 @@ export const QueryBatchesRequest = {
     message.pagination = (object.pagination !== undefined && object.pagination !== null)
       ? PageRequest.fromPartial(object.pagination)
       : undefined;
+    message.withUnsigned = object.withUnsigned ?? false;
     return message;
   },
 };
@@ -451,246 +505,6 @@ export const QueryBatchesResponse = {
   },
 };
 
-function createBaseQueryTreeEntriesRequest(): QueryTreeEntriesRequest {
-  return { batchNumber: 0n };
-}
-
-export const QueryTreeEntriesRequest = {
-  encode(message: QueryTreeEntriesRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.batchNumber !== 0n) {
-      if (BigInt.asUintN(64, message.batchNumber) !== message.batchNumber) {
-        throw new globalThis.Error("value provided for field message.batchNumber of type uint64 too large");
-      }
-      writer.uint32(8).uint64(message.batchNumber.toString());
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): QueryTreeEntriesRequest {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseQueryTreeEntriesRequest();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 8) {
-            break;
-          }
-
-          message.batchNumber = longToBigint(reader.uint64() as Long);
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): QueryTreeEntriesRequest {
-    return { batchNumber: isSet(object.batchNumber) ? BigInt(object.batchNumber) : 0n };
-  },
-
-  toJSON(message: QueryTreeEntriesRequest): unknown {
-    const obj: any = {};
-    if (message.batchNumber !== 0n) {
-      obj.batchNumber = message.batchNumber.toString();
-    }
-    return obj;
-  },
-
-  create(base?: DeepPartial<QueryTreeEntriesRequest>): QueryTreeEntriesRequest {
-    return QueryTreeEntriesRequest.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<QueryTreeEntriesRequest>): QueryTreeEntriesRequest {
-    const message = createBaseQueryTreeEntriesRequest();
-    message.batchNumber = object.batchNumber ?? 0n;
-    return message;
-  },
-};
-
-function createBaseQueryTreeEntriesResponse(): QueryTreeEntriesResponse {
-  return { entries: undefined };
-}
-
-export const QueryTreeEntriesResponse = {
-  encode(message: QueryTreeEntriesResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.entries !== undefined) {
-      TreeEntries.encode(message.entries, writer.uint32(10).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): QueryTreeEntriesResponse {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseQueryTreeEntriesResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.entries = TreeEntries.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): QueryTreeEntriesResponse {
-    return { entries: isSet(object.entries) ? TreeEntries.fromJSON(object.entries) : undefined };
-  },
-
-  toJSON(message: QueryTreeEntriesResponse): unknown {
-    const obj: any = {};
-    if (message.entries !== undefined) {
-      obj.entries = TreeEntries.toJSON(message.entries);
-    }
-    return obj;
-  },
-
-  create(base?: DeepPartial<QueryTreeEntriesResponse>): QueryTreeEntriesResponse {
-    return QueryTreeEntriesResponse.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<QueryTreeEntriesResponse>): QueryTreeEntriesResponse {
-    const message = createBaseQueryTreeEntriesResponse();
-    message.entries = (object.entries !== undefined && object.entries !== null)
-      ? TreeEntries.fromPartial(object.entries)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseQueryBatchSignaturesRequest(): QueryBatchSignaturesRequest {
-  return { batchNumber: 0n };
-}
-
-export const QueryBatchSignaturesRequest = {
-  encode(message: QueryBatchSignaturesRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.batchNumber !== 0n) {
-      if (BigInt.asUintN(64, message.batchNumber) !== message.batchNumber) {
-        throw new globalThis.Error("value provided for field message.batchNumber of type uint64 too large");
-      }
-      writer.uint32(8).uint64(message.batchNumber.toString());
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): QueryBatchSignaturesRequest {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseQueryBatchSignaturesRequest();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 8) {
-            break;
-          }
-
-          message.batchNumber = longToBigint(reader.uint64() as Long);
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): QueryBatchSignaturesRequest {
-    return { batchNumber: isSet(object.batchNumber) ? BigInt(object.batchNumber) : 0n };
-  },
-
-  toJSON(message: QueryBatchSignaturesRequest): unknown {
-    const obj: any = {};
-    if (message.batchNumber !== 0n) {
-      obj.batchNumber = message.batchNumber.toString();
-    }
-    return obj;
-  },
-
-  create(base?: DeepPartial<QueryBatchSignaturesRequest>): QueryBatchSignaturesRequest {
-    return QueryBatchSignaturesRequest.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<QueryBatchSignaturesRequest>): QueryBatchSignaturesRequest {
-    const message = createBaseQueryBatchSignaturesRequest();
-    message.batchNumber = object.batchNumber ?? 0n;
-    return message;
-  },
-};
-
-function createBaseQueryBatchSignaturesResponse(): QueryBatchSignaturesResponse {
-  return { batchSigs: [] };
-}
-
-export const QueryBatchSignaturesResponse = {
-  encode(message: QueryBatchSignaturesResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    for (const v of message.batchSigs) {
-      BatchSignatures.encode(v!, writer.uint32(10).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): QueryBatchSignaturesResponse {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseQueryBatchSignaturesResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.batchSigs.push(BatchSignatures.decode(reader, reader.uint32()));
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): QueryBatchSignaturesResponse {
-    return {
-      batchSigs: globalThis.Array.isArray(object?.batchSigs)
-        ? object.batchSigs.map((e: any) => BatchSignatures.fromJSON(e))
-        : [],
-    };
-  },
-
-  toJSON(message: QueryBatchSignaturesResponse): unknown {
-    const obj: any = {};
-    if (message.batchSigs?.length) {
-      obj.batchSigs = message.batchSigs.map((e) => BatchSignatures.toJSON(e));
-    }
-    return obj;
-  },
-
-  create(base?: DeepPartial<QueryBatchSignaturesResponse>): QueryBatchSignaturesResponse {
-    return QueryBatchSignaturesResponse.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<QueryBatchSignaturesResponse>): QueryBatchSignaturesResponse {
-    const message = createBaseQueryBatchSignaturesResponse();
-    message.batchSigs = object.batchSigs?.map((e) => BatchSignatures.fromPartial(e)) || [];
-    return message;
-  },
-};
-
 function createBaseQueryDataResultRequest(): QueryDataResultRequest {
   return { dataRequestId: "" };
 }
@@ -749,13 +563,16 @@ export const QueryDataResultRequest = {
 };
 
 function createBaseQueryDataResultResponse(): QueryDataResultResponse {
-  return { dataResult: undefined };
+  return { dataResult: undefined, batchAssignment: undefined };
 }
 
 export const QueryDataResultResponse = {
   encode(message: QueryDataResultResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.dataResult !== undefined) {
       DataResult.encode(message.dataResult, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.batchAssignment !== undefined) {
+      BatchAssignment.encode(message.batchAssignment, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
@@ -774,6 +591,13 @@ export const QueryDataResultResponse = {
 
           message.dataResult = DataResult.decode(reader, reader.uint32());
           continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.batchAssignment = BatchAssignment.decode(reader, reader.uint32());
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -784,13 +608,19 @@ export const QueryDataResultResponse = {
   },
 
   fromJSON(object: any): QueryDataResultResponse {
-    return { dataResult: isSet(object.dataResult) ? DataResult.fromJSON(object.dataResult) : undefined };
+    return {
+      dataResult: isSet(object.dataResult) ? DataResult.fromJSON(object.dataResult) : undefined,
+      batchAssignment: isSet(object.batchAssignment) ? BatchAssignment.fromJSON(object.batchAssignment) : undefined,
+    };
   },
 
   toJSON(message: QueryDataResultResponse): unknown {
     const obj: any = {};
     if (message.dataResult !== undefined) {
       obj.dataResult = DataResult.toJSON(message.dataResult);
+    }
+    if (message.batchAssignment !== undefined) {
+      obj.batchAssignment = BatchAssignment.toJSON(message.batchAssignment);
     }
     return obj;
   },
@@ -803,123 +633,9 @@ export const QueryDataResultResponse = {
     message.dataResult = (object.dataResult !== undefined && object.dataResult !== null)
       ? DataResult.fromPartial(object.dataResult)
       : undefined;
-    return message;
-  },
-};
-
-function createBaseQueryBatchAssignmentRequest(): QueryBatchAssignmentRequest {
-  return { dataRequestId: "" };
-}
-
-export const QueryBatchAssignmentRequest = {
-  encode(message: QueryBatchAssignmentRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.dataRequestId !== "") {
-      writer.uint32(10).string(message.dataRequestId);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): QueryBatchAssignmentRequest {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseQueryBatchAssignmentRequest();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.dataRequestId = reader.string();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): QueryBatchAssignmentRequest {
-    return { dataRequestId: isSet(object.dataRequestId) ? globalThis.String(object.dataRequestId) : "" };
-  },
-
-  toJSON(message: QueryBatchAssignmentRequest): unknown {
-    const obj: any = {};
-    if (message.dataRequestId !== "") {
-      obj.dataRequestId = message.dataRequestId;
-    }
-    return obj;
-  },
-
-  create(base?: DeepPartial<QueryBatchAssignmentRequest>): QueryBatchAssignmentRequest {
-    return QueryBatchAssignmentRequest.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<QueryBatchAssignmentRequest>): QueryBatchAssignmentRequest {
-    const message = createBaseQueryBatchAssignmentRequest();
-    message.dataRequestId = object.dataRequestId ?? "";
-    return message;
-  },
-};
-
-function createBaseQueryBatchAssignmentResponse(): QueryBatchAssignmentResponse {
-  return { batchNumber: 0n };
-}
-
-export const QueryBatchAssignmentResponse = {
-  encode(message: QueryBatchAssignmentResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.batchNumber !== 0n) {
-      if (BigInt.asUintN(64, message.batchNumber) !== message.batchNumber) {
-        throw new globalThis.Error("value provided for field message.batchNumber of type uint64 too large");
-      }
-      writer.uint32(8).uint64(message.batchNumber.toString());
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): QueryBatchAssignmentResponse {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseQueryBatchAssignmentResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 8) {
-            break;
-          }
-
-          message.batchNumber = longToBigint(reader.uint64() as Long);
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): QueryBatchAssignmentResponse {
-    return { batchNumber: isSet(object.batchNumber) ? BigInt(object.batchNumber) : 0n };
-  },
-
-  toJSON(message: QueryBatchAssignmentResponse): unknown {
-    const obj: any = {};
-    if (message.batchNumber !== 0n) {
-      obj.batchNumber = message.batchNumber.toString();
-    }
-    return obj;
-  },
-
-  create(base?: DeepPartial<QueryBatchAssignmentResponse>): QueryBatchAssignmentResponse {
-    return QueryBatchAssignmentResponse.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<QueryBatchAssignmentResponse>): QueryBatchAssignmentResponse {
-    const message = createBaseQueryBatchAssignmentResponse();
-    message.batchNumber = object.batchNumber ?? 0n;
+    message.batchAssignment = (object.batchAssignment !== undefined && object.batchAssignment !== null)
+      ? BatchAssignment.fromPartial(object.batchAssignment)
+      : undefined;
     return message;
   },
 };
@@ -932,23 +648,11 @@ export interface Query {
   BatchForHeight(request: QueryBatchForHeightRequest): Promise<QueryBatchForHeightResponse>;
   /** Batch returns all batches in the store. */
   Batches(request: QueryBatchesRequest): Promise<QueryBatchesResponse>;
-  /** TreeEntries returns the tree entries from the given batch number. */
-  TreeEntries(request: QueryTreeEntriesRequest): Promise<QueryTreeEntriesResponse>;
-  /**
-   * BatchSignatures returns the batch signatures for the given batch
-   * and the
-   */
-  BatchSignatures(request: QueryBatchSignaturesRequest): Promise<QueryBatchSignaturesResponse>;
   /**
    * DataResult returns a data result given its associated data request's
    * ID.
    */
   DataResult(request: QueryDataResultRequest): Promise<QueryDataResultResponse>;
-  /**
-   * BatchAssignment returns the batch number that a given data request
-   * has been assigned to.
-   */
-  BatchAssignment(request: QueryBatchAssignmentRequest): Promise<QueryBatchAssignmentResponse>;
 }
 
 export const QueryServiceName = "sedachain.batching.v1.Query";
@@ -961,10 +665,7 @@ export class QueryClientImpl implements Query {
     this.Batch = this.Batch.bind(this);
     this.BatchForHeight = this.BatchForHeight.bind(this);
     this.Batches = this.Batches.bind(this);
-    this.TreeEntries = this.TreeEntries.bind(this);
-    this.BatchSignatures = this.BatchSignatures.bind(this);
     this.DataResult = this.DataResult.bind(this);
-    this.BatchAssignment = this.BatchAssignment.bind(this);
   }
   Batch(request: QueryBatchRequest): Promise<QueryBatchResponse> {
     const data = QueryBatchRequest.encode(request).finish();
@@ -984,28 +685,10 @@ export class QueryClientImpl implements Query {
     return promise.then((data) => QueryBatchesResponse.decode(_m0.Reader.create(data)));
   }
 
-  TreeEntries(request: QueryTreeEntriesRequest): Promise<QueryTreeEntriesResponse> {
-    const data = QueryTreeEntriesRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "TreeEntries", data);
-    return promise.then((data) => QueryTreeEntriesResponse.decode(_m0.Reader.create(data)));
-  }
-
-  BatchSignatures(request: QueryBatchSignaturesRequest): Promise<QueryBatchSignaturesResponse> {
-    const data = QueryBatchSignaturesRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "BatchSignatures", data);
-    return promise.then((data) => QueryBatchSignaturesResponse.decode(_m0.Reader.create(data)));
-  }
-
   DataResult(request: QueryDataResultRequest): Promise<QueryDataResultResponse> {
     const data = QueryDataResultRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "DataResult", data);
     return promise.then((data) => QueryDataResultResponse.decode(_m0.Reader.create(data)));
-  }
-
-  BatchAssignment(request: QueryBatchAssignmentRequest): Promise<QueryBatchAssignmentResponse> {
-    const data = QueryBatchAssignmentRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "BatchAssignment", data);
-    return promise.then((data) => QueryBatchAssignmentResponse.decode(_m0.Reader.create(data)));
   }
 }
 

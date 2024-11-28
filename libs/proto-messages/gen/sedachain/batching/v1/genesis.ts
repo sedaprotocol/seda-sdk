@@ -7,7 +7,7 @@
 /* eslint-disable */
 import Long from "long";
 import _m0 from "protobufjs/minimal";
-import { Batch, DataResult, Params, TreeEntries } from "./batching";
+import { Batch, BatchSignatures, DataResult, DataResultTreeEntries, ValidatorTreeEntry } from "./batching";
 
 /** GenesisState defines the batching module's genesis state. */
 export interface GenesisState {
@@ -17,10 +17,9 @@ export interface GenesisState {
    */
   currentBatchNumber: bigint;
   batches: Batch[];
-  treeEntries: TreeEntries[];
+  batchData: BatchData[];
   dataResults: DataResult[];
   batchAssignments: BatchAssignment[];
-  params: Params | undefined;
 }
 
 /**
@@ -32,15 +31,16 @@ export interface BatchAssignment {
   dataRequestId: string;
 }
 
+/** BatchData represents a given batch's full data. */
+export interface BatchData {
+  batchNumber: bigint;
+  dataResultEntries: DataResultTreeEntries | undefined;
+  validatorEntries: ValidatorTreeEntry[];
+  batchSignatures: BatchSignatures[];
+}
+
 function createBaseGenesisState(): GenesisState {
-  return {
-    currentBatchNumber: 0n,
-    batches: [],
-    treeEntries: [],
-    dataResults: [],
-    batchAssignments: [],
-    params: undefined,
-  };
+  return { currentBatchNumber: 0n, batches: [], batchData: [], dataResults: [], batchAssignments: [] };
 }
 
 export const GenesisState = {
@@ -54,17 +54,14 @@ export const GenesisState = {
     for (const v of message.batches) {
       Batch.encode(v!, writer.uint32(18).fork()).ldelim();
     }
-    for (const v of message.treeEntries) {
-      TreeEntries.encode(v!, writer.uint32(26).fork()).ldelim();
+    for (const v of message.batchData) {
+      BatchData.encode(v!, writer.uint32(26).fork()).ldelim();
     }
     for (const v of message.dataResults) {
       DataResult.encode(v!, writer.uint32(34).fork()).ldelim();
     }
     for (const v of message.batchAssignments) {
       BatchAssignment.encode(v!, writer.uint32(42).fork()).ldelim();
-    }
-    if (message.params !== undefined) {
-      Params.encode(message.params, writer.uint32(50).fork()).ldelim();
     }
     return writer;
   },
@@ -95,7 +92,7 @@ export const GenesisState = {
             break;
           }
 
-          message.treeEntries.push(TreeEntries.decode(reader, reader.uint32()));
+          message.batchData.push(BatchData.decode(reader, reader.uint32()));
           continue;
         case 4:
           if (tag !== 34) {
@@ -111,13 +108,6 @@ export const GenesisState = {
 
           message.batchAssignments.push(BatchAssignment.decode(reader, reader.uint32()));
           continue;
-        case 6:
-          if (tag !== 50) {
-            break;
-          }
-
-          message.params = Params.decode(reader, reader.uint32());
-          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -131,8 +121,8 @@ export const GenesisState = {
     return {
       currentBatchNumber: isSet(object.currentBatchNumber) ? BigInt(object.currentBatchNumber) : 0n,
       batches: globalThis.Array.isArray(object?.batches) ? object.batches.map((e: any) => Batch.fromJSON(e)) : [],
-      treeEntries: globalThis.Array.isArray(object?.treeEntries)
-        ? object.treeEntries.map((e: any) => TreeEntries.fromJSON(e))
+      batchData: globalThis.Array.isArray(object?.batchData)
+        ? object.batchData.map((e: any) => BatchData.fromJSON(e))
         : [],
       dataResults: globalThis.Array.isArray(object?.dataResults)
         ? object.dataResults.map((e: any) => DataResult.fromJSON(e))
@@ -140,7 +130,6 @@ export const GenesisState = {
       batchAssignments: globalThis.Array.isArray(object?.batchAssignments)
         ? object.batchAssignments.map((e: any) => BatchAssignment.fromJSON(e))
         : [],
-      params: isSet(object.params) ? Params.fromJSON(object.params) : undefined,
     };
   },
 
@@ -152,17 +141,14 @@ export const GenesisState = {
     if (message.batches?.length) {
       obj.batches = message.batches.map((e) => Batch.toJSON(e));
     }
-    if (message.treeEntries?.length) {
-      obj.treeEntries = message.treeEntries.map((e) => TreeEntries.toJSON(e));
+    if (message.batchData?.length) {
+      obj.batchData = message.batchData.map((e) => BatchData.toJSON(e));
     }
     if (message.dataResults?.length) {
       obj.dataResults = message.dataResults.map((e) => DataResult.toJSON(e));
     }
     if (message.batchAssignments?.length) {
       obj.batchAssignments = message.batchAssignments.map((e) => BatchAssignment.toJSON(e));
-    }
-    if (message.params !== undefined) {
-      obj.params = Params.toJSON(message.params);
     }
     return obj;
   },
@@ -174,12 +160,9 @@ export const GenesisState = {
     const message = createBaseGenesisState();
     message.currentBatchNumber = object.currentBatchNumber ?? 0n;
     message.batches = object.batches?.map((e) => Batch.fromPartial(e)) || [];
-    message.treeEntries = object.treeEntries?.map((e) => TreeEntries.fromPartial(e)) || [];
+    message.batchData = object.batchData?.map((e) => BatchData.fromPartial(e)) || [];
     message.dataResults = object.dataResults?.map((e) => DataResult.fromPartial(e)) || [];
     message.batchAssignments = object.batchAssignments?.map((e) => BatchAssignment.fromPartial(e)) || [];
-    message.params = (object.params !== undefined && object.params !== null)
-      ? Params.fromPartial(object.params)
-      : undefined;
     return message;
   },
 };
@@ -257,6 +240,121 @@ export const BatchAssignment = {
     const message = createBaseBatchAssignment();
     message.batchNumber = object.batchNumber ?? 0n;
     message.dataRequestId = object.dataRequestId ?? "";
+    return message;
+  },
+};
+
+function createBaseBatchData(): BatchData {
+  return { batchNumber: 0n, dataResultEntries: undefined, validatorEntries: [], batchSignatures: [] };
+}
+
+export const BatchData = {
+  encode(message: BatchData, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.batchNumber !== 0n) {
+      if (BigInt.asUintN(64, message.batchNumber) !== message.batchNumber) {
+        throw new globalThis.Error("value provided for field message.batchNumber of type uint64 too large");
+      }
+      writer.uint32(8).uint64(message.batchNumber.toString());
+    }
+    if (message.dataResultEntries !== undefined) {
+      DataResultTreeEntries.encode(message.dataResultEntries, writer.uint32(18).fork()).ldelim();
+    }
+    for (const v of message.validatorEntries) {
+      ValidatorTreeEntry.encode(v!, writer.uint32(26).fork()).ldelim();
+    }
+    for (const v of message.batchSignatures) {
+      BatchSignatures.encode(v!, writer.uint32(34).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): BatchData {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseBatchData();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 8) {
+            break;
+          }
+
+          message.batchNumber = longToBigint(reader.uint64() as Long);
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.dataResultEntries = DataResultTreeEntries.decode(reader, reader.uint32());
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.validatorEntries.push(ValidatorTreeEntry.decode(reader, reader.uint32()));
+          continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.batchSignatures.push(BatchSignatures.decode(reader, reader.uint32()));
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): BatchData {
+    return {
+      batchNumber: isSet(object.batchNumber) ? BigInt(object.batchNumber) : 0n,
+      dataResultEntries: isSet(object.dataResultEntries)
+        ? DataResultTreeEntries.fromJSON(object.dataResultEntries)
+        : undefined,
+      validatorEntries: globalThis.Array.isArray(object?.validatorEntries)
+        ? object.validatorEntries.map((e: any) => ValidatorTreeEntry.fromJSON(e))
+        : [],
+      batchSignatures: globalThis.Array.isArray(object?.batchSignatures)
+        ? object.batchSignatures.map((e: any) => BatchSignatures.fromJSON(e))
+        : [],
+    };
+  },
+
+  toJSON(message: BatchData): unknown {
+    const obj: any = {};
+    if (message.batchNumber !== 0n) {
+      obj.batchNumber = message.batchNumber.toString();
+    }
+    if (message.dataResultEntries !== undefined) {
+      obj.dataResultEntries = DataResultTreeEntries.toJSON(message.dataResultEntries);
+    }
+    if (message.validatorEntries?.length) {
+      obj.validatorEntries = message.validatorEntries.map((e) => ValidatorTreeEntry.toJSON(e));
+    }
+    if (message.batchSignatures?.length) {
+      obj.batchSignatures = message.batchSignatures.map((e) => BatchSignatures.toJSON(e));
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<BatchData>): BatchData {
+    return BatchData.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<BatchData>): BatchData {
+    const message = createBaseBatchData();
+    message.batchNumber = object.batchNumber ?? 0n;
+    message.dataResultEntries = (object.dataResultEntries !== undefined && object.dataResultEntries !== null)
+      ? DataResultTreeEntries.fromPartial(object.dataResultEntries)
+      : undefined;
+    message.validatorEntries = object.validatorEntries?.map((e) => ValidatorTreeEntry.fromPartial(e)) || [];
+    message.batchSignatures = object.batchSignatures?.map((e) => BatchSignatures.fromPartial(e)) || [];
     return message;
   },
 };
