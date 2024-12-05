@@ -12,6 +12,25 @@ export interface ToString {
  * @returns
  */
 export function toString<T = string>(message: T): string {
+	if (isArray<T>()) {
+		if (Array.isArray(message)) {
+			let result = "[";
+
+			for (let index = 0; index < message.length; index++) {
+				const element = message[index];
+				result += `${toString(element)}`;
+
+				if (index !== message.length - 1) {
+					result += ", ";
+				}
+			}
+
+			return result + "]";
+		}
+
+		return "Array<T>";
+	}
+
 	if (!isFloat(message) && message === null) {
 		return "null";
 	}
