@@ -42,4 +42,13 @@ describe("console", () => {
 
 		expect(result.stdout).toEqual("null\n");
 	});
+
+	it("should print a 0 value", async () => {
+		const result = await testOracleProgramExecution(
+			oracleProgram,
+			Buffer.from("testLogZero"),
+		);
+
+		expect(result.stdout).toEqual("0\n");
+	});
 });

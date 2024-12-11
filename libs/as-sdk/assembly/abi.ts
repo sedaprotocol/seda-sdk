@@ -1,6 +1,6 @@
 import { Bytes } from "./bytes";
 
-export function abiDecode(input: Bytes, abi: string[]): Bytes[] {
+export function abiDecode(abi: string[], input: Bytes): Bytes[] {
     let cursor: i32 = 0;
 
     // index in abi array => dynamic info

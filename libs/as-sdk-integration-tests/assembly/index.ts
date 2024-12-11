@@ -17,6 +17,7 @@ import {
 	TestLogByteArray,
 	TestLogFloat,
 	TestLogNull,
+	TestLogZero,
 } from "./console";
 import {
 	TestKeccak256,
@@ -97,6 +98,8 @@ if (args === "testHttpRejection") {
 	new TestBigNumberToBytes().run();
 } else if (args === "testLogNull") {
 	new TestLogNull().run();
+} else if (args === "testLogZero") {
+	new TestLogZero().run();
 } else if (args === "testLogFloat") {
 	new TestLogFloat().run();
 } else if (args === "testInvalidAttribute") {

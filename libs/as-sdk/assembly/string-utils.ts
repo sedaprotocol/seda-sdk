@@ -31,7 +31,7 @@ export function toString<T = string>(message: T): string {
 		return "Array<T>";
 	}
 
-	if (!isFloat(message) && !isInteger<T>() && message === null) {
+	if (isNullable<T>()) {
 		return "null";
 	}
 

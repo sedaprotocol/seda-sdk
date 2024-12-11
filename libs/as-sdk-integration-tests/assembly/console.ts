@@ -22,11 +22,22 @@ export class TestLogByteArray extends OracleProgram {
 
 export class TestLogNull extends OracleProgram {
 	execution(): void {
-		Console.log(null);
+		let value: string | null = null;
+		Console.log(value);
 
 		Process.exit(0);
 	}
 }
+
+export class TestLogZero extends OracleProgram {
+	execution(): void {
+		let zero: usize = 0;
+		Console.log(zero);
+
+		Process.exit(0);
+	}
+}
+
 
 export class TestLogFloat extends OracleProgram {
 	execution(): void {
