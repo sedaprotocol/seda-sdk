@@ -1,6 +1,7 @@
 import { u128, u256 } from "as-bignum/assembly";
 import { JSON } from "json-as";
 import { decodeHex, encodeHex } from "./hex";
+import { Console } from "./console";
 
 @json
 class InnerBytes {
@@ -458,6 +459,38 @@ export class Bytes {
 		this.validateNumberByteLength<u256>(sizeOfNumber);
 
 		return u256.fromBytes(this.value, bigEndian);
+	}
+
+	/**
+	 * Convert the Bytes instance to a boolean value.
+	 * Returns true if either the first or last byte in the array is non-zero, false if both are zero. Note that this only checks the first and last byte.
+	 * 
+	 * @example
+	 * ```ts
+	 * const trueBytes = Bytes.fromHexString("0x01");
+	 * Console.log(trueBytes.toBool()); // true
+	 * 
+	 * const falseBytes = Bytes.fromHexString("0x00");
+	 * Console.log(falseBytes.toBool()); // false
+	 * 
+	 * const multiByteTrue = Bytes.fromHexString("0x0100000000");
+	 * Console.log(multiByteTrue.toBool()); // true
+	 * ```
+	 */
+	toBool(): bool {
+		let firstByte = this.value.at(0);
+		
+		if (firstByte !== 0) {
+			return true;
+		}
+
+		let lastByte = this.value.at(this.value.byteLength - 1);
+
+		if (lastByte !== 0) {
+			return true;
+		}
+
+		return false;
 	}
 
 	// Make sure the byte amount is exactly the amount required for an integer

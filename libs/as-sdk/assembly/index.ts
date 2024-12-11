@@ -43,3 +43,4 @@ export { secp256k1Verify, keccak256 } from "./crypto";
 // Export library so consumers don't need to reimport it themselves
 export { JSON } from "json-as/assembly";
 export { u128, u256 } from "as-bignum/assembly";
+export { abiDecode } from "./abi";
