@@ -1,5 +1,4 @@
 import { Bytes } from "./bytes";
-import { Console } from "./console";
 
 export function abiDecode(input: Bytes, abi: string[]): Bytes[] {
     let cursor: i32 = 0;
@@ -14,7 +13,7 @@ export function abiDecode(input: Bytes, abi: string[]): Bytes[] {
         const info = input.slice(cursor, cursor + 32);
         cursor += 32;
         
-        if (variableType === "uint") {
+        if (variableType.startsWith("uint")) {
             decodedInfo[i] = info;
         } else if (variableType === "bool") {
             decodedInfo[i] = info;
