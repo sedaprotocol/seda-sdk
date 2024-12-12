@@ -1,3 +1,4 @@
+import { u256 } from "as-bignum/assembly";
 import { Bytes } from "./bytes";
 
 export function abiDecode(abi: string[], input: Bytes): Bytes[] {
@@ -13,12 +14,18 @@ export function abiDecode(abi: string[], input: Bytes): Bytes[] {
         const info = input.slice(cursor, cursor + 32);
         cursor += 32;
         
-        if (variableType.startsWith("uint")) {
+        if (variableType.includes("int")) {
+            // Handle both signed (int) and unsigned (uint) integers of any size (8-256 bits)
+            // Since we're working with the raw bytes, we don't need special handling for different sizes
             decodedInfo[i] = info;
         } else if (variableType === "bool") {
             decodedInfo[i] = info;
         } else if (variableType === "string" || variableType === "bytes") {
             dynamicInfo.set(i, info);
+        } else if (variableType.includes("bytes") || variableType === "address") {
+            decodedInfo[i] = info;
+        } else {
+            throw new Error(`Type "${variableType}" is not supported`);
         }
     }
 
@@ -38,4 +45,41 @@ export function abiDecode(abi: string[], input: Bytes): Bytes[] {
     }
 
     return decodedInfo;
+}
+
+export function abiEncode(abi: string[], input: Bytes[]): Bytes {
+    let result = Bytes.empty();
+    let danglingBytes: Bytes[] = [];
+    const danglingOffset = input.length * 32;
+
+    for (let i = 0; i < input.length; i++) {
+        const abiType = abi[i];
+        const variable = input[i];
+
+        if (abiType === "string" || abiType === "bytes") {
+            // We only add the offset to the result
+            const offset = danglingOffset + (32 * i);
+            result = result.concat(Bytes.fromNumber(u256.from(offset), true));
+
+            const lengthBytes = Bytes.fromNumber(u256.from(variable.length), true);
+            const stringBytes = lengthBytes.concat(variable.pad32());
+
+            danglingBytes.push(stringBytes);
+        } else if (abiType.includes("int")) {
+            // Handle both signed (int) and unsigned (uint) integers of any size (8-256 bits)
+            // Since we're working with the raw bytes, we don't need special handling for different sizes
+            result = result.concat(variable.pad32(false));
+        } else if (abiType.includes("bytes") || abiType === "address") {
+            result = result.concat(variable.pad32(false));
+        } else if (abiType === "bool") {
+            result = result.concat(variable.pad32(false));
+        }
+    }
+
+    for (let i = 0; i < danglingBytes.length; i++) {
+        const element = danglingBytes[i];
+        result = result.concat(element);
+    }
+
+    return result;
 }

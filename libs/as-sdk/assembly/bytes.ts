@@ -493,6 +493,92 @@ export class Bytes {
 		return false;
 	}
 
+	/**
+	 * Create a new Bytes instance from a boolean value.
+	 * Creates a single byte array with value 1 for true or 0 for false.
+	 *
+	 * @example
+	 * ```ts
+	 * const trueBytes = Bytes.fromBool(true);
+	 * Console.log(trueBytes.toHexString()); // "01"
+	 * Console.log(trueBytes.toBool()); // true
+	 * 
+	 * const falseBytes = Bytes.fromBool(false);
+	 * Console.log(falseBytes.toHexString()); // "00" 
+	 * Console.log(falseBytes.toBool()); // false
+	 * ```
+	 * @param input The boolean value to convert to bytes
+	 */
+	static fromBool(input: bool): Bytes {
+		const typedArray = new Uint8Array(1);
+
+		if (input) {
+			typedArray.set([1], 0);
+		}
+
+		return Bytes.fromByteArray(typedArray);
+	}
+
+	/**
+	 * Pad the Bytes instance to a multiple of 32 bytes. If padRight is true (default),
+	 * zeros are added to the right of the bytes. If false, zeros are added to the left.
+	 *
+	 * @example
+	 * ```ts
+	 * const data = Bytes.fromUtf8String("hello");
+	 * 
+	 * // Pad right (default) to next multiple of 32
+	 * const rightPadded = data.pad32();
+	 * Console.log(rightPadded.length); // 32
+	 * Console.log(rightPadded.toHexString()); // "68656c6c6f000000000000000000000000000000000000000000000000000000"
+	 * 
+	 * // Pad left to next multiple of 32
+	 * const leftPadded = data.pad32(false);
+	 * Console.log(leftPadded.length); // 32
+	 * Console.log(leftPadded.toHexString()); // "000000000000000000000000000000000000000000000000000068656c6c6f"
+	 * ```
+	 * @param padRight If true, pad on the right side. If false, pad on the left side
+	 * @returns A new Bytes instance padded to the next multiple of 32 bytes
+	 */
+	pad32(padRight: bool = true): Bytes {
+		const remainder = this.length % 32;
+		return this.pad(this.length + (32 - remainder), padRight);
+	}
+
+	/**
+	 * Pad the Bytes instance to a target length with zeros. If padRight is true (default),
+	 * zeros are added to the right of the bytes. If false, zeros are added to the left.
+	 *
+	 * @example
+	 * ```ts
+	 * const data = Bytes.fromUtf8String("hello");
+	 * 
+	 * // Pad right (default)
+	 * const rightPadded = data.pad(10);
+	 * Console.log(rightPadded.toHexString()); // "68656c6c6f0000000000"
+	 * 
+	 * // Pad left
+	 * const leftPadded = data.pad(10, false); 
+	 * Console.log(leftPadded.toHexString()); // "0000000000068656c6c6f"
+	 * ```
+	 * @param targetLength The desired length after padding
+	 * @param padRight If true, pad on the right side. If false, pad on the left side
+	 * @returns A new Bytes instance padded to the target length
+	 */
+	pad(targetLength: i32, padRight: bool = true): Bytes {
+		if (targetLength <= this.length) return this;
+
+		const typedArray = new Uint8Array(targetLength);
+
+		if (padRight) {
+			typedArray.set(this.value, 0);
+		} else {
+			typedArray.set(this.value, targetLength - this.length);
+		}
+
+		return Bytes.fromByteArray(typedArray);
+	}
+
 	// Make sure the byte amount is exactly the amount required for an integer
 	// Otherwise we could interpret the bytes wrong
 	private validateNumberByteLength<T>(sizeOfNumber: usize): void {

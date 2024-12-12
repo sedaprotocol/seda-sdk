@@ -1,5 +1,5 @@
 import { Bytes, Process } from "../../as-sdk/assembly/index";
-import { TestAbiDecode } from "./abi";
+import { TestAbiDecode, TestAbiEncode } from "./abi";
 import {
 	TestBigNumberToBytes,
 	TestBytesConcat,
@@ -106,6 +106,8 @@ if (args === "testHttpRejection") {
 	new TestInvalidAttribute().run();
 } else if (args.startsWith("testAbiDecode")) {
 	new TestAbiDecode().run();
+} else if (args.startsWith("testAbiEncode")) {
+	new TestAbiEncode().run();
 }
 
 Process.error(Bytes.fromUtf8String("No argument given"));
