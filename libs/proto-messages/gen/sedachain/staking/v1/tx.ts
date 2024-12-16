@@ -9,9 +9,13 @@ import _m0 from "protobufjs/minimal";
 import { Coin } from "../../../cosmos/base/v1beta1/coin";
 import { CommissionRates, Description } from "../../../cosmos/staking/v1beta1/staking";
 import { Any } from "../../../google/protobuf/any";
+import { IndexedPubKey } from "../../pubkey/v1/pubkey";
 
-/** MsgCreateValidator defines a SDK message for creating a new validator. */
-export interface MsgCreateValidatorWithVRF {
+/**
+ * MsgCreateSEDAValidator defines a message for creating a new SEDA
+ * validator.
+ */
+export interface MsgCreateSEDAValidator {
   description: Description | undefined;
   commission: CommissionRates | undefined;
   minSelfDelegation: string;
@@ -26,14 +30,17 @@ export interface MsgCreateValidatorWithVRF {
   validatorAddress: string;
   pubkey: Any | undefined;
   value: Coin | undefined;
-  vrfPubkey: Any | undefined;
+  indexedPubKeys: IndexedPubKey[];
 }
 
-/** MsgCreateValidatorResponse defines the Msg/CreateValidator response type. */
-export interface MsgCreateValidatorWithVRFResponse {
+/**
+ * MsgCreateSEDAValidatorResponse defines the Msg/MsgCreateSEDAValidator
+ * response type.
+ */
+export interface MsgCreateSEDAValidatorResponse {
 }
 
-function createBaseMsgCreateValidatorWithVRF(): MsgCreateValidatorWithVRF {
+function createBaseMsgCreateSEDAValidator(): MsgCreateSEDAValidator {
   return {
     description: undefined,
     commission: undefined,
@@ -42,12 +49,12 @@ function createBaseMsgCreateValidatorWithVRF(): MsgCreateValidatorWithVRF {
     validatorAddress: "",
     pubkey: undefined,
     value: undefined,
-    vrfPubkey: undefined,
+    indexedPubKeys: [],
   };
 }
 
-export const MsgCreateValidatorWithVRF = {
-  encode(message: MsgCreateValidatorWithVRF, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const MsgCreateSEDAValidator = {
+  encode(message: MsgCreateSEDAValidator, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.description !== undefined) {
       Description.encode(message.description, writer.uint32(10).fork()).ldelim();
     }
@@ -69,16 +76,16 @@ export const MsgCreateValidatorWithVRF = {
     if (message.value !== undefined) {
       Coin.encode(message.value, writer.uint32(58).fork()).ldelim();
     }
-    if (message.vrfPubkey !== undefined) {
-      Any.encode(message.vrfPubkey, writer.uint32(66).fork()).ldelim();
+    for (const v of message.indexedPubKeys) {
+      IndexedPubKey.encode(v!, writer.uint32(66).fork()).ldelim();
     }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgCreateValidatorWithVRF {
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgCreateSEDAValidator {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgCreateValidatorWithVRF();
+    const message = createBaseMsgCreateSEDAValidator();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -136,7 +143,7 @@ export const MsgCreateValidatorWithVRF = {
             break;
           }
 
-          message.vrfPubkey = Any.decode(reader, reader.uint32());
+          message.indexedPubKeys.push(IndexedPubKey.decode(reader, reader.uint32()));
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -147,7 +154,7 @@ export const MsgCreateValidatorWithVRF = {
     return message;
   },
 
-  fromJSON(object: any): MsgCreateValidatorWithVRF {
+  fromJSON(object: any): MsgCreateSEDAValidator {
     return {
       description: isSet(object.description) ? Description.fromJSON(object.description) : undefined,
       commission: isSet(object.commission) ? CommissionRates.fromJSON(object.commission) : undefined,
@@ -156,11 +163,13 @@ export const MsgCreateValidatorWithVRF = {
       validatorAddress: isSet(object.validatorAddress) ? globalThis.String(object.validatorAddress) : "",
       pubkey: isSet(object.pubkey) ? Any.fromJSON(object.pubkey) : undefined,
       value: isSet(object.value) ? Coin.fromJSON(object.value) : undefined,
-      vrfPubkey: isSet(object.vrfPubkey) ? Any.fromJSON(object.vrfPubkey) : undefined,
+      indexedPubKeys: globalThis.Array.isArray(object?.indexedPubKeys)
+        ? object.indexedPubKeys.map((e: any) => IndexedPubKey.fromJSON(e))
+        : [],
     };
   },
 
-  toJSON(message: MsgCreateValidatorWithVRF): unknown {
+  toJSON(message: MsgCreateSEDAValidator): unknown {
     const obj: any = {};
     if (message.description !== undefined) {
       obj.description = Description.toJSON(message.description);
@@ -183,17 +192,17 @@ export const MsgCreateValidatorWithVRF = {
     if (message.value !== undefined) {
       obj.value = Coin.toJSON(message.value);
     }
-    if (message.vrfPubkey !== undefined) {
-      obj.vrfPubkey = Any.toJSON(message.vrfPubkey);
+    if (message.indexedPubKeys?.length) {
+      obj.indexedPubKeys = message.indexedPubKeys.map((e) => IndexedPubKey.toJSON(e));
     }
     return obj;
   },
 
-  create(base?: DeepPartial<MsgCreateValidatorWithVRF>): MsgCreateValidatorWithVRF {
-    return MsgCreateValidatorWithVRF.fromPartial(base ?? {});
+  create(base?: DeepPartial<MsgCreateSEDAValidator>): MsgCreateSEDAValidator {
+    return MsgCreateSEDAValidator.fromPartial(base ?? {});
   },
-  fromPartial(object: DeepPartial<MsgCreateValidatorWithVRF>): MsgCreateValidatorWithVRF {
-    const message = createBaseMsgCreateValidatorWithVRF();
+  fromPartial(object: DeepPartial<MsgCreateSEDAValidator>): MsgCreateSEDAValidator {
+    const message = createBaseMsgCreateSEDAValidator();
     message.description = (object.description !== undefined && object.description !== null)
       ? Description.fromPartial(object.description)
       : undefined;
@@ -207,26 +216,24 @@ export const MsgCreateValidatorWithVRF = {
       ? Any.fromPartial(object.pubkey)
       : undefined;
     message.value = (object.value !== undefined && object.value !== null) ? Coin.fromPartial(object.value) : undefined;
-    message.vrfPubkey = (object.vrfPubkey !== undefined && object.vrfPubkey !== null)
-      ? Any.fromPartial(object.vrfPubkey)
-      : undefined;
+    message.indexedPubKeys = object.indexedPubKeys?.map((e) => IndexedPubKey.fromPartial(e)) || [];
     return message;
   },
 };
 
-function createBaseMsgCreateValidatorWithVRFResponse(): MsgCreateValidatorWithVRFResponse {
+function createBaseMsgCreateSEDAValidatorResponse(): MsgCreateSEDAValidatorResponse {
   return {};
 }
 
-export const MsgCreateValidatorWithVRFResponse = {
-  encode(_: MsgCreateValidatorWithVRFResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const MsgCreateSEDAValidatorResponse = {
+  encode(_: MsgCreateSEDAValidatorResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgCreateValidatorWithVRFResponse {
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgCreateSEDAValidatorResponse {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgCreateValidatorWithVRFResponse();
+    const message = createBaseMsgCreateSEDAValidatorResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -239,28 +246,28 @@ export const MsgCreateValidatorWithVRFResponse = {
     return message;
   },
 
-  fromJSON(_: any): MsgCreateValidatorWithVRFResponse {
+  fromJSON(_: any): MsgCreateSEDAValidatorResponse {
     return {};
   },
 
-  toJSON(_: MsgCreateValidatorWithVRFResponse): unknown {
+  toJSON(_: MsgCreateSEDAValidatorResponse): unknown {
     const obj: any = {};
     return obj;
   },
 
-  create(base?: DeepPartial<MsgCreateValidatorWithVRFResponse>): MsgCreateValidatorWithVRFResponse {
-    return MsgCreateValidatorWithVRFResponse.fromPartial(base ?? {});
+  create(base?: DeepPartial<MsgCreateSEDAValidatorResponse>): MsgCreateSEDAValidatorResponse {
+    return MsgCreateSEDAValidatorResponse.fromPartial(base ?? {});
   },
-  fromPartial(_: DeepPartial<MsgCreateValidatorWithVRFResponse>): MsgCreateValidatorWithVRFResponse {
-    const message = createBaseMsgCreateValidatorWithVRFResponse();
+  fromPartial(_: DeepPartial<MsgCreateSEDAValidatorResponse>): MsgCreateSEDAValidatorResponse {
+    const message = createBaseMsgCreateSEDAValidatorResponse();
     return message;
   },
 };
 
 /** Msg defines the staking Msg service. */
 export interface Msg {
-  /** CreateValidatorWithVRF defines a method for creating a new validator. */
-  CreateValidatorWithVRF(request: MsgCreateValidatorWithVRF): Promise<MsgCreateValidatorWithVRFResponse>;
+  /** CreateSEDAValidator defines a method for creating a new validator. */
+  CreateSEDAValidator(request: MsgCreateSEDAValidator): Promise<MsgCreateSEDAValidatorResponse>;
 }
 
 export const MsgServiceName = "sedachain.staking.v1.Msg";
@@ -270,12 +277,12 @@ export class MsgClientImpl implements Msg {
   constructor(rpc: Rpc, opts?: { service?: string }) {
     this.service = opts?.service || MsgServiceName;
     this.rpc = rpc;
-    this.CreateValidatorWithVRF = this.CreateValidatorWithVRF.bind(this);
+    this.CreateSEDAValidator = this.CreateSEDAValidator.bind(this);
   }
-  CreateValidatorWithVRF(request: MsgCreateValidatorWithVRF): Promise<MsgCreateValidatorWithVRFResponse> {
-    const data = MsgCreateValidatorWithVRF.encode(request).finish();
-    const promise = this.rpc.request(this.service, "CreateValidatorWithVRF", data);
-    return promise.then((data) => MsgCreateValidatorWithVRFResponse.decode(_m0.Reader.create(data)));
+  CreateSEDAValidator(request: MsgCreateSEDAValidator): Promise<MsgCreateSEDAValidatorResponse> {
+    const data = MsgCreateSEDAValidator.encode(request).finish();
+    const promise = this.rpc.request(this.service, "CreateSEDAValidator", data);
+    return promise.then((data) => MsgCreateSEDAValidatorResponse.decode(_m0.Reader.create(data)));
   }
 }
 

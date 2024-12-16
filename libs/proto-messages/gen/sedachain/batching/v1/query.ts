@@ -56,6 +56,7 @@ export interface QueryBatchesResponse {
 /** The request message for QueryDataResult RPC. */
 export interface QueryDataResultRequest {
   dataRequestId: string;
+  dataRequestHeight: bigint;
 }
 
 /** The response message for QueryDataResult RPC. */
@@ -506,13 +507,19 @@ export const QueryBatchesResponse = {
 };
 
 function createBaseQueryDataResultRequest(): QueryDataResultRequest {
-  return { dataRequestId: "" };
+  return { dataRequestId: "", dataRequestHeight: 0n };
 }
 
 export const QueryDataResultRequest = {
   encode(message: QueryDataResultRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.dataRequestId !== "") {
       writer.uint32(10).string(message.dataRequestId);
+    }
+    if (message.dataRequestHeight !== 0n) {
+      if (BigInt.asUintN(64, message.dataRequestHeight) !== message.dataRequestHeight) {
+        throw new globalThis.Error("value provided for field message.dataRequestHeight of type uint64 too large");
+      }
+      writer.uint32(16).uint64(message.dataRequestHeight.toString());
     }
     return writer;
   },
@@ -531,6 +538,13 @@ export const QueryDataResultRequest = {
 
           message.dataRequestId = reader.string();
           continue;
+        case 2:
+          if (tag !== 16) {
+            break;
+          }
+
+          message.dataRequestHeight = longToBigint(reader.uint64() as Long);
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -541,13 +555,19 @@ export const QueryDataResultRequest = {
   },
 
   fromJSON(object: any): QueryDataResultRequest {
-    return { dataRequestId: isSet(object.dataRequestId) ? globalThis.String(object.dataRequestId) : "" };
+    return {
+      dataRequestId: isSet(object.dataRequestId) ? globalThis.String(object.dataRequestId) : "",
+      dataRequestHeight: isSet(object.dataRequestHeight) ? BigInt(object.dataRequestHeight) : 0n,
+    };
   },
 
   toJSON(message: QueryDataResultRequest): unknown {
     const obj: any = {};
     if (message.dataRequestId !== "") {
       obj.dataRequestId = message.dataRequestId;
+    }
+    if (message.dataRequestHeight !== 0n) {
+      obj.dataRequestHeight = message.dataRequestHeight.toString();
     }
     return obj;
   },
@@ -558,6 +578,7 @@ export const QueryDataResultRequest = {
   fromPartial(object: DeepPartial<QueryDataResultRequest>): QueryDataResultRequest {
     const message = createBaseQueryDataResultRequest();
     message.dataRequestId = object.dataRequestId ?? "";
+    message.dataRequestHeight = object.dataRequestHeight ?? 0n;
     return message;
   },
 };

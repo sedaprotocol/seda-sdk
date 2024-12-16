@@ -18,7 +18,7 @@ export interface GenesisState {
   currentBatchNumber: bigint;
   batches: Batch[];
   batchData: BatchData[];
-  dataResults: DataResult[];
+  dataResults: GenesisDataResult[];
   batchAssignments: BatchAssignment[];
 }
 
@@ -29,6 +29,7 @@ export interface GenesisState {
 export interface BatchAssignment {
   batchNumber: bigint;
   dataRequestId: string;
+  dataRequestHeight: bigint;
 }
 
 /** BatchData represents a given batch's full data. */
@@ -37,6 +38,12 @@ export interface BatchData {
   dataResultEntries: DataResultTreeEntries | undefined;
   validatorEntries: ValidatorTreeEntry[];
   batchSignatures: BatchSignatures[];
+}
+
+/** GenesisDataResult includes a data result and its batching status. */
+export interface GenesisDataResult {
+  batched: boolean;
+  dataResult: DataResult | undefined;
 }
 
 function createBaseGenesisState(): GenesisState {
@@ -58,7 +65,7 @@ export const GenesisState = {
       BatchData.encode(v!, writer.uint32(26).fork()).ldelim();
     }
     for (const v of message.dataResults) {
-      DataResult.encode(v!, writer.uint32(34).fork()).ldelim();
+      GenesisDataResult.encode(v!, writer.uint32(34).fork()).ldelim();
     }
     for (const v of message.batchAssignments) {
       BatchAssignment.encode(v!, writer.uint32(42).fork()).ldelim();
@@ -99,7 +106,7 @@ export const GenesisState = {
             break;
           }
 
-          message.dataResults.push(DataResult.decode(reader, reader.uint32()));
+          message.dataResults.push(GenesisDataResult.decode(reader, reader.uint32()));
           continue;
         case 5:
           if (tag !== 42) {
@@ -125,7 +132,7 @@ export const GenesisState = {
         ? object.batchData.map((e: any) => BatchData.fromJSON(e))
         : [],
       dataResults: globalThis.Array.isArray(object?.dataResults)
-        ? object.dataResults.map((e: any) => DataResult.fromJSON(e))
+        ? object.dataResults.map((e: any) => GenesisDataResult.fromJSON(e))
         : [],
       batchAssignments: globalThis.Array.isArray(object?.batchAssignments)
         ? object.batchAssignments.map((e: any) => BatchAssignment.fromJSON(e))
@@ -145,7 +152,7 @@ export const GenesisState = {
       obj.batchData = message.batchData.map((e) => BatchData.toJSON(e));
     }
     if (message.dataResults?.length) {
-      obj.dataResults = message.dataResults.map((e) => DataResult.toJSON(e));
+      obj.dataResults = message.dataResults.map((e) => GenesisDataResult.toJSON(e));
     }
     if (message.batchAssignments?.length) {
       obj.batchAssignments = message.batchAssignments.map((e) => BatchAssignment.toJSON(e));
@@ -161,14 +168,14 @@ export const GenesisState = {
     message.currentBatchNumber = object.currentBatchNumber ?? 0n;
     message.batches = object.batches?.map((e) => Batch.fromPartial(e)) || [];
     message.batchData = object.batchData?.map((e) => BatchData.fromPartial(e)) || [];
-    message.dataResults = object.dataResults?.map((e) => DataResult.fromPartial(e)) || [];
+    message.dataResults = object.dataResults?.map((e) => GenesisDataResult.fromPartial(e)) || [];
     message.batchAssignments = object.batchAssignments?.map((e) => BatchAssignment.fromPartial(e)) || [];
     return message;
   },
 };
 
 function createBaseBatchAssignment(): BatchAssignment {
-  return { batchNumber: 0n, dataRequestId: "" };
+  return { batchNumber: 0n, dataRequestId: "", dataRequestHeight: 0n };
 }
 
 export const BatchAssignment = {
@@ -181,6 +188,12 @@ export const BatchAssignment = {
     }
     if (message.dataRequestId !== "") {
       writer.uint32(18).string(message.dataRequestId);
+    }
+    if (message.dataRequestHeight !== 0n) {
+      if (BigInt.asUintN(64, message.dataRequestHeight) !== message.dataRequestHeight) {
+        throw new globalThis.Error("value provided for field message.dataRequestHeight of type uint64 too large");
+      }
+      writer.uint32(24).uint64(message.dataRequestHeight.toString());
     }
     return writer;
   },
@@ -206,6 +219,13 @@ export const BatchAssignment = {
 
           message.dataRequestId = reader.string();
           continue;
+        case 3:
+          if (tag !== 24) {
+            break;
+          }
+
+          message.dataRequestHeight = longToBigint(reader.uint64() as Long);
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -219,6 +239,7 @@ export const BatchAssignment = {
     return {
       batchNumber: isSet(object.batchNumber) ? BigInt(object.batchNumber) : 0n,
       dataRequestId: isSet(object.dataRequestId) ? globalThis.String(object.dataRequestId) : "",
+      dataRequestHeight: isSet(object.dataRequestHeight) ? BigInt(object.dataRequestHeight) : 0n,
     };
   },
 
@@ -230,6 +251,9 @@ export const BatchAssignment = {
     if (message.dataRequestId !== "") {
       obj.dataRequestId = message.dataRequestId;
     }
+    if (message.dataRequestHeight !== 0n) {
+      obj.dataRequestHeight = message.dataRequestHeight.toString();
+    }
     return obj;
   },
 
@@ -240,6 +264,7 @@ export const BatchAssignment = {
     const message = createBaseBatchAssignment();
     message.batchNumber = object.batchNumber ?? 0n;
     message.dataRequestId = object.dataRequestId ?? "";
+    message.dataRequestHeight = object.dataRequestHeight ?? 0n;
     return message;
   },
 };
@@ -355,6 +380,82 @@ export const BatchData = {
       : undefined;
     message.validatorEntries = object.validatorEntries?.map((e) => ValidatorTreeEntry.fromPartial(e)) || [];
     message.batchSignatures = object.batchSignatures?.map((e) => BatchSignatures.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseGenesisDataResult(): GenesisDataResult {
+  return { batched: false, dataResult: undefined };
+}
+
+export const GenesisDataResult = {
+  encode(message: GenesisDataResult, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.batched !== false) {
+      writer.uint32(8).bool(message.batched);
+    }
+    if (message.dataResult !== undefined) {
+      DataResult.encode(message.dataResult, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): GenesisDataResult {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGenesisDataResult();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 8) {
+            break;
+          }
+
+          message.batched = reader.bool();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.dataResult = DataResult.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GenesisDataResult {
+    return {
+      batched: isSet(object.batched) ? globalThis.Boolean(object.batched) : false,
+      dataResult: isSet(object.dataResult) ? DataResult.fromJSON(object.dataResult) : undefined,
+    };
+  },
+
+  toJSON(message: GenesisDataResult): unknown {
+    const obj: any = {};
+    if (message.batched !== false) {
+      obj.batched = message.batched;
+    }
+    if (message.dataResult !== undefined) {
+      obj.dataResult = DataResult.toJSON(message.dataResult);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<GenesisDataResult>): GenesisDataResult {
+    return GenesisDataResult.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GenesisDataResult>): GenesisDataResult {
+    const message = createBaseGenesisDataResult();
+    message.batched = object.batched ?? false;
+    message.dataResult = (object.dataResult !== undefined && object.dataResult !== null)
+      ? DataResult.fromPartial(object.dataResult)
+      : undefined;
     return message;
   },
 };

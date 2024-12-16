@@ -2,21 +2,11 @@
 // versions:
 //   protoc-gen-ts_proto  v1.181.2
 //   protoc               unknown
-// source: sedachain/pubkey/v1/tx.proto
+// source: sedachain/tally/v1/tx.proto
 
 /* eslint-disable */
 import _m0 from "protobufjs/minimal";
-import { IndexedPubKey, Params } from "./pubkey";
-
-/** MsgAddKey defines a message for registering a new public key. */
-export interface MsgAddKey {
-  validatorAddr: string;
-  indexedPubKeys: IndexedPubKey[];
-}
-
-/** MsgAddKeyResponse defines the Msg/MsgAddKey response type. */
-export interface MsgAddKeyResponse {
-}
+import { Params } from "./tally";
 
 /** The request message for the UpdateParams method. */
 export interface MsgUpdateParams {
@@ -31,125 +21,6 @@ export interface MsgUpdateParams {
 /** The response message for the UpdateParams method. */
 export interface MsgUpdateParamsResponse {
 }
-
-function createBaseMsgAddKey(): MsgAddKey {
-  return { validatorAddr: "", indexedPubKeys: [] };
-}
-
-export const MsgAddKey = {
-  encode(message: MsgAddKey, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.validatorAddr !== "") {
-      writer.uint32(10).string(message.validatorAddr);
-    }
-    for (const v of message.indexedPubKeys) {
-      IndexedPubKey.encode(v!, writer.uint32(18).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgAddKey {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgAddKey();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.validatorAddr = reader.string();
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.indexedPubKeys.push(IndexedPubKey.decode(reader, reader.uint32()));
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): MsgAddKey {
-    return {
-      validatorAddr: isSet(object.validatorAddr) ? globalThis.String(object.validatorAddr) : "",
-      indexedPubKeys: globalThis.Array.isArray(object?.indexedPubKeys)
-        ? object.indexedPubKeys.map((e: any) => IndexedPubKey.fromJSON(e))
-        : [],
-    };
-  },
-
-  toJSON(message: MsgAddKey): unknown {
-    const obj: any = {};
-    if (message.validatorAddr !== "") {
-      obj.validatorAddr = message.validatorAddr;
-    }
-    if (message.indexedPubKeys?.length) {
-      obj.indexedPubKeys = message.indexedPubKeys.map((e) => IndexedPubKey.toJSON(e));
-    }
-    return obj;
-  },
-
-  create(base?: DeepPartial<MsgAddKey>): MsgAddKey {
-    return MsgAddKey.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<MsgAddKey>): MsgAddKey {
-    const message = createBaseMsgAddKey();
-    message.validatorAddr = object.validatorAddr ?? "";
-    message.indexedPubKeys = object.indexedPubKeys?.map((e) => IndexedPubKey.fromPartial(e)) || [];
-    return message;
-  },
-};
-
-function createBaseMsgAddKeyResponse(): MsgAddKeyResponse {
-  return {};
-}
-
-export const MsgAddKeyResponse = {
-  encode(_: MsgAddKeyResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgAddKeyResponse {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgAddKeyResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(_: any): MsgAddKeyResponse {
-    return {};
-  },
-
-  toJSON(_: MsgAddKeyResponse): unknown {
-    const obj: any = {};
-    return obj;
-  },
-
-  create(base?: DeepPartial<MsgAddKeyResponse>): MsgAddKeyResponse {
-    return MsgAddKeyResponse.fromPartial(base ?? {});
-  },
-  fromPartial(_: DeepPartial<MsgAddKeyResponse>): MsgAddKeyResponse {
-    const message = createBaseMsgAddKeyResponse();
-    return message;
-  },
-};
 
 function createBaseMsgUpdateParams(): MsgUpdateParams {
   return { authority: "", params: undefined };
@@ -270,30 +141,21 @@ export const MsgUpdateParamsResponse = {
   },
 };
 
-/** Msg defines the pubkey Msg service. */
+/** Msg defines the tally Msg service. */
 export interface Msg {
-  /** AddKey defines a method for registering a new public key. */
-  AddKey(request: MsgAddKey): Promise<MsgAddKeyResponse>;
   /** The UpdateParams method updates the module's parameters. */
   UpdateParams(request: MsgUpdateParams): Promise<MsgUpdateParamsResponse>;
 }
 
-export const MsgServiceName = "sedachain.pubkey.v1.Msg";
+export const MsgServiceName = "sedachain.tally.v1.Msg";
 export class MsgClientImpl implements Msg {
   private readonly rpc: Rpc;
   private readonly service: string;
   constructor(rpc: Rpc, opts?: { service?: string }) {
     this.service = opts?.service || MsgServiceName;
     this.rpc = rpc;
-    this.AddKey = this.AddKey.bind(this);
     this.UpdateParams = this.UpdateParams.bind(this);
   }
-  AddKey(request: MsgAddKey): Promise<MsgAddKeyResponse> {
-    const data = MsgAddKey.encode(request).finish();
-    const promise = this.rpc.request(this.service, "AddKey", data);
-    return promise.then((data) => MsgAddKeyResponse.decode(_m0.Reader.create(data)));
-  }
-
   UpdateParams(request: MsgUpdateParams): Promise<MsgUpdateParamsResponse> {
     const data = MsgUpdateParams.encode(request).finish();
     const promise = this.rpc.request(this.service, "UpdateParams", data);

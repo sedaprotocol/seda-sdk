@@ -7,22 +7,150 @@
 /* eslint-disable */
 import _m0 from "protobufjs/minimal";
 import { ValidatorPubKeys } from "./genesis";
+import { Params, ProvingScheme } from "./pubkey";
+
+/** QueryParamsRequest is the request type for the Query/Params RPC method. */
+export interface QueryParamsRequest {
+}
+
+/** QueryParamsResponse is the response type for the Query/Params RPC method. */
+export interface QueryParamsResponse {
+  /** params defines the parameters of the module. */
+  params: Params | undefined;
+}
 
 /**
- * QueryValidatorKeysRequest is request type for the Query/ValidatorKeys RPC
- * method.
+ * QueryValidatorKeysRequest is request type for the Query/ValidatorKeys
+ * RPC method.
  */
 export interface QueryValidatorKeysRequest {
   validatorAddr: string;
 }
 
 /**
- * QueryValidatorKeysResponse is response type for the Query/ValidatorKeys RPC
- * method.
+ * QueryValidatorKeysResponse is response type for the Query/ValidatorKeys
+ * RPC method.
  */
 export interface QueryValidatorKeysResponse {
   validatorPubKeys: ValidatorPubKeys | undefined;
 }
+
+/**
+ * QueryProvingSchemesRequest is request type for the Query/ProvingSchemes
+ * RPC method.
+ */
+export interface QueryProvingSchemesRequest {
+}
+
+/**
+ * QueryProvingSchemesResponse is response type for the Query/ProvingSchemes
+ * RPC method.
+ */
+export interface QueryProvingSchemesResponse {
+  provingSchemes: ProvingScheme[];
+}
+
+function createBaseQueryParamsRequest(): QueryParamsRequest {
+  return {};
+}
+
+export const QueryParamsRequest = {
+  encode(_: QueryParamsRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryParamsRequest {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryParamsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): QueryParamsRequest {
+    return {};
+  },
+
+  toJSON(_: QueryParamsRequest): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create(base?: DeepPartial<QueryParamsRequest>): QueryParamsRequest {
+    return QueryParamsRequest.fromPartial(base ?? {});
+  },
+  fromPartial(_: DeepPartial<QueryParamsRequest>): QueryParamsRequest {
+    const message = createBaseQueryParamsRequest();
+    return message;
+  },
+};
+
+function createBaseQueryParamsResponse(): QueryParamsResponse {
+  return { params: undefined };
+}
+
+export const QueryParamsResponse = {
+  encode(message: QueryParamsResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.params !== undefined) {
+      Params.encode(message.params, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryParamsResponse {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryParamsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.params = Params.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryParamsResponse {
+    return { params: isSet(object.params) ? Params.fromJSON(object.params) : undefined };
+  },
+
+  toJSON(message: QueryParamsResponse): unknown {
+    const obj: any = {};
+    if (message.params !== undefined) {
+      obj.params = Params.toJSON(message.params);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<QueryParamsResponse>): QueryParamsResponse {
+    return QueryParamsResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<QueryParamsResponse>): QueryParamsResponse {
+    const message = createBaseQueryParamsResponse();
+    message.params = (object.params !== undefined && object.params !== null)
+      ? Params.fromPartial(object.params)
+      : undefined;
+    return message;
+  },
+};
 
 function createBaseQueryValidatorKeysRequest(): QueryValidatorKeysRequest {
   return { validatorAddr: "" };
@@ -142,10 +270,118 @@ export const QueryValidatorKeysResponse = {
   },
 };
 
+function createBaseQueryProvingSchemesRequest(): QueryProvingSchemesRequest {
+  return {};
+}
+
+export const QueryProvingSchemesRequest = {
+  encode(_: QueryProvingSchemesRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryProvingSchemesRequest {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryProvingSchemesRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): QueryProvingSchemesRequest {
+    return {};
+  },
+
+  toJSON(_: QueryProvingSchemesRequest): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create(base?: DeepPartial<QueryProvingSchemesRequest>): QueryProvingSchemesRequest {
+    return QueryProvingSchemesRequest.fromPartial(base ?? {});
+  },
+  fromPartial(_: DeepPartial<QueryProvingSchemesRequest>): QueryProvingSchemesRequest {
+    const message = createBaseQueryProvingSchemesRequest();
+    return message;
+  },
+};
+
+function createBaseQueryProvingSchemesResponse(): QueryProvingSchemesResponse {
+  return { provingSchemes: [] };
+}
+
+export const QueryProvingSchemesResponse = {
+  encode(message: QueryProvingSchemesResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.provingSchemes) {
+      ProvingScheme.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryProvingSchemesResponse {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryProvingSchemesResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.provingSchemes.push(ProvingScheme.decode(reader, reader.uint32()));
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryProvingSchemesResponse {
+    return {
+      provingSchemes: globalThis.Array.isArray(object?.provingSchemes)
+        ? object.provingSchemes.map((e: any) => ProvingScheme.fromJSON(e))
+        : [],
+    };
+  },
+
+  toJSON(message: QueryProvingSchemesResponse): unknown {
+    const obj: any = {};
+    if (message.provingSchemes?.length) {
+      obj.provingSchemes = message.provingSchemes.map((e) => ProvingScheme.toJSON(e));
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<QueryProvingSchemesResponse>): QueryProvingSchemesResponse {
+    return QueryProvingSchemesResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<QueryProvingSchemesResponse>): QueryProvingSchemesResponse {
+    const message = createBaseQueryProvingSchemesResponse();
+    message.provingSchemes = object.provingSchemes?.map((e) => ProvingScheme.fromPartial(e)) || [];
+    return message;
+  },
+};
+
 /** Query defines the gRPC querier service. */
 export interface Query {
+  /** Params returns the total set of pubkey parameters. */
+  Params(request: QueryParamsRequest): Promise<QueryParamsResponse>;
   /** ValidatorKeys returns a given validator's registered keys. */
   ValidatorKeys(request: QueryValidatorKeysRequest): Promise<QueryValidatorKeysResponse>;
+  /** ProvingSchemes returns the statuses of the SEDA proving schemes. */
+  ProvingSchemes(request: QueryProvingSchemesRequest): Promise<QueryProvingSchemesResponse>;
 }
 
 export const QueryServiceName = "sedachain.pubkey.v1.Query";
@@ -155,12 +391,26 @@ export class QueryClientImpl implements Query {
   constructor(rpc: Rpc, opts?: { service?: string }) {
     this.service = opts?.service || QueryServiceName;
     this.rpc = rpc;
+    this.Params = this.Params.bind(this);
     this.ValidatorKeys = this.ValidatorKeys.bind(this);
+    this.ProvingSchemes = this.ProvingSchemes.bind(this);
   }
+  Params(request: QueryParamsRequest): Promise<QueryParamsResponse> {
+    const data = QueryParamsRequest.encode(request).finish();
+    const promise = this.rpc.request(this.service, "Params", data);
+    return promise.then((data) => QueryParamsResponse.decode(_m0.Reader.create(data)));
+  }
+
   ValidatorKeys(request: QueryValidatorKeysRequest): Promise<QueryValidatorKeysResponse> {
     const data = QueryValidatorKeysRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "ValidatorKeys", data);
     return promise.then((data) => QueryValidatorKeysResponse.decode(_m0.Reader.create(data)));
+  }
+
+  ProvingSchemes(request: QueryProvingSchemesRequest): Promise<QueryProvingSchemesResponse> {
+    const data = QueryProvingSchemesRequest.encode(request).finish();
+    const promise = this.rpc.request(this.service, "ProvingSchemes", data);
+    return promise.then((data) => QueryProvingSchemesResponse.decode(_m0.Reader.create(data)));
   }
 }
 

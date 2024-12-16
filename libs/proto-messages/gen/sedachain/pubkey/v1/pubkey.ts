@@ -5,12 +5,43 @@
 // source: sedachain/pubkey/v1/pubkey.proto
 
 /* eslint-disable */
+import Long from "long";
 import _m0 from "protobufjs/minimal";
 
 /** IndexPubKeyPair defines an index - public key pair. */
 export interface IndexedPubKey {
   index: number;
   pubKey: Uint8Array;
+}
+
+/** ProvingScheme defines a proving scheme. */
+export interface ProvingScheme {
+  /** index is the SEDA key index. */
+  index: number;
+  /** is_activated indicates if the proving scheme has been activated. */
+  isActivated: boolean;
+  /**
+   * activation_height is the height at which the proving scheme is to
+   * be activated. This field is set to -1 by default until the public
+   * key registration rate reaches the activation threshold and is reset
+   * if the public key registration rate goes below the threshold before
+   * the scheme is activated.
+   */
+  activationHeight: bigint;
+}
+
+/** Params defines the parameters for the pubkey module. */
+export interface Params {
+  /**
+   * activation_block_delay is the number of blocks to wait before activating a
+   * proving scheme.
+   */
+  activationBlockDelay: bigint;
+  /**
+   * activation_threshold_percent is the percentage of the total voting power
+   * that is required to activate a proving scheme.
+   */
+  activationThresholdPercent: number;
 }
 
 function createBaseIndexedPubKey(): IndexedPubKey {
@@ -87,6 +118,177 @@ export const IndexedPubKey = {
   },
 };
 
+function createBaseProvingScheme(): ProvingScheme {
+  return { index: 0, isActivated: false, activationHeight: 0n };
+}
+
+export const ProvingScheme = {
+  encode(message: ProvingScheme, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.index !== 0) {
+      writer.uint32(8).uint32(message.index);
+    }
+    if (message.isActivated !== false) {
+      writer.uint32(16).bool(message.isActivated);
+    }
+    if (message.activationHeight !== 0n) {
+      if (BigInt.asIntN(64, message.activationHeight) !== message.activationHeight) {
+        throw new globalThis.Error("value provided for field message.activationHeight of type int64 too large");
+      }
+      writer.uint32(24).int64(message.activationHeight.toString());
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ProvingScheme {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseProvingScheme();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 8) {
+            break;
+          }
+
+          message.index = reader.uint32();
+          continue;
+        case 2:
+          if (tag !== 16) {
+            break;
+          }
+
+          message.isActivated = reader.bool();
+          continue;
+        case 3:
+          if (tag !== 24) {
+            break;
+          }
+
+          message.activationHeight = longToBigint(reader.int64() as Long);
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ProvingScheme {
+    return {
+      index: isSet(object.index) ? globalThis.Number(object.index) : 0,
+      isActivated: isSet(object.isActivated) ? globalThis.Boolean(object.isActivated) : false,
+      activationHeight: isSet(object.activationHeight) ? BigInt(object.activationHeight) : 0n,
+    };
+  },
+
+  toJSON(message: ProvingScheme): unknown {
+    const obj: any = {};
+    if (message.index !== 0) {
+      obj.index = Math.round(message.index);
+    }
+    if (message.isActivated !== false) {
+      obj.isActivated = message.isActivated;
+    }
+    if (message.activationHeight !== 0n) {
+      obj.activationHeight = message.activationHeight.toString();
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<ProvingScheme>): ProvingScheme {
+    return ProvingScheme.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ProvingScheme>): ProvingScheme {
+    const message = createBaseProvingScheme();
+    message.index = object.index ?? 0;
+    message.isActivated = object.isActivated ?? false;
+    message.activationHeight = object.activationHeight ?? 0n;
+    return message;
+  },
+};
+
+function createBaseParams(): Params {
+  return { activationBlockDelay: 0n, activationThresholdPercent: 0 };
+}
+
+export const Params = {
+  encode(message: Params, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.activationBlockDelay !== 0n) {
+      if (BigInt.asIntN(64, message.activationBlockDelay) !== message.activationBlockDelay) {
+        throw new globalThis.Error("value provided for field message.activationBlockDelay of type int64 too large");
+      }
+      writer.uint32(8).int64(message.activationBlockDelay.toString());
+    }
+    if (message.activationThresholdPercent !== 0) {
+      writer.uint32(16).uint32(message.activationThresholdPercent);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Params {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseParams();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 8) {
+            break;
+          }
+
+          message.activationBlockDelay = longToBigint(reader.int64() as Long);
+          continue;
+        case 2:
+          if (tag !== 16) {
+            break;
+          }
+
+          message.activationThresholdPercent = reader.uint32();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Params {
+    return {
+      activationBlockDelay: isSet(object.activationBlockDelay) ? BigInt(object.activationBlockDelay) : 0n,
+      activationThresholdPercent: isSet(object.activationThresholdPercent)
+        ? globalThis.Number(object.activationThresholdPercent)
+        : 0,
+    };
+  },
+
+  toJSON(message: Params): unknown {
+    const obj: any = {};
+    if (message.activationBlockDelay !== 0n) {
+      obj.activationBlockDelay = message.activationBlockDelay.toString();
+    }
+    if (message.activationThresholdPercent !== 0) {
+      obj.activationThresholdPercent = Math.round(message.activationThresholdPercent);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<Params>): Params {
+    return Params.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<Params>): Params {
+    const message = createBaseParams();
+    message.activationBlockDelay = object.activationBlockDelay ?? 0n;
+    message.activationThresholdPercent = object.activationThresholdPercent ?? 0;
+    return message;
+  },
+};
+
 function bytesFromBase64(b64: string): Uint8Array {
   if ((globalThis as any).Buffer) {
     return Uint8Array.from(globalThis.Buffer.from(b64, "base64"));
@@ -119,6 +321,15 @@ type DeepPartial<T> = T extends Builtin ? T
   : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
+
+function longToBigint(long: Long) {
+  return BigInt(long.toString());
+}
+
+if (_m0.util.Long !== Long) {
+  _m0.util.Long = Long as any;
+  _m0.configure();
+}
 
 function isSet(value: any): boolean {
   return value !== null && value !== undefined;
