@@ -13,6 +13,7 @@ import {
 	transform,
 } from "valibot";
 import type { QueryConfig } from "../config";
+import type { DataRequest } from "./data-request";
 import { createBatchingQueryClient } from "./query-client";
 
 const DataResultSchema = pipe(
@@ -54,27 +55,28 @@ export type DataRequestResult = InferOutput<typeof DataResultSchema>;
 
 export async function getDataResult(
 	queryConfig: QueryConfig,
-	drId: string,
+	dr: DataRequest,
 ): Promise<DataRequestResult> {
 	const batchingQueryClient = await createBatchingQueryClient(queryConfig);
 
 	const drResult = (
 		await tryAsync(
 			batchingQueryClient.DataResult({
-				dataRequestId: drId,
+				dataRequestId: dr.id,
+				dataRequestHeight: dr.height,
 			}),
 		)
 	).map((res) => Maybe.of(res.dataResult));
 
 	if (drResult.isErr) {
 		if (drResult.error.message.includes("not found")) {
-			throw new Error(`No DR found for id: "${drId}"`);
+			throw new Error(`No request found for ${dr.toString()}`);
 		}
 		throw drResult.error;
 	}
 
 	if (drResult.value.isNothing || drResult.value.value.drId === "") {
-		throw new Error(`No DR found for id: "${drId}"`);
+		throw new Error(`No request found for ${dr.toString()}`);
 	}
 
 	return parse(DataResultSchema, drResult.value.value);

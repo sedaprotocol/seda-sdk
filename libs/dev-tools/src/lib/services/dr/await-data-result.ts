@@ -1,6 +1,6 @@
 import type { QueryConfig } from "@dev-tools/services/config";
-import { createSigningClient } from "@dev-tools/services/signing-client";
 import { tryAsync } from "@seda-protocol/utils";
+import type { DataRequest } from "./data-request";
 import { getDataResult } from "./get-data-result";
 
 type Opts = {
@@ -12,13 +12,13 @@ type Opts = {
 
 export async function awaitDataResult(
 	queryConfig: QueryConfig,
-	drId: string,
+	dr: DataRequest,
 	opts: Opts = { timeoutSeconds: 60, pollingIntervalSeconds: 10 },
 ) {
 	const timeoutTime = Date.now() + opts.timeoutSeconds * 1000;
 
 	while (Date.now() < timeoutTime) {
-		const result = await tryAsync(async () => getDataResult(queryConfig, drId));
+		const result = await tryAsync(async () => getDataResult(queryConfig, dr));
 		if (!result.isErr && result.value !== null) {
 			return result.value;
 		}
@@ -26,7 +26,7 @@ export async function awaitDataResult(
 	}
 
 	throw new Error(
-		`Timeout: DR "${drId}" took longer than ${opts.timeoutSeconds} seconds to execute.`,
+		`Timeout: "${dr.toString()}" took longer than ${opts.timeoutSeconds} seconds to execute.`,
 	);
 }
 

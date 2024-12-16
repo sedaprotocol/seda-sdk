@@ -1,5 +1,6 @@
 import type { QueryConfig } from "@dev-tools/services/config";
 import { tryAsync } from "@seda-protocol/utils";
+import type { DataRequest } from "./data-request";
 import { getDataResultBundle } from "./get-data-result-bundle";
 
 type Opts = {
@@ -11,14 +12,14 @@ type Opts = {
 
 export async function awaitDataResultBundle(
 	queryConfig: QueryConfig,
-	drIds: string[],
+	drs: DataRequest[],
 	opts: Opts = { timeoutSeconds: 60, pollingIntervalSeconds: 10 },
 ) {
 	const timeoutTime = Date.now() + opts.timeoutSeconds * 1000;
 
 	while (Date.now() < timeoutTime) {
 		const result = await tryAsync(async () =>
-			getDataResultBundle(queryConfig, drIds),
+			getDataResultBundle(queryConfig, drs),
 		);
 		if (!result.isErr && result.value.every((r) => r.result !== null)) {
 			return result.value;

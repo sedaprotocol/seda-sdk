@@ -1,3 +1,5 @@
+import { tryParseSync } from "@seda-protocol/utils";
+import * as v from "valibot";
 import type { GasOptions } from "../gas-options";
 import { signAndSendTx } from "../sign-and-send-tx";
 import type { ISigner } from "../signer";
@@ -6,12 +8,18 @@ import {
 	type PostDataRequestInput,
 	createPostedDataRequest,
 } from "./create-dr-input";
+import type { DataRequest } from "./data-request";
+import { PostDataRequestResponseSchema } from "./post-data-request";
+
+const PostDataRequestBundleResponseSchema = v.array(
+	PostDataRequestResponseSchema,
+);
 
 export async function postDataRequestBundle(
 	signer: ISigner,
 	dataRequestInputs: PostDataRequestInput[],
 	gasOptions?: GasOptions,
-): Promise<{ tx: string; drIds: string[] }> {
+): Promise<{ tx: string; drs: DataRequest[] }> {
 	const sigingClientResult = await createSigningClient(signer);
 	if (sigingClientResult.isErr) {
 		throw sigingClientResult.error;
@@ -55,14 +63,19 @@ export async function postDataRequestBundle(
 		throw new Error(`TX failed: "${response.value.transactionHash}"`);
 	}
 
-	const drIds = response.value.msgResponses.map((messageResponseRaw) => {
+	const drsResponse = response.value.msgResponses.map((messageResponseRaw) => {
 		const messageResponse = sigingClient.registry.decode(messageResponseRaw);
 
 		return JSON.parse(Buffer.from(messageResponse.data).toString());
 	});
 
+	const drs = tryParseSync(PostDataRequestBundleResponseSchema, drsResponse);
+	if (drs.isErr) {
+		throw new Error(`Failed to parse DR response: ${drs.error}`);
+	}
+
 	return {
 		tx: response.value.transactionHash,
-		drIds,
+		drs: drs.value,
 	};
 }

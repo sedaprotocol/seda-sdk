@@ -1,3 +1,5 @@
+import { tryParseSync } from "@seda-protocol/utils";
+import * as v from "valibot";
 import type { GasOptions } from "../gas-options";
 import { signAndSendTx } from "../sign-and-send-tx";
 import type { ISigner } from "../signer";
@@ -6,12 +8,24 @@ import {
 	type PostDataRequestInput,
 	createPostedDataRequest,
 } from "./create-dr-input";
+import { DataRequest } from "./data-request";
+
+export const PostDataRequestResponseSchema = v.pipe(
+	v.object({
+		dr_id: v.string(),
+		height: v.pipe(
+			v.number(),
+			v.transform((val) => BigInt(val)),
+		),
+	}),
+	v.transform((val) => new DataRequest(val.dr_id, val.height)),
+);
 
 export async function postDataRequest(
 	signer: ISigner,
 	dataRequestInput: PostDataRequestInput,
 	gasOptions?: GasOptions,
-): Promise<{ tx: string; drId: string }> {
+): Promise<{ tx: string; dr: DataRequest }> {
 	const sigingClientResult = await createSigningClient(signer);
 	if (sigingClientResult.isErr) {
 		throw sigingClientResult.error;
@@ -57,10 +71,14 @@ export async function postDataRequest(
 		response.value.msgResponses[0],
 	);
 
-	const drId = JSON.parse(Buffer.from(messageResponse.data).toString());
+	const drResponse = JSON.parse(Buffer.from(messageResponse.data).toString());
+	const dr = tryParseSync(PostDataRequestResponseSchema, drResponse);
+	if (dr.isErr) {
+		throw new Error(`Failed to parse DR response: ${dr.error}`);
+	}
 
 	return {
 		tx: response.value.transactionHash,
-		drId,
+		dr: dr.value,
 	};
 }

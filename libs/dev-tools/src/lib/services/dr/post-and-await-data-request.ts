@@ -20,7 +20,7 @@ export async function postAndAwaitDataRequest(
 
 	const dataResult = await awaitDataResult(
 		{ rpc: signer.getEndpoint() },
-		postDrResponse.drId,
+		postDrResponse.dr,
 		awaitOptions,
 	);
 
