@@ -1,3 +1,5 @@
+import { AbiValue } from "./abi";
+import { Console } from "./console";
 import { encodeHex } from "./hex";
 
 export interface ToString {
@@ -25,7 +27,7 @@ export function toString<T = string>(message: T): string {
 				}
 			}
 
-			return result + "]";
+			return `${result}]`;
 		}
 
 		return "Array<T>";
@@ -37,6 +39,11 @@ export function toString<T = string>(message: T): string {
 
 	if (message instanceof ArrayBuffer) {
 		return `ArrayBuffer(0x${encodeHex(Uint8Array.wrap(message))})`;
+	}
+
+	// @ts-expect-error We're testing for the method before calling it
+	if (isDefined(message.toString) && message instanceof AbiValue) {
+		return message.toString();
 	}
 
 	// @ts-expect-error We're testing for the method before calling it

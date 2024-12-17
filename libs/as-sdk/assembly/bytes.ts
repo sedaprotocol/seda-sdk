@@ -1,7 +1,7 @@
 import { u128, u256 } from "as-bignum/assembly";
 import { JSON } from "json-as";
-import { decodeHex, encodeHex } from "./hex";
 import { Console } from "./console";
+import { decodeHex, encodeHex } from "./hex";
 
 @json
 class InnerBytes {
@@ -36,7 +36,7 @@ export class Bytes {
 	/**
 	 * @hidden Should only be constructed through static methods.
 	 */
-	private constructor(value: Uint8Array) {
+	protected constructor(value: Uint8Array) {
 		this.value = value;
 	}
 
@@ -464,27 +464,27 @@ export class Bytes {
 	/**
 	 * Convert the Bytes instance to a boolean value.
 	 * Returns true if either the first or last byte in the array is non-zero, false if both are zero. Note that this only checks the first and last byte.
-	 * 
+	 *
 	 * @example
 	 * ```ts
 	 * const trueBytes = Bytes.fromHexString("0x01");
 	 * Console.log(trueBytes.toBool()); // true
-	 * 
+	 *
 	 * const falseBytes = Bytes.fromHexString("0x00");
 	 * Console.log(falseBytes.toBool()); // false
-	 * 
+	 *
 	 * const multiByteTrue = Bytes.fromHexString("0x0100000000");
 	 * Console.log(multiByteTrue.toBool()); // true
 	 * ```
 	 */
 	toBool(): bool {
-		let firstByte = this.value.at(0);
-		
+		const firstByte = this.value.at(0);
+
 		if (firstByte !== 0) {
 			return true;
 		}
 
-		let lastByte = this.value.at(this.value.byteLength - 1);
+		const lastByte = this.value.at(this.value.byteLength - 1);
 
 		if (lastByte !== 0) {
 			return true;
@@ -502,9 +502,9 @@ export class Bytes {
 	 * const trueBytes = Bytes.fromBool(true);
 	 * Console.log(trueBytes.toHexString()); // "01"
 	 * Console.log(trueBytes.toBool()); // true
-	 * 
+	 *
 	 * const falseBytes = Bytes.fromBool(false);
-	 * Console.log(falseBytes.toHexString()); // "00" 
+	 * Console.log(falseBytes.toHexString()); // "00"
 	 * Console.log(falseBytes.toBool()); // false
 	 * ```
 	 * @param input The boolean value to convert to bytes
@@ -526,12 +526,12 @@ export class Bytes {
 	 * @example
 	 * ```ts
 	 * const data = Bytes.fromUtf8String("hello");
-	 * 
+	 *
 	 * // Pad right (default) to next multiple of 32
 	 * const rightPadded = data.pad32();
 	 * Console.log(rightPadded.length); // 32
 	 * Console.log(rightPadded.toHexString()); // "68656c6c6f000000000000000000000000000000000000000000000000000000"
-	 * 
+	 *
 	 * // Pad left to next multiple of 32
 	 * const leftPadded = data.pad32(false);
 	 * Console.log(leftPadded.length); // 32
@@ -552,13 +552,13 @@ export class Bytes {
 	 * @example
 	 * ```ts
 	 * const data = Bytes.fromUtf8String("hello");
-	 * 
+	 *
 	 * // Pad right (default)
 	 * const rightPadded = data.pad(10);
 	 * Console.log(rightPadded.toHexString()); // "68656c6c6f0000000000"
-	 * 
+	 *
 	 * // Pad left
-	 * const leftPadded = data.pad(10, false); 
+	 * const leftPadded = data.pad(10, false);
 	 * Console.log(leftPadded.toHexString()); // "0000000000068656c6c6f"
 	 * ```
 	 * @param targetLength The desired length after padding
