@@ -8,7 +8,7 @@ export default {
 	 */
 	include: ["./assembly/__test__/**/*.include.ts"],
 	/**
-	 * A set of regexp that will disclude source files from testing.
+	 * A set of regexp that will exclude source files from testing.
 	 */
 	disclude: [/node_modules/],
 	/**
