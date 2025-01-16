@@ -183,3 +183,50 @@ export function abiEncode(abi: string[], input: Bytes[]): Bytes {
 
 	return result;
 }
+
+export function abiChatGptDecode(types: string[], input: Bytes): string {
+	let offset: i32 = 0;
+
+	for (let i = 0; i < types.length; i++) {
+		const type = types[i];
+		
+		if (type == "string[]") {
+			const output = decodeStringArray(input, offset);
+			Console.log(output.map((x: Bytes) => x.toUtf8String()));
+			offset += 32;
+		}
+	}
+
+	return "aaa";
+}
+
+function decodeString(data: Bytes, offset: i32): Bytes {
+	Console.log("offset:" + offset.toString());
+	const dynamicOffset = data.slice(offset, offset + 32).toU256(true).toI32();
+	const length = data.slice(dynamicOffset, dynamicOffset + 32).toU256(true).toI32();
+	const stringBytes = data.slice(dynamicOffset + 32, dynamicOffset + 32 + length);
+
+	return stringBytes;
+}
+
+
+function decodeStringArray(data: Bytes, offset: i32): Bytes[] {
+	const dynamicOffset = data.slice(offset, offset + 32).toU256(true).toI32();
+	const length = data.slice(dynamicOffset, dynamicOffset + 32).toU256(true).toI32();
+	Console.log(`Length:${length}`);
+	const array: Bytes[] = [];
+	
+	// Debug logging
+	Console.log("Data length: " + data.length.toString());
+	Console.log("Dynamic offset: " + dynamicOffset.toString());
+	
+	for (let i: i32 = 0; i < length; i++) {
+		const itemOffset = dynamicOffset + 32 + (i * 32);
+		Console.log("Item " + i.toString() + " offset: " + itemOffset.toString());
+		const item = decodeString(data, itemOffset);
+		Console.log("Item " + i.toString() + " value: " + item.toUtf8String());
+		array.push(item);
+	}
+
+	return array;
+}

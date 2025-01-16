@@ -91,11 +91,12 @@ describe("abi", () => {
 			expect(result.exitCode).toBe(0);
 		});
 
-		it.skip("should be able to decode abi encoded array of strings", async () => {
+		it("should be able to decode abi encoded array of strings", async () => {
 			const encoded = encodeAbiParameters(
 				[{ name: "x", type: "string[]" }],
-				[["h", "ellw", "o"]],
+				[["h", "ellw", "ops"]],
 			);
+			
 			const result = await testOracleProgramExecution(
 				oracleProgram,
 				Buffer.from(`testAbiStringDecodeArrays:${encoded}`),

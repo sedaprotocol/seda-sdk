@@ -6,7 +6,7 @@ import {
 	abiDecode,
 	u256,
 } from "../../as-sdk/assembly";
-import { AbiValue, abiEncode } from "../../as-sdk/assembly/abi";
+import { AbiValue, abiChatGptDecode, abiEncode } from "../../as-sdk/assembly/abi";
 
 export class TestAbiDecode extends OracleProgram {
 	execution(): void {
@@ -45,13 +45,13 @@ export class TestAbiStringDecodeArrays extends OracleProgram {
 		const input = Bytes.fromHexString(
 			Process.getInputs().slice(26).toUtf8String(),
 		);
-		const output = abiDecode(["string[]"], input);
-		const strings: string[] = output
-			.at(0)
-			.asArray()
-			.map((v: Bytes) => v.toUtf8String());
+		const output = abiChatGptDecode(["string[]"], input);
+		// const strings: string[] = output
+		// 	.at(0)
+		// 	.asArray()
+		// 	.map((v: Bytes) => v.toUtf8String());
 
-		Console.log(strings);
+		// Console.log(strings);
 
 		Process.success(Bytes.empty());
 	}
