@@ -67,6 +67,8 @@ export type PostDataRequestInput = {
 	memo?: Uint8Array;
 };
 
+export type DataRequest = ReturnType<typeof createPostedDataRequest>;
+
 export function createPostedDataRequest(input: PostDataRequestInput) {
 	const version = input.version ?? DEFAULT_VERSION;
 
@@ -83,8 +85,8 @@ export function createPostedDataRequest(input: PostDataRequestInput) {
 		encodeConsensusFilter(input.consensusOptions),
 	);
 
-	const exec_gas_limit = input.execGasLimit ?? DEFAULT_GAS_LIMIT;
-	const tally_gas_limit = input.tallyGasLimit ?? DEFAULT_GAS_LIMIT;
+	const exec_gas_limit = input.execGasLimit ?? DEFAULT_EXEC_GAS_LIMIT;
+	const tally_gas_limit = input.tallyGasLimit ?? DEFAULT_TALLY_GAS_LIMIT;
 	const gas_price = (input.gasPrice ?? DEFAULT_GAS_PRICE).toString();
 
 	const memo = base64Encode(input.memo ?? DEFAULT_MEMO);

@@ -1,3 +1,4 @@
+import { calculateDrFunds } from "@dev-tools/services/dr/calculate-dr-funds";
 import { tryParseSync } from "@seda-protocol/utils";
 import * as v from "valibot";
 import type { GasOptions } from "../gas-options";
@@ -30,17 +31,19 @@ export async function postDataRequestBundle(
 	const { client: sigingClient, address } = sigingClientResult.value;
 
 	const messages = dataRequestInputs.map((dataRequestInput) => {
+		const postedDr = createPostedDataRequest(dataRequestInput);
 		return {
 			typeUrl: "/cosmwasm.wasm.v1.MsgExecuteContract",
 			value: {
 				sender: address,
 				contract,
+				funds: [{ amount: calculateDrFunds(postedDr), denom: "aseda" }],
 				msg: Buffer.from(
 					JSON.stringify({
 						post_data_request: {
 							seda_payload: Buffer.from([]).toString("base64"),
 							payback_address: Buffer.from("seda_sdk").toString("base64"),
-							posted_dr: createPostedDataRequest(dataRequestInput),
+							posted_dr: postedDr,
 						},
 					}),
 				),
