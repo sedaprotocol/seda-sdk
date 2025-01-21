@@ -6,6 +6,5 @@ export function calculateDrFunds(dataRequest: DataRequest): string {
 	const funds =
 		BigInt(dataRequest.exec_gas_limit + dataRequest.tally_gas_limit) * price;
 
-	console.log("[DEBUG]: calculateDrFunds ::: ", dataRequest);
 	return funds.toString();
 }
