@@ -6,9 +6,9 @@
 /* eslint-disable */
 
 export * as google from "./index.google";
+export * as cosmos_proto from "./index.cosmos_proto";
 export * as gogoproto from "./index.gogoproto";
 export * as sedachain from "./index.sedachain";
-export * as cosmos from "./index.cosmos";
-export * as cosmos_proto from "./index.cosmos_proto";
 export * as amino from "./index.amino";
+export * as cosmos from "./index.cosmos";
 export * as tendermint from "./index.tendermint";

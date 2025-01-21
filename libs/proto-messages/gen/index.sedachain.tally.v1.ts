@@ -7,4 +7,5 @@
 
 export * from "./sedachain/tally/v1/tally";
 export * from "./sedachain/tally/v1/genesis";
+export * from "./sedachain/tally/v1/query";
 export * from "./sedachain/tally/v1/tx";

@@ -10,12 +10,44 @@ import _m0 from "protobufjs/minimal";
 
 /** Params defines the parameters for the tally module. */
 export interface Params {
-  /** max_tally_gas_limit is the maximum gas limit for a tally request. */
+  /** MaxTallyGasLimit is the maximum gas limit for a tally request. */
   maxTallyGasLimit: bigint;
+  /** FilterGasCostNone is the gas cost for a filter type none. */
+  filterGasCostNone: bigint;
+  /**
+   * FilterGasCostMultiplierMode is the gas cost multiplier for a filter type
+   * mode.
+   */
+  filterGasCostMultiplierMode: bigint;
+  /**
+   * FilterGasCostMultiplierStdDev is the gas cost multiplier for a filter type
+   * stddev.
+   */
+  filterGasCostMultiplierStdDev: bigint;
+  /** GasCostBase is the base gas cost for a data request. */
+  gasCostBase: bigint;
+  /**
+   * GasCostFallback is the gas cost incurred for data request execution when
+   * even basic consensus has not been reached.
+   */
+  executionGasCostFallback: bigint;
+  /**
+   * BurnRatio is the ratio of the gas cost to be burned in case of reduced
+   * payout scenarios.
+   */
+  burnRatio: string;
 }
 
 function createBaseParams(): Params {
-  return { maxTallyGasLimit: 0n };
+  return {
+    maxTallyGasLimit: 0n,
+    filterGasCostNone: 0n,
+    filterGasCostMultiplierMode: 0n,
+    filterGasCostMultiplierStdDev: 0n,
+    gasCostBase: 0n,
+    executionGasCostFallback: 0n,
+    burnRatio: "",
+  };
 }
 
 export const Params = {
@@ -25,6 +57,45 @@ export const Params = {
         throw new globalThis.Error("value provided for field message.maxTallyGasLimit of type uint64 too large");
       }
       writer.uint32(8).uint64(message.maxTallyGasLimit.toString());
+    }
+    if (message.filterGasCostNone !== 0n) {
+      if (BigInt.asUintN(64, message.filterGasCostNone) !== message.filterGasCostNone) {
+        throw new globalThis.Error("value provided for field message.filterGasCostNone of type uint64 too large");
+      }
+      writer.uint32(16).uint64(message.filterGasCostNone.toString());
+    }
+    if (message.filterGasCostMultiplierMode !== 0n) {
+      if (BigInt.asUintN(64, message.filterGasCostMultiplierMode) !== message.filterGasCostMultiplierMode) {
+        throw new globalThis.Error(
+          "value provided for field message.filterGasCostMultiplierMode of type uint64 too large",
+        );
+      }
+      writer.uint32(24).uint64(message.filterGasCostMultiplierMode.toString());
+    }
+    if (message.filterGasCostMultiplierStdDev !== 0n) {
+      if (BigInt.asUintN(64, message.filterGasCostMultiplierStdDev) !== message.filterGasCostMultiplierStdDev) {
+        throw new globalThis.Error(
+          "value provided for field message.filterGasCostMultiplierStdDev of type uint64 too large",
+        );
+      }
+      writer.uint32(32).uint64(message.filterGasCostMultiplierStdDev.toString());
+    }
+    if (message.gasCostBase !== 0n) {
+      if (BigInt.asUintN(64, message.gasCostBase) !== message.gasCostBase) {
+        throw new globalThis.Error("value provided for field message.gasCostBase of type uint64 too large");
+      }
+      writer.uint32(40).uint64(message.gasCostBase.toString());
+    }
+    if (message.executionGasCostFallback !== 0n) {
+      if (BigInt.asUintN(64, message.executionGasCostFallback) !== message.executionGasCostFallback) {
+        throw new globalThis.Error(
+          "value provided for field message.executionGasCostFallback of type uint64 too large",
+        );
+      }
+      writer.uint32(48).uint64(message.executionGasCostFallback.toString());
+    }
+    if (message.burnRatio !== "") {
+      writer.uint32(58).string(message.burnRatio);
     }
     return writer;
   },
@@ -43,6 +114,48 @@ export const Params = {
 
           message.maxTallyGasLimit = longToBigint(reader.uint64() as Long);
           continue;
+        case 2:
+          if (tag !== 16) {
+            break;
+          }
+
+          message.filterGasCostNone = longToBigint(reader.uint64() as Long);
+          continue;
+        case 3:
+          if (tag !== 24) {
+            break;
+          }
+
+          message.filterGasCostMultiplierMode = longToBigint(reader.uint64() as Long);
+          continue;
+        case 4:
+          if (tag !== 32) {
+            break;
+          }
+
+          message.filterGasCostMultiplierStdDev = longToBigint(reader.uint64() as Long);
+          continue;
+        case 5:
+          if (tag !== 40) {
+            break;
+          }
+
+          message.gasCostBase = longToBigint(reader.uint64() as Long);
+          continue;
+        case 6:
+          if (tag !== 48) {
+            break;
+          }
+
+          message.executionGasCostFallback = longToBigint(reader.uint64() as Long);
+          continue;
+        case 7:
+          if (tag !== 58) {
+            break;
+          }
+
+          message.burnRatio = reader.string();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -53,13 +166,43 @@ export const Params = {
   },
 
   fromJSON(object: any): Params {
-    return { maxTallyGasLimit: isSet(object.maxTallyGasLimit) ? BigInt(object.maxTallyGasLimit) : 0n };
+    return {
+      maxTallyGasLimit: isSet(object.maxTallyGasLimit) ? BigInt(object.maxTallyGasLimit) : 0n,
+      filterGasCostNone: isSet(object.filterGasCostNone) ? BigInt(object.filterGasCostNone) : 0n,
+      filterGasCostMultiplierMode: isSet(object.filterGasCostMultiplierMode)
+        ? BigInt(object.filterGasCostMultiplierMode)
+        : 0n,
+      filterGasCostMultiplierStdDev: isSet(object.filterGasCostMultiplierStdDev)
+        ? BigInt(object.filterGasCostMultiplierStdDev)
+        : 0n,
+      gasCostBase: isSet(object.gasCostBase) ? BigInt(object.gasCostBase) : 0n,
+      executionGasCostFallback: isSet(object.executionGasCostFallback) ? BigInt(object.executionGasCostFallback) : 0n,
+      burnRatio: isSet(object.burnRatio) ? globalThis.String(object.burnRatio) : "",
+    };
   },
 
   toJSON(message: Params): unknown {
     const obj: any = {};
     if (message.maxTallyGasLimit !== 0n) {
       obj.maxTallyGasLimit = message.maxTallyGasLimit.toString();
+    }
+    if (message.filterGasCostNone !== 0n) {
+      obj.filterGasCostNone = message.filterGasCostNone.toString();
+    }
+    if (message.filterGasCostMultiplierMode !== 0n) {
+      obj.filterGasCostMultiplierMode = message.filterGasCostMultiplierMode.toString();
+    }
+    if (message.filterGasCostMultiplierStdDev !== 0n) {
+      obj.filterGasCostMultiplierStdDev = message.filterGasCostMultiplierStdDev.toString();
+    }
+    if (message.gasCostBase !== 0n) {
+      obj.gasCostBase = message.gasCostBase.toString();
+    }
+    if (message.executionGasCostFallback !== 0n) {
+      obj.executionGasCostFallback = message.executionGasCostFallback.toString();
+    }
+    if (message.burnRatio !== "") {
+      obj.burnRatio = message.burnRatio;
     }
     return obj;
   },
@@ -70,6 +213,12 @@ export const Params = {
   fromPartial(object: DeepPartial<Params>): Params {
     const message = createBaseParams();
     message.maxTallyGasLimit = object.maxTallyGasLimit ?? 0n;
+    message.filterGasCostNone = object.filterGasCostNone ?? 0n;
+    message.filterGasCostMultiplierMode = object.filterGasCostMultiplierMode ?? 0n;
+    message.filterGasCostMultiplierStdDev = object.filterGasCostMultiplierStdDev ?? 0n;
+    message.gasCostBase = object.gasCostBase ?? 0n;
+    message.executionGasCostFallback = object.executionGasCostFallback ?? 0n;
+    message.burnRatio = object.burnRatio ?? "";
     return message;
   },
 };

@@ -6,5 +6,6 @@
 /* eslint-disable */
 
 export * from "./sedachain/batching/v1/batching";
+export * from "./sedachain/batching/v1/evidence";
 export * from "./sedachain/batching/v1/genesis";
 export * from "./sedachain/batching/v1/query";

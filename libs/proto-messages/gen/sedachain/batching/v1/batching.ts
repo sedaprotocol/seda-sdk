@@ -85,7 +85,7 @@ export interface DataResult {
   /** exit_code is the exit code of the tally wasm binary execution. */
   exitCode: number;
   /** gas_used is the gas used by the data request execution. */
-  gasUsed: bigint;
+  gasUsed: string;
   /** result is the result of the tally wasm binary execution. */
   result: Uint8Array;
   /** payback_address is the payback address set by the relayer. */
@@ -498,7 +498,7 @@ function createBaseDataResult(): DataResult {
     blockHeight: 0n,
     blockTimestamp: 0n,
     exitCode: 0,
-    gasUsed: 0n,
+    gasUsed: "",
     result: new Uint8Array(0),
     paybackAddress: "",
     sedaPayload: "",
@@ -538,11 +538,8 @@ export const DataResult = {
     if (message.exitCode !== 0) {
       writer.uint32(56).uint32(message.exitCode);
     }
-    if (message.gasUsed !== 0n) {
-      if (BigInt.asUintN(64, message.gasUsed) !== message.gasUsed) {
-        throw new globalThis.Error("value provided for field message.gasUsed of type uint64 too large");
-      }
-      writer.uint32(64).uint64(message.gasUsed.toString());
+    if (message.gasUsed !== "") {
+      writer.uint32(66).string(message.gasUsed);
     }
     if (message.result.length !== 0) {
       writer.uint32(74).bytes(message.result);
@@ -616,11 +613,11 @@ export const DataResult = {
           message.exitCode = reader.uint32();
           continue;
         case 8:
-          if (tag !== 64) {
+          if (tag !== 66) {
             break;
           }
 
-          message.gasUsed = longToBigint(reader.uint64() as Long);
+          message.gasUsed = reader.string();
           continue;
         case 9:
           if (tag !== 74) {
@@ -668,7 +665,7 @@ export const DataResult = {
       blockHeight: isSet(object.blockHeight) ? BigInt(object.blockHeight) : 0n,
       blockTimestamp: isSet(object.blockTimestamp) ? BigInt(object.blockTimestamp) : 0n,
       exitCode: isSet(object.exitCode) ? globalThis.Number(object.exitCode) : 0,
-      gasUsed: isSet(object.gasUsed) ? BigInt(object.gasUsed) : 0n,
+      gasUsed: isSet(object.gasUsed) ? globalThis.String(object.gasUsed) : "",
       result: isSet(object.result) ? bytesFromBase64(object.result) : new Uint8Array(0),
       paybackAddress: isSet(object.paybackAddress) ? globalThis.String(object.paybackAddress) : "",
       sedaPayload: isSet(object.sedaPayload) ? globalThis.String(object.sedaPayload) : "",
@@ -699,8 +696,8 @@ export const DataResult = {
     if (message.exitCode !== 0) {
       obj.exitCode = Math.round(message.exitCode);
     }
-    if (message.gasUsed !== 0n) {
-      obj.gasUsed = message.gasUsed.toString();
+    if (message.gasUsed !== "") {
+      obj.gasUsed = message.gasUsed;
     }
     if (message.result.length !== 0) {
       obj.result = base64FromBytes(message.result);
@@ -729,7 +726,7 @@ export const DataResult = {
     message.blockHeight = object.blockHeight ?? 0n;
     message.blockTimestamp = object.blockTimestamp ?? 0n;
     message.exitCode = object.exitCode ?? 0;
-    message.gasUsed = object.gasUsed ?? 0n;
+    message.gasUsed = object.gasUsed ?? "";
     message.result = object.result ?? new Uint8Array(0);
     message.paybackAddress = object.paybackAddress ?? "";
     message.sedaPayload = object.sedaPayload ?? "";
