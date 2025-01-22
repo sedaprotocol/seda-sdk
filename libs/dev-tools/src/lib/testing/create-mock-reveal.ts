@@ -24,7 +24,7 @@ export function createMockReveal(input: RevealInput) {
 	return {
 		salt: MOCK_SALT_BYTES,
 		exit_code: input.exitCode,
-		gas_used: input.gasUsed.toString(),
+		gas_used: input.gasUsed,
 		reveal: [...resultBytes],
 	};
 }

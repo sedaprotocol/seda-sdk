@@ -107,7 +107,7 @@ describe("TallyVm", () => {
 
 		expect(result.exitCode).toBe(0);
 		expect(result.resultAsString).toBe(
-			'[{"salt":{"type":"hex","value":"736564615f73646b"},"exitCode":0,"gasUsed":"200000","reveal":{"type":"hex","value":"7b2264617461223a22626162795f736861726b227d"},"inConsensus":true},{"salt":{"type":"hex","value":"736564615f73646b"},"exitCode":1,"gasUsed":"1336","reveal":{"type":"hex","value":"7b2264617461223a226772616e6470615f736861726b227d"},"inConsensus":true},{"salt":{"type":"hex","value":"736564615f73646b"},"exitCode":0,"gasUsed":"12","reveal":{"type":"hex","value":"7b2264617461223a226772616e646d615f736861726b227d"},"inConsensus":false}]',
+			'[{"salt":{"type":"hex","value":"736564615f73646b"},"exitCode":0,"gasUsed":200000,"reveal":{"type":"hex","value":"7b2264617461223a22626162795f736861726b227d"},"inConsensus":true},{"salt":{"type":"hex","value":"736564615f73646b"},"exitCode":1,"gasUsed":1336,"reveal":{"type":"hex","value":"7b2264617461223a226772616e6470615f736861726b227d"},"inConsensus":true},{"salt":{"type":"hex","value":"736564615f73646b"},"exitCode":0,"gasUsed":12,"reveal":{"type":"hex","value":"7b2264617461223a226772616e646d615f736861726b227d"},"inConsensus":false}]',
 		);
 	});
 
@@ -141,7 +141,7 @@ describe("TallyVm", () => {
 
 		expect(result.exitCode).toBe(0);
 		expect(result.resultAsString).toBe(
-			'[{"salt":{"type":"hex","value":"736564615f73646b"},"exitCode":0,"gasUsed":"1336","reveal":{"type":"hex","value":"7b2264617461223a226772616e6470615f736861726b227d"},"inConsensus":true},{"salt":{"type":"hex","value":"736564615f73646b"},"exitCode":0,"gasUsed":"1346","reveal":{"type":"hex","value":"7b2264617461223a22636f7573696e5f736861726b227d"},"inConsensus":true}]',
+			'[{"salt":{"type":"hex","value":"736564615f73646b"},"exitCode":0,"gasUsed":1336,"reveal":{"type":"hex","value":"7b2264617461223a226772616e6470615f736861726b227d"},"inConsensus":true},{"salt":{"type":"hex","value":"736564615f73646b"},"exitCode":0,"gasUsed":1346,"reveal":{"type":"hex","value":"7b2264617461223a22636f7573696e5f736861726b227d"},"inConsensus":true}]',
 		);
 	});
 });

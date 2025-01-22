@@ -10,7 +10,7 @@ const CONSENSUS_ARGUMENT_POSITION = 3;
 class RevealBody {
 	salt!: u8[];
 	exit_code!: u8;
-	gas_used!: string;
+	gas_used!: u64;
 	reveal!: u8[];
 }
 
@@ -35,7 +35,7 @@ export class RevealResult {
 	/**
 	 * Gas units consumed by the overlay node while executing the Oracle Program.
 	 */
-	gasUsed!: string;
+	gasUsed!: u64;
 
 	/**
 	 * The ouput of the execution phase of the Oracle Program.
