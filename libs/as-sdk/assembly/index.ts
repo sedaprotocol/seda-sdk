@@ -39,6 +39,8 @@ export { Bytes } from "./bytes";
 export { decodeHex, encodeHex } from "./hex";
 export { OracleProgram } from "./oracle-program";
 export { secp256k1Verify, keccak256 } from "./crypto";
+export { Result } from "./result";
+export { Maybe } from "./maybe";
 
 // Export library so consumers don't need to reimport it themselves
 export { JSON } from "json-as/assembly";
