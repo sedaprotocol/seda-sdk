@@ -1,0 +1,17 @@
+[workspace]
+resolver = "2"
+default-members = ["libs/rs-sdk/example"]
+members = ["libs/rs-sdk/sdk", "libs/rs-sdk/example"]
+
+[workspace.dependencies]
+anyhow = "1.0.95"
+hex = "0.4.3"
+serde = { version = "1.0.204", features = ["derive"] }
+serde_json = "1.0.122"
+thiserror = "1.0.63"
+seda-sdk-rs = { path ="./libs/rs-sdk/sdk" }
+
+[profile.release-wasm]
+inherits = "release"
+lto = "fat"
+opt-level = "z"
