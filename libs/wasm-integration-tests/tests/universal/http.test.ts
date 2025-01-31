@@ -1,14 +1,11 @@
 import { beforeEach, describe, expect, it, mock } from "bun:test";
-import { readFile } from "node:fs/promises";
 import { testOracleProgramExecution } from "@seda/dev-tools";
 import { Response } from "node-fetch";
+import { sdks } from "./sdks";
 
 const mockHttpFetch = mock();
-const oracleProgram = await readFile(
-	"dist/libs/as-sdk-integration-tests/debug.wasm",
-);
 
-describe("Http", () => {
+describe.each(sdks)("%s:Http", (_, oracleProgram) => {
 	beforeEach(() => {
 		mockHttpFetch.mockReset();
 	});
@@ -67,21 +64,5 @@ describe("Http", () => {
 		expect(result.resultAsString).toEqual(
 			"101:Test SDK:Don't forget to test some integrations.",
 		);
-	});
-
-	it("should exit when an invalid Oracle Program is given", async () => {
-		const result = await testOracleProgramExecution(
-			Buffer.from(new Uint8Array([0, 97, 115, 109])),
-			Buffer.from("testHttpSuccess"),
-		);
-
-		expect(result).toEqual({
-			exitCode: 1,
-			stderr:
-				"CompileError: WebAssembly.Module doesn't parse at byte 0: expected a module of at least 8 bytes",
-			stdout: "",
-			result: new Uint8Array(),
-			resultAsString: "",
-		});
 	});
 });

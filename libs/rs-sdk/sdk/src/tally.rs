@@ -37,8 +37,8 @@ pub fn get_unfiltered_reveals() -> Result<Vec<RevealResult>> {
             CONSENSUS_ARGUMENT_POSITION
         )))?;
 
-    let reveals: Vec<RevealBody> = serde_json::from_str(&encoded_reveals)?;
-    let consensus: Vec<u8> = serde_json::from_str(&encoded_consensus)?;
+    let reveals: Vec<RevealBody> = serde_json::from_str(encoded_reveals)?;
+    let consensus: Vec<u8> = serde_json::from_str(encoded_consensus)?;
 
     if reveals.len() != consensus.len() {
         return Err(Error::msg(format!(

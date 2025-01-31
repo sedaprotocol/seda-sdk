@@ -162,3 +162,23 @@ export class TestBytesToBigNumber extends OracleProgram {
 		Process.success(Bytes.fromUtf8String(result));
 	}
 }
+
+export class TestBytesHexEncodeDecode extends OracleProgram {
+	execution(): void {
+		const input = Bytes.fromHexString(
+			"006e75ec00000000000000000000000000000000000000000000",
+		);
+
+		Process.success(Bytes.fromUtf8String(input.toHexString()));
+	}
+}
+
+export class TestBytesPrefixedHexDecode extends OracleProgram {
+	execution(): void {
+		const input = Bytes.fromHexString(
+			"0x006e75ec00000000000000000000000000000000000000000000",
+		);
+
+		Process.success(Bytes.fromUtf8String(input.toHexString()));
+	}
+}

@@ -1,15 +1,11 @@
 import { beforeEach, describe, expect, it, mock } from "bun:test";
-import { readFile } from "node:fs/promises";
 import { testOracleProgramExecution } from "@seda/dev-tools";
 import { Response } from "node-fetch";
+import { sdks } from "./sdks";
 
 const mockHttpFetch = mock();
 
-const oracleProgram = await readFile(
-	"dist/libs/as-sdk-integration-tests/debug.wasm",
-);
-
-describe("ProxyHttp", () => {
+describe.each(sdks)("%s:ProxyHttp", (_, oracleProgram) => {
 	beforeEach(() => {
 		mockHttpFetch.mockReset();
 	});
@@ -62,15 +58,18 @@ describe("ProxyHttp", () => {
 	});
 });
 
-describe("generateProxyHttpSigningMessage", () => {
-	it("should generate the expected message", async () => {
-		const result = await testOracleProgramExecution(
-			oracleProgram,
-			Buffer.from("testGenerateProxyMessage"),
-		);
+describe.each(sdks)(
+	"%s:generateProxyHttpSigningMessage",
+	(_, oracleProgram) => {
+		it("should generate the expected message", async () => {
+			const result = await testOracleProgramExecution(
+				oracleProgram,
+				Buffer.from("testGenerateProxyMessage"),
+			);
 
-		expect(result.resultAsString).toBe(
-			"edba3f8cfcd4165f73cd4641ced2b2ec0d3ba4338e3eec30edd58777d86b53b25a61babeb76c554783ca90a1a250e84f1b703409fdff33c217ab64dd51f05199c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a4706db57ed7cc68d9897b06df02ed002ce206633eec05690d504d61789ae87db019",
-		);
-	});
-});
+			expect(result.resultAsString).toBe(
+				"edba3f8cfcd4165f73cd4641ced2b2ec0d3ba4338e3eec30edd58777d86b53b25a61babeb76c554783ca90a1a250e84f1b703409fdff33c217ab64dd51f05199c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a4706db57ed7cc68d9897b06df02ed002ce206633eec05690d504d61789ae87db019",
+			);
+		});
+	},
+);

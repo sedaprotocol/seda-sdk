@@ -85,13 +85,7 @@ impl HttpFetchResponse {
 
     pub fn from_promise(promise_status: PromiseStatus) -> Self {
         match promise_status {
-            PromiseStatus::Rejected(error) => HttpFetchResponse {
-                content_length: error.len(),
-                bytes: error,
-                headers: BTreeMap::default(),
-                status: 0,
-                url: String::default(),
-            },
+            PromiseStatus::Rejected(error) => error.try_into().unwrap(),
             _ => promise_status.parse().unwrap(),
         }
     }
@@ -159,12 +153,12 @@ impl TryFrom<Vec<u8>> for HttpFetchResponse {
 ///     println!("Status code: {}", response.status);
 ///     println!("Final URL: {}", response.url);
 ///     println!("Response size: {}", response.content_length);
-///     
+///
 ///     // Process response headers
 ///     if let Some(content_type) = response.headers.get("content-type") {
 ///         println!("Content-Type: {}", content_type);
 ///     }
-///     
+///
 ///     // Process response body
 ///     if !response.bytes.is_empty() {
 ///         // Convert bytes to string if it's UTF-8 encoded
@@ -176,7 +170,6 @@ impl TryFrom<Vec<u8>> for HttpFetchResponse {
 ///     println!("Request failed with status: {}", response.status);
 /// }
 /// ```
-
 pub fn http_fetch<URL: ToString>(url: URL, options: Option<HttpFetchOptions>) -> HttpFetchResponse {
     let http_action = HttpFetchAction {
         url: url.to_string(),

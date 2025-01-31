@@ -1,8 +1,11 @@
 use serde::{Deserialize, Serialize};
 
 use crate::{
+    bytes::{Bytes, ToBytes},
     http::{HttpFetchOptions, HttpFetchResponse},
+    keccak256::keccak256,
     promise::PromiseStatus,
+    HttpFetchMethod,
 };
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -50,14 +53,13 @@ struct ProxyHttpFetchAction {
 ///     println!("Status: {}", response.status);
 ///     println!("Final URL: {}", response.url);
 ///     println!("Response size: {}", response.content_length);
-///     
+///
 ///     // Access response headers
 ///     if let Some(content_type) = response.headers.get("content-type") {
 ///         println!("Content-Type: {}", content_type);
 ///     }
 /// }
 /// ```
-
 pub fn proxy_http_fetch<URL: ToString>(
     url: URL,
     public_key: Option<String>,
@@ -82,4 +84,57 @@ pub fn proxy_http_fetch<URL: ToString>(
         serde_json::from_slice(&result_data_ptr).expect("Could not deserialize proxy_http_fetch");
 
     HttpFetchResponse::from_promise(promise_status)
+}
+
+/// Generates the message which the data proxy hashed and signed. This can be useful when you need to verify
+/// the data proxy signature in the tally phase. With this message there is no need to include the entire request
+/// and response data in the execution result.
+///
+/// # Arguments
+///
+/// * `url` - The URL of the request
+/// * `method` - The HTTP method used for the request
+/// * `request_body` - The body of the request as Bytes
+/// * `response_body` - The body of the response as Bytes
+///
+/// # Returns
+///
+/// Returns the message that the data proxy should have hashed and signed
+///
+/// # Examples
+///
+/// ```no_run
+/// use seda_sdk::{
+///     bytes::{Bytes, ToBytes},
+///     http::HttpFetchMethod,
+///     proxy_http_fetch::{generate_proxy_http_signing_message, proxy_http_fetch},
+/// };
+///
+/// let url = "https://api.example.com/data";
+/// let response = proxy_http_fetch(url, None, None);
+///
+/// if response.is_ok() {
+///     let proxy_message = generate_proxy_http_signing_message(
+///         url.to_string(),
+///         HttpFetchMethod::Get,
+///         Bytes::default(),
+///         response.bytes.to_bytes()
+///     );
+///     // Use proxy_message for signature verification
+/// }
+/// ```
+pub fn generate_proxy_http_signing_message(
+    url: String,
+    method: HttpFetchMethod,
+    request_body: Bytes,
+    response_body: Bytes,
+) -> Bytes {
+    let url_hash = keccak256(url.as_bytes().to_vec());
+    let method_hash = keccak256(method.as_str().as_bytes().to_vec());
+    let request_body_hash = keccak256(request_body.to_vec());
+    let response_body_hash = keccak256(response_body.to_vec());
+
+    [url_hash, method_hash, request_body_hash, response_body_hash]
+        .concat()
+        .to_bytes()
 }

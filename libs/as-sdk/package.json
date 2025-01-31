@@ -4,7 +4,7 @@
 	"version": "0.0.18",
 	"types": "./assembly/index.ts",
 	"dependencies": {
-		"@assemblyscript/wasi-shim": "git+https://github.com/sedaprotocol/wasi-shim.git",
+		"@assemblyscript/wasi-shim": "git+https://github.com/sedaprotocol/wasi-shim.git#8fda40c6a952d83013f4202ceb2d0c79939a45e0",
 		"as-bignum": "^0.3.1",
 		"json-as": "^0.9.26",
 		"visitor-as": "^0.11.4"

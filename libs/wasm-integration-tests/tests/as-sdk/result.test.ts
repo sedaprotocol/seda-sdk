@@ -1,12 +1,7 @@
 import { describe, expect, it } from "bun:test";
-import { readFile } from "node:fs/promises";
 import { testOracleProgramExecution } from "@seda/dev-tools";
-
-const oracleProgram = await readFile(
-	"dist/libs/as-sdk-integration-tests/debug.wasm",
-);
-
-describe("Result", () => {
+import { oracleProgram } from "./oracle-program";
+describe("as-sdk:Result", () => {
 	it("should correctly handle Ok and Err values", async () => {
 		const result = await testOracleProgramExecution(
 			oracleProgram,

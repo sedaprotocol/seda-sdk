@@ -1,0 +1,25 @@
+{
+	"name": "wasm-integration-tests",
+	"$schema": "../../node_modules/nx/schemas/project-schema.json",
+	"sourceRoot": "libs/wasm-integration-tests/tests",
+	"projectType": "library",
+	"tags": [],
+	"targets": {
+		"test": {
+			"executor": "nx:run-commands",
+			"options": {
+				"command": "bun test libs/wasm-integration-tests/"
+			},
+			"dependsOn": [
+				{
+					"target": "build",
+					"projects": [
+						"dev-tools",
+						"rs-sdk-integration-tests",
+						"as-sdk-integration-tests"
+					]
+				}
+			]
+		}
+	}
+}

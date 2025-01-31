@@ -9,6 +9,7 @@
 	},
 	"namedInputs": {
 		"default": ["{projectRoot}/**/*", "sharedGlobals"],
+		"rs-sdk": ["{workspaceRoot}/libs/rs-sdk/**/*"],
 		"production": [
 			"default",
 			"!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",

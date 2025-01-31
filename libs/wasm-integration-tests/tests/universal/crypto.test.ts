@@ -1,12 +1,8 @@
 import { describe, expect, it } from "bun:test";
-import { readFile } from "node:fs/promises";
 import { testOracleProgramExecution } from "@seda/dev-tools";
+import { sdks } from "./sdks";
 
-const oracleProgram = await readFile(
-	"dist/libs/as-sdk-integration-tests/debug.wasm",
-);
-
-describe("Crypto", () => {
+describe.each(sdks)("%s:Crypto", (_, oracleProgram) => {
 	it("Test valid Secp256k1 signature", async () => {
 		const result = await testOracleProgramExecution(
 			oracleProgram,
@@ -22,7 +18,8 @@ describe("Crypto", () => {
 			Buffer.from("testSecp256k1VerifyInvalid"),
 		);
 
-		expect(result.resultAsString).toEqual("invalid secp256k1 signature");
+		expect(result.exitCode).toBe(1);
+		expect(result.resultAsString).toContain("invalid secp256k1 signature");
 	});
 
 	describe("keccak256", () => {

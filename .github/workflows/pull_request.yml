@@ -1,32 +1,57 @@
 name: Pull request checks
+
 on:
   pull_request:
     push:
       branches:
         - main
 
+concurrency:
+  group: ${{ github.head_ref }}
+  cancel-in-progress: true
+
 jobs:
-  verify_build:
+  build_and_test:
     runs-on: ubuntu-latest
     permissions:
       contents: read
       # Required to put a comment into the pull-request
       pull-requests: write
+
     steps:
-      - uses: actions/checkout@v3
-
-      - uses: oven-sh/setup-bun@v1
+      - name: 📥 Checkout
+        uses: actions/checkout@v3
         with:
-          bun-version: 1.1.13
+          fetch-depth: 1
 
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
+      - name: 📥 Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: 1.2.0
 
-      - name: Check formatting
+      - name: 📥Install dependencies
+        # There is a bug with lockfile generation when using package overrides, so for now we
+        # install without the lockfile. :(
+        # run: bun install --frozen-lockfile
+        run: bun install
+
+      - name: 📥 Install Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          components: rustfmt clippy
+          target: wasm32-wasip1 wasm32-unknown-unknown
+
+      - name: 📋 Check formatting Biome
         run: bunx biome check .
 
-      - name: Build projects
+      - name: 📋 Check formatting Rust
+        run: make fmt-check
+
+      - name: 📋 Clippy Check
+        run: make check
+
+      - name: 🏗️ Build projects
         run: bun run build
 
-      - name: Run unit tests
+      - name: 🧪 Run integration tests
         run: bun run test

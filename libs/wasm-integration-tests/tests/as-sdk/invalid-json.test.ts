@@ -1,12 +1,8 @@
 import { describe, expect, it } from "bun:test";
-import { readFile } from "node:fs/promises";
 import { testOracleProgramExecution } from "@seda/dev-tools";
+import { oracleProgram } from "./oracle-program";
 
-const oracleProgram = await readFile(
-	"dist/libs/as-sdk-integration-tests/debug.wasm",
-);
-
-describe("invalid json", () => {
+describe("as-sdk:invalid json", () => {
 	describe("invalid attribute", () => {
 		it("should mention the mismatched type", async () => {
 			const result = await testOracleProgramExecution(

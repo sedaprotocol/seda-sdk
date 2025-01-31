@@ -14,6 +14,6 @@ mod vm_modes;
 pub use http::{http_fetch, HttpFetchMethod, HttpFetchOptions, HttpFetchResponse};
 pub use keccak256::keccak256;
 pub use process::Process;
-pub use proxy_http_fetch::proxy_http_fetch;
+pub use proxy_http_fetch::{generate_proxy_http_signing_message, proxy_http_fetch};
 pub use secp256k1::secp256k1_verify;
 pub use tally::*;

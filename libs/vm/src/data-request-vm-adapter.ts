@@ -49,7 +49,7 @@ export default class DataRequestVmAdapter implements VmAdapter {
 			const bufferResponse = await response.arrayBuffer();
 			const httpResponse = new HttpFetchResponse({
 				bytes: Array.from(new Uint8Array(bufferResponse)),
-				content_length: response.size,
+				content_length: response.size ?? 0,
 				headers: Object.fromEntries(response.headers.entries()),
 				status: response.status,
 				url: response.url,

@@ -1,0 +1,10 @@
+[package]
+name = "rs-sdk-integration-tests"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+seda-sdk-rs = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+hex = { workspace = true }

@@ -1,15 +1,15 @@
 {
-	"name": "as-sdk-integration-tests",
+	"name": "rs-sdk-integration-tests",
 	"$schema": "../../node_modules/nx/schemas/project-schema.json",
-	"sourceRoot": "libs/as-sdk-integration-tests/assembly",
+	"sourceRoot": "libs/rs-sdk-integration-tests/src",
 	"projectType": "library",
 	"tags": [],
 	"targets": {
 		"build": {
+			"inputs": ["default", "rs-sdk"],
 			"executor": "nx:run-commands",
 			"options": {
-				"command": "asc ./assembly/index.ts --target debug",
-				"cwd": "libs/as-sdk-integration-tests"
+				"command": "make build-integration-tests"
 			}
 		}
 	}

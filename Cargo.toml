@@ -1,7 +1,7 @@
 [workspace]
 resolver = "2"
-default-members = ["libs/rs-sdk/example"]
-members = ["libs/rs-sdk/sdk", "libs/rs-sdk/example"]
+default-members = ["libs/rs-sdk-integration-tests"]
+members = ["libs/rs-sdk/sdk", "libs/rs-sdk-integration-tests"]
 
 [workspace.dependencies]
 anyhow = "1.0.95"

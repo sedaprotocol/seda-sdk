@@ -1,12 +1,8 @@
 import { describe, expect, it } from "bun:test";
-import { readFile } from "node:fs/promises";
 import { testOracleProgramExecution } from "@seda/dev-tools";
+import { oracleProgram } from "./oracle-program";
 
-const oracleProgram = await readFile(
-	"dist/libs/as-sdk-integration-tests/debug.wasm",
-);
-
-describe("bytes", () => {
+describe("as-sdk:Bytes", () => {
 	describe("concat", () => {
 		it("should concatenate 2 Bytes instances in a new one", async () => {
 			const result = await testOracleProgramExecution(
@@ -128,6 +124,30 @@ describe("bytes", () => {
 
 			expect(result.resultAsString).toBe(
 				"235817861417383168075506718003194494976:123456789",
+			);
+		});
+	});
+
+	describe("hex", () => {
+		it("should correctly decode/encode hex strings", async () => {
+			const result = await testOracleProgramExecution(
+				oracleProgram,
+				Buffer.from("testBytesHexEncodeDecode"),
+			);
+
+			expect(result.resultAsString).toEqual(
+				"006e75ec00000000000000000000000000000000000000000000",
+			);
+		});
+
+		it("should ignore 0x prefixes in hex strings", async () => {
+			const result = await testOracleProgramExecution(
+				oracleProgram,
+				Buffer.from("testBytesPrefixedHexDecode"),
+			);
+
+			expect(result.resultAsString).toEqual(
+				"006e75ec00000000000000000000000000000000000000000000",
 			);
 		});
 	});

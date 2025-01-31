@@ -7,21 +7,15 @@ const REVEALS_ARGUMENT_POSITION = 2;
 const CONSENSUS_ARGUMENT_POSITION = 3;
 
 @json
-class RevealBody {
+class RevealBodyArg {
 	salt!: u8[];
 	exit_code!: u8;
 	gas_used!: u64;
 	reveal!: u8[];
 }
 
-/**
- * A revealed report from an overlay node. Includes the exit code and output of the executed Oracle Program, as
- * well as some other data from the overlay node.
- *
- * @category Tally
- */
 @json
-export class RevealResult {
+class RevealBody {
 	/**
 	 * Entropy added by the overlay node to prevent other overlay nodes from copying the result.
 	 */
@@ -41,6 +35,17 @@ export class RevealResult {
 	 * The ouput of the execution phase of the Oracle Program.
 	 */
 	reveal!: Bytes;
+}
+
+/**
+ * A revealed report from an overlay node. Includes the exit code and output of the executed Oracle Program, as
+ * well as some other data from the overlay node.
+ *
+ * @category Tally
+ */
+@json
+export class RevealResult {
+	body!: RevealBody;
 
 	/**
 	 * Flag indicating whether this reveal result was in consensus. See {@linkcode Tally.getUnfilteredReveals} to access
@@ -66,7 +71,7 @@ export default class Tally {
 	 */
 	static getUnfilteredReveals(): RevealResult[] {
 		const encodedReveals = Process.args().at(REVEALS_ARGUMENT_POSITION);
-		const reveals = JSON.parse<RevealBody[]>(encodedReveals);
+		const reveals = JSON.parse<RevealBodyArg[]>(encodedReveals);
 
 		const encodedConsensus = Process.args().at(CONSENSUS_ARGUMENT_POSITION);
 		const consensus = JSON.parse<u8[]>(encodedConsensus);
@@ -74,8 +79,10 @@ export default class Tally {
 		const revealsAmount = reveals.length;
 		const consensusAmount = consensus.length;
 		if (revealsAmount !== consensusAmount) {
-			throw new Error(
-				`Number of reveals (${revealsAmount}) does not equal number of consensus reports (${consensusAmount}).`,
+			Process.error(
+				Bytes.fromUtf8String(
+					`Number of reveals (${revealsAmount}) does not equal number of consensus reports (${consensusAmount}).`,
+				),
 			);
 		}
 
@@ -84,10 +91,12 @@ export default class Tally {
 			const reveal = reveals[index];
 
 			revealResults.push({
-				exitCode: reveal.exit_code,
-				gasUsed: reveal.gas_used,
-				reveal: Bytes.fromByteArray(jsonArrToUint8Array(reveal.reveal)),
-				salt: Bytes.fromByteArray(jsonArrToUint8Array(reveal.salt)),
+				body: {
+					exitCode: reveal.exit_code,
+					gasUsed: reveal.gas_used,
+					reveal: Bytes.fromByteArray(jsonArrToUint8Array(reveal.reveal)),
+					salt: Bytes.fromByteArray(jsonArrToUint8Array(reveal.salt)),
+				},
 				inConsensus: consensus.at(index) === 0,
 			});
 		}

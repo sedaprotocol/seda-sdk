@@ -2,7 +2,9 @@ import { Bytes, Process } from "../../as-sdk/assembly/index";
 import {
 	TestBigNumberToBytes,
 	TestBytesConcat,
+	TestBytesHexEncodeDecode,
 	TestBytesJSON,
+	TestBytesPrefixedHexDecode,
 	TestBytesSliceNoArguments,
 	TestBytesSliceOnlyStart,
 	TestBytesSliceStartEnd,
@@ -22,11 +24,6 @@ import {
 	TestSecp256k1VerifyInvalid,
 	TestSecp256k1VerifyValid,
 } from "./crypto";
-import {
-	TestBytesHexEncodeDecode,
-	TestBytesPrefixedHexDecode,
-	TestHexInputEncodeDecode,
-} from "./encoding";
 import {
 	TestHttpRejection,
 	TestHttpSuccess,
@@ -85,9 +82,6 @@ if (args === "testHttpRejection") {
 	new TestBytesPrefixedHexDecode().run();
 } else if (args.startsWith("testBytesJSON")) {
 	new TestBytesJSON().run();
-	// Pretty iffy condition, not sure how else we can check for this though
-} else if (Process.getInputs().value.length === 26) {
-	new TestHexInputEncodeDecode().run();
 } else if (args === "testBytesToNumber") {
 	new TestBytesToNumber().run();
 } else if (args === "testNumberToBytes") {

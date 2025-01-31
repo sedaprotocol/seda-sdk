@@ -9,13 +9,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "34ac096ce696dc2fcabef30516bb13c0a68a11d30131d3df6f04711467681b04"
 
 [[package]]
-name = "example"
-version = "0.1.0"
-dependencies = [
- "seda-sdk-rs",
-]
-
-[[package]]
 name = "hex"
 version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -49,6 +42,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0e4dccaaaf89514f546c693ddc140f729f958c247918a13380cccc6078391acc"
 dependencies = [
  "proc-macro2",
+]
+
+[[package]]
+name = "rs-sdk-integration-tests"
+version = "0.1.0"
+dependencies = [
+ "hex",
+ "seda-sdk-rs",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

@@ -31,7 +31,6 @@ use super::raw;
 ///     println!("Signature is invalid!");
 /// }
 /// ```
-
 pub fn secp256k1_verify(message: &[u8], signature: &[u8], public_key: &[u8]) -> bool {
     let message_len = message.len() as i64;
     let signature_bytes = signature.to_vec();
@@ -39,7 +38,7 @@ pub fn secp256k1_verify(message: &[u8], signature: &[u8], public_key: &[u8]) -> 
     let public_key_bytes = public_key.to_vec();
     let public_key_length = public_key_bytes.len() as i32;
 
-    let result: u8 = unsafe {
+    let result_length: u8 = unsafe {
         raw::secp256k1_verify(
             message.as_ptr(),
             message_len,
@@ -50,9 +49,18 @@ pub fn secp256k1_verify(message: &[u8], signature: &[u8], public_key: &[u8]) -> 
         )
     };
 
-    match result {
+    let mut result_data_ptr = vec![0; result_length as usize];
+
+    unsafe {
+        super::raw::call_result_write(result_data_ptr.as_mut_ptr(), result_length.into());
+    }
+
+    match result_data_ptr.first().unwrap_or(&0) {
         0 => false,
         1 => true,
-        _ => panic!("Secp256k1 verify returned invalid bool in u8: {}", result),
+        _ => panic!(
+            "Secp256k1 verify returned invalid bool in u8: {}",
+            result_length
+        ),
     }
 }
