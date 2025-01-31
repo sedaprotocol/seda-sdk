@@ -1,15 +1,26 @@
 [workspace]
 resolver = "2"
 default-members = ["libs/rs-sdk-integration-tests"]
-members = ["libs/rs-sdk/sdk", "libs/rs-sdk-integration-tests"]
+members = [
+	"libs/rs-sdk/sdk",
+	"libs/rs-sdk-integration-tests",
+	"libs/rs-sdk/seda-sdk-macros",
+	"libs/rs-sdk/examples",
+]
 
 [workspace.dependencies]
 anyhow = "1.0.95"
 hex = "0.4.3"
+proc-macro2 = "1.0"
+quote = "1.0"
 serde = { version = "1.0.204", features = ["derive"] }
 serde_json = "1.0.122"
+syn = { version = "2.0", features = ["full"] }
 thiserror = "1.0.63"
-seda-sdk-rs = { path ="./libs/rs-sdk/sdk" }
+
+seda-sdk-rs = { path = "./libs/rs-sdk/sdk" }
+seda-sdk-macros = { path = "./libs/rs-sdk/seda-sdk-macros" }
+
 
 [profile.release-wasm]
 inherits = "release"

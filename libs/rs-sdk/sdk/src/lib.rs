@@ -17,3 +17,5 @@ pub use process::Process;
 pub use proxy_http_fetch::{generate_proxy_http_signing_message, proxy_http_fetch};
 pub use secp256k1::secp256k1_verify;
 pub use tally::*;
+
+pub use seda_sdk_macros::oracle_program;
