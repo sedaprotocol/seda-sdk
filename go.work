@@ -1,0 +1,6 @@
+go 1.21.6
+
+use (
+	./libs/go-sdk
+	./libs/go-sdk-integration-tests
+)

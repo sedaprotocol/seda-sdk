@@ -16,7 +16,8 @@
 					"projects": [
 						"dev-tools",
 						"rs-sdk-integration-tests",
-						"as-sdk-integration-tests"
+						"as-sdk-integration-tests",
+						"go-sdk-integration-tests"
 					]
 				}
 			]

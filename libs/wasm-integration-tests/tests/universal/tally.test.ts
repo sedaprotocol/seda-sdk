@@ -32,6 +32,7 @@ describe.each(sdks)("%s:Tally", (sdkType, oracleProgram) => {
 			new TallyVmAdapter(),
 		);
 
+		console.log(result.stdout);
 		expect(result.resultAsString).toInclude(
 			"Number of reveals (2) does not equal number of consensus reports (1).",
 		);
@@ -66,13 +67,14 @@ describe.each(sdks)("%s:Tally", (sdkType, oracleProgram) => {
 			reports,
 		);
 
+		console.log(result.stdout);
 		expect(result.exitCode).toBe(0);
 
 		if (sdkType === "as-sdk") {
 			expect(result.resultAsString).toBe(
 				'[{"body":{"salt":{"type":"hex","value":"736564615f73646b"},"exitCode":0,"gasUsed":200000,"reveal":{"type":"hex","value":"7b2264617461223a22626162795f736861726b227d"}},"inConsensus":true},{"body":{"salt":{"type":"hex","value":"736564615f73646b"},"exitCode":1,"gasUsed":1336,"reveal":{"type":"hex","value":"7b2264617461223a226772616e6470615f736861726b227d"}},"inConsensus":true},{"body":{"salt":{"type":"hex","value":"736564615f73646b"},"exitCode":0,"gasUsed":12,"reveal":{"type":"hex","value":"7b2264617461223a226772616e646d615f736861726b227d"}},"inConsensus":false}]',
 			);
-		} else if (sdkType === "rs-sdk") {
+		} else if (sdkType === "rs-sdk" || sdkType === "go-sdk") {
 			expect(result.resultAsString).toBe(
 				'[{"body":{"salt":[115,101,100,97,95,115,100,107],"exit_code":0,"gas_used":200000,"reveal":[123,34,100,97,116,97,34,58,34,98,97,98,121,95,115,104,97,114,107,34,125]},"in_consensus":true},{"body":{"salt":[115,101,100,97,95,115,100,107],"exit_code":1,"gas_used":1336,"reveal":[123,34,100,97,116,97,34,58,34,103,114,97,110,100,112,97,95,115,104,97,114,107,34,125]},"in_consensus":true},{"body":{"salt":[115,101,100,97,95,115,100,107],"exit_code":0,"gas_used":12,"reveal":[123,34,100,97,116,97,34,58,34,103,114,97,110,100,109,97,95,115,104,97,114,107,34,125]},"in_consensus":false}]',
 			);
@@ -114,7 +116,7 @@ describe.each(sdks)("%s:Tally", (sdkType, oracleProgram) => {
 			expect(result.resultAsString).toBe(
 				'[{"body":{"salt":{"type":"hex","value":"736564615f73646b"},"exitCode":0,"gasUsed":1336,"reveal":{"type":"hex","value":"7b2264617461223a226772616e6470615f736861726b227d"}},"inConsensus":true},{"body":{"salt":{"type":"hex","value":"736564615f73646b"},"exitCode":0,"gasUsed":1346,"reveal":{"type":"hex","value":"7b2264617461223a22636f7573696e5f736861726b227d"}},"inConsensus":true}]',
 			);
-		} else if (sdkType === "rs-sdk") {
+		} else if (sdkType === "rs-sdk" || sdkType === "go-sdk") {
 			expect(result.resultAsString).toBe(
 				'[{"body":{"salt":[115,101,100,97,95,115,100,107],"exit_code":0,"gas_used":1336,"reveal":[123,34,100,97,116,97,34,58,34,103,114,97,110,100,112,97,95,115,104,97,114,107,34,125]},"in_consensus":true},{"body":{"salt":[115,101,100,97,95,115,100,107],"exit_code":0,"gas_used":1346,"reveal":[123,34,100,97,116,97,34,58,34,99,111,117,115,105,110,95,115,104,97,114,107,34,125]},"in_consensus":true}]',
 			);

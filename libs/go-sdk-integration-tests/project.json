@@ -1,0 +1,16 @@
+{
+	"name": "go-sdk-integration-tests",
+	"$schema": "../../node_modules/nx/schemas/project-schema.json",
+	"sourceRoot": "libs/go-sdk-integration-tests/src",
+	"projectType": "library",
+	"tags": [],
+	"targets": {
+		"build": {
+			"inputs": ["default", "go-sdk"],
+			"executor": "nx:run-commands",
+			"options": {
+				"command": "make build-go-integration-tests"
+			}
+		}
+	}
+}
