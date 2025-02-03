@@ -20,12 +20,12 @@ jobs:
 
     steps:
       - name: 📥 Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 1
 
       - name: 📥 Setup Bun
-        uses: oven-sh/setup-bun@v1
+        uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.2.0
 
@@ -50,7 +50,7 @@ jobs:
       - name: 📋 Clippy Check
         run: make check
 
-      - name: 🏗️ Build projects
+      - name: 🔨 Build projects
         run: bun run build
 
       - name: 🧪 Run integration tests
