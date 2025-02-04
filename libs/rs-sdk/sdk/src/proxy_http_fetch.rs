@@ -123,13 +123,13 @@ pub fn proxy_http_fetch<URL: ToString>(
 ///     // Use proxy_message for signature verification
 /// }
 /// ```
-pub fn generate_proxy_http_signing_message(
-    url: String,
+pub fn generate_proxy_http_signing_message<URL: ToString>(
+    url: URL,
     method: HttpFetchMethod,
     request_body: Bytes,
     response_body: Bytes,
 ) -> Bytes {
-    let url_hash = keccak256(url.as_bytes().to_vec());
+    let url_hash = keccak256(url.to_string().as_bytes().to_vec());
     let method_hash = keccak256(method.as_str().as_bytes().to_vec());
     let request_body_hash = keccak256(request_body.to_vec());
     let response_body_hash = keccak256(response_body.to_vec());
