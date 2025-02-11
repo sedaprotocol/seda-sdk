@@ -27,10 +27,7 @@ list.action(async () => {
 		},
 	});
 
-	const result = queryResult.list.map((hashTypePair) => {
-		const [hash, expirationHeight] = hashTypePair.split(",");
-		return { oracleProgramId: hash, expirationHeight };
-	});
+	const result = queryResult.list;
 
 	spinnerSuccess();
 	console.log();

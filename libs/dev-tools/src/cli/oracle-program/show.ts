@@ -26,6 +26,10 @@ show.action(async () => {
 	});
 
 	if (queryResult.isErr) {
+		if (queryResult.error.message.includes("not found")) {
+			spinnerError(`Unable to find Oracle Program for id "${hash}"`);
+			return;
+		}
 		spinnerError(queryResult.error);
 		return;
 	}
@@ -33,12 +37,11 @@ show.action(async () => {
 	const response = Maybe.of(queryResult.value.oracleProgram);
 
 	response.match({
-		Just(oracleProgram) {
+		Just() {
 			spinnerSuccess();
 			console.log();
 			console.table({
 				oracleProgramId: hash,
-				expirationHeight: oracleProgram.expirationHeight,
 			});
 		},
 		Nothing() {
