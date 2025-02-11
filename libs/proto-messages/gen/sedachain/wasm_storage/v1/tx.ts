@@ -13,22 +13,14 @@ import { Params } from "./wasm_storage";
 /** The request message for the StoreOracleProgram method. */
 export interface MsgStoreOracleProgram {
   sender: string;
+  /** The wasm program to store as gzip-compressed bytes. */
   wasm: Uint8Array;
+  /** The length of the unzipped wasm program in bytes. */
+  storageFee: Coin[];
 }
 
 /** The response message for the StoreOracleProgram method. */
 export interface MsgStoreOracleProgramResponse {
-  hash: string;
-}
-
-/** The request message for the StoreExecutorWasm method. */
-export interface MsgStoreExecutorWasm {
-  sender: string;
-  wasm: Uint8Array;
-}
-
-/** The response message for the StoreExecutorWasm method. */
-export interface MsgStoreExecutorWasmResponse {
   hash: string;
 }
 
@@ -64,7 +56,7 @@ export interface MsgUpdateParamsResponse {
 }
 
 function createBaseMsgStoreOracleProgram(): MsgStoreOracleProgram {
-  return { sender: "", wasm: new Uint8Array(0) };
+  return { sender: "", wasm: new Uint8Array(0), storageFee: [] };
 }
 
 export const MsgStoreOracleProgram = {
@@ -74,6 +66,9 @@ export const MsgStoreOracleProgram = {
     }
     if (message.wasm.length !== 0) {
       writer.uint32(18).bytes(message.wasm);
+    }
+    for (const v of message.storageFee) {
+      Coin.encode(v!, writer.uint32(26).fork()).ldelim();
     }
     return writer;
   },
@@ -99,6 +94,13 @@ export const MsgStoreOracleProgram = {
 
           message.wasm = reader.bytes();
           continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.storageFee.push(Coin.decode(reader, reader.uint32()));
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -112,6 +114,9 @@ export const MsgStoreOracleProgram = {
     return {
       sender: isSet(object.sender) ? globalThis.String(object.sender) : "",
       wasm: isSet(object.wasm) ? bytesFromBase64(object.wasm) : new Uint8Array(0),
+      storageFee: globalThis.Array.isArray(object?.storageFee)
+        ? object.storageFee.map((e: any) => Coin.fromJSON(e))
+        : [],
     };
   },
 
@@ -123,6 +128,9 @@ export const MsgStoreOracleProgram = {
     if (message.wasm.length !== 0) {
       obj.wasm = base64FromBytes(message.wasm);
     }
+    if (message.storageFee?.length) {
+      obj.storageFee = message.storageFee.map((e) => Coin.toJSON(e));
+    }
     return obj;
   },
 
@@ -133,6 +141,7 @@ export const MsgStoreOracleProgram = {
     const message = createBaseMsgStoreOracleProgram();
     message.sender = object.sender ?? "";
     message.wasm = object.wasm ?? new Uint8Array(0);
+    message.storageFee = object.storageFee?.map((e) => Coin.fromPartial(e)) || [];
     return message;
   },
 };
@@ -189,137 +198,6 @@ export const MsgStoreOracleProgramResponse = {
   },
   fromPartial(object: DeepPartial<MsgStoreOracleProgramResponse>): MsgStoreOracleProgramResponse {
     const message = createBaseMsgStoreOracleProgramResponse();
-    message.hash = object.hash ?? "";
-    return message;
-  },
-};
-
-function createBaseMsgStoreExecutorWasm(): MsgStoreExecutorWasm {
-  return { sender: "", wasm: new Uint8Array(0) };
-}
-
-export const MsgStoreExecutorWasm = {
-  encode(message: MsgStoreExecutorWasm, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.sender !== "") {
-      writer.uint32(10).string(message.sender);
-    }
-    if (message.wasm.length !== 0) {
-      writer.uint32(18).bytes(message.wasm);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgStoreExecutorWasm {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgStoreExecutorWasm();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.sender = reader.string();
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.wasm = reader.bytes();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): MsgStoreExecutorWasm {
-    return {
-      sender: isSet(object.sender) ? globalThis.String(object.sender) : "",
-      wasm: isSet(object.wasm) ? bytesFromBase64(object.wasm) : new Uint8Array(0),
-    };
-  },
-
-  toJSON(message: MsgStoreExecutorWasm): unknown {
-    const obj: any = {};
-    if (message.sender !== "") {
-      obj.sender = message.sender;
-    }
-    if (message.wasm.length !== 0) {
-      obj.wasm = base64FromBytes(message.wasm);
-    }
-    return obj;
-  },
-
-  create(base?: DeepPartial<MsgStoreExecutorWasm>): MsgStoreExecutorWasm {
-    return MsgStoreExecutorWasm.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<MsgStoreExecutorWasm>): MsgStoreExecutorWasm {
-    const message = createBaseMsgStoreExecutorWasm();
-    message.sender = object.sender ?? "";
-    message.wasm = object.wasm ?? new Uint8Array(0);
-    return message;
-  },
-};
-
-function createBaseMsgStoreExecutorWasmResponse(): MsgStoreExecutorWasmResponse {
-  return { hash: "" };
-}
-
-export const MsgStoreExecutorWasmResponse = {
-  encode(message: MsgStoreExecutorWasmResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.hash !== "") {
-      writer.uint32(10).string(message.hash);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgStoreExecutorWasmResponse {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgStoreExecutorWasmResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.hash = reader.string();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): MsgStoreExecutorWasmResponse {
-    return { hash: isSet(object.hash) ? globalThis.String(object.hash) : "" };
-  },
-
-  toJSON(message: MsgStoreExecutorWasmResponse): unknown {
-    const obj: any = {};
-    if (message.hash !== "") {
-      obj.hash = message.hash;
-    }
-    return obj;
-  },
-
-  create(base?: DeepPartial<MsgStoreExecutorWasmResponse>): MsgStoreExecutorWasmResponse {
-    return MsgStoreExecutorWasmResponse.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<MsgStoreExecutorWasmResponse>): MsgStoreExecutorWasmResponse {
-    const message = createBaseMsgStoreExecutorWasmResponse();
     message.hash = object.hash ?? "";
     return message;
   },
@@ -681,8 +559,6 @@ export const MsgUpdateParamsResponse = {
 export interface Msg {
   /** StoreOracleProgram stores an oracle program. */
   StoreOracleProgram(request: MsgStoreOracleProgram): Promise<MsgStoreOracleProgramResponse>;
-  /** StoreExecutorWasm stores an executor wasm. */
-  StoreExecutorWasm(request: MsgStoreExecutorWasm): Promise<MsgStoreExecutorWasmResponse>;
   /**
    * InstantiateCoreContract instantiates the Core Contract and registers its
    * address.
@@ -700,7 +576,6 @@ export class MsgClientImpl implements Msg {
     this.service = opts?.service || MsgServiceName;
     this.rpc = rpc;
     this.StoreOracleProgram = this.StoreOracleProgram.bind(this);
-    this.StoreExecutorWasm = this.StoreExecutorWasm.bind(this);
     this.InstantiateCoreContract = this.InstantiateCoreContract.bind(this);
     this.UpdateParams = this.UpdateParams.bind(this);
   }
@@ -708,12 +583,6 @@ export class MsgClientImpl implements Msg {
     const data = MsgStoreOracleProgram.encode(request).finish();
     const promise = this.rpc.request(this.service, "StoreOracleProgram", data);
     return promise.then((data) => MsgStoreOracleProgramResponse.decode(_m0.Reader.create(data)));
-  }
-
-  StoreExecutorWasm(request: MsgStoreExecutorWasm): Promise<MsgStoreExecutorWasmResponse> {
-    const data = MsgStoreExecutorWasm.encode(request).finish();
-    const promise = this.rpc.request(this.service, "StoreExecutorWasm", data);
-    return promise.then((data) => MsgStoreExecutorWasmResponse.decode(_m0.Reader.create(data)));
   }
 
   InstantiateCoreContract(request: MsgInstantiateCoreContract): Promise<MsgInstantiateCoreContractResponse> {

@@ -36,6 +36,8 @@ export interface Params {
    * payout scenarios.
    */
   burnRatio: string;
+  /** MaxResultSize is the maximum size of the result of a data request in bytes. */
+  maxResultSize: number;
 }
 
 function createBaseParams(): Params {
@@ -47,6 +49,7 @@ function createBaseParams(): Params {
     gasCostBase: 0n,
     executionGasCostFallback: 0n,
     burnRatio: "",
+    maxResultSize: 0,
   };
 }
 
@@ -96,6 +99,9 @@ export const Params = {
     }
     if (message.burnRatio !== "") {
       writer.uint32(58).string(message.burnRatio);
+    }
+    if (message.maxResultSize !== 0) {
+      writer.uint32(64).uint32(message.maxResultSize);
     }
     return writer;
   },
@@ -156,6 +162,13 @@ export const Params = {
 
           message.burnRatio = reader.string();
           continue;
+        case 8:
+          if (tag !== 64) {
+            break;
+          }
+
+          message.maxResultSize = reader.uint32();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -178,6 +191,7 @@ export const Params = {
       gasCostBase: isSet(object.gasCostBase) ? BigInt(object.gasCostBase) : 0n,
       executionGasCostFallback: isSet(object.executionGasCostFallback) ? BigInt(object.executionGasCostFallback) : 0n,
       burnRatio: isSet(object.burnRatio) ? globalThis.String(object.burnRatio) : "",
+      maxResultSize: isSet(object.maxResultSize) ? globalThis.Number(object.maxResultSize) : 0,
     };
   },
 
@@ -204,6 +218,9 @@ export const Params = {
     if (message.burnRatio !== "") {
       obj.burnRatio = message.burnRatio;
     }
+    if (message.maxResultSize !== 0) {
+      obj.maxResultSize = Math.round(message.maxResultSize);
+    }
     return obj;
   },
 
@@ -219,6 +236,7 @@ export const Params = {
     message.gasCostBase = object.gasCostBase ?? 0n;
     message.executionGasCostFallback = object.executionGasCostFallback ?? 0n;
     message.burnRatio = object.burnRatio ?? "";
+    message.maxResultSize = object.maxResultSize ?? 0;
     return message;
   },
 };

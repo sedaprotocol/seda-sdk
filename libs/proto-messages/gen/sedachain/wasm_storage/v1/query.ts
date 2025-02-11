@@ -7,7 +7,7 @@
 /* eslint-disable */
 import _m0 from "protobufjs/minimal";
 import { PageRequest, PageResponse } from "../../../cosmos/base/query/v1beta1/pagination";
-import { ExecutorWasm, OracleProgram } from "./wasm_storage";
+import { OracleProgram, Params } from "./wasm_storage";
 
 /** The request message for QueryOracleProgram RPC. */
 export interface QueryOracleProgramRequest {
@@ -31,25 +31,6 @@ export interface QueryOracleProgramsResponse {
   pagination: PageResponse | undefined;
 }
 
-/** The request message for QueryExecutorWasm RPC. */
-export interface QueryExecutorWasmRequest {
-  hash: string;
-}
-
-/** The response message for QueryExecutorWasm RPC. */
-export interface QueryExecutorWasmResponse {
-  wasm: ExecutorWasm | undefined;
-}
-
-/** The request message for QueryExecutorWasms RPC. */
-export interface QueryExecutorWasmsRequest {
-}
-
-/** The response message for QueryExecutorWasms RPC. */
-export interface QueryExecutorWasmsResponse {
-  list: string[];
-}
-
 /** The request message for QueryCoreContractRegistry RPC. */
 export interface QueryCoreContractRegistryRequest {
 }
@@ -57,6 +38,16 @@ export interface QueryCoreContractRegistryRequest {
 /** The response message for QueryCoreContractRegistry RPC. */
 export interface QueryCoreContractRegistryResponse {
   address: string;
+}
+
+/** QueryParamsRequest is the request type for the Query/Params RPC method. */
+export interface QueryParamsRequest {
+}
+
+/** QueryParamsResponse is the response type for the Query/Params RPC method. */
+export interface QueryParamsResponse {
+  /** params defines the parameters of the module. */
+  params: Params | undefined;
 }
 
 function createBaseQueryOracleProgramRequest(): QueryOracleProgramRequest {
@@ -310,222 +301,6 @@ export const QueryOracleProgramsResponse = {
   },
 };
 
-function createBaseQueryExecutorWasmRequest(): QueryExecutorWasmRequest {
-  return { hash: "" };
-}
-
-export const QueryExecutorWasmRequest = {
-  encode(message: QueryExecutorWasmRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.hash !== "") {
-      writer.uint32(10).string(message.hash);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): QueryExecutorWasmRequest {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseQueryExecutorWasmRequest();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.hash = reader.string();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): QueryExecutorWasmRequest {
-    return { hash: isSet(object.hash) ? globalThis.String(object.hash) : "" };
-  },
-
-  toJSON(message: QueryExecutorWasmRequest): unknown {
-    const obj: any = {};
-    if (message.hash !== "") {
-      obj.hash = message.hash;
-    }
-    return obj;
-  },
-
-  create(base?: DeepPartial<QueryExecutorWasmRequest>): QueryExecutorWasmRequest {
-    return QueryExecutorWasmRequest.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<QueryExecutorWasmRequest>): QueryExecutorWasmRequest {
-    const message = createBaseQueryExecutorWasmRequest();
-    message.hash = object.hash ?? "";
-    return message;
-  },
-};
-
-function createBaseQueryExecutorWasmResponse(): QueryExecutorWasmResponse {
-  return { wasm: undefined };
-}
-
-export const QueryExecutorWasmResponse = {
-  encode(message: QueryExecutorWasmResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.wasm !== undefined) {
-      ExecutorWasm.encode(message.wasm, writer.uint32(10).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): QueryExecutorWasmResponse {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseQueryExecutorWasmResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.wasm = ExecutorWasm.decode(reader, reader.uint32());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): QueryExecutorWasmResponse {
-    return { wasm: isSet(object.wasm) ? ExecutorWasm.fromJSON(object.wasm) : undefined };
-  },
-
-  toJSON(message: QueryExecutorWasmResponse): unknown {
-    const obj: any = {};
-    if (message.wasm !== undefined) {
-      obj.wasm = ExecutorWasm.toJSON(message.wasm);
-    }
-    return obj;
-  },
-
-  create(base?: DeepPartial<QueryExecutorWasmResponse>): QueryExecutorWasmResponse {
-    return QueryExecutorWasmResponse.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<QueryExecutorWasmResponse>): QueryExecutorWasmResponse {
-    const message = createBaseQueryExecutorWasmResponse();
-    message.wasm = (object.wasm !== undefined && object.wasm !== null)
-      ? ExecutorWasm.fromPartial(object.wasm)
-      : undefined;
-    return message;
-  },
-};
-
-function createBaseQueryExecutorWasmsRequest(): QueryExecutorWasmsRequest {
-  return {};
-}
-
-export const QueryExecutorWasmsRequest = {
-  encode(_: QueryExecutorWasmsRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): QueryExecutorWasmsRequest {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseQueryExecutorWasmsRequest();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(_: any): QueryExecutorWasmsRequest {
-    return {};
-  },
-
-  toJSON(_: QueryExecutorWasmsRequest): unknown {
-    const obj: any = {};
-    return obj;
-  },
-
-  create(base?: DeepPartial<QueryExecutorWasmsRequest>): QueryExecutorWasmsRequest {
-    return QueryExecutorWasmsRequest.fromPartial(base ?? {});
-  },
-  fromPartial(_: DeepPartial<QueryExecutorWasmsRequest>): QueryExecutorWasmsRequest {
-    const message = createBaseQueryExecutorWasmsRequest();
-    return message;
-  },
-};
-
-function createBaseQueryExecutorWasmsResponse(): QueryExecutorWasmsResponse {
-  return { list: [] };
-}
-
-export const QueryExecutorWasmsResponse = {
-  encode(message: QueryExecutorWasmsResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    for (const v of message.list) {
-      writer.uint32(10).string(v!);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): QueryExecutorWasmsResponse {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseQueryExecutorWasmsResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.list.push(reader.string());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): QueryExecutorWasmsResponse {
-    return { list: globalThis.Array.isArray(object?.list) ? object.list.map((e: any) => globalThis.String(e)) : [] };
-  },
-
-  toJSON(message: QueryExecutorWasmsResponse): unknown {
-    const obj: any = {};
-    if (message.list?.length) {
-      obj.list = message.list;
-    }
-    return obj;
-  },
-
-  create(base?: DeepPartial<QueryExecutorWasmsResponse>): QueryExecutorWasmsResponse {
-    return QueryExecutorWasmsResponse.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<QueryExecutorWasmsResponse>): QueryExecutorWasmsResponse {
-    const message = createBaseQueryExecutorWasmsResponse();
-    message.list = object.list?.map((e) => e) || [];
-    return message;
-  },
-};
-
 function createBaseQueryCoreContractRegistryRequest(): QueryCoreContractRegistryRequest {
   return {};
 }
@@ -626,18 +401,118 @@ export const QueryCoreContractRegistryResponse = {
   },
 };
 
+function createBaseQueryParamsRequest(): QueryParamsRequest {
+  return {};
+}
+
+export const QueryParamsRequest = {
+  encode(_: QueryParamsRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryParamsRequest {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryParamsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): QueryParamsRequest {
+    return {};
+  },
+
+  toJSON(_: QueryParamsRequest): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create(base?: DeepPartial<QueryParamsRequest>): QueryParamsRequest {
+    return QueryParamsRequest.fromPartial(base ?? {});
+  },
+  fromPartial(_: DeepPartial<QueryParamsRequest>): QueryParamsRequest {
+    const message = createBaseQueryParamsRequest();
+    return message;
+  },
+};
+
+function createBaseQueryParamsResponse(): QueryParamsResponse {
+  return { params: undefined };
+}
+
+export const QueryParamsResponse = {
+  encode(message: QueryParamsResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.params !== undefined) {
+      Params.encode(message.params, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryParamsResponse {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryParamsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.params = Params.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryParamsResponse {
+    return { params: isSet(object.params) ? Params.fromJSON(object.params) : undefined };
+  },
+
+  toJSON(message: QueryParamsResponse): unknown {
+    const obj: any = {};
+    if (message.params !== undefined) {
+      obj.params = Params.toJSON(message.params);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<QueryParamsResponse>): QueryParamsResponse {
+    return QueryParamsResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<QueryParamsResponse>): QueryParamsResponse {
+    const message = createBaseQueryParamsResponse();
+    message.params = (object.params !== undefined && object.params !== null)
+      ? Params.fromPartial(object.params)
+      : undefined;
+    return message;
+  },
+};
+
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** OracleProgram returns an oracle program given its hash. */
   OracleProgram(request: QueryOracleProgramRequest): Promise<QueryOracleProgramResponse>;
   /** OraclePrograms returns all oracle programs. */
   OraclePrograms(request: QueryOracleProgramsRequest): Promise<QueryOracleProgramsResponse>;
-  /** ExecutorWasm returns an executor wasm given its hash. */
-  ExecutorWasm(request: QueryExecutorWasmRequest): Promise<QueryExecutorWasmResponse>;
-  /** ExecutorWasms returns all executor wasms. */
-  ExecutorWasms(request: QueryExecutorWasmsRequest): Promise<QueryExecutorWasmsResponse>;
   /** CoreContractRegistry returns the Core Contract Registry address. */
   CoreContractRegistry(request: QueryCoreContractRegistryRequest): Promise<QueryCoreContractRegistryResponse>;
+  /** Params returns the total set of wasm-storage parameters. */
+  Params(request: QueryParamsRequest): Promise<QueryParamsResponse>;
 }
 
 export const QueryServiceName = "sedachain.wasm_storage.v1.Query";
@@ -649,9 +524,8 @@ export class QueryClientImpl implements Query {
     this.rpc = rpc;
     this.OracleProgram = this.OracleProgram.bind(this);
     this.OraclePrograms = this.OraclePrograms.bind(this);
-    this.ExecutorWasm = this.ExecutorWasm.bind(this);
-    this.ExecutorWasms = this.ExecutorWasms.bind(this);
     this.CoreContractRegistry = this.CoreContractRegistry.bind(this);
+    this.Params = this.Params.bind(this);
   }
   OracleProgram(request: QueryOracleProgramRequest): Promise<QueryOracleProgramResponse> {
     const data = QueryOracleProgramRequest.encode(request).finish();
@@ -665,22 +539,16 @@ export class QueryClientImpl implements Query {
     return promise.then((data) => QueryOracleProgramsResponse.decode(_m0.Reader.create(data)));
   }
 
-  ExecutorWasm(request: QueryExecutorWasmRequest): Promise<QueryExecutorWasmResponse> {
-    const data = QueryExecutorWasmRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "ExecutorWasm", data);
-    return promise.then((data) => QueryExecutorWasmResponse.decode(_m0.Reader.create(data)));
-  }
-
-  ExecutorWasms(request: QueryExecutorWasmsRequest): Promise<QueryExecutorWasmsResponse> {
-    const data = QueryExecutorWasmsRequest.encode(request).finish();
-    const promise = this.rpc.request(this.service, "ExecutorWasms", data);
-    return promise.then((data) => QueryExecutorWasmsResponse.decode(_m0.Reader.create(data)));
-  }
-
   CoreContractRegistry(request: QueryCoreContractRegistryRequest): Promise<QueryCoreContractRegistryResponse> {
     const data = QueryCoreContractRegistryRequest.encode(request).finish();
     const promise = this.rpc.request(this.service, "CoreContractRegistry", data);
     return promise.then((data) => QueryCoreContractRegistryResponse.decode(_m0.Reader.create(data)));
+  }
+
+  Params(request: QueryParamsRequest): Promise<QueryParamsResponse> {
+    const data = QueryParamsRequest.encode(request).finish();
+    const promise = this.rpc.request(this.service, "Params", data);
+    return promise.then((data) => QueryParamsResponse.decode(_m0.Reader.create(data)));
   }
 }
 

@@ -1,7 +1,7 @@
 {
 	"name": "@seda-protocol/proto-messages",
 	"type": "module",
-	"version": "0.5.0-dev.0",
+	"version": "0.5.0-dev.7",
 	"scripts": {
 		"build": "bunx buf generate",
 		"prepublish": "bun run build"

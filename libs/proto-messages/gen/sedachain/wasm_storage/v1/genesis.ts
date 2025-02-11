@@ -6,18 +6,17 @@
 
 /* eslint-disable */
 import _m0 from "protobufjs/minimal";
-import { ExecutorWasm, OracleProgram, Params } from "./wasm_storage";
+import { OracleProgram, Params } from "./wasm_storage";
 
 /** GenesisState defines wasm-storage module's genesis state. */
 export interface GenesisState {
   params: Params | undefined;
   oraclePrograms: OracleProgram[];
-  executorWasms: ExecutorWasm[];
   coreContractRegistry: string;
 }
 
 function createBaseGenesisState(): GenesisState {
-  return { params: undefined, oraclePrograms: [], executorWasms: [], coreContractRegistry: "" };
+  return { params: undefined, oraclePrograms: [], coreContractRegistry: "" };
 }
 
 export const GenesisState = {
@@ -28,11 +27,8 @@ export const GenesisState = {
     for (const v of message.oraclePrograms) {
       OracleProgram.encode(v!, writer.uint32(18).fork()).ldelim();
     }
-    for (const v of message.executorWasms) {
-      ExecutorWasm.encode(v!, writer.uint32(26).fork()).ldelim();
-    }
     if (message.coreContractRegistry !== "") {
-      writer.uint32(34).string(message.coreContractRegistry);
+      writer.uint32(26).string(message.coreContractRegistry);
     }
     return writer;
   },
@@ -63,13 +59,6 @@ export const GenesisState = {
             break;
           }
 
-          message.executorWasms.push(ExecutorWasm.decode(reader, reader.uint32()));
-          continue;
-        case 4:
-          if (tag !== 34) {
-            break;
-          }
-
           message.coreContractRegistry = reader.string();
           continue;
       }
@@ -87,9 +76,6 @@ export const GenesisState = {
       oraclePrograms: globalThis.Array.isArray(object?.oraclePrograms)
         ? object.oraclePrograms.map((e: any) => OracleProgram.fromJSON(e))
         : [],
-      executorWasms: globalThis.Array.isArray(object?.executorWasms)
-        ? object.executorWasms.map((e: any) => ExecutorWasm.fromJSON(e))
-        : [],
       coreContractRegistry: isSet(object.coreContractRegistry) ? globalThis.String(object.coreContractRegistry) : "",
     };
   },
@@ -101,9 +87,6 @@ export const GenesisState = {
     }
     if (message.oraclePrograms?.length) {
       obj.oraclePrograms = message.oraclePrograms.map((e) => OracleProgram.toJSON(e));
-    }
-    if (message.executorWasms?.length) {
-      obj.executorWasms = message.executorWasms.map((e) => ExecutorWasm.toJSON(e));
     }
     if (message.coreContractRegistry !== "") {
       obj.coreContractRegistry = message.coreContractRegistry;
@@ -120,7 +103,6 @@ export const GenesisState = {
       ? Params.fromPartial(object.params)
       : undefined;
     message.oraclePrograms = object.oraclePrograms?.map((e) => OracleProgram.fromPartial(e)) || [];
-    message.executorWasms = object.executorWasms?.map((e) => ExecutorWasm.fromPartial(e)) || [];
     message.coreContractRegistry = object.coreContractRegistry ?? "";
     return message;
   },
