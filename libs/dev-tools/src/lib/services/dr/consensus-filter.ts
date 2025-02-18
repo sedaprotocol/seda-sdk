@@ -23,9 +23,13 @@ type ModeConsensusFilter = {
 const FILTER_METHOD_STD_DEV = 0x02;
 const stdDevNumberTypesMap = {
 	int32: 0x00,
-	int64: 0x01,
-	uint32: 0x02,
+	uint32: 0x01,
+	int64: 0x02,
 	uint64: 0x03,
+	int128: 0x04,
+	uint128: 0x05,
+	int256: 0x06,
+	uint256: 0x07,
 };
 
 type StdDevConsensusFilter = {

@@ -6,8 +6,8 @@ import {
 const DEFAULT_VERSION = "0.0.1";
 const DEFAULT_REPLICATION_FACTOR = 1;
 const DEFAULT_EXEC_GAS_LIMIT = 300_000_000_000_000;
-const DEFAULT_TALLY_GAS_LIMIT = 150_000_000_000_000;
-const DEFAULT_GAS_PRICE = 1n;
+const DEFAULT_TALLY_GAS_LIMIT = 50_000_000_000_000;
+const DEFAULT_GAS_PRICE = 2_000n;
 const DEFAULT_MEMO = new Uint8Array([]);
 
 export type PostDataRequestInput = {
@@ -22,8 +22,8 @@ export type PostDataRequestInput = {
 	 */
 	execInputs: Uint8Array;
 	/**
-	 * Amount of gas units allowed for execution
-	 * Defaults to 300_000_000_000_000 (max gas limit)
+	 * Amount of gas units allowed for execution across all overlay nodes
+	 * Defaults to 300_000_000_000_000 (max gas limit per overlay node)
 	 */
 	execGasLimit?: number;
 
@@ -38,7 +38,7 @@ export type PostDataRequestInput = {
 	tallyInputs: Uint8Array;
 	/**
 	 * Amount of gas units allowed for tally
-	 * Defaults to 150_000_000_000_000 (max gas limit)
+	 * Defaults to 50_000_000_000_000 (max gas limit)
 	 */
 	tallyGasLimit?: number;
 
@@ -57,7 +57,7 @@ export type PostDataRequestInput = {
 
 	/**
 	 * How much aseda you want to pay per gas unit
-	 * Defaults to 1n (bigint)
+	 * Defaults to 2_000n (bigint)
 	 */
 	gasPrice?: bigint;
 

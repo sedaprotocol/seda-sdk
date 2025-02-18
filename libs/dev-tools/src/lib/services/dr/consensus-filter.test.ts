@@ -63,7 +63,7 @@ describe("encodeConsensusFilter", () => {
 					numberType: "int64",
 				},
 				expectedResult:
-					"02000000000016E36001000000000000000D242E726573756C742E74657874",
+					"02000000000016E36002000000000000000D242E726573756C742E74657874",
 			},
 			{
 				input: {
@@ -72,7 +72,24 @@ describe("encodeConsensusFilter", () => {
 					numberType: "int64",
 				},
 				expectedResult:
-					"02000000000007A12001000000000000000D242E726573756C742E74657874",
+					"02000000000007A12002000000000000000D242E726573756C742E74657874",
+			},
+			{
+				input: {
+					jsonPath: "$",
+					maxSigma: 1,
+					numberType: "uint128",
+				},
+				expectedResult: "0200000000000F424005000000000000000124",
+			},
+			{
+				input: {
+					jsonPath: "$[0].result.value",
+					maxSigma: 1,
+					numberType: "int256",
+				},
+				expectedResult:
+					"0200000000000F4240060000000000000011245B305D2E726573756C742E76616C7565",
 			},
 		] as const)("should encode a valid filter", ({ input, expectedResult }) => {
 			const result = encodeConsensusFilter({
