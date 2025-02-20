@@ -3,9 +3,11 @@ mod http;
 mod proxy_http;
 mod tally;
 mod vm_tests;
+mod infinite_loop;
 
 use crypto::{test_keccak256, test_secp256k1_verify_invalid, test_secp256k1_verify_valid};
 use http::{test_http_post_success, test_http_rejection, test_http_success};
+use infinite_loop::test_infinite_loop;
 use proxy_http::{test_generate_proxy_http_message, test_proxy_http_fetch};
 use seda_sdk_rs::{bytes::ToBytes, process::Process};
 use tally::{test_tally_vm_reveals, test_tally_vm_reveals_filtered};
@@ -27,6 +29,7 @@ fn main() {
         "testPostHttpSuccess" => test_http_post_success(),
         "testProxyHttpFetch" => test_proxy_http_fetch(),
         "testGenerateProxyMessage" => test_generate_proxy_http_message(),
+        "testInfiniteLoop" => test_infinite_loop(),
         _ => Process::error(&"No argument given".to_bytes()),
     }
 }

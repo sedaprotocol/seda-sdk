@@ -1,16 +1,20 @@
+import { meterWasm } from "@seda-protocol/wasm-metering";
 import { WASI, init } from "@wasmer/wasi";
+import { CallType, GasMeter, costTable } from "./metering.js";
 import VmImports from "./vm-imports.js";
 
 export interface VmCallData {
 	binary: Uint8Array | number[];
 	args: string[];
 	envs: Record<string, string>;
+	gasLimit?: bigint;
 }
 
 export interface VmResult {
 	stdout: string;
 	stderr: string;
 	exitCode: number;
+	gasUsed: bigint;
 	result?: Uint8Array;
 	resultAsString?: string;
 }
@@ -26,14 +30,26 @@ export async function executeVm(
 		env: callData.envs,
 	});
 
-	try {
-		const binary = new Uint8Array(callData.binary);
-		const module = await WebAssembly.compile(binary);
+	const meter = new GasMeter(
+		callData.gasLimit ?? BigInt(Number.MAX_SAFE_INTEGER),
+	);
 
-		const wasiImports = wasi.getImports(module);
-		const vmImports = new VmImports(notifierBuffer, processId);
+	try {
+		// Add the startup gas cost which is all bytes in the args list + a constant
+		const totalArgsBytes = callData.args.reduce(
+			(acc, value) => acc + BigInt(value.length),
+			0n,
+		);
+		meter.applyGasCost(CallType.Startup, totalArgsBytes);
+		const binary = Buffer.from(new Uint8Array(callData.binary));
+		const meteredWasm = meterWasm(binary, costTable);
+		const wasmModule = new WebAssembly.Module(meteredWasm);
+
+		const wasiImports = wasi.getImports(wasmModule);
+		const vmImports = new VmImports(notifierBuffer, meter, processId);
 		const finalImports = vmImports.getImports(wasiImports);
-		const instance = await WebAssembly.instantiate(module, finalImports);
+
+		const instance = await WebAssembly.instantiate(wasmModule, finalImports);
 		const memory = instance.exports.memory;
 		vmImports.setMemory(memory as WebAssembly.Memory);
 
@@ -44,6 +60,7 @@ export async function executeVm(
 			stderr: wasi.getStderrString(),
 			stdout: wasi.getStdoutString(),
 			result: vmImports.result,
+			gasUsed: meter.gasUsed,
 			resultAsString: new TextDecoder().decode(vmImports.result),
 		};
 	} catch (err) {
@@ -61,6 +78,7 @@ export async function executeVm(
 			stderr: stderr !== "" ? stderr : `${err}`,
 			stdout: wasi.getStdoutString(),
 			result: new Uint8Array(),
+			gasUsed: meter.gasUsed,
 			resultAsString: "",
 		};
 	}
