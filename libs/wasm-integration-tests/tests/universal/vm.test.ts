@@ -15,9 +15,10 @@ describe("Vm", () => {
 		expect(result).toEqual({
 			exitCode: 1,
 			stderr:
-				"CompileError: WebAssembly.Module doesn't parse at byte 0: expected a module of at least 8 bytes",
+				"CompileError: WebAssembly.Module doesn't parse at byte 0: expected a module of at least 8 bytes (evaluating 'new WebAssembly.Module(meteredWasm)')",
 			stdout: "",
-			result: new Uint8Array(),
+			result: new Uint8Array(0),
+			gasUsed: 5000000360000n,
 			resultAsString: "",
 		});
 	});

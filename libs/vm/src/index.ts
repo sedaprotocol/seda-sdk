@@ -78,6 +78,7 @@ export function callVm(
 				exitCode: 1,
 				stderr: `[${processId}] - Worker threw an uncaught error: ${error}`,
 				stdout: "",
+				gasUsed: 0n,
 			});
 		});
 
@@ -86,6 +87,7 @@ export function callVm(
 				exitCode,
 				stderr: `[${processId}] - The worker has been terminated`,
 				stdout: "",
+				gasUsed: 0n,
 			});
 		});
 
