@@ -1,6 +1,7 @@
 import * as Secp256k1 from "@noble/secp256k1";
 import { trySync } from "@seda-protocol/utils";
 import { Maybe } from "true-myth";
+import { CallType, type GasMeter } from "./metering";
 import { keccak256, secp256k1Verify } from "./services/crypto";
 import { type HttpFetchAction, HttpFetchResponse } from "./types/vm-actions";
 import { PromiseStatus } from "./types/vm-promise";
@@ -15,10 +16,16 @@ export default class VmImports {
 	result: Uint8Array = new Uint8Array();
 	usedPublicKeys: string[] = [];
 	processId: string;
+	gasMeter: GasMeter;
 
-	constructor(notifierBuffer: SharedArrayBuffer, processId: string) {
+	constructor(
+		notifierBuffer: SharedArrayBuffer,
+		gasMeter: GasMeter,
+		processId: string,
+	) {
 		this.workerToHost = new WorkerToHost(notifierBuffer, processId);
 		this.processId = processId;
+		this.gasMeter = gasMeter;
 	}
 
 	setMemory(memory: WebAssembly.Memory) {
@@ -33,10 +40,13 @@ export default class VmImports {
 	 * @returns
 	 */
 	proxyHttpFetch(action: number, actionLength: number) {
+		this.gasMeter.applyGasCost(CallType.ProxyHttpFetchRequest, actionLength);
+
 		const rawAction = new Uint8Array(
 			this.memory?.buffer.slice(action, action + actionLength) ?? [],
 		);
 		const messageRaw = Buffer.from(rawAction).toString("utf-8");
+		let length = 0;
 
 		try {
 			const message: HttpFetchAction = JSON.parse(messageRaw);
@@ -86,19 +96,25 @@ export default class VmImports {
 				return this.callResult.length;
 			}
 
+			// TODO: Apply the gas cost of a proxy call
+
 			this.usedPublicKeys.push(publicKeyRaw.value);
 
 			this.callResult = rawResponse;
-			return this.callResult.length;
+			length = this.callResult.length;
 		} catch (error) {
 			console.error(`[${this.processId}] - @httpFetch: ${messageRaw}`, error);
 			this.callResult = new Uint8Array();
 
-			return 0;
+			length = 0;
 		}
+
+		this.gasMeter.applyGasCost(CallType.HttpFetchResponse, actionLength);
 	}
 
 	httpFetch(action: number, actionLength: number) {
+		this.gasMeter.applyGasCost(CallType.HttpFetchRequest, actionLength);
+
 		const rawAction = new Uint8Array(
 			this.memory?.buffer.slice(action, action + actionLength) ?? [],
 		);
@@ -107,6 +123,8 @@ export default class VmImports {
 		try {
 			const message: HttpFetchAction = JSON.parse(messageRaw);
 			this.callResult = this.workerToHost.callActionOnHost(message);
+
+			this.gasMeter.applyGasCost(CallType.Keccak256, this.callResult.length);
 			return this.callResult.length;
 		} catch (error) {
 			console.error(`[${this.processId}] - @httpFetch: ${messageRaw}`, error);
@@ -117,6 +135,8 @@ export default class VmImports {
 	}
 
 	keccak256(messagePtr: number, messageLength: number) {
+		this.gasMeter.applyGasCost(CallType.Keccak256, messageLength);
+
 		const message = Buffer.from(
 			new Uint8Array(
 				this.memory?.buffer.slice(messagePtr, messagePtr + messageLength) ?? [],
@@ -146,6 +166,11 @@ export default class VmImports {
 		publicKeyPtr: number,
 		publicKeyLength: number,
 	) {
+		this.gasMeter.applyGasCost(
+			CallType.Secp256k1Verify,
+			Number(messageLength.toString()),
+		);
+
 		const message = Buffer.from(
 			new Uint8Array(
 				this.memory?.buffer.slice(
@@ -198,16 +223,24 @@ export default class VmImports {
 	}
 
 	executionResult(ptr: number, length: number) {
+		this.gasMeter.applyGasCost(CallType.ExecutionResult, length);
+
 		this.result = new Uint8Array(
 			this.memory?.buffer.slice(ptr, ptr + length) ?? [],
 		);
 	}
 
-	getImports(wasiImports: object): WebAssembly.Imports {
+	getImports(
+		wasiImports: object,
+		useGas: (gas: bigint) => void,
+	): WebAssembly.Imports {
 		return {
 			// TODO: Data requests should not have this many imports
 			// we should restrict it to only a few
 			...wasiImports,
+			vm: {
+				meter: useGas,
+			},
 			seda_v1: {
 				// TODO: Should be this.proxyHttpFetch but since thats broken for now we will use httpFetch
 				proxy_http_fetch: this.httpFetch.bind(this),
