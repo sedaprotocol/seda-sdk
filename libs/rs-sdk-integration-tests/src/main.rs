@@ -1,9 +1,9 @@
 mod crypto;
 mod http;
+mod infinite_loop;
 mod proxy_http;
 mod tally;
 mod vm_tests;
-mod infinite_loop;
 
 use crypto::{test_keccak256, test_secp256k1_verify_invalid, test_secp256k1_verify_valid};
 use http::{test_http_post_success, test_http_rejection, test_http_success};

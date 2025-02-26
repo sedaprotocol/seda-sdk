@@ -1,5 +1,15 @@
 import { parentPort } from "node:worker_threads";
-import type { VmAction } from "./types/vm-actions";
+import { tryAsync } from "@seda-protocol/utils";
+import { Result, ResultNS } from "true-myth";
+import { ResultJSON } from "true-myth/result";
+import { JSONStringify } from "./services/json";
+import {
+	HttpFetchResponse,
+	type VmAction,
+	isHttpFetchAction,
+	isProxyHttpFetchAction,
+	isProxyHttpFetchGasCostAction,
+} from "./types/vm-actions";
 import type { VmAdapter } from "./types/vm-adapter";
 import { PromiseStatus, type ToBuffer } from "./types/vm-promise.js";
 import type {
@@ -19,12 +29,6 @@ enum AtomicState {
 	ResponseResultLength = 2,
 	RequestResult = 3,
 	ResponseResult = 4,
-}
-
-class EmptyBuffer implements ToBuffer {
-	toBuffer(): Uint8Array {
-		return new Uint8Array();
-	}
 }
 
 function updateNotifierState(buffer: Int32Array, state: AtomicState) {
@@ -60,9 +64,7 @@ function waitForNotifierStateChange(
  * The host then writes the full value onto that buffer and unfreezes the worker thread
  */
 export class HostToWorker {
-	private actionResult: PromiseStatus<unknown> = PromiseStatus.rejected(
-		new EmptyBuffer(),
-	);
+	private actionResult: Buffer = Buffer.alloc(0);
 
 	constructor(
 		private adapter: VmAdapter,
@@ -71,12 +73,28 @@ export class HostToWorker {
 	) {}
 
 	async executeAction(action: VmAction) {
-		try {
-			const actionResult = await this.adapter.httpFetch(action);
-			this.actionResult = actionResult;
-		} catch (error) {
-			console.error(`[${this.processId}] - Error @executeAction: ${error}`);
-			this.actionResult = PromiseStatus.rejected(new EmptyBuffer());
+		if (isHttpFetchAction(action)) {
+			const actionResult = await tryAsync(this.adapter.httpFetch(action));
+
+			this.actionResult = actionResult.match({
+				Ok: (value) => value.toBuffer(),
+				Err: (error) =>
+					HttpFetchResponse.createRejectedPromise(error.message).toBuffer(),
+			});
+		} else if (isProxyHttpFetchGasCostAction(action)) {
+			const actionResult = await this.adapter.getProxyHttpFetchGasCost(
+				action.fetchAction,
+			);
+
+			this.actionResult = Buffer.from(JSONStringify(actionResult.toJSON()));
+		} else if (isProxyHttpFetchAction(action)) {
+			const actionResult = await tryAsync(this.adapter.proxyHttpFetch(action));
+
+			this.actionResult = actionResult.match({
+				Ok: (value) => value.toBuffer(),
+				Err: (error) =>
+					HttpFetchResponse.createRejectedPromise(error.message).toBuffer(),
+			});
 		}
 
 		if (typeof this.actionResult === "undefined") {
@@ -106,7 +124,7 @@ export class HostToWorker {
 		}
 
 		const targetu8 = new Uint8Array(target);
-		targetu8.set(this.actionResult.toBuffer());
+		targetu8.set(this.actionResult);
 
 		const notifierBufferi32 = new Int32Array(this.notifierBuffer);
 		updateNotifierState(notifierBufferi32, AtomicState.ResponseResult);
@@ -125,7 +143,7 @@ export class WorkerToHost {
 	 * @param action
 	 * @returns
 	 */
-	callActionOnHost(action: VmAction): Uint8Array {
+	callActionOnHost(action: VmAction): Buffer {
 		const notifierBufferi32 = new Int32Array(this.notifierBuffer);
 		resetNotifierState(notifierBufferi32);
 
@@ -158,6 +176,6 @@ export class WorkerToHost {
 
 		waitForNotifierStateChange(notifierBufferi32, AtomicState.RequestResult);
 
-		return new Uint8Array(valueBuffer);
+		return Buffer.from(new Uint8Array(valueBuffer));
 	}
 }

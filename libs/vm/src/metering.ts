@@ -84,7 +84,6 @@ export class GasMeter {
 }
 
 export const costTable = {
-	// start: GAS_STARTUP + 1n,
 	type: {
 		DEFAULT: Number(GAS_PER_OPRATION),
 	},
@@ -118,5 +117,5 @@ export const costTable = {
 			br_on_null: Number(GAS_ACCOUNTING_OPCODE),
 			br_on_non_null: Number(GAS_ACCOUNTING_OPCODE),
 		},
-	}
+	},
 };

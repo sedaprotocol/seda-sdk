@@ -1,5 +1,9 @@
 import fetch from "node-fetch";
-import type { HttpFetchAction } from "./types/vm-actions.js";
+import type { Result } from "true-myth";
+import type {
+	HttpFetchAction,
+	ProxyHttpFetchAction,
+} from "./types/vm-actions.js";
 import { HttpFetchResponse } from "./types/vm-actions.js";
 import type { VmAdapter } from "./types/vm-adapter.js";
 import { VM_MODE_DR, VM_MODE_ENV_KEY } from "./types/vm-modes.js";
@@ -32,6 +36,18 @@ export default class DataRequestVmAdapter implements VmAdapter {
 
 	setProcessId(processId: string) {
 		this.processId = processId;
+	}
+
+	getProxyHttpFetchGasCost(
+		_action: ProxyHttpFetchAction,
+	): Promise<Result<bigint, Error>> {
+		throw new Error("Unimplemented");
+	}
+
+	proxyHttpFetch(
+		_action: ProxyHttpFetchAction,
+	): Promise<PromiseStatus<HttpFetchResponse>> {
+		throw new Error("Unimplemented");
 	}
 
 	async httpFetch(

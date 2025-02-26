@@ -14,9 +14,8 @@ describe("rs-sdk:infinite-loop", () => {
 		);
 
 		expect(result.exitCode).toBe(1);
-		expect(result.stderr).toBe("Error: Ran out of gas");
+		expect(result.stderr).toBe("\nRan out of gas");
 		expect(result.gasUsed).toBe(5000000380000n);
-		// expect(result.exitCode).toBe(0);
 	});
 
 	it("should stop when a program is an infintite loop", async () => {
@@ -24,12 +23,11 @@ describe("rs-sdk:infinite-loop", () => {
 			oracleProgram,
 			Buffer.from("testInfiniteLoop"),
 			undefined,
-			300_000_000_000n,
+			300_000_000_000_000n,
 		);
 
 		expect(result.exitCode).toBe(1);
-		expect(result.stderr).toBe("Error: Ran out of gas");
-		expect(result.gasUsed).toBe(5000000380000n);
-		// expect(result.exitCode).toBe(0);
+		// Gas metering in JS works on branches instead of a per opcode basis..
+		expect(result.gasUsed).toBe(300000002192500n);
 	});
 });

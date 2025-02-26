@@ -1,4 +1,5 @@
-import type { HttpFetchAction } from "./types/vm-actions";
+import { Result } from "true-myth";
+import type { HttpFetchAction, ProxyHttpFetchAction } from "./types/vm-actions";
 import { HttpFetchResponse } from "./types/vm-actions.js";
 import type { VmAdapter } from "./types/vm-adapter";
 import { VM_MODE_ENV_KEY, VM_MODE_TALLY } from "./types/vm-modes.js";
@@ -16,6 +17,30 @@ export default class TallyVmAdapter implements VmAdapter {
 				[VM_MODE_ENV_KEY]: VM_MODE_TALLY,
 			},
 		};
+	}
+
+	async getProxyHttpFetchGasCost(
+		_action: ProxyHttpFetchAction,
+	): Promise<Result<bigint, Error>> {
+		return Result.err(new Error("proxy_http_fetch is not allowed in tally"));
+	}
+
+	async proxyHttpFetch(
+		_action: ProxyHttpFetchAction,
+	): Promise<PromiseStatus<HttpFetchResponse>> {
+		const error = new TextEncoder().encode(
+			"proxy_http_fetch is not allowed in tally",
+		);
+
+		return PromiseStatus.rejected(
+			new HttpFetchResponse({
+				bytes: Array.from(error),
+				content_length: error.length,
+				headers: {},
+				status: 0,
+				url: "",
+			}),
+		);
 	}
 
 	setProcessId(processId: string) {

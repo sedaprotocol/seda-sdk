@@ -1,12 +1,17 @@
-import { meterWasm } from "@seda-protocol/wasm-metering";
+// @ts-ignore
+import { meterWasm } from "@seda-protocol/wasm-metering-ts";
 import { WASI, init } from "@wasmer/wasi";
 import { CallType, GasMeter, costTable } from "./metering.js";
 import VmImports from "./vm-imports.js";
 
 export interface VmCallData {
+	/** WebAssembly binary to execute */
 	binary: Uint8Array | number[];
+	/** Command line arguments for the WebAssembly module */
 	args: string[];
+	/** Environment variables for the WebAssembly module */
 	envs: Record<string, string>;
+	/** Gas limit for execution (defaults to MAX_SAFE_INTEGER) */
 	gasLimit?: bigint;
 }
 
@@ -33,6 +38,7 @@ export async function executeVm(
 	const meter = new GasMeter(
 		callData.gasLimit ?? BigInt(Number.MAX_SAFE_INTEGER),
 	);
+	const vmImports = new VmImports(notifierBuffer, meter, processId, callData);
 
 	try {
 		// Add the startup gas cost which is all bytes in the args list + a constant
@@ -46,7 +52,6 @@ export async function executeVm(
 		const wasmModule = new WebAssembly.Module(meteredWasm);
 
 		const wasiImports = wasi.getImports(wasmModule);
-		const vmImports = new VmImports(notifierBuffer, meter, processId);
 		const finalImports = vmImports.getImports(wasiImports);
 
 		const instance = await WebAssembly.instantiate(wasmModule, finalImports);
@@ -65,19 +70,26 @@ export async function executeVm(
 		};
 	} catch (err) {
 		console.error(`[${processId}] -
-      @executeWasm
-      Exception threw: ${err}
-      VM StdErr: ${wasi.getStderrString()}
-      VM StdOut: ${wasi.getStdoutString()}
-    `);
+			@executeWasm
+			Exception threw: ${err}
+			VM StdErr: ${wasi.getStderrString()}
+			VM StdOut: ${wasi.getStdoutString()}
+		`);
 
-		const stderr = wasi.getStderrString();
+		let stderr = wasi.getStderrString();
+
+		let error = `${err}`;
+		if (err instanceof Error) {
+			error = err.message;
+		}
+
+		stderr += `\n${error}`;
 
 		return {
 			exitCode: 1,
-			stderr: stderr !== "" ? stderr : `${err}`,
+			stderr,
 			stdout: wasi.getStdoutString(),
-			result: new Uint8Array(),
+			result: vmImports.result,
 			gasUsed: meter.gasUsed,
 			resultAsString: "",
 		};

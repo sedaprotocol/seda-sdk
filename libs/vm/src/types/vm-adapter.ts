@@ -1,5 +1,10 @@
+import type { Result } from "true-myth";
 import type { VmCallData } from "../vm";
-import type { HttpFetchAction, HttpFetchResponse } from "./vm-actions";
+import type {
+	HttpFetchAction,
+	HttpFetchResponse,
+	ProxyHttpFetchAction,
+} from "./vm-actions";
 import type { PromiseStatus } from "./vm-promise.js";
 
 export interface VmAdapter {
@@ -24,4 +29,22 @@ export interface VmAdapter {
 	 * @param action
 	 */
 	httpFetch(action: HttpFetchAction): Promise<PromiseStatus<HttpFetchResponse>>;
+
+	/**
+	 * Method to calculate the gas cost of a proxy http fetch call
+	 *
+	 * @param action
+	 */
+	getProxyHttpFetchGasCost(
+		action: ProxyHttpFetchAction,
+	): Promise<Result<bigint, Error>>;
+
+	/**
+	 * Method to do a remote proxy http fetch call
+	 *
+	 * @param action
+	 */
+	proxyHttpFetch(
+		action: ProxyHttpFetchAction,
+	): Promise<PromiseStatus<HttpFetchResponse>>;
 }
