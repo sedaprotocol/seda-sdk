@@ -41,7 +41,7 @@ export class PromiseStatus<T> {
 		return JSON.stringify(this.value);
 	}
 
-	toBuffer(): Uint8Array {
-		return new TextEncoder().encode(this.toJSON());
+	toBuffer(): Buffer {
+		return Buffer.from(new TextEncoder().encode(this.toJSON()));
 	}
 }

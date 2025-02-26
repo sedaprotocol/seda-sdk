@@ -15,6 +15,19 @@ export * from "./types/vm-modes.js";
 export { default as TallyVmAdapter } from "./tally-vm-adapter.js";
 export { default as DataRequestVmAdapter } from "./data-request-vm-adapter.js";
 
+export { PromiseStatus } from "./types/vm-promise.js";
+export type { VmCallData } from "./vm.js";
+
+export {
+	type HttpFetchAction,
+	HttpFetchMethod,
+	type HttpFetchOptions,
+	HttpFetchResponse,
+	type ProxyHttpFetchAction,
+	type ProxyHttpFetchGasCostAction,
+	type HttpFetchResponseData,
+} from "./types/vm-actions.js";
+
 const CURRENT_FILE_PATH = parse(import.meta.url);
 CURRENT_FILE_PATH.base = "worker.js";
 const DEFAULT_WORKER_PATH = format(CURRENT_FILE_PATH);

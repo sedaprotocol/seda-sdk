@@ -38,8 +38,16 @@ export class GasMeter {
 		this.gasUsed = startingGas;
 	}
 
-	useGas(gas: bigint) {
-		this.gasUsed += gas;
+	useGas(gas: bigint, check = true) {
+		const finalGas = gas;
+
+		// if (check) {
+		// 	if (gas !== GAS_PER_OPRATION || gas !== GAS_ACCOUNTING_OPCODE) {
+		// 		finalGas = GAS_ACCOUNTING_OPCODE;
+		// 	}
+		// }
+
+		this.gasUsed += finalGas;
 
 		if (this.gasUsed > this.limit) {
 			throw new Error("Ran out of gas");
@@ -79,7 +87,7 @@ export class GasMeter {
 				throw new Error("Unknown call type");
 		}
 
-		this.useGas(gasCost);
+		this.useGas(gasCost, false);
 	}
 }
 
@@ -118,5 +126,5 @@ export const costTable = {
 			br_on_null: Number(GAS_ACCOUNTING_OPCODE),
 			br_on_non_null: Number(GAS_ACCOUNTING_OPCODE),
 		},
-	}
+	},
 };

@@ -4,7 +4,7 @@ import {
 	type ToBuffer,
 } from "./vm-promise";
 
-enum HttpFetchMethod {
+export enum HttpFetchMethod {
 	Options = "Options",
 	Get = "Get",
 	Post = "Post",
@@ -22,9 +22,41 @@ export interface HttpFetchOptions {
 	body?: Uint8Array;
 }
 
+export type VmAction =
+	| HttpFetchAction
+	| ProxyHttpFetchAction
+	| ProxyHttpFetchGasCostAction;
+
 export interface HttpFetchAction {
 	url: string;
 	options: HttpFetchOptions;
+	type: "http-fetch-action";
+}
+
+export function isHttpFetchAction(action: VmAction): action is HttpFetchAction {
+	return action.type === "http-fetch-action";
+}
+
+export interface ProxyHttpFetchAction extends Omit<HttpFetchAction, "type"> {
+	public_key?: string;
+	type: "proxy-http-fetch-action";
+}
+
+export function isProxyHttpFetchAction(
+	action: VmAction,
+): action is ProxyHttpFetchAction {
+	return action.type === "proxy-http-fetch-action";
+}
+
+export interface ProxyHttpFetchGasCostAction {
+	fetchAction: ProxyHttpFetchAction;
+	type: "proxy-http-fetch-gas-cost-action";
+}
+
+export function isProxyHttpFetchGasCostAction(
+	action: VmAction,
+): action is ProxyHttpFetchGasCostAction {
+	return action.type === "proxy-http-fetch-gas-cost-action";
 }
 
 export interface HttpFetchResponseData {
@@ -89,5 +121,3 @@ export class HttpFetchResponse implements ToBuffer {
 		});
 	}
 }
-
-export type VmAction = HttpFetchAction;
