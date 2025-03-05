@@ -73,14 +73,14 @@ export async function executeVm(
 			resultAsString: new TextDecoder().decode(vmImports.result),
 		};
 	} catch (err) {
+		let stderr = wasi.getStderrString();
+
 		console.error(`[${processId}] -
 			@executeWasm
 			Exception threw: ${err}
-			VM StdErr: ${wasi.getStderrString()}
+			VM StdErr: ${stderr}
 			VM StdOut: ${wasi.getStdoutString()}
 		`);
-
-		let stderr = wasi.getStderrString();
 
 		let error = `${err}`;
 		if (err instanceof Error) {

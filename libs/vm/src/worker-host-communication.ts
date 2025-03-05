@@ -82,9 +82,9 @@ export class HostToWorker {
 					HttpFetchResponse.createRejectedPromise(error.message).toBuffer(),
 			});
 		} else if (isProxyHttpFetchGasCostAction(action)) {
-			const actionResult = await this.adapter.getProxyHttpFetchGasCost(
-				action.fetchAction,
-			);
+			const actionResult = (
+				await this.adapter.getProxyHttpFetchGasCost(action.fetchAction)
+			).mapErr((error) => error.message);
 
 			this.actionResult = Buffer.from(JSONStringify(actionResult.toJSON()));
 		} else if (isProxyHttpFetchAction(action)) {
