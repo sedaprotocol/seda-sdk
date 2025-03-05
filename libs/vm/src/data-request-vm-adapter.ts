@@ -1,5 +1,7 @@
+import { Readable, Stream } from "node:stream";
 import fetch from "node-fetch";
 import type { Result } from "true-myth";
+import { readStream } from "./services/read-stream.js";
 import type {
 	HttpFetchAction,
 	ProxyHttpFetchAction,
@@ -12,15 +14,27 @@ import type { VmCallData } from "./vm.js";
 
 interface Options {
 	fetchMock?: typeof fetch;
+	timeout?: number;
+	maxResponseBytes?: number;
 }
 
 export default class DataRequestVmAdapter implements VmAdapter {
 	private processId?: string;
 	private fetchFunction = fetch;
+	private timeout = 30_000;
+	private maxResponseBytes = 10 * 1024 * 1024; // 10MB
 
 	constructor(opts?: Options) {
 		if (opts?.fetchMock) {
 			this.fetchFunction = opts.fetchMock;
+		}
+
+		if (opts?.timeout) {
+			this.timeout = opts.timeout;
+		}
+
+		if (opts?.maxResponseBytes) {
+			this.maxResponseBytes = opts.maxResponseBytes;
 		}
 	}
 
@@ -65,6 +79,7 @@ export default class DataRequestVmAdapter implements VmAdapter {
 	): Promise<PromiseStatus<HttpFetchResponse>> {
 		try {
 			const response = await this.fetchFunction(new URL(action.url), {
+				signal: AbortSignal.timeout(this.timeout),
 				method: action.options.method.toUpperCase(),
 				headers: action.options.headers,
 				body: action.options.body
@@ -72,9 +87,13 @@ export default class DataRequestVmAdapter implements VmAdapter {
 					: undefined,
 			});
 
-			const bufferResponse = await response.arrayBuffer();
+			if (!response.body) throw new Error("HTTP Body was already consumed");
+
+			const readResult = await readStream(response.body, this.maxResponseBytes);
+			if (readResult.isErr) throw readResult.error;
+
 			const httpResponse = new HttpFetchResponse({
-				bytes: Array.from(new Uint8Array(bufferResponse)),
+				bytes: Array.from(readResult.value),
 				content_length: response.size ?? 0,
 				headers: Object.fromEntries(response.headers.entries()),
 				status: response.status,
