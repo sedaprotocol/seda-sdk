@@ -13,6 +13,7 @@ export interface VmCallData {
 	envs: Record<string, string>;
 	/** Gas limit for execution (defaults to MAX_SAFE_INTEGER) */
 	gasLimit?: bigint;
+	allowedImports?: string[];
 }
 
 export interface VmResult {
@@ -51,7 +52,10 @@ export async function executeVm(
 		const meteredWasm = meterWasm(binary, costTable);
 		const wasmModule = new WebAssembly.Module(meteredWasm);
 
-		const wasiImports = wasi.getImports(wasmModule);
+		const wasiImports = wasi.getImports(wasmModule) as Record<
+			string,
+			Record<string, unknown>
+		>;
 		const finalImports = vmImports.getImports(wasiImports);
 
 		const instance = await WebAssembly.instantiate(wasmModule, finalImports);

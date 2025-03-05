@@ -218,11 +218,29 @@ export default class VmImports {
 		);
 	}
 
-	getImports(wasiImports: object): WebAssembly.Imports {
+	getImports(
+		wasiImports: Record<string, Record<string, unknown>>,
+	): WebAssembly.Imports {
+		const finalWasiImports = wasiImports;
+
+		if (this.callData.allowedImports) {
+			// Loop through every WASI versions
+			for (const wasiVersionKey of Object.keys(wasiImports)) {
+				const wasiVersionImports = wasiImports[wasiVersionKey];
+
+				// Then delete any non allowed WASI imports
+				for (const wasiFunctionName of Object.keys(wasiVersionImports)) {
+					if (this.callData.allowedImports.includes(wasiFunctionName)) {
+						continue;
+					}
+
+					delete finalWasiImports[wasiVersionKey][wasiFunctionName];
+				}
+			}
+		}
+
 		return {
-			// TODO: Data requests should not have this many imports
-			// we should restrict it to only a few
-			...wasiImports,
+			...finalWasiImports,
 			vm: {
 				meter: this.gasMeter.useGas.bind(this.gasMeter),
 			},

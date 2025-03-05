@@ -27,6 +27,16 @@ export default class DataRequestVmAdapter implements VmAdapter {
 	modifyVmCallData(input: VmCallData): VmCallData {
 		return {
 			...input,
+			allowedImports: [
+				...(input.allowedImports ?? []),
+				"args_get",
+				"args_sizes_get",
+				"proc_exit",
+				"random_get",
+				"fd_write",
+				"environ_get",
+				"environ_sizes_get",
+			],
 			envs: {
 				...input.envs,
 				[VM_MODE_ENV_KEY]: VM_MODE_DR,
