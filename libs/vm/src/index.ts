@@ -17,6 +17,7 @@ export { default as DataRequestVmAdapter } from "./data-request-vm-adapter.js";
 
 export { PromiseStatus } from "./types/vm-promise.js";
 export type { VmCallData } from "./vm.js";
+export { startWorker } from "./worker.js";
 
 export {
 	type HttpFetchAction,
@@ -36,13 +37,13 @@ const DEFAULT_WORKER_PATH = format(CURRENT_FILE_PATH);
  * Executes the given WASM binary as if it were an Oracle Program
  *
  * @param callData The call data passed to the VM
- * @param workerUrl URL of the compiled worker.js
+ * @param worker URL of the compiled worker.js
  * @param vmAdapter Option to insert a custom VM adapter, can be used to mock
  * @returns
  */
 export function callVm(
 	callData: VmCallData,
-	workerUrl = DEFAULT_WORKER_PATH,
+	worker: string | Worker = DEFAULT_WORKER_PATH,
 	vmAdapter: VmAdapter = new DataRequestVmAdapter(),
 ): Promise<VmResult> {
 	return new Promise((resolve) => {
@@ -55,7 +56,8 @@ export function callVm(
 		const processId = createProcessId(finalCallData);
 		vmAdapter.setProcessId(processId);
 
-		const worker = new Worker(new URL(workerUrl));
+		const vmWorker =
+			typeof worker === "string" ? new Worker(new URL(worker)) : worker;
 		const notifierBuffer = new SharedArrayBuffer(8); // 4 bytes for notifying, 4 bytes for storing i32 numbers
 
 		const hostToWorker = new HostToWorker(vmAdapter, notifierBuffer, processId);
@@ -69,10 +71,10 @@ export function callVm(
 			type: WorkerMessageType.VmCall,
 		};
 
-		worker.on("message", async (message: WorkerMessage) => {
+		vmWorker.on("message", async (message: WorkerMessage) => {
 			try {
 				if (message.type === WorkerMessageType.VmResult) {
-					worker.terminate();
+					vmWorker.terminate();
 					resolve(message.result);
 				} else if (message.type === WorkerMessageType.VmActionExecute) {
 					await hostToWorker.executeAction(message.action);
@@ -86,7 +88,7 @@ export function callVm(
 			}
 		});
 
-		worker.on("error", (error) => {
+		vmWorker.on("error", (error) => {
 			resolve({
 				exitCode: 1,
 				stderr: `[${processId}] - Worker threw an uncaught error: ${error}`,
@@ -95,7 +97,7 @@ export function callVm(
 			});
 		});
 
-		worker.on("exit", (exitCode) => {
+		vmWorker.on("exit", (exitCode) => {
 			resolve({
 				exitCode,
 				stderr: `[${processId}] - The worker has been terminated`,
@@ -104,6 +106,6 @@ export function callVm(
 			});
 		});
 
-		worker.postMessage(workerMessage);
+		vmWorker.postMessage(workerMessage);
 	});
 }
