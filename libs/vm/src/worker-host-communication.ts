@@ -2,20 +2,20 @@ import { parentPort } from "node:worker_threads";
 import { tryAsync } from "@seda-protocol/utils";
 import { Result, ResultNS } from "true-myth";
 import { ResultJSON } from "true-myth/result";
-import { JSONStringify } from "./services/json";
+import { JSONStringify } from "./services/json.js";
 import {
 	HttpFetchResponse,
 	type VmAction,
 	isHttpFetchAction,
 	isProxyHttpFetchAction,
 	isProxyHttpFetchGasCostAction,
-} from "./types/vm-actions";
-import type { VmAdapter } from "./types/vm-adapter";
+} from "./types/vm-actions.js";
+import type { VmAdapter } from "./types/vm-adapter.js";
 import { PromiseStatus, type ToBuffer } from "./types/vm-promise.js";
 import type {
 	VmActionExecuteMessage,
 	VmActionResultBufferMessage,
-} from "./types/worker-messages";
+} from "./types/worker-messages.js";
 import { WorkerMessageType } from "./types/worker-messages.js";
 
 const MAX_I32_VALUE = 2_147_483_647;

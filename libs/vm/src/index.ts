@@ -8,7 +8,7 @@ import {
 	type WorkerMessage,
 	WorkerMessageType,
 } from "./types/worker-messages.js";
-import type { VmCallData, VmResult } from "./vm";
+import type { VmCallData, VmResult } from "./vm.js";
 import { HostToWorker } from "./worker-host-communication.js";
 
 export * from "./types/vm-modes.js";
@@ -16,8 +16,11 @@ export { default as TallyVmAdapter } from "./tally-vm-adapter.js";
 export { default as DataRequestVmAdapter } from "./data-request-vm-adapter.js";
 
 export { PromiseStatus } from "./types/vm-promise.js";
-export type { VmCallData } from "./vm.js";
+export type { VmCallData, VmResult } from "./vm.js";
 export { startWorker } from "./worker.js";
+export { createWasmModule, type CacheOptions } from "./services/compile-wasm-moudle.js"
+
+export const version = "1.0";
 
 export {
 	type HttpFetchAction,
@@ -65,7 +68,8 @@ export function callVm(
 			processId,
 			callData: {
 				...finalCallData,
-				binary: Array.from(finalCallData.binary),
+				binary: finalCallData.binary,
+				// binary: Array.from(finalCallData.binary),
 			},
 			notifierBuffer,
 			type: WorkerMessageType.VmCall,
@@ -74,7 +78,6 @@ export function callVm(
 		vmWorker.on("message", async (message: WorkerMessage) => {
 			try {
 				if (message.type === WorkerMessageType.VmResult) {
-					vmWorker.terminate();
 					resolve(message.result);
 				} else if (message.type === WorkerMessageType.VmActionExecute) {
 					await hostToWorker.executeAction(message.action);

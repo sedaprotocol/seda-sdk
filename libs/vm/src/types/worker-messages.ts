@@ -1,5 +1,5 @@
-import type { VmCallData, VmResult } from "../vm";
-import type { VmAction } from "./vm-actions";
+import type { VmCallData, VmResult } from "../vm.js";
+import type { VmAction } from "./vm-actions.js";
 
 export enum WorkerMessageType {
 	VmCall = "VmCall",
