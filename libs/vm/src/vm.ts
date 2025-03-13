@@ -1,12 +1,11 @@
-// @ts-ignore
-import { meterWasm } from "@seda-protocol/wasm-metering-ts";
 import { WASI, init } from "@wasmer/wasi";
-import { CallType, GasMeter, costTable } from "./metering.js";
+import { CallType, GasMeter } from "./metering.js";
 import VmImports from "./vm-imports.js";
+import { type CacheOptions, createWasmModule } from "./services/compile-wasm-moudle.js";
 
 export interface VmCallData {
 	/** WebAssembly binary to execute */
-	binary: Uint8Array | number[];
+	binary: WebAssembly.Module | Uint8Array | number[];
 	/** Command line arguments for the WebAssembly module */
 	args: string[];
 	/** Environment variables for the WebAssembly module */
@@ -14,6 +13,7 @@ export interface VmCallData {
 	/** Gas limit for execution (defaults to MAX_SAFE_INTEGER) */
 	gasLimit?: bigint;
 	allowedImports?: string[];
+	cache?: CacheOptions;
 }
 
 export interface VmResult {
@@ -47,21 +47,19 @@ export async function executeVm(
 			(acc, value) => acc + BigInt(value.length),
 			0n,
 		);
+
 		meter.applyGasCost(CallType.Startup, totalArgsBytes);
-		const binary = Buffer.from(new Uint8Array(callData.binary));
-		const meteredWasm = meterWasm(binary, costTable);
-		const wasmModule = new WebAssembly.Module(meteredWasm);
+		const wasmModule = await createWasmModule(callData.binary, callData.cache);
 
 		const wasiImports = wasi.getImports(wasmModule) as Record<
 			string,
 			Record<string, unknown>
 		>;
-		const finalImports = vmImports.getImports(wasiImports);
 
+		const finalImports = vmImports.getImports(wasiImports);
 		const instance = await WebAssembly.instantiate(wasmModule, finalImports);
 		const memory = instance.exports.memory;
 		vmImports.setMemory(memory as WebAssembly.Memory);
-
 		const exitCode = wasi.start(instance);
 
 		return {

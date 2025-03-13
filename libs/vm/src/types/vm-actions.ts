@@ -2,7 +2,7 @@ import {
 	PromiseStatus,
 	PromiseStatusResult,
 	type ToBuffer,
-} from "./vm-promise";
+} from "./vm-promise.js";
 
 export enum HttpFetchMethod {
 	Options = "Options",
