@@ -19,8 +19,8 @@ export function startWorker() {
 			if (message.type === WorkerMessageType.VmCall) {
 				const result = await executeVm(
 					message.callData,
-					message.notifierBuffer,
 					message.processId,
+					message.notifierBuffer,
 				);
 				const response: VmResultWorkerMessage = {
 					result,

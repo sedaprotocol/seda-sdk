@@ -1,5 +1,6 @@
 import { format, parse } from "node:path";
 import { Worker } from "node:worker_threads";
+import { tryAsync } from "@seda-protocol/utils";
 import DataRequestVmAdapter from "./data-request-vm-adapter.js";
 import { createProcessId } from "./services/create-process-id.js";
 import type { VmAdapter } from "./types/vm-adapter.js";
@@ -8,7 +9,7 @@ import {
 	type WorkerMessage,
 	WorkerMessageType,
 } from "./types/worker-messages.js";
-import type { VmCallData, VmResult } from "./vm.js";
+import { type VmCallData, type VmResult, executeVm } from "./vm.js";
 import { HostToWorker } from "./worker-host-communication.js";
 
 export * from "./types/vm-modes.js";
@@ -18,7 +19,11 @@ export { default as DataRequestVmAdapter } from "./data-request-vm-adapter.js";
 export { PromiseStatus } from "./types/vm-promise.js";
 export type { VmCallData, VmResult } from "./vm.js";
 export { startWorker } from "./worker.js";
-export { createWasmModule, type CacheOptions } from "./services/compile-wasm-moudle.js"
+export {
+	createWasmModule,
+	type CacheOptions,
+} from "./services/compile-wasm-moudle.js";
+export { executeVm } from "./vm.js";
 
 export const version = "1.0";
 
@@ -48,22 +53,29 @@ export function callVm(
 	callData: VmCallData,
 	worker: string | Worker = DEFAULT_WORKER_PATH,
 	vmAdapter: VmAdapter = new DataRequestVmAdapter(),
+	sync = false,
 ): Promise<VmResult> {
-	return new Promise((resolve) => {
-		const finalCallData: VmCallData = vmAdapter.modifyVmCallData({
-			...callData,
-			// First argument matches the Rust Wasmer standard (_start for WASI)
-			args: ["_start", ...callData.args],
-		});
+	// biome-ignore lint/suspicious/noAsyncPromiseExecutor: We do need it for the sync flow
+	return new Promise(async (resolve) => {
+		const finalCallData: VmCallData = vmAdapter.modifyVmCallData(callData);
 
 		const processId = createProcessId(finalCallData);
 		vmAdapter.setProcessId(processId);
+
+		// We run in a synchronous environment, no workers are used.
+		if (sync) {
+			const syncresult = await tryAsync(
+				executeVm(finalCallData, processId, vmAdapter),
+			);
+			if (syncresult.isErr) throw syncresult.error;
+			return resolve(syncresult.value);
+		}
 
 		const vmWorker =
 			typeof worker === "string" ? new Worker(new URL(worker)) : worker;
 		const notifierBuffer = new SharedArrayBuffer(8); // 4 bytes for notifying, 4 bytes for storing i32 numbers
 
-		const hostToWorker = new HostToWorker(vmAdapter, notifierBuffer, processId);
+		const hostToWorker = new HostToWorker(vmAdapter, processId, notifierBuffer);
 		const workerMessage: VmCallWorkerMessage = {
 			processId,
 			callData: {

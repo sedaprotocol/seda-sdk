@@ -1,5 +1,8 @@
 import { Result } from "true-myth";
-import type { HttpFetchAction, ProxyHttpFetchAction } from "./types/vm-actions.js";
+import type {
+	HttpFetchAction,
+	ProxyHttpFetchAction,
+} from "./types/vm-actions.js";
 import { HttpFetchResponse } from "./types/vm-actions.js";
 import type { VmAdapter } from "./types/vm-adapter.js";
 import { VM_MODE_ENV_KEY, VM_MODE_TALLY } from "./types/vm-modes.js";

@@ -10,9 +10,10 @@ import {
 	type ProxyHttpFetchAction,
 	type ProxyHttpFetchGasCostAction,
 } from "./types/vm-actions.js";
+import type { VmAdapter } from "./types/vm-adapter.js";
 import { PromiseStatus } from "./types/vm-promise.js";
 import type { VmCallData } from "./vm.js";
-import { WorkerToHost } from "./worker-host-communication.js";
+import { VmActionRequest, WorkerToHost } from "./worker-host-communication.js";
 
 export default class VmImports {
 	memory?: WebAssembly.Memory;
@@ -26,13 +27,22 @@ export default class VmImports {
 	gasMeter: GasMeter;
 	callData: VmCallData;
 
+	// This is because we need to keep track of which async requests we have to do
+	// We set this variable to indicate that we must abort the machine and execute this action
+	// so that we can re-execute the VM with the result
+	reExecutionRequest?: VmActionRequest;
+
 	constructor(
-		notifierBuffer: SharedArrayBuffer,
 		gasMeter: GasMeter,
 		processId: string,
 		callData: VmCallData,
+		notifierBufferOrAdapter: SharedArrayBuffer | VmAdapter,
+		asyncRequests: VmActionRequest[] = [],
 	) {
-		this.workerToHost = new WorkerToHost(notifierBuffer, processId);
+		this.workerToHost = new WorkerToHost(
+			notifierBufferOrAdapter,
+			asyncRequests,
+		);
 		this.processId = processId;
 		this.gasMeter = gasMeter;
 		this.callData = callData;
@@ -60,40 +70,56 @@ export default class VmImports {
 		);
 		const messageRaw = Buffer.from(rawAction).toString("utf-8");
 
-		const message: ProxyHttpFetchAction = {
-			...JSON.parse(messageRaw),
-			type: "proxy-http-fetch-action",
-		};
-		const gasCostMessage: ProxyHttpFetchGasCostAction = {
-			type: "proxy-http-fetch-gas-cost-action",
-			fetchAction: message,
-		};
+		try {
+			const message: ProxyHttpFetchAction = {
+				...JSON.parse(messageRaw),
+				type: "proxy-http-fetch-action",
+			};
+			const gasCostMessage: ProxyHttpFetchGasCostAction = {
+				type: "proxy-http-fetch-gas-cost-action",
+				fetchAction: message,
+			};
 
-		// First we try to fetch the price of the proxy call in gas units
-		const gasCostMessageResponse: ResultJSON<string, Error> = JSON.parse(
-			this.workerToHost.callActionOnHost(gasCostMessage).toString(),
-		);
+			// First we try to fetch the price of the proxy call in gas units
+			const gasCostMessageResponse: ResultJSON<string, Error> = JSON.parse(
+				this.workerToHost.callActionOnHost(gasCostMessage).toString(),
+			);
 
-		if (gasCostMessageResponse.variant === "Err") {
-			this.callResult = HttpFetchResponse.createRejectedPromise(
-				`${gasCostMessageResponse.error}`,
-			).toBuffer();
+			if (gasCostMessageResponse.variant === "Err") {
+				this.callResult = HttpFetchResponse.createRejectedPromise(
+					`${gasCostMessageResponse.error}`,
+				).toBuffer();
 
+				return this.callResult.length;
+			}
+
+			this.gasMeter.useGas(BigInt(gasCostMessageResponse.value));
+
+			// Now we know for sure we can pay for it. We should now do the actual fetch
+			const proxyCallResponse = this.workerToHost.callActionOnHost(message);
+
+			this.gasMeter.applyGasCost(
+				CallType.HttpFetchResponse,
+				BigInt(proxyCallResponse.length),
+			);
+
+			this.callResult = proxyCallResponse;
 			return this.callResult.length;
+		} catch (error) {
+			// Force the VM to exit and notify in executeVm that we need to re-execute
+			if (error instanceof VmActionRequest) {
+				this.reExecutionRequest = error;
+				throw error;
+			}
+
+			console.error(
+				`[${this.processId}] - @proxyHttpFetch: ${messageRaw}`,
+				error,
+			);
+			this.callResult = new Uint8Array();
+
+			return 0;
 		}
-
-		this.gasMeter.useGas(BigInt(gasCostMessageResponse.value));
-
-		// Now we know for sure we can pay for it. We should now do the actual fetch
-		const proxyCallResponse = this.workerToHost.callActionOnHost(message);
-
-		this.gasMeter.applyGasCost(
-			CallType.HttpFetchResponse,
-			BigInt(proxyCallResponse.length),
-		);
-
-		this.callResult = proxyCallResponse;
-		return this.callResult.length;
 	}
 
 	httpFetch(action: number, actionLength: number): number {
@@ -118,6 +144,12 @@ export default class VmImports {
 			);
 			return this.callResult.length;
 		} catch (error) {
+			// Force the VM to exit and notify in executeVm that we need to re-execute
+			if (error instanceof VmActionRequest) {
+				this.reExecutionRequest = error;
+				throw error;
+			}
+
 			console.error(`[${this.processId}] - @httpFetch: ${messageRaw}`, error);
 			this.callResult = new Uint8Array();
 
