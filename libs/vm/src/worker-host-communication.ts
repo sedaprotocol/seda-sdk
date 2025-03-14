@@ -1,6 +1,6 @@
 import { parentPort } from "node:worker_threads";
 import { tryAsync } from "@seda-protocol/utils";
-import { Result, ResultNS } from "true-myth";
+import { Maybe, Result, ResultNS } from "true-myth";
 import { ResultJSON } from "true-myth/result";
 import { JSONStringify } from "./services/json.js";
 import {
@@ -68,11 +68,11 @@ export class HostToWorker {
 
 	constructor(
 		private adapter: VmAdapter,
-		private notifierBuffer: SharedArrayBuffer,
 		private processId: string,
+		private notifierBuffer?: SharedArrayBuffer,
 	) {}
 
-	async executeAction(action: VmAction) {
+	async executeAction(action: VmAction): Promise<Buffer> {
 		if (isHttpFetchAction(action)) {
 			const actionResult = await tryAsync(this.adapter.httpFetch(action));
 
@@ -110,13 +110,22 @@ export class HostToWorker {
 			);
 		}
 
-		const notifierBufferi32 = new Int32Array(this.notifierBuffer);
-		notifierBufferi32.set([this.actionResult.length], 1);
+		if (this.notifierBuffer) {
+			const notifierBufferi32 = new Int32Array(this.notifierBuffer);
+			notifierBufferi32.set([this.actionResult.length], 1);
 
-		updateNotifierState(notifierBufferi32, AtomicState.ResponseResultLength);
+			updateNotifierState(notifierBufferi32, AtomicState.ResponseResultLength);
+		}
+
+		return this.actionResult;
 	}
 
 	async sendActionResultToWorker(target: SharedArrayBuffer) {
+		if (!this.notifierBuffer)
+			throw new Error(
+				`[${this.processId}] Called function while not using a worker`,
+			);
+
 		if (target.byteLength !== this.actionResult.length) {
 			throw new Error(
 				`[${this.processId}] - target buffer does not have a length of ${this.actionResult.length}, received: ${target.byteLength}`,
@@ -131,11 +140,34 @@ export class HostToWorker {
 	}
 }
 
+export class VmActionRequest {
+	public result: Maybe<Buffer> = Maybe.nothing();
+
+	constructor(public vmAction: VmAction) {}
+}
+
 export class WorkerToHost {
+	private requestIndex = 0;
+
 	constructor(
-		private notifierBuffer: SharedArrayBuffer,
-		private processId: string,
+		private notifierBufferOrAdapter: SharedArrayBuffer | VmAdapter,
+		private asyncRequests: VmActionRequest[] = [],
 	) {}
+
+	callActionSync(action: VmAction): Buffer {
+		const asyncRequestResponse = this.asyncRequests.at(this.requestIndex);
+
+		if (typeof asyncRequestResponse !== "undefined") {
+			if (asyncRequestResponse.result.isJust) {
+				this.requestIndex += 1;
+				return asyncRequestResponse.result.value;
+			}
+		}
+
+		// By throwing the action request we abort the current VM execution.
+		// This way we can fetch the async data and re-execute but with the result of the data
+		throw new VmActionRequest(action);
+	}
 
 	/**
 	 * Calls the given action on the host machine and sleeps the thread until an answer has been received
@@ -144,7 +176,11 @@ export class WorkerToHost {
 	 * @returns
 	 */
 	callActionOnHost(action: VmAction): Buffer {
-		const notifierBufferi32 = new Int32Array(this.notifierBuffer);
+		if (!(this.notifierBufferOrAdapter instanceof SharedArrayBuffer)) {
+			return this.callActionSync(action);
+		}
+
+		const notifierBufferi32 = new Int32Array(this.notifierBufferOrAdapter);
 		resetNotifierState(notifierBufferi32);
 
 		const actionMessage: VmActionExecuteMessage = {

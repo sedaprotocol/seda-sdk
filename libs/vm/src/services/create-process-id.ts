@@ -12,7 +12,7 @@ export function createProcessId(callData: VmCallData): string {
 	} else {
 		binary = new Uint8Array(callData.binary);
 	}
-	
+
 	hasher.update(binary);
 	const binaryId = hasher.digest().toString("hex");
 

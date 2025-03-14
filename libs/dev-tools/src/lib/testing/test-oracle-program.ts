@@ -33,6 +33,7 @@ export function testOracleProgramExecution(
 	inputs: Buffer,
 	fetchMock?: typeof fetch,
 	gasLimit?: bigint,
+	sync?: boolean,
 ) {
 	return callVm(
 		{
@@ -43,5 +44,6 @@ export function testOracleProgramExecution(
 		},
 		undefined,
 		new DataRequestVmAdapter({ fetchMock }),
+		sync,
 	);
 }

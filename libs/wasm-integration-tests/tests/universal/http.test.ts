@@ -10,6 +10,29 @@ describe.each(sdks)("%s:Http", (_, oracleProgram) => {
 		mockHttpFetch.mockReset();
 	});
 
+	it("Test mocked SDK HTTP Success in a sync environment", async () => {
+		const mockResponse = new Response(
+			JSON.stringify({
+				userId: 200,
+				id: 999,
+				title: "mocked",
+				completed: true,
+			}),
+		);
+		mockHttpFetch.mockResolvedValue(mockResponse);
+
+		const result = await testOracleProgramExecution(
+			oracleProgram,
+			Buffer.from("testHttpSuccess"),
+			mockHttpFetch,
+			undefined,
+			true,
+		);
+
+		expect(result.exitCode).toBe(0);
+		expect(result.resultAsString).toEqual("200:999:mocked:true");
+	});
+
 	it("Test SDK HTTP Rejection", async () => {
 		const result = await testOracleProgramExecution(
 			oracleProgram,
