@@ -5,7 +5,6 @@ import VmImports from "./vm-imports";
 describe("vm-imports", () => {
 	it("should only add allowed WASI imports", () => {
 		const vmImports = new VmImports(
-			new SharedArrayBuffer(1),
 			new GasMeter(1n),
 			"1",
 			{
@@ -14,6 +13,7 @@ describe("vm-imports", () => {
 				envs: {},
 				allowedImports: ["args_get"],
 			},
+			new SharedArrayBuffer(1),
 		);
 
 		const finalImports = vmImports.getImports({
@@ -31,7 +31,6 @@ describe("vm-imports", () => {
 
 	it("should only add allowed WASI imports even on multiple versions", () => {
 		const vmImports = new VmImports(
-			new SharedArrayBuffer(1),
 			new GasMeter(1n),
 			"1",
 			{
@@ -40,6 +39,7 @@ describe("vm-imports", () => {
 				envs: {},
 				allowedImports: ["args_get"],
 			},
+			new SharedArrayBuffer(1),
 		);
 
 		const finalImports = vmImports.getImports({
@@ -66,7 +66,6 @@ describe("vm-imports", () => {
 
 	it("Empty array should disallow all imports", () => {
 		const vmImports = new VmImports(
-			new SharedArrayBuffer(1),
 			new GasMeter(1n),
 			"1",
 			{
@@ -75,6 +74,7 @@ describe("vm-imports", () => {
 				envs: {},
 				allowedImports: [],
 			},
+			new SharedArrayBuffer(1),
 		);
 
 		const finalImports = vmImports.getImports({
@@ -92,7 +92,6 @@ describe("vm-imports", () => {
 
 	it("undefined allowedImports should allow all", () => {
 		const vmImports = new VmImports(
-			new SharedArrayBuffer(1),
 			new GasMeter(1n),
 			"1",
 			{
@@ -100,6 +99,7 @@ describe("vm-imports", () => {
 				binary: new Uint8Array(),
 				envs: {},
 			},
+			new SharedArrayBuffer(1),
 		);
 
 		const finalImports = vmImports.getImports({
