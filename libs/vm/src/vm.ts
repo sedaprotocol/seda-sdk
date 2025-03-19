@@ -89,6 +89,8 @@ export async function executeVm(
 
 		const finalImports = vmImports.getImports(wasiImports);
 		const instance = await WebAssembly.instantiate(wasmModule, finalImports);
+		const memory = instance.exports.memory;
+		vmImports.setMemory(memory as WebAssembly.Memory);
 		const exitCode = wasi.start(instance);
 
 		return {
