@@ -15,14 +15,12 @@ export type RevealInput = {
 };
 
 const encoder = new TextEncoder();
-const MOCK_SALT = "seda_sdk";
-const MOCK_SALT_BYTES = [...encoder.encode(MOCK_SALT)];
 
 export function createMockReveal(input: RevealInput) {
 	const resultBytes = inputToBytes(input.result);
 
 	return {
-		salt: MOCK_SALT_BYTES,
+		dr_block_height: 1,
 		exit_code: input.exitCode,
 		gas_used: input.gasUsed,
 		reveal: [...resultBytes],
