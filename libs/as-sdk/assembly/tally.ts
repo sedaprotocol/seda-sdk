@@ -8,7 +8,7 @@ const CONSENSUS_ARGUMENT_POSITION = 3;
 
 @json
 class RevealBodyArg {
-	salt!: u8[];
+	dr_block_height!: u64;
 	exit_code!: u8;
 	gas_used!: u64;
 	reveal!: u8[];
@@ -17,9 +17,9 @@ class RevealBodyArg {
 @json
 class RevealBody {
 	/**
-	 * Entropy added by the overlay node to prevent other overlay nodes from copying the result.
+	 * The block height at which the Data Request was posted.
 	 */
-	salt!: Bytes;
+	drBlockHeight!: u64;
 
 	/**
 	 * POSIX compatible exit code that was returned by the execution phase of the Oracle Program.
@@ -92,10 +92,10 @@ export default class Tally {
 
 			revealResults.push({
 				body: {
+					drBlockHeight: reveal.dr_block_height,
 					exitCode: reveal.exit_code,
 					gasUsed: reveal.gas_used,
 					reveal: Bytes.fromByteArray(jsonArrToUint8Array(reveal.reveal)),
-					salt: Bytes.fromByteArray(jsonArrToUint8Array(reveal.salt)),
 				},
 				inConsensus: consensus.at(index) === 0,
 			});
