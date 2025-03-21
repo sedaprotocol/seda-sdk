@@ -8,7 +8,7 @@ const CONSENSUS_ARGUMENT_POSITION: usize = 3;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct RevealBody {
-    pub salt: Vec<u8>,
+    pub dr_block_height: u64,
     pub exit_code: u8,
     pub gas_used: u64,
     pub reveal: Vec<u8>,
