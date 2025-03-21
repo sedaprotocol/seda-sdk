@@ -1,5 +1,9 @@
 import { readFile } from "node:fs/promises";
+import { resolve } from "node:path";
 
 export const oracleProgram = await readFile(
-	"dist/libs/as-sdk-integration-tests/debug.wasm",
+	resolve(
+		import.meta.dir,
+		"../../../../dist/libs/as-sdk-integration-tests/debug.wasm",
+	),
 );

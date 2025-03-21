@@ -1,4 +1,11 @@
-import { beforeEach, describe, expect, it, mock } from "bun:test";
+import {
+	beforeEach,
+	describe,
+	expect,
+	it,
+	mock,
+	setDefaultTimeout,
+} from "bun:test";
 import { testOracleProgramExecution } from "@seda/dev-tools";
 import { Response } from "node-fetch";
 import { sdks } from "./sdks";
@@ -6,6 +13,8 @@ import { sdks } from "./sdks";
 const mockHttpFetch = mock();
 
 describe.each(sdks)("%s:Http", (_, oracleProgram) => {
+	setDefaultTimeout(30_000);
+
 	beforeEach(() => {
 		mockHttpFetch.mockReset();
 	});

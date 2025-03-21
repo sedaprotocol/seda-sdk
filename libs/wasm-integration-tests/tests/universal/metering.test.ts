@@ -11,8 +11,29 @@ const tallyProgram = await readFile(
 	resolve(import.meta.dir, "../../tally.wasm"),
 );
 
+const tooMuchMemoryProgram = await readFile(
+	resolve(import.meta.dir, "../../assign_too_much_memory.wasm"),
+);
+
 describe("metering", () => {
 	setDefaultTimeout(30_000);
+
+	// TODO: Test with creating a program that grows its memory every loop
+	// And just start with an initial of 1
+	it("should run out of gas when there is not enough memory", async () => {
+		const result = await testOracleProgramExecution(
+			tooMuchMemoryProgram,
+			Buffer.from("not_used"),
+			undefined,
+			3000000000000000n,
+			true,
+		);
+
+		expect(result.exitCode).toBe(1);
+		expect(result.stderr).toInclude(
+			"resizable limits has an initial page count of 65536 which is greater than its maximum",
+		);
+	});
 
 	it("should run out of gas when there is not enough gas attached to it", async () => {
 		const result = await testOracleProgramExecution(

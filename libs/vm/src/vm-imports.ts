@@ -2,6 +2,9 @@ import * as Secp256k1 from "@noble/secp256k1";
 import { trySync } from "@seda-protocol/utils";
 import { Maybe } from "true-myth";
 import type { ResultJSON } from "true-myth/result";
+import { args_get, args_sizes_get } from "./imports/wasi/args_get.js";
+import { environ_get, environ_sizes_get } from "./imports/wasi/environ_get.js";
+import { fd_write } from "./imports/wasi/fd_write.js";
 import { CallType, type GasMeter } from "./metering.js";
 import { keccak256, secp256k1Verify } from "./services/crypto.js";
 import {
@@ -14,6 +17,8 @@ import type { VmAdapter } from "./types/vm-adapter.js";
 import { PromiseStatus } from "./types/vm-promise.js";
 import type { VmCallData } from "./vm.js";
 import { VmActionRequest, WorkerToHost } from "./worker-host-communication.js";
+
+export type VmImportsCollection = Record<string, Record<string, unknown>>;
 
 export default class VmImports {
 	memory?: WebAssembly.Memory;
@@ -250,9 +255,7 @@ export default class VmImports {
 		);
 	}
 
-	getImports(
-		wasiImports: Record<string, Record<string, unknown>>,
-	): WebAssembly.Imports {
+	getImports(wasiImports: WebAssembly.Imports): WebAssembly.Imports {
 		const finalWasiImports = wasiImports;
 
 		if (this.callData.allowedImports) {
@@ -271,8 +274,57 @@ export default class VmImports {
 			}
 		}
 
+		const injectedWasi: WebAssembly.Imports = {};
+
+		for (const wasiNamespace of Object.keys(wasiImports)) {
+			injectedWasi[wasiNamespace] = {
+				args_get: (...args: number[]) =>
+					args_get(
+						this.callData,
+						this.gasMeter,
+						wasiImports[wasiNamespace].args_get,
+						args[0],
+						args[1],
+					),
+				args_sizes_get: (...args: number[]) =>
+					args_sizes_get(
+						this.callData,
+						this.gasMeter,
+						wasiImports[wasiNamespace].args_sizes_get,
+						args[0],
+						args[1],
+					),
+				fd_write: (...args: number[]) =>
+					fd_write(
+						this.gasMeter,
+						wasiImports[wasiNamespace].fd_write,
+						args[0],
+						args[1],
+						args[2],
+						args[3],
+					),
+				environ_get: (...args: number[]) =>
+					environ_get(
+						this.callData,
+						this.gasMeter,
+						wasiImports[wasiNamespace].environ_get,
+						args[0],
+						args[1],
+					),
+				environ_sizes_get: (...args: number[]) =>
+					environ_sizes_get(
+						this.callData,
+						this.gasMeter,
+						wasiImports[wasiNamespace].environ_sizes_get,
+						args[0],
+						args[1],
+					),
+				proc_exit: wasiImports[wasiNamespace].proc_exit,
+			};
+		}
+
 		return {
-			...finalWasiImports,
+			...injectedWasi,
 			vm: {
 				meter: this.gasMeter.useGas.bind(this.gasMeter),
 			},

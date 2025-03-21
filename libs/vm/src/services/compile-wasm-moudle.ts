@@ -1,9 +1,10 @@
 import { existsSync } from "node:fs";
 import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
+import { trySync } from "@seda-protocol/utils";
 // @ts-ignore
 import { meterWasm } from "@seda-protocol/wasm-metering-ts";
-import { Maybe } from "true-myth";
+import { Maybe, Result } from "true-myth";
 import { costTable } from "../metering.js";
 import type { VmCallData } from "../vm.js";
 
@@ -15,9 +16,9 @@ export type CacheOptions = {
 export async function createWasmModule(
 	binary: Uint8Array | WebAssembly.Module | number[],
 	options?: CacheOptions,
-): Promise<WebAssembly.Module> {
+): Promise<Result<WebAssembly.Module, Error>> {
 	if (binary instanceof WebAssembly.Module) {
-		return binary;
+		return Result.ok(binary);
 	}
 
 	const binaryArray =
@@ -39,5 +40,5 @@ export async function createWasmModule(
 		Nothing: () => Promise.resolve(meterWasm(binaryArray, costTable)),
 	});
 
-	return new WebAssembly.Module(meteredBinary);
+	return trySync(() => new WebAssembly.Module(meteredBinary));
 }

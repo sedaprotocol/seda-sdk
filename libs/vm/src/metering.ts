@@ -18,6 +18,12 @@ const GAS_PROXY_HTTP_FETCH_BASE = TERA_GAS * 7n;
 const GAS_SECP256K1_BASE = 10_000_000n;
 const GAS_KECCAK256_BASE = 10_000_000n;
 
+const GAS_ARGS_GET_BASE = TERA_GAS;
+const GAS_ARGS_SIZES_GET_BASE = TERA_GAS;
+const GAS_ENVIRON_GET_BASE = TERA_GAS;
+const GAS_ENVIRON_SIZES_GET_BASE = TERA_GAS;
+const GAS_FD_WRITE_BASE = TERA_GAS;
+
 export enum CallType {
 	ExecutionResult = 0,
 	HttpFetchRequest = 1,
@@ -27,6 +33,11 @@ export enum CallType {
 	Secp256k1Verify = 5,
 	Keccak256 = 6,
 	Startup = 7,
+	ArgsGet = 8,
+	ArgsSizesGet = 9,
+	EnvironGet = 10,
+	EnvironSizesGet = 11,
+	FdWrite = 12
 }
 
 export class GasMeter {
@@ -75,6 +86,21 @@ export class GasMeter {
 			case CallType.Keccak256:
 				gasCost = GAS_KECCAK256_BASE + GAS_PER_BYTE * bytesLength;
 				break;
+			case CallType.ArgsGet:
+				gasCost = GAS_ARGS_GET_BASE + GAS_PER_BYTE * bytesLength;
+				break;
+			case CallType.ArgsSizesGet:
+				gasCost = GAS_ARGS_SIZES_GET_BASE + GAS_PER_BYTE * bytesLength;
+				break;
+			case CallType.EnvironGet:
+				gasCost = GAS_ENVIRON_GET_BASE + GAS_PER_BYTE * bytesLength;
+				break;
+			case CallType.EnvironSizesGet:
+				gasCost = GAS_ENVIRON_SIZES_GET_BASE + GAS_PER_BYTE * bytesLength;
+				break;
+			case CallType.FdWrite:
+				gasCost = GAS_FD_WRITE_BASE + GAS_PER_BYTE * bytesLength;
+				break;
 			default:
 				throw new Error("Unknown call type");
 		}
@@ -84,6 +110,9 @@ export class GasMeter {
 }
 
 export const costTable = {
+	memory: {
+		maximum: 256,
+	},
 	type: {
 		DEFAULT: Number(GAS_PER_OPRATION),
 	},
