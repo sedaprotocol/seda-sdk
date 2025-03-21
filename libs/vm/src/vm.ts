@@ -74,6 +74,11 @@ export async function executeVm(
 	const wasmModule = await createWasmModule(callData.binary, callData.cache);
 
 	try {
+		// For now rethrow the error (since we wanna keep wasmModule outside so we can re-use a compiled module)
+		if (wasmModule.isErr) {
+			throw wasmModule.error;
+		}
+
 		// Add the startup gas cost which is all bytes in the args list + a constant
 		const totalArgsBytes = callData.args.reduce(
 			(acc, value) => acc + BigInt(value.length),
@@ -82,13 +87,18 @@ export async function executeVm(
 
 		meter.applyGasCost(CallType.Startup, totalArgsBytes);
 
-		const wasiImports = wasi.getImports(wasmModule) as Record<
+		const wasiImports = wasi.getImports(wasmModule.value) as Record<
 			string,
 			Record<string, unknown>
 		>;
 
-		const finalImports = vmImports.getImports(wasiImports);
-		const instance = await WebAssembly.instantiate(wasmModule, finalImports);
+		const finalImports = vmImports.getImports(
+			wasiImports as unknown as WebAssembly.Imports,
+		);
+		const instance = await WebAssembly.instantiate(
+			wasmModule.value,
+			finalImports,
+		);
 		const memory = instance.exports.memory;
 		vmImports.setMemory(memory as WebAssembly.Memory);
 		const exitCode = wasi.start(instance);
@@ -112,7 +122,7 @@ export async function executeVm(
 				executeVm(
 					{
 						...callData,
-						binary: wasmModule,
+						binary: wasmModule.isOk ? wasmModule.value : callData.binary,
 					},
 					processId,
 					notifierBufferOrAdapter,
