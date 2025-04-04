@@ -28,6 +28,6 @@ describe("rs-sdk:infinite-loop", () => {
 
 		expect(result.exitCode).toBe(1);
 		// Gas metering in JS works on branches instead of a per opcode basis..
-		expect(result.gasUsed).toBe(300000002192500n);
+		expect(result.gasUsed).toBe(300000002470000n);
 	});
 });
