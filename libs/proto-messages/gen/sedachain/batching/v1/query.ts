@@ -14,6 +14,7 @@ import { BatchAssignment } from "./genesis";
 /** The request message for QueryBatch RPC. */
 export interface QueryBatchRequest {
   batchNumber: bigint;
+  latestSigned: boolean;
 }
 
 /** The response message for QueryBatch RPC. */
@@ -66,7 +67,7 @@ export interface QueryDataResultResponse {
 }
 
 function createBaseQueryBatchRequest(): QueryBatchRequest {
-  return { batchNumber: 0n };
+  return { batchNumber: 0n, latestSigned: true };
 }
 
 export const QueryBatchRequest = {
@@ -76,6 +77,9 @@ export const QueryBatchRequest = {
         throw new globalThis.Error("value provided for field message.batchNumber of type uint64 too large");
       }
       writer.uint32(8).uint64(message.batchNumber.toString());
+    }
+    if (message.latestSigned !== false) {
+      writer.uint32(16).bool(message.latestSigned);
     }
     return writer;
   },
@@ -104,13 +108,14 @@ export const QueryBatchRequest = {
   },
 
   fromJSON(object: any): QueryBatchRequest {
-    return { batchNumber: isSet(object.batchNumber) ? BigInt(object.batchNumber) : 0n };
+    return { batchNumber: isSet(object.batchNumber) ? BigInt(object.batchNumber) : 0n, latestSigned: isSet(object.latestSigned) ? object.latestSigned : true};
   },
 
   toJSON(message: QueryBatchRequest): unknown {
     const obj: any = {};
     if (message.batchNumber !== 0n) {
       obj.batchNumber = message.batchNumber.toString();
+      obj.latestSigned = message.latestSigned.toString();
     }
     return obj;
   },
@@ -121,6 +126,7 @@ export const QueryBatchRequest = {
   fromPartial(object: DeepPartial<QueryBatchRequest>): QueryBatchRequest {
     const message = createBaseQueryBatchRequest();
     message.batchNumber = object.batchNumber ?? 0n;
+    message.latestSigned = object.latestSigned?? true;
     return message;
   },
 };
