@@ -86,6 +86,9 @@ export const QueryBatchRequest = {
       }
       writer.uint32(16).uint64(message.batchNumber.toString());
     }
+    if (message.latestSigned !== false) {
+      writer.uint32(16).bool(message.latestSigned);
+    }
     return writer;
   },
 
@@ -133,6 +136,7 @@ export const QueryBatchRequest = {
     }
     if (message.batchNumber !== 0n) {
       obj.batchNumber = message.batchNumber.toString();
+      obj.latestSigned = message.latestSigned.toString();
     }
     return obj;
   },
@@ -144,6 +148,7 @@ export const QueryBatchRequest = {
     const message = createBaseQueryBatchRequest();
     message.latestSigned = object.latestSigned ?? false;
     message.batchNumber = object.batchNumber ?? 0n;
+    message.latestSigned = object.latestSigned?? true;
     return message;
   },
 };
