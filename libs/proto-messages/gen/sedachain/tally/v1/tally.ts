@@ -20,10 +20,10 @@ export interface Params {
    */
   filterGasCostMultiplierMode: bigint;
   /**
-   * FilterGasCostMultiplierStdDev is the gas cost multiplier for a filter type
-   * stddev.
+   * FilterGasCostMAD is the gas cost multiplier for a filter type
+   * Median Absolute Deviation.
    */
-  filterGasCostMultiplierStdDev: bigint;
+  filterGasCostMultiplierMAD: bigint;
   /** GasCostBase is the base gas cost for a data request. */
   gasCostBase: bigint;
   /**
@@ -38,6 +38,8 @@ export interface Params {
   burnRatio: string;
   /** MaxResultSize is the maximum size of the result of a data request in bytes. */
   maxResultSize: number;
+  /** MaxTalliesPerBlock specifies the maximum number of tallies per block. */
+  maxTalliesPerBlock: number;
 }
 
 function createBaseParams(): Params {
@@ -45,11 +47,12 @@ function createBaseParams(): Params {
     maxTallyGasLimit: 0n,
     filterGasCostNone: 0n,
     filterGasCostMultiplierMode: 0n,
-    filterGasCostMultiplierStdDev: 0n,
+    filterGasCostMultiplierMAD: 0n,
     gasCostBase: 0n,
     executionGasCostFallback: 0n,
     burnRatio: "",
     maxResultSize: 0,
+    maxTalliesPerBlock: 0,
   };
 }
 
@@ -75,13 +78,13 @@ export const Params = {
       }
       writer.uint32(24).uint64(message.filterGasCostMultiplierMode.toString());
     }
-    if (message.filterGasCostMultiplierStdDev !== 0n) {
-      if (BigInt.asUintN(64, message.filterGasCostMultiplierStdDev) !== message.filterGasCostMultiplierStdDev) {
+    if (message.filterGasCostMultiplierMAD !== 0n) {
+      if (BigInt.asUintN(64, message.filterGasCostMultiplierMAD) !== message.filterGasCostMultiplierMAD) {
         throw new globalThis.Error(
-          "value provided for field message.filterGasCostMultiplierStdDev of type uint64 too large",
+          "value provided for field message.filterGasCostMultiplierMAD of type uint64 too large",
         );
       }
-      writer.uint32(32).uint64(message.filterGasCostMultiplierStdDev.toString());
+      writer.uint32(32).uint64(message.filterGasCostMultiplierMAD.toString());
     }
     if (message.gasCostBase !== 0n) {
       if (BigInt.asUintN(64, message.gasCostBase) !== message.gasCostBase) {
@@ -102,6 +105,9 @@ export const Params = {
     }
     if (message.maxResultSize !== 0) {
       writer.uint32(64).uint32(message.maxResultSize);
+    }
+    if (message.maxTalliesPerBlock !== 0) {
+      writer.uint32(72).uint32(message.maxTalliesPerBlock);
     }
     return writer;
   },
@@ -139,7 +145,7 @@ export const Params = {
             break;
           }
 
-          message.filterGasCostMultiplierStdDev = longToBigint(reader.uint64() as Long);
+          message.filterGasCostMultiplierMAD = longToBigint(reader.uint64() as Long);
           continue;
         case 5:
           if (tag !== 40) {
@@ -169,6 +175,13 @@ export const Params = {
 
           message.maxResultSize = reader.uint32();
           continue;
+        case 9:
+          if (tag !== 72) {
+            break;
+          }
+
+          message.maxTalliesPerBlock = reader.uint32();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -185,13 +198,14 @@ export const Params = {
       filterGasCostMultiplierMode: isSet(object.filterGasCostMultiplierMode)
         ? BigInt(object.filterGasCostMultiplierMode)
         : 0n,
-      filterGasCostMultiplierStdDev: isSet(object.filterGasCostMultiplierStdDev)
-        ? BigInt(object.filterGasCostMultiplierStdDev)
+      filterGasCostMultiplierMAD: isSet(object.filterGasCostMultiplierMAD)
+        ? BigInt(object.filterGasCostMultiplierMAD)
         : 0n,
       gasCostBase: isSet(object.gasCostBase) ? BigInt(object.gasCostBase) : 0n,
       executionGasCostFallback: isSet(object.executionGasCostFallback) ? BigInt(object.executionGasCostFallback) : 0n,
       burnRatio: isSet(object.burnRatio) ? globalThis.String(object.burnRatio) : "",
       maxResultSize: isSet(object.maxResultSize) ? globalThis.Number(object.maxResultSize) : 0,
+      maxTalliesPerBlock: isSet(object.maxTalliesPerBlock) ? globalThis.Number(object.maxTalliesPerBlock) : 0,
     };
   },
 
@@ -206,8 +220,8 @@ export const Params = {
     if (message.filterGasCostMultiplierMode !== 0n) {
       obj.filterGasCostMultiplierMode = message.filterGasCostMultiplierMode.toString();
     }
-    if (message.filterGasCostMultiplierStdDev !== 0n) {
-      obj.filterGasCostMultiplierStdDev = message.filterGasCostMultiplierStdDev.toString();
+    if (message.filterGasCostMultiplierMAD !== 0n) {
+      obj.filterGasCostMultiplierMAD = message.filterGasCostMultiplierMAD.toString();
     }
     if (message.gasCostBase !== 0n) {
       obj.gasCostBase = message.gasCostBase.toString();
@@ -221,6 +235,9 @@ export const Params = {
     if (message.maxResultSize !== 0) {
       obj.maxResultSize = Math.round(message.maxResultSize);
     }
+    if (message.maxTalliesPerBlock !== 0) {
+      obj.maxTalliesPerBlock = Math.round(message.maxTalliesPerBlock);
+    }
     return obj;
   },
 
@@ -232,11 +249,12 @@ export const Params = {
     message.maxTallyGasLimit = object.maxTallyGasLimit ?? 0n;
     message.filterGasCostNone = object.filterGasCostNone ?? 0n;
     message.filterGasCostMultiplierMode = object.filterGasCostMultiplierMode ?? 0n;
-    message.filterGasCostMultiplierStdDev = object.filterGasCostMultiplierStdDev ?? 0n;
+    message.filterGasCostMultiplierMAD = object.filterGasCostMultiplierMAD ?? 0n;
     message.gasCostBase = object.gasCostBase ?? 0n;
     message.executionGasCostFallback = object.executionGasCostFallback ?? 0n;
     message.burnRatio = object.burnRatio ?? "";
     message.maxResultSize = object.maxResultSize ?? 0;
+    message.maxTalliesPerBlock = object.maxTalliesPerBlock ?? 0;
     return message;
   },
 };

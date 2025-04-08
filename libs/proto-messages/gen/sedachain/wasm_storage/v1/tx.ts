@@ -13,9 +13,9 @@ import { Params } from "./wasm_storage";
 /** The request message for the StoreOracleProgram method. */
 export interface MsgStoreOracleProgram {
   sender: string;
-  /** The wasm program to store as gzip-compressed bytes. */
+  /** Wasm is the wasm program to store as gzip-compressed bytes. */
   wasm: Uint8Array;
-  /** The length of the unzipped wasm program in bytes. */
+  /** StorageFee is the fee incurred for storing the unzipped wasm bytes. */
   storageFee: Coin[];
 }
 
@@ -44,15 +44,31 @@ export interface MsgInstantiateCoreContractResponse {
 /** The request message for the UpdateParams method. */
 export interface MsgUpdateParams {
   /**
-   * authority is the address that controls the module (defaults to x/gov unless
+   * Authority is the address that controls the module (defaults to x/gov unless
    * overwritten).
    */
   authority: string;
   params: Params | undefined;
 }
 
-/** no data needs to be returned */
+/** The response message for the UpdateParams method. */
 export interface MsgUpdateParamsResponse {
+}
+
+/** The request message for the MsgRefundTxFee method. */
+export interface MsgRefundTxFee {
+  /** Authority is the address that controls the method. */
+  authority: string;
+  /** DrId is the hex-encoded data request ID. */
+  drId: string;
+  /** PublicKey is the hex-encoded public key (identifier) of the executor. */
+  publicKey: string;
+  /** IsReveal is true for a reveal message and false for a commit message. */
+  isReveal: boolean;
+}
+
+/** The response message for the MsgRefundTxFee method. */
+export interface MsgRefundTxFeeResponse {
 }
 
 function createBaseMsgStoreOracleProgram(): MsgStoreOracleProgram {
@@ -555,6 +571,153 @@ export const MsgUpdateParamsResponse = {
   },
 };
 
+function createBaseMsgRefundTxFee(): MsgRefundTxFee {
+  return { authority: "", drId: "", publicKey: "", isReveal: false };
+}
+
+export const MsgRefundTxFee = {
+  encode(message: MsgRefundTxFee, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.authority !== "") {
+      writer.uint32(10).string(message.authority);
+    }
+    if (message.drId !== "") {
+      writer.uint32(18).string(message.drId);
+    }
+    if (message.publicKey !== "") {
+      writer.uint32(26).string(message.publicKey);
+    }
+    if (message.isReveal !== false) {
+      writer.uint32(32).bool(message.isReveal);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgRefundTxFee {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgRefundTxFee();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.authority = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.drId = reader.string();
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.publicKey = reader.string();
+          continue;
+        case 4:
+          if (tag !== 32) {
+            break;
+          }
+
+          message.isReveal = reader.bool();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MsgRefundTxFee {
+    return {
+      authority: isSet(object.authority) ? globalThis.String(object.authority) : "",
+      drId: isSet(object.drId) ? globalThis.String(object.drId) : "",
+      publicKey: isSet(object.publicKey) ? globalThis.String(object.publicKey) : "",
+      isReveal: isSet(object.isReveal) ? globalThis.Boolean(object.isReveal) : false,
+    };
+  },
+
+  toJSON(message: MsgRefundTxFee): unknown {
+    const obj: any = {};
+    if (message.authority !== "") {
+      obj.authority = message.authority;
+    }
+    if (message.drId !== "") {
+      obj.drId = message.drId;
+    }
+    if (message.publicKey !== "") {
+      obj.publicKey = message.publicKey;
+    }
+    if (message.isReveal !== false) {
+      obj.isReveal = message.isReveal;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<MsgRefundTxFee>): MsgRefundTxFee {
+    return MsgRefundTxFee.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<MsgRefundTxFee>): MsgRefundTxFee {
+    const message = createBaseMsgRefundTxFee();
+    message.authority = object.authority ?? "";
+    message.drId = object.drId ?? "";
+    message.publicKey = object.publicKey ?? "";
+    message.isReveal = object.isReveal ?? false;
+    return message;
+  },
+};
+
+function createBaseMsgRefundTxFeeResponse(): MsgRefundTxFeeResponse {
+  return {};
+}
+
+export const MsgRefundTxFeeResponse = {
+  encode(_: MsgRefundTxFeeResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): MsgRefundTxFeeResponse {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgRefundTxFeeResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): MsgRefundTxFeeResponse {
+    return {};
+  },
+
+  toJSON(_: MsgRefundTxFeeResponse): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create(base?: DeepPartial<MsgRefundTxFeeResponse>): MsgRefundTxFeeResponse {
+    return MsgRefundTxFeeResponse.fromPartial(base ?? {});
+  },
+  fromPartial(_: DeepPartial<MsgRefundTxFeeResponse>): MsgRefundTxFeeResponse {
+    const message = createBaseMsgRefundTxFeeResponse();
+    return message;
+  },
+};
+
 /** Msg service defines the wasm-storage tx gRPC methods. */
 export interface Msg {
   /** StoreOracleProgram stores an oracle program. */
@@ -566,6 +729,8 @@ export interface Msg {
   InstantiateCoreContract(request: MsgInstantiateCoreContract): Promise<MsgInstantiateCoreContractResponse>;
   /** The UpdateParams method updates the module's parameters. */
   UpdateParams(request: MsgUpdateParams): Promise<MsgUpdateParamsResponse>;
+  /** The RefundTxFee method is used by the Core Contract to refund tx fee. */
+  RefundTxFee(request: MsgRefundTxFee): Promise<MsgRefundTxFeeResponse>;
 }
 
 export const MsgServiceName = "sedachain.wasm_storage.v1.Msg";
@@ -578,6 +743,7 @@ export class MsgClientImpl implements Msg {
     this.StoreOracleProgram = this.StoreOracleProgram.bind(this);
     this.InstantiateCoreContract = this.InstantiateCoreContract.bind(this);
     this.UpdateParams = this.UpdateParams.bind(this);
+    this.RefundTxFee = this.RefundTxFee.bind(this);
   }
   StoreOracleProgram(request: MsgStoreOracleProgram): Promise<MsgStoreOracleProgramResponse> {
     const data = MsgStoreOracleProgram.encode(request).finish();
@@ -595,6 +761,12 @@ export class MsgClientImpl implements Msg {
     const data = MsgUpdateParams.encode(request).finish();
     const promise = this.rpc.request(this.service, "UpdateParams", data);
     return promise.then((data) => MsgUpdateParamsResponse.decode(_m0.Reader.create(data)));
+  }
+
+  RefundTxFee(request: MsgRefundTxFee): Promise<MsgRefundTxFeeResponse> {
+    const data = MsgRefundTxFee.encode(request).finish();
+    const promise = this.rpc.request(this.service, "RefundTxFee", data);
+    return promise.then((data) => MsgRefundTxFeeResponse.decode(_m0.Reader.create(data)));
   }
 }
 

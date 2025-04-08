@@ -16,6 +16,11 @@ export interface Params {
    * update comes into effect.
    */
   minFeeUpdateDelay: number;
+  /**
+   * registration_fee is the fee incurred for registering a data proxy.
+   * This fee is burned.
+   */
+  registrationFee: Coin | undefined;
 }
 
 /** ProxyConfig defines a data-proxy entry in the registry. */
@@ -54,13 +59,16 @@ export interface FeeUpdate {
 }
 
 function createBaseParams(): Params {
-  return { minFeeUpdateDelay: 0 };
+  return { minFeeUpdateDelay: 0, registrationFee: undefined };
 }
 
 export const Params = {
   encode(message: Params, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.minFeeUpdateDelay !== 0) {
       writer.uint32(8).uint32(message.minFeeUpdateDelay);
+    }
+    if (message.registrationFee !== undefined) {
+      Coin.encode(message.registrationFee, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
@@ -79,6 +87,13 @@ export const Params = {
 
           message.minFeeUpdateDelay = reader.uint32();
           continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.registrationFee = Coin.decode(reader, reader.uint32());
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -89,13 +104,19 @@ export const Params = {
   },
 
   fromJSON(object: any): Params {
-    return { minFeeUpdateDelay: isSet(object.minFeeUpdateDelay) ? globalThis.Number(object.minFeeUpdateDelay) : 0 };
+    return {
+      minFeeUpdateDelay: isSet(object.minFeeUpdateDelay) ? globalThis.Number(object.minFeeUpdateDelay) : 0,
+      registrationFee: isSet(object.registrationFee) ? Coin.fromJSON(object.registrationFee) : undefined,
+    };
   },
 
   toJSON(message: Params): unknown {
     const obj: any = {};
     if (message.minFeeUpdateDelay !== 0) {
       obj.minFeeUpdateDelay = Math.round(message.minFeeUpdateDelay);
+    }
+    if (message.registrationFee !== undefined) {
+      obj.registrationFee = Coin.toJSON(message.registrationFee);
     }
     return obj;
   },
@@ -106,6 +127,9 @@ export const Params = {
   fromPartial(object: DeepPartial<Params>): Params {
     const message = createBaseParams();
     message.minFeeUpdateDelay = object.minFeeUpdateDelay ?? 0;
+    message.registrationFee = (object.registrationFee !== undefined && object.registrationFee !== null)
+      ? Coin.fromPartial(object.registrationFee)
+      : undefined;
     return message;
   },
 };

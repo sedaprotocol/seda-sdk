@@ -13,6 +13,12 @@ import { BatchAssignment } from "./genesis";
 
 /** The request message for QueryBatch RPC. */
 export interface QueryBatchRequest {
+  /**
+   * latest_signed, if true, overrides the batch_number field and returns the
+   * latest signed batch.
+   */
+  latestSigned: boolean;
+  /** batch_number is used to query a specific batch. */
   batchNumber: bigint;
 }
 
@@ -66,16 +72,19 @@ export interface QueryDataResultResponse {
 }
 
 function createBaseQueryBatchRequest(): QueryBatchRequest {
-  return { batchNumber: 0n };
+  return { latestSigned: false, batchNumber: 0n };
 }
 
 export const QueryBatchRequest = {
   encode(message: QueryBatchRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.latestSigned !== false) {
+      writer.uint32(8).bool(message.latestSigned);
+    }
     if (message.batchNumber !== 0n) {
       if (BigInt.asUintN(64, message.batchNumber) !== message.batchNumber) {
         throw new globalThis.Error("value provided for field message.batchNumber of type uint64 too large");
       }
-      writer.uint32(8).uint64(message.batchNumber.toString());
+      writer.uint32(16).uint64(message.batchNumber.toString());
     }
     return writer;
   },
@@ -92,6 +101,13 @@ export const QueryBatchRequest = {
             break;
           }
 
+          message.latestSigned = reader.bool();
+          continue;
+        case 2:
+          if (tag !== 16) {
+            break;
+          }
+
           message.batchNumber = longToBigint(reader.uint64() as Long);
           continue;
       }
@@ -104,11 +120,17 @@ export const QueryBatchRequest = {
   },
 
   fromJSON(object: any): QueryBatchRequest {
-    return { batchNumber: isSet(object.batchNumber) ? BigInt(object.batchNumber) : 0n };
+    return {
+      latestSigned: isSet(object.latestSigned) ? globalThis.Boolean(object.latestSigned) : false,
+      batchNumber: isSet(object.batchNumber) ? BigInt(object.batchNumber) : 0n,
+    };
   },
 
   toJSON(message: QueryBatchRequest): unknown {
     const obj: any = {};
+    if (message.latestSigned !== false) {
+      obj.latestSigned = message.latestSigned;
+    }
     if (message.batchNumber !== 0n) {
       obj.batchNumber = message.batchNumber.toString();
     }
@@ -120,6 +142,7 @@ export const QueryBatchRequest = {
   },
   fromPartial(object: DeepPartial<QueryBatchRequest>): QueryBatchRequest {
     const message = createBaseQueryBatchRequest();
+    message.latestSigned = object.latestSigned ?? false;
     message.batchNumber = object.batchNumber ?? 0n;
     return message;
   },
