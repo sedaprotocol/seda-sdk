@@ -20,8 +20,8 @@ type ModeConsensusFilter = {
 	jsonPath: JsonPath;
 };
 
-const FILTER_METHOD_STD_DEV = 0x02;
-const stdDevNumberTypesMap = {
+const FILTER_METHOD_MAD = 0x02;
+const madNumberTypesMap = {
 	int32: 0x00,
 	uint32: 0x01,
 	int64: 0x02,
@@ -32,8 +32,11 @@ const stdDevNumberTypesMap = {
 	uint256: 0x07,
 };
 
-type StdDevConsensusFilter = {
-	method: "std-dev";
+type MadConsensusFilter = {
+	/**
+	 * Median absolute deviation (MAD) filter.
+	 */
+	method: "mad";
 	/**
 	 * JSON path used to extract the value to compare from the data request reveal. Should start
 	 * with '$'.
@@ -42,14 +45,14 @@ type StdDevConsensusFilter = {
 	/**
 	 * How to interpret the value found at the JSON path.
 	 */
-	numberType: keyof typeof stdDevNumberTypesMap;
+	numberType: keyof typeof madNumberTypesMap;
 	/**
 	 * Will be converted to a uint64 with 10^6 precision.
 	 */
 	maxSigma: number;
 };
 
-type JsonPathFilter = ModeConsensusFilter | StdDevConsensusFilter;
+type JsonPathFilter = ModeConsensusFilter | MadConsensusFilter;
 export type ConsensusFilter = JsonPathFilter | NoneConsensusFilter;
 
 export function encodeConsensusFilter(filter: ConsensusFilter) {
@@ -58,8 +61,8 @@ export function encodeConsensusFilter(filter: ConsensusFilter) {
 			return encodeNoneFilter(filter);
 		case "mode":
 			return encodeModeFilter(filter);
-		case "std-dev":
-			return encodeStdDevFilter(filter);
+		case "mad":
+			return encodeMadFilter(filter);
 		default:
 			// @ts-expect-error In case a caller does not utilise type checking
 			throw new Error(`Unknown method "${filter.method}".`);
@@ -92,18 +95,18 @@ function encodeModeFilter(filter: ModeConsensusFilter): Uint8Array {
 	]);
 }
 
-// Standard deviation filter input looks as follows:
+// Median absolute deviation (MAD) filter input looks as follows:
 // 0             1           9             10                 18 18+json_path_length
 // | filter_type | max_sigma | number_type | json_path_length | json_path |
-function encodeStdDevFilter(filter: StdDevConsensusFilter): Uint8Array {
+function encodeMadFilter(filter: MadConsensusFilter): Uint8Array {
 	assert(
-		filter.method === "std-dev",
-		`Can't construct "std-dev" filter for filter method "${filter.method}"`,
+		filter.method === "mad",
+		`Can't construct "mad" filter for filter method "${filter.method}"`,
 	);
 
 	return new Uint8Array([
-		FILTER_METHOD_STD_DEV,
-		...getStdDevFilterBytes(filter),
+		FILTER_METHOD_MAD,
+		...getMadFilterBytes(filter),
 		...getJsonPathFilterBytes(filter),
 	]);
 }
@@ -130,10 +133,10 @@ function getJsonPathFilterBytes(filter: JsonPathFilter): number[] {
 // First 8 bytes encode the sigma, last byte encodes the number type.
 // 0           8             9
 // | max_sigma | number_type |
-function getStdDevFilterBytes(filter: StdDevConsensusFilter): number[] {
+function getMadFilterBytes(filter: MadConsensusFilter): number[] {
 	assert(
-		filter.numberType in stdDevNumberTypesMap,
-		`Unknown number type "${filter.numberType}" for std-dev filter.`,
+		filter.numberType in madNumberTypesMap,
+		`Unknown number type "${filter.numberType}" for mad filter.`,
 	);
 
 	const sigma = Big(filter.maxSigma).mul(1e6);
@@ -143,5 +146,5 @@ function getStdDevFilterBytes(filter: StdDevConsensusFilter): number[] {
 	dataView.setBigUint64(0, maxSigma);
 	const maxSigmaBytes = new Uint8Array(dataView.buffer);
 
-	return [...maxSigmaBytes, stdDevNumberTypesMap[filter.numberType]];
+	return [...maxSigmaBytes, madNumberTypesMap[filter.numberType]];
 }

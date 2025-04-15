@@ -44,7 +44,7 @@ describe("encodeConsensusFilter", () => {
 		});
 	});
 
-	describe("method: std-dev", () => {
+	describe("method: MAD", () => {
 		// Taken from chain unit tests
 		it.each([
 			{
@@ -93,7 +93,7 @@ describe("encodeConsensusFilter", () => {
 			},
 		] as const)("should encode a valid filter", ({ input, expectedResult }) => {
 			const result = encodeConsensusFilter({
-				method: "std-dev",
+				method: "mad",
 				...input,
 			});
 
@@ -105,7 +105,7 @@ describe("encodeConsensusFilter", () => {
 		it("should fail on an invalid JSON path", () => {
 			expect(() => {
 				encodeConsensusFilter({
-					method: "std-dev",
+					method: "mad",
 					// @ts-expect-error Force invalid input
 					jsonPath: "result.text",
 					maxSigma: 1.5,
