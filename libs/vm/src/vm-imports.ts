@@ -238,10 +238,15 @@ export default class VmImports {
 		return this.callResult.length;
 	}
 
-	callResultWrite(ptr: number, length: number) {
+	callResultWrite(result_data_ptr: number, length: number) {
 		try {
+			if (this.callResult.length !== length) {
+				throw new Error("call_result_write: result_data_ptr length does not match call_value length");
+			}
+
 			const memory = new Uint8Array(this.memory?.buffer ?? []);
-			memory.set(this.callResult.slice(0, length), ptr);
+			memory.set(this.callResult.slice(0, length), result_data_ptr);
+			this.callResult = new Uint8Array();
 		} catch (err) {
 			console.error(`[${this.processId}] - @callResultWrite: `, err);
 		}

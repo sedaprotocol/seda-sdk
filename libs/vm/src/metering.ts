@@ -111,7 +111,7 @@ export class GasMeter {
 
 export const costTable = {
 	memory: {
-		maximum: 256,
+		maximum: 160,
 	},
 	type: {
 		DEFAULT: Number(GAS_PER_OPRATION),
