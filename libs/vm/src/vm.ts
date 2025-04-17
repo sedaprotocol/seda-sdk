@@ -1,6 +1,6 @@
 import { tryAsync } from "@seda-protocol/utils";
 import { WASI, init } from "@wasmer/wasi";
-import { Maybe } from "true-myth";
+import { Maybe, Result } from "true-myth";
 import { VmError } from "./errors.js";
 import { CallType, GasMeter } from "./metering.js";
 import {
@@ -24,6 +24,7 @@ export interface VmCallData {
 	/** Gas limit for execution (defaults to MAX_SAFE_INTEGER) */
 	gasLimit?: bigint;
 	allowedImports?: string[];
+	vmMode: "tally" | "exec";
 	cache?: CacheOptions;
 	stdoutLimit?: number;
 	stderrLimit?: number;
@@ -90,21 +91,29 @@ async function internalExecuteVm(
 		asyncRequests,
 	);
 
-	const wasmModule = await createWasmModule(callData.binary, callData.cache);
+	let wasmModule: Result<WebAssembly.Module, Error> = Result.err(
+		new Error("empty wasm binary"),
+	);
 
 	try {
-		// For now rethrow the error (since we wanna keep wasmModule outside so we can re-use a compiled module)
-		if (wasmModule.isErr) {
-			throw new VmError(wasmModule.error.message);
-		}
-
 		// Add the startup gas cost which is all bytes in the args list + a constant
 		const totalArgsBytes = callData.args.reduce(
 			(acc, value) => acc + BigInt(value.length),
 			0n,
 		);
 
+		// Add the startup gas cost which is all bytes in the args list + a constant
 		meter.applyGasCost(CallType.Startup, totalArgsBytes);
+
+		// For now rethrow the error (since we wanna keep wasmModule outside so we can re-use a compiled module)
+		wasmModule = await createWasmModule(
+			callData.binary,
+			callData.vmMode,
+			callData.cache,
+		);
+		if (wasmModule.isErr) {
+			throw new VmError(wasmModule.error.message);
+		}
 
 		const wasiImports = wasi.getImports(wasmModule.value) as Record<
 			string,

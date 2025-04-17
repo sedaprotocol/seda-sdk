@@ -11,7 +11,7 @@
         "@cosmjs/stargate": "^0.32.4",
         "@noble/secp256k1": "2.1.0",
         "@seda-protocol/utils": "^1.3.0",
-        "@seda-protocol/wasm-metering-ts": "file:../wasm-metering/",
+        "@seda-protocol/wasm-metering-ts": "file:../wasm-metering-ts/",
         "@types/node-gzip": "^1.1.1",
         "@wasmer/wasi": "^1.2.2",
         "as-bignum": "^0.3.1",
@@ -465,7 +465,7 @@
 
     "@seda-protocol/utils": ["@seda-protocol/utils@1.3.0", "", { "peerDependencies": { "true-myth": "^8.0.1", "valibot": "^0.42.1" } }, "sha512-6/2qt7+TUQcezWwGHB3QdJZLfd8cRzS58UpdbqzAtRmy4jsM7AR5bcKqNrIjNNBIB/rX29ObaLjT3JK3G3Khkg=="],
 
-    "@seda-protocol/wasm-metering-ts": ["@seda-protocol/wasm-metering-ts@file:../wasm-metering", { "dependencies": { "buffer-pipe": "^0.0.5", "leb128": "^0.0.5", "safe-buffer": "^5.2.1", "warp-isomorphic": "^1.0.7", "warp-wasm-metering": "^1.0.1" }, "devDependencies": { "@biomejs/biome": "1.9.4", "@types/bun": "latest" }, "peerDependencies": { "typescript": "^5.7.3" } }],
+    "@seda-protocol/wasm-metering-ts": ["@seda-protocol/wasm-metering-ts@file:../wasm-metering-ts", { "dependencies": { "buffer-pipe": "^0.0.5", "leb128": "^0.0.5", "safe-buffer": "^5.2.1", "warp-isomorphic": "^1.0.7", "warp-wasm-metering": "^1.0.1" }, "devDependencies": { "@biomejs/biome": "1.9.4", "@types/bun": "latest" }, "peerDependencies": { "typescript": "^5.7.3" } }],
 
     "@sinclair/typebox": ["@sinclair/typebox@0.27.8", "", {}, "sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA=="],
 
@@ -1357,7 +1357,7 @@
 
     "@seda-protocol/wasm-metering-ts/@biomejs/biome": ["@biomejs/biome@1.9.4", "", { "optionalDependencies": { "@biomejs/cli-darwin-arm64": "1.9.4", "@biomejs/cli-darwin-x64": "1.9.4", "@biomejs/cli-linux-arm64": "1.9.4", "@biomejs/cli-linux-arm64-musl": "1.9.4", "@biomejs/cli-linux-x64": "1.9.4", "@biomejs/cli-linux-x64-musl": "1.9.4", "@biomejs/cli-win32-arm64": "1.9.4", "@biomejs/cli-win32-x64": "1.9.4" }, "bin": { "biome": "bin/biome" } }, "sha512-1rkd7G70+o9KkTn5KLmDYXihGoTaIGO9PIIN2ZB7UJxFrWw04CZHPYiMRjYsaDvVV7hP1dYNRLxSANLaBFGpog=="],
 
-    "@seda-protocol/wasm-metering-ts/@types/bun": ["@types/bun@1.2.5", "", { "dependencies": { "bun-types": "1.2.5" } }, "sha512-w2OZTzrZTVtbnJew1pdFmgV99H0/L+Pvw+z1P67HaR18MHOzYnTYOi6qzErhK8HyT+DB782ADVPPE92Xu2/Opg=="],
+    "@seda-protocol/wasm-metering-ts/@types/bun": ["@types/bun@1.2.10", "", { "dependencies": { "bun-types": "1.2.10" } }, "sha512-eilv6WFM3M0c9ztJt7/g80BDusK98z/FrFwseZgT4bXCq2vPhXD4z8R3oddmAn+R/Nmz9vBn4kweJKmGTZj+lg=="],
 
     "@swc-node/sourcemap-support/source-map-support": ["source-map-support@0.5.21", "", { "dependencies": { "buffer-from": "^1.0.0", "source-map": "^0.6.0" } }, "sha512-uBHU3L3czsIyYXKX88fdrGovxdSCoTGDRZ6SYXtSRxLZUzHg5P/66Ht6uoUlHu9EZod+inXhKo3qQgwXUT/y1w=="],
 
@@ -2389,7 +2389,7 @@
 
     "@seda-protocol/wasm-metering-ts/@biomejs/biome/@biomejs/cli-win32-x64": ["@biomejs/cli-win32-x64@1.9.4", "", { "os": "win32", "cpu": "x64" }, "sha512-8Y5wMhVIPaWe6jw2H+KlEm4wP/f7EW3810ZLmDlrEEy5KvBsb9ECEfu/kMWD484ijfQ8+nIi0giMgu9g1UAuuA=="],
 
-    "@seda-protocol/wasm-metering-ts/@types/bun/bun-types": ["bun-types@1.2.5", "", { "dependencies": { "@types/node": "*", "@types/ws": "~8.5.10" } }, "sha512-3oO6LVGGRRKI4kHINx5PIdIgnLRb7l/SprhzqXapmoYkFl5m4j6EvALvbDVuuBFaamB46Ap6HCUxIXNLCGy+tg=="],
+    "@seda-protocol/wasm-metering-ts/@types/bun/bun-types": ["bun-types@1.2.10", "", { "dependencies": { "@types/node": "*" } }, "sha512-b5ITZMnVdf3m1gMvJHG+gIfeJHiQPJak0f7925Hxu6ZN5VKA8AGy4GZ4lM+Xkn6jtWxg5S3ldWvfmXdvnkp3GQ=="],
 
     "@swc-node/sourcemap-support/source-map-support/source-map": ["source-map@0.6.1", "", {}, "sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g=="],
 

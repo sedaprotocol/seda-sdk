@@ -1,25 +1,36 @@
 import { VmError } from "./errors";
 
-const GAS_PER_OPRATION = 125n * 15n;
+const GAS_MULTIPLIER_EXEC = 15n;
+const GAS_MULTIPLIER_TALLY = 150n;
+const GAS_PER_OPERATION_BASE = 125n;
 const GAS_ACCOUNTING_MULTIPLIER = 3_000n;
-const GAS_ACCOUNTING_OPCODE = GAS_PER_OPRATION * GAS_ACCOUNTING_MULTIPLIER;
+
+const GAS_PER_OPERATION_TALLY = GAS_PER_OPERATION_BASE * GAS_MULTIPLIER_TALLY;
+const GAS_PER_OPERATION_EXEC = GAS_PER_OPERATION_BASE * GAS_MULTIPLIER_EXEC;
+
+const GAS_ACCOUNTING_OPCODE_TALLY =
+	GAS_PER_OPERATION_TALLY * GAS_ACCOUNTING_MULTIPLIER;
+const GAS_ACCOUNTING_OPCODE_EXEC =
+	GAS_PER_OPERATION_EXEC * GAS_ACCOUNTING_MULTIPLIER;
 
 // Gas for reading and writing bytes
-const TERA_GAS = 1_000_000_000_000n;
 const GAS_PER_BYTE = 10_000n;
-export const GAS_STARTUP = TERA_GAS * 5n;
 
 const GAS_PER_BYTE_EXECUTION_RESULT = 10_000_000n;
+
+const TERA_GAS = 1_000_000_000_000n;
 
 // Makes it so you can do roughly 30 http requests with the current gas calculations.
 const GAS_HTTP_FETCH_BASE = TERA_GAS * 5n;
 
-const GAS_BN254_VERIFY_BASE = 10_000_000n;
+const GAS_BN254_VERIFY_BASE = TERA_GAS;
 // Makes it so you can do roughly 25 proxy http requests with the current gas calculations.
 const GAS_PROXY_HTTP_FETCH_BASE = TERA_GAS * 7n;
-const GAS_SECP256K1_BASE = 10_000_000n;
-const GAS_KECCAK256_BASE = 10_000_000n;
+const GAS_SECP256K1_BASE = TERA_GAS;
+const GAS_KECCAK256_BASE = TERA_GAS;
+const GAS_STARTUP = TERA_GAS * 5n;
 
+// WASI Gas
 const GAS_ARGS_GET_BASE = TERA_GAS;
 const GAS_ARGS_SIZES_GET_BASE = TERA_GAS;
 const GAS_ENVIRON_GET_BASE = TERA_GAS;
@@ -101,6 +112,8 @@ export class GasMeter {
 				gasCost = GAS_ENVIRON_SIZES_GET_BASE + GAS_PER_BYTE * bytesLength;
 				break;
 			case CallType.FdWrite:
+				// For FdWrite, use the number of I/O vectors instead of bytes length
+				// This aligns with the Rust implementation
 				gasCost = GAS_FD_WRITE_BASE + GAS_PER_BYTE * bytesLength;
 				break;
 			default:
@@ -111,42 +124,82 @@ export class GasMeter {
 	}
 }
 
-export const costTable = {
+export const tallyCostTable = {
 	memory: {
 		maximum: 160,
 	},
 	type: {
-		DEFAULT: Number(GAS_PER_OPRATION),
+		DEFAULT: Number(GAS_PER_OPERATION_TALLY),
 	},
 	code: {
 		locals: {
-			DEFAULT: Number(GAS_PER_OPRATION),
+			DEFAULT: Number(GAS_PER_OPERATION_TALLY),
 		},
 		code: {
-			DEFAULT: Number(GAS_PER_OPRATION),
-			loop: Number(GAS_ACCOUNTING_OPCODE),
-			end: Number(GAS_ACCOUNTING_OPCODE),
-			if: Number(GAS_ACCOUNTING_OPCODE),
-			else: Number(GAS_ACCOUNTING_OPCODE),
-			br: Number(GAS_ACCOUNTING_OPCODE),
-			br_table: Number(GAS_ACCOUNTING_OPCODE),
-			br_if: Number(GAS_ACCOUNTING_OPCODE),
-			call: Number(GAS_ACCOUNTING_OPCODE),
-			call_indirect: Number(GAS_ACCOUNTING_OPCODE),
-			return: Number(GAS_ACCOUNTING_OPCODE),
-			throw: Number(GAS_ACCOUNTING_OPCODE),
-			throw_ref: Number(GAS_ACCOUNTING_OPCODE),
-			rethrow: Number(GAS_ACCOUNTING_OPCODE),
-			delegate: Number(GAS_ACCOUNTING_OPCODE),
-			catch: Number(GAS_ACCOUNTING_OPCODE),
-			return_call: Number(GAS_ACCOUNTING_OPCODE),
-			return_call_indirect: Number(GAS_ACCOUNTING_OPCODE),
-			br_on_cast: Number(GAS_ACCOUNTING_OPCODE),
-			br_on_cast_fail: Number(GAS_ACCOUNTING_OPCODE),
-			call_ref: Number(GAS_ACCOUNTING_OPCODE),
-			return_call_ref: Number(GAS_ACCOUNTING_OPCODE),
-			br_on_null: Number(GAS_ACCOUNTING_OPCODE),
-			br_on_non_null: Number(GAS_ACCOUNTING_OPCODE),
+			DEFAULT: Number(GAS_PER_OPERATION_TALLY),
+			loop: Number(GAS_ACCOUNTING_OPCODE_TALLY),
+			end: Number(GAS_ACCOUNTING_OPCODE_TALLY),
+			if: Number(GAS_ACCOUNTING_OPCODE_TALLY),
+			else: Number(GAS_ACCOUNTING_OPCODE_TALLY),
+			br: Number(GAS_ACCOUNTING_OPCODE_TALLY),
+			br_table: Number(GAS_ACCOUNTING_OPCODE_TALLY),
+			br_if: Number(GAS_ACCOUNTING_OPCODE_TALLY),
+			call: Number(GAS_ACCOUNTING_OPCODE_TALLY),
+			call_indirect: Number(GAS_ACCOUNTING_OPCODE_TALLY),
+			return: Number(GAS_ACCOUNTING_OPCODE_TALLY),
+			throw: Number(GAS_ACCOUNTING_OPCODE_TALLY),
+			throw_ref: Number(GAS_ACCOUNTING_OPCODE_TALLY),
+			rethrow: Number(GAS_ACCOUNTING_OPCODE_TALLY),
+			delegate: Number(GAS_ACCOUNTING_OPCODE_TALLY),
+			catch: Number(GAS_ACCOUNTING_OPCODE_TALLY),
+			return_call: Number(GAS_ACCOUNTING_OPCODE_TALLY),
+			return_call_indirect: Number(GAS_ACCOUNTING_OPCODE_TALLY),
+			br_on_cast: Number(GAS_ACCOUNTING_OPCODE_TALLY),
+			br_on_cast_fail: Number(GAS_ACCOUNTING_OPCODE_TALLY),
+			call_ref: Number(GAS_ACCOUNTING_OPCODE_TALLY),
+			return_call_ref: Number(GAS_ACCOUNTING_OPCODE_TALLY),
+			br_on_null: Number(GAS_ACCOUNTING_OPCODE_TALLY),
+			br_on_non_null: Number(GAS_ACCOUNTING_OPCODE_TALLY),
+		},
+	},
+};
+
+export const execCostTable = {
+	memory: {
+		maximum: 160,
+	},
+	type: {
+		DEFAULT: Number(GAS_PER_OPERATION_EXEC),
+	},
+	code: {
+		locals: {
+			DEFAULT: Number(GAS_PER_OPERATION_EXEC),
+		},
+		code: {
+			DEFAULT: Number(GAS_PER_OPERATION_EXEC),
+			loop: Number(GAS_ACCOUNTING_OPCODE_EXEC),
+			end: Number(GAS_ACCOUNTING_OPCODE_EXEC),
+			if: Number(GAS_ACCOUNTING_OPCODE_EXEC),
+			else: Number(GAS_ACCOUNTING_OPCODE_EXEC),
+			br: Number(GAS_ACCOUNTING_OPCODE_EXEC),
+			br_table: Number(GAS_ACCOUNTING_OPCODE_EXEC),
+			br_if: Number(GAS_ACCOUNTING_OPCODE_EXEC),
+			call: Number(GAS_ACCOUNTING_OPCODE_EXEC),
+			call_indirect: Number(GAS_ACCOUNTING_OPCODE_EXEC),
+			return: Number(GAS_ACCOUNTING_OPCODE_EXEC),
+			throw: Number(GAS_ACCOUNTING_OPCODE_EXEC),
+			throw_ref: Number(GAS_ACCOUNTING_OPCODE_EXEC),
+			rethrow: Number(GAS_ACCOUNTING_OPCODE_EXEC),
+			delegate: Number(GAS_ACCOUNTING_OPCODE_EXEC),
+			catch: Number(GAS_ACCOUNTING_OPCODE_EXEC),
+			return_call: Number(GAS_ACCOUNTING_OPCODE_EXEC),
+			return_call_indirect: Number(GAS_ACCOUNTING_OPCODE_EXEC),
+			br_on_cast: Number(GAS_ACCOUNTING_OPCODE_EXEC),
+			br_on_cast_fail: Number(GAS_ACCOUNTING_OPCODE_EXEC),
+			call_ref: Number(GAS_ACCOUNTING_OPCODE_EXEC),
+			return_call_ref: Number(GAS_ACCOUNTING_OPCODE_EXEC),
+			br_on_null: Number(GAS_ACCOUNTING_OPCODE_EXEC),
+			br_on_non_null: Number(GAS_ACCOUNTING_OPCODE_EXEC),
 		},
 	},
 };

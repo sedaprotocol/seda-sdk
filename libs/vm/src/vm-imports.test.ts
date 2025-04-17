@@ -64,7 +64,7 @@ describe("vm-imports", () => {
 		expect(finalImports.some_other_wasi_version.args_get).toBeDefined();
 	});
 
-	it("Empty array should disallow all imports", () => {
+	it("Empty array should disallow all imports except for the pre-configured WASI imports", () => {
 		const vmImports = new VmImports(
 			new GasMeter(1n),
 			"1",
@@ -79,7 +79,6 @@ describe("vm-imports", () => {
 
 		const finalImports = vmImports.getImports({
 			wasi_snapshot_preview1: {
-				args_get: () => {},
 				function_that_could_harm: () => {},
 			},
 		});
@@ -87,7 +86,7 @@ describe("vm-imports", () => {
 		expect(
 			finalImports.wasi_snapshot_preview1.function_that_could_harm,
 		).toBeUndefined();
-		expect(finalImports.wasi_snapshot_preview1.args_get).toBeUndefined();
+		expect(finalImports.wasi_snapshot_preview1.args_get).toBeDefined();
 	});
 
 	it("undefined allowedImports should allow all", () => {
