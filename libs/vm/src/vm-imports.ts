@@ -17,6 +17,7 @@ import type { VmAdapter } from "./types/vm-adapter.js";
 import { PromiseStatus } from "./types/vm-promise.js";
 import type { VmCallData } from "./vm.js";
 import { VmActionRequest, WorkerToHost } from "./worker-host-communication.js";
+import { VmError } from "./errors.js";
 
 export type VmImportsCollection = Record<string, Record<string, unknown>>;
 
@@ -194,7 +195,12 @@ export default class VmImports {
 		publicKeyPtr: number,
 		publicKeyLength: number,
 	) {
-		this.gasMeter.applyGasCost(CallType.Secp256k1Verify, messageLength);
+		if (messageLength < 0 || signatureLength < 0 || publicKeyLength < 0) {
+			throw new VmError("Negative length provided");
+		}
+
+		const totalLen = messageLength + BigInt(signatureLength) + BigInt(publicKeyLength);
+		this.gasMeter.applyGasCost(CallType.Secp256k1Verify, totalLen);
 
 		const message = Buffer.from(
 			new Uint8Array(
@@ -226,12 +232,8 @@ export default class VmImports {
 		);
 
 		if (result.isErr) {
-			console.error(
-				`[${this.processId}] - @secp256k1Verify: ${message}`,
-				result.error,
-			);
 			this.callResult = new Uint8Array();
-			return 0;
+			throw new VmError(result.error.message);
 		}
 
 		this.callResult = result.value;
@@ -239,11 +241,11 @@ export default class VmImports {
 	}
 
 	callResultWrite(result_data_ptr: number, length: number) {
-		try {
-			if (this.callResult.length !== length) {
-				throw new Error("call_result_write: result_data_ptr length does not match call_value length");
-			}
+		if (this.callResult.length !== length) {
+			throw new VmError("call_result_write: result_data_ptr length does not match call_value length");
+		}
 
+		try {
 			const memory = new Uint8Array(this.memory?.buffer ?? []);
 			memory.set(this.callResult.slice(0, length), result_data_ptr);
 			this.callResult = new Uint8Array();

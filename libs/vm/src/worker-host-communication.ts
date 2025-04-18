@@ -17,6 +17,7 @@ import type {
 	VmActionResultBufferMessage,
 } from "./types/worker-messages.js";
 import { WorkerMessageType } from "./types/worker-messages.js";
+import { VmError } from "./errors.js";
 
 const MAX_I32_VALUE = 2_147_483_647;
 
@@ -99,13 +100,13 @@ export class HostToWorker {
 
 		if (typeof this.actionResult === "undefined") {
 			console.error(`[${this.processId}] - Objects that failed: ${action}`);
-			throw Error(
+			throw new VmError(
 				`[${this.processId}] - Result was undefined while reading. Action was: ${action}`,
 			);
 		}
 
 		if (this.actionResult.length > MAX_I32_VALUE) {
-			throw Error(
+			throw new VmError(
 				`[${this.processId}] - Value ${this.actionResult.length} exceeds max i32 (${MAX_I32_VALUE})`,
 			);
 		}
@@ -122,12 +123,12 @@ export class HostToWorker {
 
 	async sendActionResultToWorker(target: SharedArrayBuffer) {
 		if (!this.notifierBuffer)
-			throw new Error(
+			throw new VmError(
 				`[${this.processId}] Called function while not using a worker`,
 			);
 
 		if (target.byteLength !== this.actionResult.length) {
-			throw new Error(
+			throw new VmError(
 				`[${this.processId}] - target buffer does not have a length of ${this.actionResult.length}, received: ${target.byteLength}`,
 			);
 		}

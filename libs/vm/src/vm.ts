@@ -12,6 +12,7 @@ import {
 	HostToWorker,
 	type VmActionRequest,
 } from "./worker-host-communication.js";
+import { VmError } from "./errors.js";
 
 export interface VmCallData {
 	/** WebAssembly binary to execute */
@@ -24,6 +25,8 @@ export interface VmCallData {
 	gasLimit?: bigint;
 	allowedImports?: string[];
 	cache?: CacheOptions;
+	stdoutLimit?: number;
+	stderrLimit?: number;
 }
 
 export interface VmResult {
@@ -35,7 +38,7 @@ export interface VmResult {
 	resultAsString?: string;
 }
 
-export async function executeVm(
+async function internalExecuteVm(
 	callData: VmCallData,
 	processId: string,
 	notifierBufferOrAdapter: SharedArrayBuffer | VmAdapter,
@@ -76,7 +79,7 @@ export async function executeVm(
 	try {
 		// For now rethrow the error (since we wanna keep wasmModule outside so we can re-use a compiled module)
 		if (wasmModule.isErr) {
-			throw wasmModule.error;
+			throw new VmError(wasmModule.error.message);
 		}
 
 		// Add the startup gas cost which is all bytes in the args list + a constant
@@ -160,4 +163,31 @@ export async function executeVm(
 			resultAsString: "",
 		};
 	}
+}
+
+export async function executeVm(
+	callData: VmCallData,
+	processId: string,
+	notifierBufferOrAdapter: SharedArrayBuffer | VmAdapter,
+	asyncRequests: VmActionRequest[] = [],
+): Promise<VmResult> {
+	const result = await internalExecuteVm(callData, processId, notifierBufferOrAdapter, asyncRequests);
+
+	// Truncate stdout if limit is specified
+	if (callData.stdoutLimit !== undefined && callData.stdoutLimit > 0) {
+		// Use string operations instead of Buffer for better memory efficiency
+		if (result.stdout.length > callData.stdoutLimit) {
+			result.stdout = result.stdout.substring(0, callData.stdoutLimit);
+		}
+	}
+
+	// Truncate stderr if limit is specified
+	if (callData.stderrLimit !== undefined && callData.stderrLimit > 0) {
+		// Use string operations instead of Buffer for better memory efficiency
+		if (result.stderr.length > callData.stderrLimit) {
+			result.stderr = result.stderr.substring(0, callData.stderrLimit);
+		}
+	}
+
+	return result;
 }

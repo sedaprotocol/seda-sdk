@@ -1,3 +1,5 @@
+import { VmError } from "./errors";
+
 const GAS_PER_OPRATION = 125n * 15n;
 const GAS_ACCOUNTING_MULTIPLIER = 3_000n;
 const GAS_ACCOUNTING_OPCODE = GAS_PER_OPRATION * GAS_ACCOUNTING_MULTIPLIER;
@@ -53,7 +55,7 @@ export class GasMeter {
 		this.gasUsed += gas;
 
 		if (this.gasUsed > this.limit) {
-			throw new Error("Ran out of gas");
+			throw new VmError("Ran out of gas");
 		}
 	}
 
@@ -102,7 +104,7 @@ export class GasMeter {
 				gasCost = GAS_FD_WRITE_BASE + GAS_PER_BYTE * bytesLength;
 				break;
 			default:
-				throw new Error("Unknown call type");
+				throw new VmError("Unknown call type");
 		}
 
 		this.useGas(gasCost);
