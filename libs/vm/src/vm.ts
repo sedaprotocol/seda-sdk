@@ -165,35 +165,24 @@ async function internalExecuteVm(
 			VM StdOut: ${stdout}
 		`);
 
-		// Extract VmError message if present
 		let errString: string;
 		if (typeof err === 'string') {
 			errString = err;
 		} else if (hasMessageProperty(err)) {
-			// To prevent stacktraces from showing
+			// To prevent stacktraces from being outputted to the explorer
 			errString = err.message;
 		} else {
 			errString = `${err}`;
 		} 
 		
+		// Extract VmError message if present
 		// So we only extract the actual error and not the Wasmer wrappers
 		const vmErrorMatch = errString.match(/VmError\(([^)]+)\)/);
 		
 		if (vmErrorMatch?.[1]) {
 			stderr += `\n${vmErrorMatch[1]}`;
 		} else {
-			// Otherwise just insert the error message
-			let error: string;
-			if (typeof err === 'string') {
-				error = err;
-			} else if (hasMessageProperty(err)) {
-				// To prevent stacktraces from showing
-				error = err.message;
-			} else {
-				error = `${err}`;
-			}
-
-			stderr += `\n${error}`;
+			stderr += `\n${errString}`;
 		}
 
 		return {
