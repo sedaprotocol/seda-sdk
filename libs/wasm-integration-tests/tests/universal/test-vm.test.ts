@@ -59,7 +59,7 @@ describe("test-vm", () => {
             new TallyVmAdapter(),
         );
 
-        expect(result.stderr).toInclude("VmError(Ran out of gas)");
+        expect(result.stderr).toInclude("Ran out of gas");
     });
 
     it("infinite_loop_wasi", async () => {
@@ -83,7 +83,7 @@ describe("test-vm", () => {
         const endTime = Date.now();
         const executionTime = endTime - startTime;
 
-        expect(result.stderr).toInclude("VmError(Ran out of gas)");
+        expect(result.stderr).toInclude("Ran out of gas");
         expect(executionTime).toBeLessThan(1000); // Less than 1 second (1000ms)
     });
 

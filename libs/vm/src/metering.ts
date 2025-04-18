@@ -7,7 +7,7 @@ const GAS_ACCOUNTING_OPCODE = GAS_PER_OPRATION * GAS_ACCOUNTING_MULTIPLIER;
 // Gas for reading and writing bytes
 const TERA_GAS = 1_000_000_000_000n;
 const GAS_PER_BYTE = 10_000n;
-const GAS_STARTUP = TERA_GAS * 5n;
+export const GAS_STARTUP = TERA_GAS * 5n;
 
 const GAS_PER_BYTE_EXECUTION_RESULT = 10_000_000n;
 

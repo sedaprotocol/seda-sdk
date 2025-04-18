@@ -13,6 +13,7 @@ import { type VmCallData, type VmResult, executeVm } from "./vm.js";
 import { HostToWorker } from "./worker-host-communication.js";
 
 export * from "./types/vm-modes.js";
+export * as metering from "./metering.js";
 export { default as TallyVmAdapter } from "./tally-vm-adapter.js";
 export { default as DataRequestVmAdapter } from "./data-request-vm-adapter.js";
 

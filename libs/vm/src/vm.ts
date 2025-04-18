@@ -38,6 +38,22 @@ export interface VmResult {
 	resultAsString?: string;
 }
 
+type PropertyWithMessage = {
+	message: string;
+};
+
+function hasMessageProperty(input: unknown): input is PropertyWithMessage {
+	if (input === null) {
+		return false;
+	}
+
+	if (typeof input === "object") {
+		return Object.hasOwn(input, "message");
+	}
+
+	return false;
+}
+
 async function internalExecuteVm(
 	callData: VmCallData,
 	processId: string,
@@ -140,24 +156,50 @@ async function internalExecuteVm(
 			return subResult.value;
 		}
 
+		const stdout = wasi.getStdoutString();
+
 		console.error(`[${processId}] -
 			@executeWasm
 			Exception threw: ${err}
 			VM StdErr: ${stderr}
-			VM StdOut: ${wasi.getStdoutString()}
+			VM StdOut: ${stdout}
 		`);
 
-		let error = `${err}`;
-		if (err instanceof Error) {
-			error = err.message;
-		}
+		// Extract VmError message if present
+		let errString: string;
+		if (typeof err === 'string') {
+			errString = err;
+		} else if (hasMessageProperty(err)) {
+			// To prevent stacktraces from showing
+			errString = err.message;
+		} else {
+			errString = `${err}`;
+		} 
+		
+		// So we only extract the actual error and not the Wasmer wrappers
+		const vmErrorMatch = errString.match(/VmError\(([^)]+)\)/);
+		
+		if (vmErrorMatch?.[1]) {
+			stderr += `\n${vmErrorMatch[1]}`;
+		} else {
+			// Otherwise just insert the error message
+			let error: string;
+			if (typeof err === 'string') {
+				error = err;
+			} else if (hasMessageProperty(err)) {
+				// To prevent stacktraces from showing
+				error = err.message;
+			} else {
+				error = `${err}`;
+			}
 
-		stderr += `\n${error}`;
+			stderr += `\n${error}`;
+		}
 
 		return {
 			exitCode: 1,
 			stderr,
-			stdout: wasi.getStdoutString(),
+			stdout,
 			result: vmImports.result,
 			gasUsed: meter.gasUsed,
 			resultAsString: "",
