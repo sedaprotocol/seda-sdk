@@ -2,6 +2,7 @@ pub mod bytes;
 pub mod errors;
 pub mod http;
 pub mod keccak256;
+pub mod log;
 pub mod process;
 pub mod promise;
 mod promise_actions;
