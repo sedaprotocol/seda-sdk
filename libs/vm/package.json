@@ -1,9 +1,9 @@
 {
 	"name": "@seda-protocol/vm",
 	"type": "module",
-	"version": "0.1.4-rc1",
+	"version": "1.0.0",
 	"dependencies": {
-		"@seda-protocol/wasm-metering-ts": "https://github.com/sedaprotocol/wasm-metering-ts.git",
+		"@seda-protocol/wasm-metering-ts": "^1.0.0",
 		"@wasmer/wasi": "^1.2.2",
 		"true-myth": "^7.3.0",
 		"@noble/secp256k1": "2.1.0",
