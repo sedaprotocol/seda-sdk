@@ -1,6 +1,7 @@
 import { tryAsync } from "@seda-protocol/utils";
 import { WASI, init } from "@wasmer/wasi";
 import { Maybe } from "true-myth";
+import { VmError } from "./errors.js";
 import { CallType, GasMeter } from "./metering.js";
 import {
 	type CacheOptions,
@@ -12,7 +13,6 @@ import {
 	HostToWorker,
 	type VmActionRequest,
 } from "./worker-host-communication.js";
-import { VmError } from "./errors.js";
 
 export interface VmCallData {
 	/** WebAssembly binary to execute */
@@ -166,19 +166,19 @@ async function internalExecuteVm(
 		`);
 
 		let errString: string;
-		if (typeof err === 'string') {
+		if (typeof err === "string") {
 			errString = err;
 		} else if (hasMessageProperty(err)) {
 			// To prevent stacktraces from being outputted to the explorer
 			errString = err.message;
 		} else {
 			errString = `${err}`;
-		} 
-		
+		}
+
 		// Extract VmError message if present
 		// So we only extract the actual error and not the Wasmer wrappers
 		const vmErrorMatch = errString.match(/VmError\(([^)]+)\)/);
-		
+
 		if (vmErrorMatch?.[1]) {
 			stderr += `\n${vmErrorMatch[1]}`;
 		} else {
@@ -202,7 +202,12 @@ export async function executeVm(
 	notifierBufferOrAdapter: SharedArrayBuffer | VmAdapter,
 	asyncRequests: VmActionRequest[] = [],
 ): Promise<VmResult> {
-	const result = await internalExecuteVm(callData, processId, notifierBufferOrAdapter, asyncRequests);
+	const result = await internalExecuteVm(
+		callData,
+		processId,
+		notifierBufferOrAdapter,
+		asyncRequests,
+	);
 
 	// Truncate stdout if limit is specified
 	if (callData.stdoutLimit !== undefined && callData.stdoutLimit > 0) {

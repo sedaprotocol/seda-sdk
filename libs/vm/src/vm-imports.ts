@@ -2,6 +2,7 @@ import * as Secp256k1 from "@noble/secp256k1";
 import { trySync } from "@seda-protocol/utils";
 import { Maybe } from "true-myth";
 import type { ResultJSON } from "true-myth/result";
+import { VmError } from "./errors.js";
 import { args_get, args_sizes_get } from "./imports/wasi/args_get.js";
 import { environ_get, environ_sizes_get } from "./imports/wasi/environ_get.js";
 import { fd_write } from "./imports/wasi/fd_write.js";
@@ -17,7 +18,6 @@ import type { VmAdapter } from "./types/vm-adapter.js";
 import { PromiseStatus } from "./types/vm-promise.js";
 import type { VmCallData } from "./vm.js";
 import { VmActionRequest, WorkerToHost } from "./worker-host-communication.js";
-import { VmError } from "./errors.js";
 
 export type VmImportsCollection = Record<string, Record<string, unknown>>;
 
@@ -199,7 +199,8 @@ export default class VmImports {
 			throw new VmError("Negative length provided");
 		}
 
-		const totalLen = messageLength + BigInt(signatureLength) + BigInt(publicKeyLength);
+		const totalLen =
+			messageLength + BigInt(signatureLength) + BigInt(publicKeyLength);
 		this.gasMeter.applyGasCost(CallType.Secp256k1Verify, totalLen);
 
 		const message = Buffer.from(
@@ -242,7 +243,9 @@ export default class VmImports {
 
 	callResultWrite(result_data_ptr: number, length: number) {
 		if (this.callResult.length !== length) {
-			throw new VmError("call_result_write: result_data_ptr length does not match call_value length");
+			throw new VmError(
+				"call_result_write: result_data_ptr length does not match call_value length",
+			);
 		}
 
 		try {

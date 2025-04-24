@@ -2,6 +2,7 @@ import { parentPort } from "node:worker_threads";
 import { tryAsync } from "@seda-protocol/utils";
 import { Maybe, Result, ResultNS } from "true-myth";
 import { ResultJSON } from "true-myth/result";
+import { VmError } from "./errors.js";
 import { JSONStringify } from "./services/json.js";
 import {
 	HttpFetchResponse,
@@ -17,7 +18,6 @@ import type {
 	VmActionResultBufferMessage,
 } from "./types/worker-messages.js";
 import { WorkerMessageType } from "./types/worker-messages.js";
-import { VmError } from "./errors.js";
 
 const MAX_I32_VALUE = 2_147_483_647;
 

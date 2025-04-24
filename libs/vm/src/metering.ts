@@ -39,7 +39,7 @@ export enum CallType {
 	ArgsSizesGet = 9,
 	EnvironGet = 10,
 	EnvironSizesGet = 11,
-	FdWrite = 12
+	FdWrite = 12,
 }
 
 export class GasMeter {

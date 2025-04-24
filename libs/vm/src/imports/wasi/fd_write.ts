@@ -9,7 +9,7 @@ export function fd_write(
 	iovs_len: number,
 	nwritten: number,
 ) {
-    gasMeter.applyGasCost(CallType.FdWrite, BigInt(iovs_len));
+	gasMeter.applyGasCost(CallType.FdWrite, BigInt(iovs_len));
 	const func = extractFunctionFromImportValue(importValue);
 	return func(fd, iovs, iovs_len, nwritten);
 }
