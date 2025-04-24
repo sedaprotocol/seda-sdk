@@ -21,7 +21,6 @@ thiserror = "1.0.63"
 seda-sdk-rs = { path = "./libs/rs-sdk/sdk" }
 seda-sdk-macros = { path = "./libs/rs-sdk/seda-sdk-macros" }
 
-
 [profile.release-wasm]
 inherits = "release"
 lto = "fat"
