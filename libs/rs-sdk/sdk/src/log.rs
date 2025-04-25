@@ -43,18 +43,19 @@ macro_rules! debug {
     };
 }
 
-/// A logging macro that prints the value to stdout.
+/// A logging macro that prints the value to stdout, with a newline.
 ///
 /// This macro is a more gas-efficient alternative to regular println! statements.
-/// It evaluates the given expression and writes its display representation to standard output.
+/// It evaluates the given expression and writes its display representation to standard output,
+/// followed by a newline.
 ///
 /// # Examples
 ///
 /// ```rust
 /// # use seda_sdk_rs::log;
 /// let value = 42;
-/// log!("{}\n", value);  // Prints: 42
-/// log!("The answer is: {}\n", value);  // Prints: The answer is: 42
+/// log!("{}", value);  // Prints: 42\n
+/// log!("The answer is: {}", value);  // Prints: The answer is: 42\n
 /// ```
 ///
 /// # Notes
@@ -64,23 +65,24 @@ macro_rules! debug {
 macro_rules! log {
     ($($arg:tt)*) => {{
         use std::io::Write;
-        let _ = std::io::stdout().write_all(format!($($arg)*).as_bytes());
+        let _ = std::io::stdout().write_all(format!("{}\n", format_args!($($arg)*)).as_bytes());
         ()
     }};
 }
 
-/// A logging macro that prints the value to stderr.
+/// A logging macro that prints the value to stderr, with a newline.
 ///
 /// This macro is a more gas-efficient alternative to regular eprintln! statements.
-/// It evaluates the given expression and writes its display representation to standard error.
+/// It evaluates the given expression and writes its display representation to standard error,
+/// followed by a newline.
 ///
 /// # Examples
 ///
 /// ```rust
 /// # use seda_sdk_rs::elog;
 /// let error_code = 404;
-/// elog!("{}\n", error_code);  // Prints: 404
-/// elog!("Error {}: Not Found\n", error_code);  // Prints: Error 404: Not Found
+/// elog!("{}", error_code);  // Prints: 404\n
+/// elog!("Error {}: Not Found", error_code);  // Prints: Error 404: Not Found\n
 /// ```
 ///
 /// # Notes
@@ -90,7 +92,7 @@ macro_rules! log {
 macro_rules! elog {
     ($($arg:tt)*) => {{
         use std::io::Write;
-        let _ = std::io::stderr().write_all(format!($($arg)*).as_bytes());
+        let _ = std::io::stderr().write_all(format!("{}\n", format_args!($($arg)*)).as_bytes());
         ()
     }};
 }
