@@ -27,7 +27,10 @@ const DataResultSchema = pipe(
 		result: custom<Uint8Array>((input) => input instanceof Uint8Array),
 		blockHeight: bigint(),
 		blockTimestamp: bigint(),
-		gasUsed: bigint(),
+		gasUsed: pipe(
+			string(),
+			transform((str) => BigInt(str)),
+		),
 		paybackAddress: string(),
 		sedaPayload: string(),
 	}),
