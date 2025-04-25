@@ -42,3 +42,55 @@ macro_rules! debug {
         ($($crate::debug!($val)),+,)
     };
 }
+
+/// A logging macro that prints the value to stdout.
+///
+/// This macro is a more gas-efficient alternative to regular println! statements.
+/// It evaluates the given expression and writes its display representation to standard output.
+///
+/// # Examples
+///
+/// ```rust
+/// # use seda_sdk_rs::log;
+/// let value = 42;
+/// log!("{}\n", value);  // Prints: 42
+/// log!("The answer is: {}\n", value);  // Prints: The answer is: 42
+/// ```
+///
+/// # Notes
+///
+/// This macro requires that the expression's type implements the `Display` trait.
+#[macro_export]
+macro_rules! log {
+    ($($arg:tt)*) => {{
+        use std::io::Write;
+        let _ = std::io::stdout().write_all(format!($($arg)*).as_bytes());
+        ()
+    }};
+}
+
+/// A logging macro that prints the value to stderr.
+///
+/// This macro is a more gas-efficient alternative to regular eprintln! statements.
+/// It evaluates the given expression and writes its display representation to standard error.
+///
+/// # Examples
+///
+/// ```rust
+/// # use seda_sdk_rs::elog;
+/// let error_code = 404;
+/// elog!("{}\n", error_code);  // Prints: 404
+/// elog!("Error {}: Not Found\n", error_code);  // Prints: Error 404: Not Found
+/// ```
+///
+/// # Notes
+///
+/// This macro requires that the expression's type implements the `Display` trait.
+#[macro_export]
+macro_rules! elog {
+    ($($arg:tt)*) => {{
+        use std::io::Write;
+        let _ = std::io::stderr().write_all(format!($($arg)*).as_bytes());
+        ()
+    }};
+}
