@@ -30,6 +30,7 @@ macro_rules! debug {
     ($expr:expr) => {
         match $expr {
             expr => {
+                use std::io::Write;
                 // Format the debug message
                 std::io::stderr().write_all(format!("[{}:{}] {} = {:#?}\n", file!(), line!(), stringify!($expr), &expr).as_bytes())?;
 
