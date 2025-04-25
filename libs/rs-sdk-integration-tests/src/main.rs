@@ -2,6 +2,7 @@ mod crypto;
 mod http;
 mod infinite_loop;
 mod proxy_http;
+mod random_get;
 mod tally;
 mod vm_tests;
 
@@ -9,10 +10,10 @@ use crypto::{test_keccak256, test_secp256k1_verify_invalid, test_secp256k1_verif
 use http::{test_http_post_success, test_http_rejection, test_http_success};
 use infinite_loop::test_infinite_loop;
 use proxy_http::{test_generate_proxy_http_message, test_proxy_http_fetch};
+use random_get::test_random_get;
 use seda_sdk_rs::{bytes::ToBytes, process::Process};
 use tally::{test_tally_vm_reveals, test_tally_vm_reveals_filtered};
 use vm_tests::{test_tally_vm_http, test_tally_vm_mode};
-
 fn main() {
     let args = String::from_utf8(Process::get_inputs()).unwrap();
 
@@ -30,6 +31,7 @@ fn main() {
         "testProxyHttpFetch" => test_proxy_http_fetch(),
         "testGenerateProxyMessage" => test_generate_proxy_http_message(),
         "testInfiniteLoop" => test_infinite_loop(),
+        "testRandomGet" => test_random_get(),
         _ => Process::error(&"No argument given".to_bytes()),
     }
 }

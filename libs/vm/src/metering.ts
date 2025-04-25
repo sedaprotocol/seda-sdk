@@ -36,7 +36,7 @@ const GAS_ARGS_SIZES_GET_BASE = TERA_GAS;
 const GAS_ENVIRON_GET_BASE = TERA_GAS;
 const GAS_ENVIRON_SIZES_GET_BASE = TERA_GAS;
 const GAS_FD_WRITE_BASE = TERA_GAS;
-
+const GAS_RANDOM_GET_BASE = TERA_GAS;
 export enum CallType {
 	ExecutionResult = 0,
 	HttpFetchRequest = 1,
@@ -51,6 +51,7 @@ export enum CallType {
 	EnvironGet = 10,
 	EnvironSizesGet = 11,
 	FdWrite = 12,
+	RandomGet = 13,
 }
 
 export class GasMeter {
@@ -115,6 +116,9 @@ export class GasMeter {
 				// For FdWrite, use the number of I/O vectors instead of bytes length
 				// This aligns with the Rust implementation
 				gasCost = GAS_FD_WRITE_BASE + GAS_PER_BYTE * bytesLength;
+				break;
+			case CallType.RandomGet:
+				gasCost = GAS_RANDOM_GET_BASE + GAS_PER_BYTE * bytesLength;
 				break;
 			default:
 				throw new VmError("Unknown call type");

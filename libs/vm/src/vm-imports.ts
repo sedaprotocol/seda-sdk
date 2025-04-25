@@ -6,6 +6,7 @@ import { VmError } from "./errors.js";
 import { args_get, args_sizes_get } from "./imports/wasi/args_get.js";
 import { environ_get, environ_sizes_get } from "./imports/wasi/environ_get.js";
 import { fd_write } from "./imports/wasi/fd_write.js";
+import { random_get } from "./imports/wasi/random_get.js";
 import { CallType, type GasMeter } from "./metering.js";
 import { keccak256, secp256k1Verify } from "./services/crypto.js";
 import {
@@ -326,6 +327,13 @@ export default class VmImports {
 						this.callData,
 						this.gasMeter,
 						wasiImports[wasiNamespace].environ_sizes_get,
+						args[0],
+						args[1],
+					),
+				random_get: (...args: number[]) =>
+					random_get(
+						this.gasMeter,
+						wasiImports[wasiNamespace].random_get,
 						args[0],
 						args[1],
 					),
