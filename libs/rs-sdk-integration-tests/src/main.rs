@@ -32,6 +32,7 @@ fn main() {
         "testGenerateProxyMessage" => test_generate_proxy_http_message(),
         "testInfiniteLoop" => test_infinite_loop(),
         "testRandomGet" => test_random_get(),
+        "testPanic" => panic!("test panic"),
         _ => Process::error(&"No argument given".to_bytes()),
     }
 }

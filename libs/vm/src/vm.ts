@@ -111,6 +111,7 @@ async function internalExecuteVm(
 			callData.vmMode,
 			callData.cache,
 		);
+
 		if (wasmModule.isErr) {
 			throw new VmError(wasmModule.error.message);
 		}
@@ -190,7 +191,10 @@ async function internalExecuteVm(
 
 		if (vmErrorMatch?.[1]) {
 			stderr += `\n${vmErrorMatch[1]}`;
-		} else {
+		} else if (!errString.includes("JsValue") && !errString.includes(".js:")) {
+			// Prevent stacktraces from being outputted to the explorer
+			// JsValue is an error from the Wasmer VM, and means that the program itself panicked
+			// The program should already have outputted the error message to stderr (for example in rust the panic! macro)
 			stderr += `\n${errString}`;
 		}
 
