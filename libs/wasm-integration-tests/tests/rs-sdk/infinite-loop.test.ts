@@ -27,6 +27,6 @@ describe("rs-sdk:infinite-loop", () => {
 		);
 
 		expect(result.exitCode).toBe(1);
-		expect(result.gasUsed).toBeGreaterThan(300000000000000n);
+		expect(result.gasUsed).toBeGreaterThanOrEqual(300000000000000n);
 	});
 });

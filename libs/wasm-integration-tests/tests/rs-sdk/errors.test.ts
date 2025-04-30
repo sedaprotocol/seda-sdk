@@ -28,6 +28,6 @@ describe("rs-sdk:errors", () => {
 		expect(result.exitCode).toBe(1);
 		expect(result.stderr).not.toContain(".js");
 		expect(result.stderr).not.toContain("JsValue");
-		expect(result.stderr).toBe("\nRan out of gas");
+		expect(result.stderr).toBe("Ran out of gas");
 	});
 });

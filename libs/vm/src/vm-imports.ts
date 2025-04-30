@@ -343,9 +343,6 @@ export default class VmImports {
 
 		return {
 			...injectedWasi,
-			vm: {
-				meter: this.gasMeter.useGas.bind(this.gasMeter),
-			},
 			seda_v1: {
 				proxy_http_fetch: this.proxyHttpFetch.bind(this),
 				http_fetch: this.httpFetch.bind(this),

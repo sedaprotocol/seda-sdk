@@ -2,7 +2,7 @@ import { tryAsync } from "@seda-protocol/utils";
 import { WASI, init } from "@wasmer/wasi";
 import { Maybe, Result } from "true-myth";
 import { VmError } from "./errors.js";
-import { CallType, GasMeter } from "./metering.js";
+import { CallType, GasMeter, OUT_OF_GAS_MESSAGE } from "./metering.js";
 import {
 	type CacheOptions,
 	createWasmModule,
@@ -80,9 +80,8 @@ async function internalExecuteVm(
 		}
 	}
 
-	const meter = new GasMeter(
-		callData.gasLimit ?? BigInt(Number.MAX_SAFE_INTEGER),
-	);
+	const gasLimit = callData.gasLimit ?? BigInt(Number.MAX_SAFE_INTEGER);
+	const meter = new GasMeter(gasLimit);
 	const vmImports = new VmImports(
 		meter,
 		processId,
@@ -128,6 +127,8 @@ async function internalExecuteVm(
 			wasmModule.value,
 			finalImports,
 		);
+
+		meter.setInstance(instance);
 		const memory = instance.exports.memory;
 		vmImports.setMemory(memory as WebAssembly.Memory);
 		const exitCode = wasi.start(instance);
@@ -137,7 +138,7 @@ async function internalExecuteVm(
 			stderr: wasi.getStderrString(),
 			stdout: wasi.getStdoutString(),
 			result: vmImports.result,
-			gasUsed: meter.gasUsed,
+			gasUsed: meter.getGasUsed(),
 			resultAsString: new TextDecoder().decode(vmImports.result),
 		};
 	} catch (err) {
@@ -198,12 +199,16 @@ async function internalExecuteVm(
 			stderr += `\n${errString}`;
 		}
 
+		if (meter.isOutOfGas()) {
+			stderr += `${OUT_OF_GAS_MESSAGE}`;
+		}
+
 		return {
 			exitCode: 1,
 			stderr,
 			stdout,
 			result: vmImports.result,
-			gasUsed: meter.gasUsed,
+			gasUsed: meter.getGasUsed(),
 			resultAsString: "",
 		};
 	}
