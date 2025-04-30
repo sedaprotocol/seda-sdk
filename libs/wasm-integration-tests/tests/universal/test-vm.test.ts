@@ -97,7 +97,8 @@ describe("test-vm", () => {
 		const executionTime = endTime - startTime;
 
 		expect(result.stderr).toInclude("Ran out of gas");
-		expect(executionTime).toBeLessThan(1000); // Less than 1 second (1000ms)
+		// We expect the execution to be under 1 second, but need to account for compiling the wasm module
+		expect(executionTime).toBeLessThan(2000); // Less than 2 seconds (2000ms)
 	});
 
 	it("long_stdout_stderr", async () => {
