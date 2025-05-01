@@ -1,6 +1,7 @@
-import { tryAsync } from "@seda-protocol/utils";
-import { WASI, init } from "@wasmer/wasi";
+import { randomFillSync } from "node:crypto";
+import { tryAsync, trySync } from "@seda-protocol/utils";
 import { Maybe, Result } from "true-myth";
+import { WASI, useAll } from "uwasi";
 import { VmError } from "./errors.js";
 import { CallType, GasMeter, OUT_OF_GAS_MESSAGE } from "./metering.js";
 import {
@@ -61,12 +62,52 @@ async function internalExecuteVm(
 	notifierBufferOrAdapter: SharedArrayBuffer | VmAdapter,
 	asyncRequests: VmActionRequest[] = [],
 ): Promise<VmResult> {
-	await init();
+	let stdout = "";
+	let stderr = "";
 
-	// First argument matches the Rust Wasmer standard (_start for WASI)
+	// We use a JavaScript WASI implementation because the Wasmer version has a memory leak
 	const wasi = new WASI({
+		// First argument matches the Rust Wasmer standard (_start for WASI)
 		args: ["_start", ...callData.args],
 		env: callData.envs,
+		features: [
+			useAll({
+				randomFillSync,
+				withStdio: {
+					outputBuffers: true,
+					stdout: (line: string | Uint8Array) => {
+						if (typeof line === "string") {
+							stdout += line;
+						} else {
+							const decodedString = trySync(() =>
+								new TextDecoder("utf-8", { fatal: true }).decode(line),
+							);
+
+							if (decodedString.isOk) {
+								stdout += decodedString.value;
+							} else {
+								throw new VmError("stream did not contain valid UTF-8");
+							}
+						}
+					},
+					stderr: (line: string | Uint8Array) => {
+						if (typeof line === "string") {
+							stderr += line;
+						} else {
+							const decodedString = trySync(() =>
+								new TextDecoder("utf-8", { fatal: true }).decode(line),
+							);
+
+							if (decodedString.isOk) {
+								stderr += decodedString.value;
+							} else {
+								throw new VmError("stream did not contain valid UTF-8");
+							}
+						}
+					},
+				},
+			}),
+		],
 	});
 
 	if (!(notifierBufferOrAdapter instanceof SharedArrayBuffer)) {
@@ -115,14 +156,11 @@ async function internalExecuteVm(
 			throw new VmError(wasmModule.error.message);
 		}
 
-		const wasiImports = wasi.getImports(wasmModule.value) as Record<
-			string,
-			Record<string, unknown>
-		>;
+		const wasiImports: WebAssembly.Imports = {
+			wasi_snapshot_preview1: wasi.wasiImport,
+		};
 
-		const finalImports = vmImports.getImports(
-			wasiImports as unknown as WebAssembly.Imports,
-		);
+		const finalImports = vmImports.getImports(wasiImports);
 		const instance = await WebAssembly.instantiate(
 			wasmModule.value,
 			finalImports,
@@ -135,15 +173,13 @@ async function internalExecuteVm(
 
 		return {
 			exitCode,
-			stderr: wasi.getStderrString(),
-			stdout: wasi.getStdoutString(),
+			stderr,
+			stdout,
 			result: vmImports.result,
 			gasUsed: meter.getGasUsed(),
 			resultAsString: new TextDecoder().decode(vmImports.result),
 		};
 	} catch (err) {
-		let stderr = wasi.getStderrString();
-
 		if (vmImports.reExecutionRequest) {
 			// This is not an error that happend, we need to re-execute the vm with the result that is expected
 			asyncRequests.push(vmImports.reExecutionRequest);
@@ -167,8 +203,6 @@ async function internalExecuteVm(
 			return subResult.value;
 		}
 
-		const stdout = wasi.getStdoutString();
-
 		console.error(`[${processId}] -
 			@executeWasm
 			Exception threw: ${err}
@@ -176,31 +210,31 @@ async function internalExecuteVm(
 			VM StdOut: ${stdout}
 		`);
 
-		let errString: string;
-		if (typeof err === "string") {
-			errString = err;
-		} else if (hasMessageProperty(err)) {
-			// To prevent stacktraces from being outputted to the explorer
-			errString = err.message;
-		} else {
-			errString = `${err}`;
-		}
-
-		// Extract VmError message if present
-		// So we only extract the actual error and not the Wasmer wrappers
-		const vmErrorMatch = errString.match(/VmError\(([^)]+)\)/);
-
-		if (vmErrorMatch?.[1]) {
-			stderr += `\n${vmErrorMatch[1]}`;
-		} else if (!errString.includes("JsValue") && !errString.includes(".js:")) {
-			// Prevent stacktraces from being outputted to the explorer
-			// JsValue is an error from the Wasmer VM, and means that the program itself panicked
-			// The program should already have outputted the error message to stderr (for example in rust the panic! macro)
-			stderr += `\n${errString}`;
-		}
-
+		// Out of gas errors still throw an "unreachable" error, which is valid when running out of gas.
 		if (meter.isOutOfGas()) {
 			stderr += `${OUT_OF_GAS_MESSAGE}`;
+		} else {
+			let errString: string;
+			if (typeof err === "string") {
+				errString = err;
+			} else if (hasMessageProperty(err)) {
+				// To prevent stacktraces from being outputted to the explorer
+				errString = err.message;
+			} else {
+				errString = `${err}`;
+			}
+
+			// Extract VmError message if present
+			// So we only extract the actual error and not VM wrappers
+			const vmErrorMatch = errString.match(/VmError\(([^)]+)\)/);
+
+			if (vmErrorMatch?.[1]) {
+				stderr += `\n${vmErrorMatch[1]}`;
+			} else if (!errString.includes(".js:")) {
+				// Prevent stacktraces from being outputted to the explorer
+				// The program should already have outputted the error message to stderr (for example in rust the panic! macro)
+				stderr += `\n${errString}`;
+			}
 		}
 
 		return {

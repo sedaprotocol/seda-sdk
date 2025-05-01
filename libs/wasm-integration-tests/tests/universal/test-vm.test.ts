@@ -172,7 +172,7 @@ describe("test-vm", () => {
 			true,
 		);
 
-		expect(result.stderr).toInclude("stream did not contain valid UTF-8`");
+		expect(result.stderr).toInclude("stream did not contain valid UTF-8");
 	});
 
 	it("stdout_non_utf8", async () => {
@@ -194,6 +194,6 @@ describe("test-vm", () => {
 			true,
 		);
 
-		expect(result.stderr).toInclude("stream did not contain valid UTF-8`");
+		expect(result.stderr).toInclude("stream did not contain valid UTF-8");
 	});
 });

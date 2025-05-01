@@ -1,10 +1,10 @@
 {
 	"name": "@seda-protocol/vm",
 	"type": "module",
-	"version": "1.0.4",
+	"version": "1.0.5",
 	"dependencies": {
 		"@seda-protocol/wasm-metering-ts": "^2.0.0",
-		"@wasmer/wasi": "^1.2.2",
+		"uwasi": "^1.4.1",
 		"true-myth": "^7.3.0",
 		"@noble/secp256k1": "2.1.0",
 		"@noble/hashes": "1.4.0",
