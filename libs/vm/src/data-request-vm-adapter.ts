@@ -83,9 +83,7 @@ export default class DataRequestVmAdapter implements VmAdapter {
 				signal: AbortSignal.timeout(this.timeout),
 				method: action.options.method.toUpperCase(),
 				headers: action.options.headers,
-				body: action.options.body
-					? Buffer.from(action.options.body)
-					: undefined,
+				body: getBody(action),
 			});
 
 			if (!response.body) throw new VmError("HTTP Body was already consumed");
@@ -121,4 +119,18 @@ export default class DataRequestVmAdapter implements VmAdapter {
 			);
 		}
 	}
+}
+
+function getBody(action: HttpFetchAction) {
+	if (!action.options.body) {
+		return undefined;
+	}
+
+	const body = Buffer.from(action.options.body);
+	// If the body is empty, we don't need to send it
+	if (body.length === 0) {
+		return undefined;
+	}
+
+	return body;
 }
