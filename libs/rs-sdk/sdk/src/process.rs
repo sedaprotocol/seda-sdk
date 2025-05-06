@@ -157,9 +157,8 @@ impl Process {
     /// }
     /// ```
     pub fn replication_factor() -> u16 {
-        let variable = env::var(DR_REPLICATION_FACTOR_ENV_KEY).unwrap_or_else(|_| {
-            panic!("{DR_REPLICATION_FACTOR_ENV_KEY} is not set in environment")
-        });
+        let variable = env::var(DR_REPLICATION_FACTOR_ENV_KEY)
+            .unwrap_or_else(|_| panic!("{DR_REPLICATION_FACTOR_ENV_KEY} is not set in environment"));
 
         variable
             .parse()

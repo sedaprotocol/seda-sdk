@@ -51,9 +51,7 @@ impl<T: ToBytes, E: std::error::Error> From<Result<T, E>> for PromiseStatus {
 impl<T: ToBytes, E: std::error::Error> From<Result<Option<T>, E>> for PromiseStatus {
     fn from(value: Result<Option<T>, E>) -> Self {
         match value {
-            Ok(fulfilled) => {
-                PromiseStatus::Fulfilled(fulfilled.map(|inner| inner.to_bytes().eject()))
-            }
+            Ok(fulfilled) => PromiseStatus::Fulfilled(fulfilled.map(|inner| inner.to_bytes().eject())),
             Err(rejection) => PromiseStatus::Rejected(rejection.to_string().to_bytes().eject()),
         }
     }

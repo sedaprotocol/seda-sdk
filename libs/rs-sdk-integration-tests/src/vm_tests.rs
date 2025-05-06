@@ -9,10 +9,7 @@ pub fn test_tally_vm_mode() {
 }
 
 pub fn test_tally_vm_http() {
-    let response = http_fetch(
-        "https://api.binance.com/api/v3/ticker/price?symbol=eth-usdt",
-        None,
-    );
+    let response = http_fetch("https://api.binance.com/api/v3/ticker/price?symbol=eth-usdt", None);
 
     if response.is_ok() {
         Process::error(&"this should not be allowed in tally mode".to_bytes());

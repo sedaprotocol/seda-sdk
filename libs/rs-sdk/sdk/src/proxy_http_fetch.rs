@@ -9,7 +9,7 @@ use crate::{
 };
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
-struct ProxyHttpFetchAction {
+pub struct ProxyHttpFetchAction {
     pub url: String,
     pub public_key: Option<String>,
     pub options: HttpFetchOptions,
@@ -72,8 +72,7 @@ pub fn proxy_http_fetch<URL: ToString>(
     };
 
     let action = serde_json::to_string(&http_action).unwrap();
-    let result_length =
-        unsafe { super::raw::proxy_http_fetch(action.as_ptr(), action.len() as u32) };
+    let result_length = unsafe { super::raw::proxy_http_fetch(action.as_ptr(), action.len() as u32) };
     let mut result_data_ptr = vec![0; result_length as usize];
 
     unsafe {

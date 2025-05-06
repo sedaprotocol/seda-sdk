@@ -1,8 +1,6 @@
 use std::collections::BTreeMap;
 
-use seda_sdk_rs::{
-    bytes::ToBytes, http::http_fetch, process::Process, HttpFetchMethod, HttpFetchOptions,
-};
+use seda_sdk_rs::{bytes::ToBytes, http::http_fetch, process::Process, HttpFetchMethod, HttpFetchOptions};
 use serde::{Deserialize, Serialize};
 
 pub fn test_http_rejection() {
@@ -30,13 +28,7 @@ pub fn test_http_success() {
 
     if response.is_ok() {
         let data = serde_json::from_slice::<TodoResponse>(&response.bytes).unwrap();
-        Process::success(
-            &format!(
-                "{}:{}:{}:{}",
-                data.user_id, data.id, data.title, data.completed
-            )
-            .to_bytes(),
-        );
+        Process::success(&format!("{}:{}:{}:{}", data.user_id, data.id, data.title, data.completed).to_bytes());
         return;
     }
 
@@ -58,10 +50,7 @@ pub fn test_http_post_success() {
     let options = HttpFetchOptions {
         method: HttpFetchMethod::Post,
         headers,
-        body: Some(
-            "{\"title\":\"Test SDK\",\"body\":\"Don't forget to test some integrations.\"}"
-                .to_bytes(),
-        ),
+        body: Some("{\"title\":\"Test SDK\",\"body\":\"Don't forget to test some integrations.\"}".to_bytes()),
     };
 
     let response = http_fetch("https://jsonplaceholder.typicode.com/posts", Some(options));

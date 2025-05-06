@@ -9,7 +9,7 @@ use crate::{
 };
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
-struct HttpFetchAction {
+pub struct HttpFetchAction {
     pub url: String,
     pub options: HttpFetchOptions,
 }

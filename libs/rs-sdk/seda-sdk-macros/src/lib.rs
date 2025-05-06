@@ -4,10 +4,7 @@ use syn::{parse_macro_input, spanned::Spanned, ItemImpl};
 
 fn validate_fn(item: &syn::ImplItemFn, errors: &mut Vec<syn::Error>) {
     if item.sig.unsafety.is_some() {
-        errors.push(syn::Error::new(
-            item.sig.span(),
-            "Function must not be unsafe.",
-        ));
+        errors.push(syn::Error::new(item.sig.span(), "Function must not be unsafe."));
     }
 
     if item.sig.abi.is_some() {
@@ -18,17 +15,11 @@ fn validate_fn(item: &syn::ImplItemFn, errors: &mut Vec<syn::Error>) {
     }
 
     if item.sig.constness.is_some() {
-        errors.push(syn::Error::new(
-            item.sig.span(),
-            "Function must not be const.",
-        ));
+        errors.push(syn::Error::new(item.sig.span(), "Function must not be const."));
     }
 
     if item.sig.asyncness.is_some() {
-        errors.push(syn::Error::new(
-            item.sig.span(),
-            "Function must not be async.",
-        ));
+        errors.push(syn::Error::new(item.sig.span(), "Function must not be async."));
     }
 
     if !item.sig.generics.params.is_empty() {
