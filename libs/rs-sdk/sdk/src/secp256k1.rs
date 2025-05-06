@@ -58,9 +58,6 @@ pub fn secp256k1_verify(message: &[u8], signature: &[u8], public_key: &[u8]) -> 
     match result_data_ptr.first().unwrap_or(&0) {
         0 => false,
         1 => true,
-        _ => panic!(
-            "Secp256k1 verify returned invalid bool in u8: {}",
-            result_length
-        ),
+        _ => panic!("Secp256k1 verify returned invalid bool in u8: {result_length}"),
     }
 }

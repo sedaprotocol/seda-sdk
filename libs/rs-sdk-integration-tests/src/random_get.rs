@@ -3,7 +3,7 @@ use seda_sdk_rs::{bytes::ToBytes, process::Process};
 
 pub fn test_random_get() {
     let random_bytes = rand::thread_rng().gen_range(0..=u8::MAX);
-    println!("Random bytes: {:?}", random_bytes);
+    println!("Random bytes: {random_bytes:?}");
 
     Process::success(&random_bytes.to_bytes());
 }

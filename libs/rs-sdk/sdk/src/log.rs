@@ -66,7 +66,6 @@ macro_rules! log {
     ($($arg:tt)*) => {{
         use std::io::Write;
         let _ = std::io::stdout().write_all(format!("{}\n", format_args!($($arg)*)).as_bytes());
-        ()
     }};
 }
 
@@ -93,6 +92,5 @@ macro_rules! elog {
     ($($arg:tt)*) => {{
         use std::io::Write;
         let _ = std::io::stderr().write_all(format!("{}\n", format_args!($($arg)*)).as_bytes());
-        ()
     }};
 }

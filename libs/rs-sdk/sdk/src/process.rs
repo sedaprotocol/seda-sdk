@@ -158,15 +158,12 @@ impl Process {
     /// ```
     pub fn replication_factor() -> u16 {
         let variable = env::var(DR_REPLICATION_FACTOR_ENV_KEY).unwrap_or_else(|_| {
-            panic!(
-                "{} is not set in environment",
-                DR_REPLICATION_FACTOR_ENV_KEY
-            )
+            panic!("{DR_REPLICATION_FACTOR_ENV_KEY} is not set in environment")
         });
 
         variable
             .parse()
-            .unwrap_or_else(|_| panic!("{} must be a valid u16", DR_REPLICATION_FACTOR_ENV_KEY))
+            .unwrap_or_else(|_| panic!("{DR_REPLICATION_FACTOR_ENV_KEY} must be a valid u16"))
     }
 
     /// Exits the process with the given code and message.

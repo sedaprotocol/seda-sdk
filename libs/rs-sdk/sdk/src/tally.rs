@@ -26,15 +26,13 @@ pub fn get_unfiltered_reveals() -> Result<Vec<RevealResult>> {
     let encoded_reveals = args
         .get(REVEALS_ARGUMENT_POSITION)
         .ok_or(Error::msg(format!(
-            "Expected argument at {}",
-            REVEALS_ARGUMENT_POSITION
+            "Expected argument at {REVEALS_ARGUMENT_POSITION}",
         )))?;
 
     let encoded_consensus = args
         .get(CONSENSUS_ARGUMENT_POSITION)
         .ok_or(Error::msg(format!(
-            "Expected argument at {}",
-            CONSENSUS_ARGUMENT_POSITION
+            "Expected argument at {CONSENSUS_ARGUMENT_POSITION}"
         )))?;
 
     let reveals: Vec<RevealBody> = serde_json::from_str(encoded_reveals)?;
