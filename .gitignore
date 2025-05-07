@@ -45,3 +45,6 @@ Thumbs.db
 .nx/cache
 .nx/workspace-data
 target
+
+# Cargo Lock
+Cargo.lock

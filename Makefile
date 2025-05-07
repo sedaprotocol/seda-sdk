@@ -10,7 +10,7 @@ fmt-check:
 	cargo fmt --all -- --check
 
 check:
-	cargo clippy --all-features --locked -- -D warnings
+	cargo clippy --all-features -- -D warnings
 
 build-integration-tests:
 	cargo build -p rs-sdk-integration-tests --target wasm32-wasip1 --profile release-wasm
