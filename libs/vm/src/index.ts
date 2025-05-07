@@ -38,10 +38,6 @@ export {
 	type HttpFetchResponseData,
 } from "./types/vm-actions.js";
 
-const CURRENT_FILE_PATH = parse(import.meta.url);
-CURRENT_FILE_PATH.base = "worker.js";
-const DEFAULT_WORKER_PATH = format(CURRENT_FILE_PATH);
-
 /**
  * Executes the given WASM binary as if it were an Oracle Program
  *
@@ -52,7 +48,7 @@ const DEFAULT_WORKER_PATH = format(CURRENT_FILE_PATH);
  */
 export function callVm(
 	callData: VmCallData,
-	worker: string | Worker = DEFAULT_WORKER_PATH,
+	worker?: string | Worker,
 	vmAdapter: VmAdapter = new DataRequestVmAdapter(),
 	sync = false,
 ): Promise<VmResult> {
@@ -71,9 +67,18 @@ export function callVm(
 			if (syncresult.isErr) throw syncresult.error;
 			return resolve(syncresult.value);
 		}
+		
+		let vmWorker: Worker;
+		
+		if (worker === undefined) {
+			const CURRENT_FILE_PATH = parse(import.meta.url);
+			CURRENT_FILE_PATH.base = "worker.js";
+			const DEFAULT_WORKER_PATH = format(CURRENT_FILE_PATH);
+			vmWorker = new Worker(DEFAULT_WORKER_PATH);
+		} else {
+			vmWorker = typeof worker === "string" ? new Worker(new URL(worker)) : worker;
+		}
 
-		const vmWorker =
-			typeof worker === "string" ? new Worker(new URL(worker)) : worker;
 		const notifierBuffer = new SharedArrayBuffer(8); // 4 bytes for notifying, 4 bytes for storing i32 numbers
 
 		const hostToWorker = new HostToWorker(vmAdapter, processId, notifierBuffer);
