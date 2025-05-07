@@ -67,16 +67,17 @@ export function callVm(
 			if (syncresult.isErr) throw syncresult.error;
 			return resolve(syncresult.value);
 		}
-		
+
 		let vmWorker: Worker;
-		
+
 		if (worker === undefined) {
 			const CURRENT_FILE_PATH = parse(import.meta.url);
 			CURRENT_FILE_PATH.base = "worker.js";
 			const DEFAULT_WORKER_PATH = format(CURRENT_FILE_PATH);
 			vmWorker = new Worker(DEFAULT_WORKER_PATH);
 		} else {
-			vmWorker = typeof worker === "string" ? new Worker(new URL(worker)) : worker;
+			vmWorker =
+				typeof worker === "string" ? new Worker(new URL(worker)) : worker;
 		}
 
 		const notifierBuffer = new SharedArrayBuffer(8); // 4 bytes for notifying, 4 bytes for storing i32 numbers
