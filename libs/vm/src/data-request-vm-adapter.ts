@@ -51,6 +51,7 @@ export default class DataRequestVmAdapter implements VmAdapter {
 				"fd_write",
 				"environ_get",
 				"environ_sizes_get",
+				"clock_time_get",
 			],
 			envs: {
 				...input.envs,

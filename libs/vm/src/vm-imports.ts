@@ -19,6 +19,7 @@ import type { VmAdapter } from "./types/vm-adapter.js";
 import { PromiseStatus } from "./types/vm-promise.js";
 import type { VmCallData } from "./vm.js";
 import { VmActionRequest, WorkerToHost } from "./worker-host-communication.js";
+import { clock_time_get } from "./imports/wasi/clock.js";
 
 export type VmImportsCollection = Record<string, Record<string, unknown>>;
 
@@ -269,6 +270,8 @@ export default class VmImports {
 	getImports(wasiImports: WebAssembly.Imports): WebAssembly.Imports {
 		const finalWasiImports = wasiImports;
 
+		console.log('[DEBUG]: wasiImports ::: ', wasiImports);
+
 		if (this.callData.allowedImports) {
 			// Loop through every WASI versions
 			for (const wasiVersionKey of Object.keys(wasiImports)) {
@@ -337,9 +340,21 @@ export default class VmImports {
 						args[0],
 						args[1],
 					),
+				clock_time_get: (...args: unknown[]) => {
+					return clock_time_get(
+						this.callData,
+						this.gasMeter,
+						wasiImports[wasiNamespace].clock_time_get,
+						args[0] as number,
+						args[1] as bigint,
+						args[2] as number,
+					);
+				},
 				proc_exit: wasiImports[wasiNamespace].proc_exit,
 			};
 		}
+
+		console.log('[DEBUG]: injectedWasi ::: ', injectedWasi);
 
 		return {
 			...injectedWasi,
