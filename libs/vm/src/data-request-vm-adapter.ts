@@ -1,7 +1,7 @@
 import { Readable, Stream } from "node:stream";
 import fetch from "node-fetch";
 import type { Result } from "true-myth";
-import { VmError } from "./errors.js";
+import { VmError, VmErrorType } from "./errors.js";
 import { readStream } from "./services/read-stream.js";
 import type {
 	HttpFetchAction,
@@ -15,27 +15,35 @@ import type { VmCallData } from "./vm.js";
 
 interface Options {
 	fetchMock?: typeof fetch;
-	timeout?: number;
+	requestTimeout?: number;
 	maxResponseBytes?: number;
+	totalHttpTimeLimit?: number;
 }
 
 export default class DataRequestVmAdapter implements VmAdapter {
 	private processId?: string;
 	private fetchFunction = fetch;
-	private timeout = 30_000;
+	private requestTimeout = 2_000;
 	private maxResponseBytes = 10 * 1024 * 1024; // 10MB
+	private totalHttpTimeLimit = 20_000;
+	private totalHttpTimeLeft = 20_000;
 
-	constructor(opts?: Options) {
+	constructor(private opts?: Options) {
 		if (opts?.fetchMock) {
 			this.fetchFunction = opts.fetchMock;
 		}
 
-		if (opts?.timeout) {
-			this.timeout = opts.timeout;
+		if (opts?.requestTimeout) {
+			this.requestTimeout = opts.requestTimeout;
 		}
 
 		if (opts?.maxResponseBytes) {
 			this.maxResponseBytes = opts.maxResponseBytes;
+		}
+
+		if (opts?.totalHttpTimeLimit) {
+			this.totalHttpTimeLimit = opts.totalHttpTimeLimit;
+			this.totalHttpTimeLeft = opts.totalHttpTimeLimit;
 		}
 	}
 
@@ -78,13 +86,48 @@ export default class DataRequestVmAdapter implements VmAdapter {
 	async httpFetch(
 		action: HttpFetchAction,
 	): Promise<PromiseStatus<HttpFetchResponse>> {
+		const abortController = new AbortController();
+		const globalTimeoutMessage = `Total HTTP fetch time limit exceeded (${this.totalHttpTimeLimit}ms)`;
+
+		if (this.totalHttpTimeLeft <= 0) {
+			throw new VmError(globalTimeoutMessage, {
+				type: VmErrorType.HttpFetchGlobalTimeout,
+			});
+		}
+
+		const httpTimeLimitTimeoutId = setTimeout(() => {
+			abortController.abort(
+				new VmError(globalTimeoutMessage, {
+					type: VmErrorType.HttpFetchGlobalTimeout,
+				}),
+			);
+		}, this.totalHttpTimeLeft);
+
+		const httpTimeoutId = setTimeout(() => {
+			abortController.abort(
+				new VmError("HTTP request has timed out", {
+					type: VmErrorType.HttpFetchTimeout,
+				}),
+			);
+		}, this.requestTimeout);
+
+		const startTime = Date.now();
+
 		try {
 			const response = await this.fetchFunction(new URL(action.url), {
-				signal: AbortSignal.timeout(this.timeout),
+				signal: abortController.signal,
 				method: action.options.method.toUpperCase(),
 				headers: action.options.headers,
 				body: getBody(action),
 			});
+
+			clearTimeout(httpTimeLimitTimeoutId);
+			clearTimeout(httpTimeoutId);
+
+			const endTime = Date.now();
+			const totalTime = endTime - startTime;
+			// Update the remaining time for the next request
+			this.totalHttpTimeLeft = this.totalHttpTimeLeft - totalTime;
 
 			if (!response.body) throw new VmError("HTTP Body was already consumed");
 
@@ -101,12 +144,28 @@ export default class DataRequestVmAdapter implements VmAdapter {
 
 			return PromiseStatus.fulfilled(httpResponse);
 		} catch (error) {
+			clearTimeout(httpTimeLimitTimeoutId);
+			clearTimeout(httpTimeoutId);
+
+			const endTime = Date.now();
+			const totalTime = endTime - startTime;
+
+			// Update the remaining time for the next request
+			this.totalHttpTimeLeft = this.totalHttpTimeLeft - totalTime;
+
 			const stringifiedError = `${error}`;
 
 			console.error(
 				`[${this.processId}] - @default-vm-adapter: `,
 				stringifiedError,
 			);
+
+			if (
+				error instanceof VmError &&
+				error.type === VmErrorType.HttpFetchGlobalTimeout
+			) {
+				throw error;
+			}
 
 			return PromiseStatus.rejected(
 				new HttpFetchResponse({

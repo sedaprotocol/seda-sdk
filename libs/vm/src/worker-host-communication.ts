@@ -2,7 +2,7 @@ import { parentPort } from "node:worker_threads";
 import { tryAsync } from "@seda-protocol/utils";
 import { Maybe, Result, ResultNS } from "true-myth";
 import { ResultJSON } from "true-myth/result";
-import { VmError } from "./errors.js";
+import { VmError, VmErrorType } from "./errors.js";
 import { JSONStringify } from "./services/json.js";
 import {
 	HttpFetchResponse,
@@ -77,11 +77,22 @@ export class HostToWorker {
 		if (isHttpFetchAction(action)) {
 			const actionResult = await tryAsync(this.adapter.httpFetch(action));
 
-			this.actionResult = actionResult.match({
-				Ok: (value) => value.toBuffer(),
-				Err: (error) =>
-					HttpFetchResponse.createRejectedPromise(error.message).toBuffer(),
-			});
+			if (actionResult.isErr) {
+				const error = actionResult.error;
+
+				if (
+					error instanceof VmError &&
+					error.type === VmErrorType.HttpFetchGlobalTimeout
+				) {
+					throw error;
+				}
+
+				this.actionResult = HttpFetchResponse.createRejectedPromise(
+					error.message,
+				).toBuffer();
+			} else {
+				this.actionResult = actionResult.value.toBuffer();
+			}
 		} else if (isProxyHttpFetchGasCostAction(action)) {
 			const actionResult = (
 				await this.adapter.getProxyHttpFetchGasCost(action.fetchAction)
