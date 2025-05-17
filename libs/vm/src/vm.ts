@@ -1,19 +1,16 @@
-import { randomFillSync } from "node:crypto";
-import { tryAsync, trySync } from "@seda-protocol/utils";
 import { Maybe, Result } from "true-myth";
-import { WASI, useAll } from "uwasi";
 import { VmError } from "./errors.js";
 import { CallType, GasMeter, OUT_OF_GAS_MESSAGE } from "./metering.js";
 import {
 	type CacheOptions,
+	createWasi,
 	createWasmModule,
-} from "./services/compile-wasm-moudle.js";
+} from "./services/wasm-module.js";
+import { HttpFetchResponse } from "./types/vm-actions.js";
 import type { VmAdapter } from "./types/vm-adapter.js";
+import { PromiseStatus } from "./types/vm-promise.js";
 import VmImports from "./vm-imports.js";
-import {
-	HostToWorker,
-	type VmActionRequest,
-} from "./worker-host-communication.js";
+import { HostToWorker, VmActionRequest } from "./worker-host-communication.js";
 
 export interface VmCallData {
 	/** WebAssembly binary to execute */
@@ -56,226 +53,215 @@ function hasMessageProperty(input: unknown): input is PropertyWithMessage {
 	return false;
 }
 
-async function internalExecuteVm(
-	callData: VmCallData,
-	processId: string,
-	notifierBufferOrAdapter: SharedArrayBuffer | VmAdapter,
-	asyncRequests: VmActionRequest[] = [],
-): Promise<VmResult> {
-	let stdout = "";
-	let stderr = "";
+export class ExecuteVm {
+	public stdout = "";
+	public stderr = "";
+	public gasMeter: GasMeter;
+	private vmImports: VmImports;
+	private wasmModule: Maybe<WebAssembly.Module> = Maybe.nothing();
+	private asyncRequests: VmActionRequest[] = [];
 
-	// We use a JavaScript WASI implementation because the Wasmer version has a memory leak
-	const wasi = new WASI({
-		// First argument matches the Rust Wasmer standard (_start for WASI)
-		args: ["_start", ...callData.args],
-		env: callData.envs,
-		features: [
-			useAll({
-				randomFillSync,
-				withStdio: {
-					outputBuffers: true,
-					stdout: (line: string | Uint8Array) => {
-						if (typeof line === "string") {
-							stdout += line;
-						} else {
-							const decodedString = trySync(() =>
-								new TextDecoder("utf-8", { fatal: true }).decode(line),
-							);
+	constructor(
+		private callData: VmCallData,
+		public processId: string,
+		private notifierBufferOrAdapter: SharedArrayBuffer | VmAdapter,
+	) {
+		this.gasMeter = new GasMeter(
+			callData.gasLimit ?? BigInt(Number.MAX_SAFE_INTEGER),
+		);
 
-							if (decodedString.isOk) {
-								stdout += decodedString.value;
-							} else {
-								throw new VmError("stream did not contain valid UTF-8");
-							}
-						}
-					},
-					stderr: (line: string | Uint8Array) => {
-						if (typeof line === "string") {
-							stderr += line;
-						} else {
-							const decodedString = trySync(() =>
-								new TextDecoder("utf-8", { fatal: true }).decode(line),
-							);
+		this.vmImports = new VmImports(
+			this.gasMeter,
+			this.processId,
+			this.callData,
+			this.notifierBufferOrAdapter,
+			this.asyncRequests,
+		);
+	}
 
-							if (decodedString.isOk) {
-								stderr += decodedString.value;
-							} else {
-								throw new VmError("stream did not contain valid UTF-8");
-							}
-						}
-					},
-				},
-			}),
-		],
-	});
+	private reset() {
+		this.stdout = "";
+		this.stderr = "";
+		this.gasMeter = new GasMeter(
+			this.callData.gasLimit ?? BigInt(Number.MAX_SAFE_INTEGER),
+		);
+	}
 
-	if (!(notifierBufferOrAdapter instanceof SharedArrayBuffer)) {
-		const hostToWorker = new HostToWorker(notifierBufferOrAdapter, processId);
+	async internalExecute(): Promise<VmResult> {
+		try {
+			// First execute all the async requests that we have to handle
+			if (!(this.notifierBufferOrAdapter instanceof SharedArrayBuffer)) {
+				const hostToWorker = new HostToWorker(
+					this.notifierBufferOrAdapter,
+					this.processId,
+				);
 
-		for (const asyncRequest of asyncRequests) {
-			if (asyncRequest.result.isNothing) {
-				const result = await hostToWorker.executeAction(asyncRequest.vmAction);
-				asyncRequest.result = Maybe.just(result);
+				for (const asyncRequest of this.asyncRequests) {
+					if (asyncRequest.result.isNothing) {
+						const result = await hostToWorker.executeAction(
+							asyncRequest.vmAction,
+						);
+						asyncRequest.result = Maybe.just(result);
+					}
+				}
 			}
+
+			this.reset();
+
+			// Add the startup gas cost which is all bytes in the args list + a constant
+			const totalArgsBytes = this.callData.args.reduce(
+				(acc, value) => acc + BigInt(value.length),
+				0n,
+			);
+
+			// Add the startup gas cost which is all bytes in the args list + a constant
+			this.gasMeter.applyGasCost(CallType.Startup, totalArgsBytes);
+
+			const wasi = createWasi(
+				this.callData,
+				(line) => {
+					this.stdout += line;
+				},
+				(line) => {
+					this.stderr += line;
+				},
+			);
+
+			this.vmImports = new VmImports(
+				this.gasMeter,
+				this.processId,
+				this.callData,
+				this.notifierBufferOrAdapter,
+				this.asyncRequests,
+			);
+
+			const wasmModule = this.wasmModule
+				.map((v) => Result.ok(v))
+				.unwrapOr(
+					await createWasmModule(
+						this.callData.binary,
+						this.callData.vmMode,
+						this.callData.cache,
+					),
+				);
+
+			if (wasmModule.isErr) {
+				throw new VmError(wasmModule.error.message);
+			}
+
+			this.wasmModule = Maybe.just(wasmModule.value);
+			const wasiImports: WebAssembly.Imports = {
+				wasi_snapshot_preview1: wasi.wasiImport,
+			};
+
+			const finalImports = this.vmImports.getImports(wasiImports);
+			const instance = await WebAssembly.instantiate(
+				wasmModule.value,
+				finalImports,
+			);
+
+			this.gasMeter.setInstance(instance);
+			const memory = instance.exports.memory;
+			this.vmImports.setMemory(memory as WebAssembly.Memory);
+
+			const exitCode = wasi.start(instance);
+
+			return {
+				exitCode,
+				stdout: this.stdout,
+				stderr: this.stderr,
+				result: this.vmImports.result,
+				gasUsed: this.gasMeter.getGasUsed(),
+				resultAsString: new TextDecoder().decode(this.vmImports.result),
+			};
+		} catch (err) {
+			if (err instanceof VmActionRequest && this.vmImports.reExecutionRequest) {
+				// This is not an error that happend, we need to re-execute the vm with the result that is expected
+				this.asyncRequests.push(this.vmImports.reExecutionRequest);
+
+				return this.internalExecute();
+			}
+
+			console.error(`[${this.processId}] -
+                @executeWasm
+                Exception threw: ${err}
+                VM StdErr: ${this.stderr}
+                VM StdOut: ${this.stdout}
+		    `);
+
+			if (this.gasMeter.isOutOfGas()) {
+				this.stderr += `${OUT_OF_GAS_MESSAGE}`;
+			} else {
+				let errString: string;
+
+				if (typeof err === "string") {
+					errString = err;
+				} else if (hasMessageProperty(err)) {
+					// To prevent stacktraces from being outputted to the explorer
+					errString = err.message;
+				} else {
+					errString = `${err}`;
+				}
+
+				// Extract VmError message if present
+				// So we only extract the actual error and not VM wrappers
+				const vmErrorMatch = errString.match(/VmError\(([^)]+)\)/);
+
+				if (vmErrorMatch?.[1]) {
+					this.stderr += `\n${vmErrorMatch[1]}`;
+				} else if (!errString.includes(".js:")) {
+					// Prevent stacktraces from being outputted to the explorer
+					// The program should already have outputted the error message to stderr (for example in rust the panic! macro)
+					this.stderr += `\n${errString}`;
+				}
+			}
+
+			return {
+				exitCode: 1,
+				stderr: this.stderr,
+				stdout: this.stdout,
+				result: this.vmImports.result,
+				gasUsed: this.gasMeter.getGasUsed(),
+				resultAsString: "",
+			};
 		}
 	}
 
-	const gasLimit = callData.gasLimit ?? BigInt(Number.MAX_SAFE_INTEGER);
-	const meter = new GasMeter(gasLimit);
-	const vmImports = new VmImports(
-		meter,
-		processId,
-		callData,
-		notifierBufferOrAdapter,
-		asyncRequests,
-	);
+	async execute() {
+		const result = await this.internalExecute();
 
-	let wasmModule: Result<WebAssembly.Module, Error> = Result.err(
-		new Error("empty wasm binary"),
-	);
-
-	try {
-		// Add the startup gas cost which is all bytes in the args list + a constant
-		const totalArgsBytes = callData.args.reduce(
-			(acc, value) => acc + BigInt(value.length),
-			0n,
-		);
-
-		// Add the startup gas cost which is all bytes in the args list + a constant
-		meter.applyGasCost(CallType.Startup, totalArgsBytes);
-
-		// For now rethrow the error (since we wanna keep wasmModule outside so we can re-use a compiled module)
-		wasmModule = await createWasmModule(
-			callData.binary,
-			callData.vmMode,
-			callData.cache,
-		);
-
-		if (wasmModule.isErr) {
-			throw new VmError(wasmModule.error.message);
-		}
-
-		const wasiImports: WebAssembly.Imports = {
-			wasi_snapshot_preview1: wasi.wasiImport,
-		};
-
-		const finalImports = vmImports.getImports(wasiImports);
-		const instance = await WebAssembly.instantiate(
-			wasmModule.value,
-			finalImports,
-		);
-
-		meter.setInstance(instance);
-		const memory = instance.exports.memory;
-		vmImports.setMemory(memory as WebAssembly.Memory);
-		const exitCode = wasi.start(instance);
-
-		return {
-			exitCode,
-			stderr,
-			stdout,
-			result: vmImports.result,
-			gasUsed: meter.getGasUsed(),
-			resultAsString: new TextDecoder().decode(vmImports.result),
-		};
-	} catch (err) {
-		if (vmImports.reExecutionRequest) {
-			// This is not an error that happend, we need to re-execute the vm with the result that is expected
-			asyncRequests.push(vmImports.reExecutionRequest);
-
-			const subResult = await tryAsync(
-				executeVm(
-					{
-						...callData,
-						binary: wasmModule.isOk ? wasmModule.value : callData.binary,
-					},
-					processId,
-					notifierBufferOrAdapter,
-					asyncRequests,
-				),
-			);
-
-			if (subResult.isErr) {
-				throw `Could not do sub execution: ${subResult.error}`;
-			}
-
-			return subResult.value;
-		}
-
-		console.error(`[${processId}] -
-			@executeWasm
-			Exception threw: ${err}
-			VM StdErr: ${stderr}
-			VM StdOut: ${stdout}
-		`);
-
-		// Out of gas errors still throw an "unreachable" error, which is valid when running out of gas.
-		if (meter.isOutOfGas()) {
-			stderr += `${OUT_OF_GAS_MESSAGE}`;
-		} else {
-			let errString: string;
-			if (typeof err === "string") {
-				errString = err;
-			} else if (hasMessageProperty(err)) {
-				// To prevent stacktraces from being outputted to the explorer
-				errString = err.message;
-			} else {
-				errString = `${err}`;
-			}
-
-			// Extract VmError message if present
-			// So we only extract the actual error and not VM wrappers
-			const vmErrorMatch = errString.match(/VmError\(([^)]+)\)/);
-
-			if (vmErrorMatch?.[1]) {
-				stderr += `\n${vmErrorMatch[1]}`;
-			} else if (!errString.includes(".js:")) {
-				// Prevent stacktraces from being outputted to the explorer
-				// The program should already have outputted the error message to stderr (for example in rust the panic! macro)
-				stderr += `\n${errString}`;
+		// Truncate stdout if limit is specified
+		if (
+			this.callData.stdoutLimit !== undefined &&
+			this.callData.stdoutLimit > 0
+		) {
+			// Use string operations instead of Buffer for better memory efficiency
+			if (result.stdout.length > this.callData.stdoutLimit) {
+				result.stdout = result.stdout.substring(0, this.callData.stdoutLimit);
 			}
 		}
 
-		return {
-			exitCode: 1,
-			stderr,
-			stdout,
-			result: vmImports.result,
-			gasUsed: meter.getGasUsed(),
-			resultAsString: "",
-		};
+		// Truncate stderr if limit is specified
+		if (
+			this.callData.stderrLimit !== undefined &&
+			this.callData.stderrLimit > 0
+		) {
+			// Use string operations instead of Buffer for better memory efficiency
+			if (result.stderr.length > this.callData.stderrLimit) {
+				result.stderr = result.stderr.substring(0, this.callData.stderrLimit);
+			}
+		}
+
+		return result;
 	}
 }
 
-export async function executeVm(
+export function executeVm(
 	callData: VmCallData,
 	processId: string,
 	notifierBufferOrAdapter: SharedArrayBuffer | VmAdapter,
-	asyncRequests: VmActionRequest[] = [],
 ): Promise<VmResult> {
-	const result = await internalExecuteVm(
-		callData,
-		processId,
-		notifierBufferOrAdapter,
-		asyncRequests,
-	);
+	const vm = new ExecuteVm(callData, processId, notifierBufferOrAdapter);
 
-	// Truncate stdout if limit is specified
-	if (callData.stdoutLimit !== undefined && callData.stdoutLimit > 0) {
-		// Use string operations instead of Buffer for better memory efficiency
-		if (result.stdout.length > callData.stdoutLimit) {
-			result.stdout = result.stdout.substring(0, callData.stdoutLimit);
-		}
-	}
-
-	// Truncate stderr if limit is specified
-	if (callData.stderrLimit !== undefined && callData.stderrLimit > 0) {
-		// Use string operations instead of Buffer for better memory efficiency
-		if (result.stderr.length > callData.stderrLimit) {
-			result.stderr = result.stderr.substring(0, callData.stderrLimit);
-		}
-	}
-
-	return result;
+	return vm.execute();
 }

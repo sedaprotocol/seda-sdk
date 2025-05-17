@@ -23,7 +23,7 @@ export { startWorker } from "./worker.js";
 export {
 	createWasmModule,
 	type CacheOptions,
-} from "./services/compile-wasm-moudle.js";
+} from "./services/wasm-module.js";
 export { executeVm } from "./vm.js";
 
 export const version = "1.0";

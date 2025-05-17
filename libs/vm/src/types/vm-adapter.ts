@@ -1,4 +1,5 @@
 import type { Result } from "true-myth";
+import type { VmError } from "../errors";
 import type { VmCallData } from "../vm";
 import type {
 	HttpFetchAction,
