@@ -40,8 +40,6 @@ describe("rs-sdk:infinite-loop", () => {
 		);
 
 		expect(result.exitCode).toBe(1);
-		expect(result.stderr).toInclude(
-			"Total HTTP fetch time limit exceeded",
-		);
+		expect(result.stderr).toInclude("Total HTTP fetch time limit exceeded");
 	});
 });
