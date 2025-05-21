@@ -277,6 +277,7 @@ export const tallyCostTable = {
 
 export const execCostTable = {
 	memory: {
+		// 160 pages = 10MB (1 page = 64KB)
 		maximum: 160,
 	},
 	type: {

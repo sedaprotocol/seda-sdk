@@ -88,6 +88,9 @@ export default class DataRequestVmAdapter implements VmAdapter {
 	): Promise<PromiseStatus<HttpFetchResponse>> {
 		const abortController = new AbortController();
 		const globalTimeoutMessage = `Total HTTP fetch time limit exceeded (${this.totalHttpTimeLimit}ms)`;
+		const httpTimeoutMessage = "HTTP request has timed out";
+		let httpTimeout = false;
+		let httpTimeLimitTimeout = false;
 
 		if (this.totalHttpTimeLeft <= 0) {
 			throw new VmError(globalTimeoutMessage, {
@@ -96,6 +99,7 @@ export default class DataRequestVmAdapter implements VmAdapter {
 		}
 
 		const httpTimeLimitTimeoutId = setTimeout(() => {
+			httpTimeLimitTimeout = true;
 			abortController.abort(
 				new VmError(globalTimeoutMessage, {
 					type: VmErrorType.HttpFetchGlobalTimeout,
@@ -104,8 +108,9 @@ export default class DataRequestVmAdapter implements VmAdapter {
 		}, this.totalHttpTimeLeft);
 
 		const httpTimeoutId = setTimeout(() => {
+			httpTimeout = true;
 			abortController.abort(
-				new VmError("HTTP request has timed out", {
+				new VmError(httpTimeoutMessage, {
 					type: VmErrorType.HttpFetchTimeout,
 				}),
 			);
@@ -153,18 +158,20 @@ export default class DataRequestVmAdapter implements VmAdapter {
 			// Update the remaining time for the next request
 			this.totalHttpTimeLeft = this.totalHttpTimeLeft - totalTime;
 
-			const stringifiedError = `${error}`;
+			// When we are timed out we should use the timeout message
+			// Otherwise we use the error message
+			const stringifiedError = httpTimeout ? httpTimeoutMessage : `${error}`;
 
 			console.error(
 				`[${this.processId}] - @default-vm-adapter: `,
 				stringifiedError,
 			);
 
-			if (
-				error instanceof VmError &&
-				error.type === VmErrorType.HttpFetchGlobalTimeout
-			) {
-				throw error;
+			// When the global timeout was reached, we throw a timeout error and abort the VM
+			if (httpTimeLimitTimeout) {
+				throw new VmError(globalTimeoutMessage, {
+					type: VmErrorType.HttpFetchGlobalTimeout,
+				});
 			}
 
 			return PromiseStatus.rejected(
