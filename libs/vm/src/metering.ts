@@ -1,5 +1,5 @@
 import { Maybe, Result, type Unit } from "true-myth";
-import { VmError } from "./errors";
+import { VmError, VmErrorType } from "./errors";
 
 const GAS_MULTIPLIER_EXEC = 15n;
 const GAS_MULTIPLIER_TALLY = 150n;
@@ -102,7 +102,7 @@ export class GasMeter {
 	 * Since it's possible to have 0 points remaining without being out of gas,
 	 * we use a result error to indicate if the instance is out of gas.
 	 */
-	private getRemainingPoints(): Result<bigint, typeof OUT_OF_GAS_MESSAGE> {
+	getRemainingPoints(): Result<bigint, typeof OUT_OF_GAS_MESSAGE> {
 		// Since we're already using gas before the instance is set (such as the startup gas)
 		// we use the remaining points as they are on the gas meter.
 		// Once the instance is set we set its remaining points to the gas meter remaining points,
@@ -160,18 +160,24 @@ export class GasMeter {
 			this.pointsRemaining -= gasCost;
 
 			if (this.pointsRemaining < 0n) {
-				throw new VmError(OUT_OF_GAS_MESSAGE);
+				throw new VmError(OUT_OF_GAS_MESSAGE, {
+					type: VmErrorType.OutOfGas,
+				});
 			}
 			return;
 		}
 
 		const remainingPoints = this.getRemainingPoints();
 		if (remainingPoints.isErr) {
-			throw new VmError(OUT_OF_GAS_MESSAGE);
+			throw new VmError(OUT_OF_GAS_MESSAGE, {
+				type: VmErrorType.OutOfGas,
+			});
 		}
 
 		if (remainingPoints.value < gasCost) {
-			throw new VmError(OUT_OF_GAS_MESSAGE);
+			throw new VmError(OUT_OF_GAS_MESSAGE, {
+				type: VmErrorType.OutOfGas,
+			});
 		}
 
 		const newRemainingPoints = remainingPoints.value - gasCost;

@@ -2,7 +2,7 @@ import * as Secp256k1 from "@noble/secp256k1";
 import { trySync } from "@seda-protocol/utils";
 import { Maybe } from "true-myth";
 import type { ResultJSON } from "true-myth/result";
-import { VmError } from "./errors.js";
+import { VmError, VmErrorType } from "./errors.js";
 import { args_get, args_sizes_get } from "./imports/wasi/args_get.js";
 import { environ_get, environ_sizes_get } from "./imports/wasi/environ_get.js";
 import { fd_write } from "./imports/wasi/fd_write.js";
@@ -60,8 +60,8 @@ export default class VmImports {
 	}
 
 	/**
-	 * TODO: This function also must create the x-seda-proof the same way the overlay node does it
-	 * TODO: This function must be modified to make the verification the same as the data proxy side
+	 * This function relies on the adapter to create the x-seda-proof and verifying the response
+	 * from the data proxy.
 	 * @param action
 	 * @param actionLength
 	 * @returns
@@ -100,7 +100,22 @@ export default class VmImports {
 				return this.callResult.length;
 			}
 
-			this.gasMeter.useGas(BigInt(gasCostMessageResponse.value));
+			// We wrap the original out of gas error to make it easier for the requestor to identify what went wrong
+			const gasCost = trySync(() => {
+				this.gasMeter.useGas(BigInt(gasCostMessageResponse.value));
+			});
+			if (gasCost.isErr) {
+				const remainingPoints = this.gasMeter
+					.getRemainingPoints()
+					.mapOr("0", (t) => t.toString());
+
+				throw new VmError(
+					`Insufficient gas to pay for data proxy. ${gasCostMessageResponse.value} required, only ${remainingPoints} left`,
+					{
+						type: VmErrorType.InsufficientDataProxyFee,
+					},
+				);
+			}
 
 			// Now we know for sure we can pay for it. We should now do the actual fetch
 			const proxyCallResponse = this.workerToHost.callActionOnHost(message);
@@ -116,6 +131,14 @@ export default class VmImports {
 			// Force the VM to exit and notify in executeVm that we need to re-execute
 			if (error instanceof VmActionRequest) {
 				this.reExecutionRequest = error;
+				throw error;
+			}
+
+			if (
+				error instanceof VmError &&
+				(error.type === VmErrorType.InsufficientDataProxyFee ||
+					error.type === VmErrorType.OutOfGas)
+			) {
 				throw error;
 			}
 
@@ -154,6 +177,10 @@ export default class VmImports {
 			// Force the VM to exit and notify in executeVm that we need to re-execute
 			if (error instanceof VmActionRequest) {
 				this.reExecutionRequest = error;
+				throw error;
+			}
+
+			if (error instanceof VmError && error.type === VmErrorType.OutOfGas) {
 				throw error;
 			}
 
