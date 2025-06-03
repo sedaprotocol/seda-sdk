@@ -2,6 +2,7 @@ import { calculateDrFunds } from "@dev-tools/services/dr/calculate-dr-funds";
 import { tryParseSync } from "@seda-protocol/utils";
 import * as v from "valibot";
 import type { GasOptions } from "../gas-options";
+import { getDrConfig } from "../get-dr-config";
 import { signAndSendTx } from "../sign-and-send-tx";
 import type { ISigner } from "../signer";
 import { createSigningClient } from "../signing-client";
@@ -27,11 +28,15 @@ export async function postDataRequestBundle(
 	}
 
 	const contract = signer.getCoreContractAddress();
+	const drConfig = await getDrConfig(sigingClientResult.value.client, signer);
+	if (drConfig.isErr) {
+		throw drConfig.error;
+	}
 
 	const { client: sigingClient, address } = sigingClientResult.value;
 
 	const messages = dataRequestInputs.map((dataRequestInput) => {
-		const postedDr = createPostedDataRequest(dataRequestInput);
+		const postedDr = createPostedDataRequest(dataRequestInput, drConfig.value);
 		return {
 			typeUrl: "/cosmwasm.wasm.v1.MsgExecuteContract",
 			value: {
