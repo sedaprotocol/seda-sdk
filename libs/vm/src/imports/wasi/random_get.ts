@@ -8,6 +8,6 @@ export function random_get(
 	bufLen: number,
 ) {
 	gasMeter.applyGasCost(CallType.RandomGet, BigInt(bufLen));
-	const func = extractFunctionFromImportValue(importValue);
+	const func = extractFunctionFromImportValue("random_get", importValue);
 	return func(buf, bufLen);
 }

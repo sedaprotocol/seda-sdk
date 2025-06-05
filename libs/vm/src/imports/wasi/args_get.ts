@@ -17,7 +17,7 @@ export function args_sizes_get(
 		CallType.ArgsSizesGet,
 		BigInt(getArgsBytesLength(vmCallData.args)),
 	);
-	const func = extractFunctionFromImportValue(importValue);
+	const func = extractFunctionFromImportValue("args_sizes_get", importValue);
 	return func(argc, argv_buf_size);
 }
 
@@ -32,6 +32,6 @@ export function args_get(
 		CallType.ArgsGet,
 		BigInt(getArgsBytesLength(vmCallData.args)),
 	);
-	const func = extractFunctionFromImportValue(importValue);
+	const func = extractFunctionFromImportValue("args_get", importValue);
 	return func(argv, argv_buf);
 }

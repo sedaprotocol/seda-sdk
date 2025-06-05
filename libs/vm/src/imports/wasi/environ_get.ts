@@ -20,7 +20,7 @@ export function environ_get(
 		CallType.EnvironGet,
 		BigInt(getEnvBytesLength(vmCallData.envs)),
 	);
-	const func = extractFunctionFromImportValue(importValue);
+	const func = extractFunctionFromImportValue("environ_get", importValue);
 	return func(environ, environ_buf);
 }
 
@@ -35,6 +35,6 @@ export function environ_sizes_get(
 		CallType.EnvironSizesGet,
 		BigInt(getEnvBytesLength(vmCallData.envs)),
 	);
-	const func = extractFunctionFromImportValue(importValue);
+	const func = extractFunctionFromImportValue("environ_sizes_get", importValue);
 	return func(environc, environ_buf_size);
 }
