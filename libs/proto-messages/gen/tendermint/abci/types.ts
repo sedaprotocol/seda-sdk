@@ -294,7 +294,7 @@ export interface ResponseCheckTx {
   priority: bigint;
   /**
    * mempool_error is set by CometBFT.
-   * ABCI applictions creating a ResponseCheckTX should not set mempool_error.
+   * ABCI applications creating a ResponseCheckTX should not set mempool_error.
    */
   mempoolError: string;
 }
