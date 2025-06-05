@@ -47,10 +47,10 @@ function getFromOptsOrEnvOrFail<
 
 function getFromOptsOrEnv<
 	K extends string,
-	A extends Record<K, string | undefined>,
+	A extends Record<K, string | number | undefined>,
 >(key: K, opts: Partial<A>, envKey: string): Maybe<string> {
 	return Maybe.of(opts[key]).mapOrElse(
 		() => getEnv(envKey),
-		(t) => Maybe.just(t as string),
+		(t) => Maybe.just(String(t)),
 	);
 }
