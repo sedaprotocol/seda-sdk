@@ -1,5 +1,6 @@
 pub mod bytes;
 pub mod errors;
+pub mod hashmap;
 pub mod http;
 pub mod keccak256;
 pub mod log;

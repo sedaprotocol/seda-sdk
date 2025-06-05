@@ -4,9 +4,25 @@ SDK for creating Oracle Programs on the SEDA chain.
 
 ## Caveats
 
-- println, eprint, dbg alternatives
-- Determinism
-- HashMap
+When writing Oracle Programs in Rust for SEDA, there are several important considerations to keep in mind:
+
+### Logging and Debugging
+
+The standard Rust logging macros like `println!`, `eprintln!`, and `dbg!` are not suitable for use in Oracle Programs as they consume large amounts of gas. Instead, we provide the `Console` module which offers gas-efficient alternatives:
+
+- `debug!` - `dbg!` alternative. Used for printing debug information to std err
+- `log!` - `println!` alternative. Used for logging to std out
+- `elog!` - `eprintln!` alternative. Used for logging to std err
+
+### Determinism and the Tally Phase
+
+While the execution phase of an Oracle Program has access to non-deterministic data, the tally phase of an Oracle Program must be deterministic. This means it produces the same output given the same input. When you or a library tries to access randomness the program will halt and exit with an error.
+
+The standard `HashMap` from `std::collections` can't be used without a custom hasher, as the default hasher relies on randomness for the initial seed. Instead try one of the following:
+
+- `BTreeMap` - For key-value storage with ordered keys
+- `Vec` with manual key lookups - For smaller datasets
+- Our provided `seda_sdk_rs::HashMap` - A wrapper around `std::collections::HashMap` with a deterministic hasher
 
 ## Example
 

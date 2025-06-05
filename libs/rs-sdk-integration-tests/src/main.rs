@@ -12,7 +12,9 @@ use infinite_loop::{test_infinite_loop, test_infinite_loop_http_fetch};
 use proxy_http::{test_generate_proxy_http_message, test_proxy_http_fetch};
 use random_get::test_random_get;
 use seda_sdk_rs::{bytes::ToBytes, process::Process};
-use tally::{test_tally_vm_reveals, test_tally_vm_reveals_filtered};
+use tally::{
+    test_tally_deterministic_hashmap, test_tally_hashmap, test_tally_vm_reveals, test_tally_vm_reveals_filtered,
+};
 use vm_tests::{test_tally_vm_http, test_tally_vm_mode};
 fn main() {
     let args = String::from_utf8(Process::get_inputs()).unwrap();
@@ -34,6 +36,8 @@ fn main() {
         "testInfiniteLoopHttpFetch" => test_infinite_loop_http_fetch(),
         "testRandomGet" => test_random_get(),
         "testPanic" => panic!("test panic"),
+        "testTallyHashMap" => test_tally_hashmap(),
+        "testTallyDeterministicHashMap" => test_tally_deterministic_hashmap(),
         _ => Process::error(&"No argument given".to_bytes()),
     }
 }
