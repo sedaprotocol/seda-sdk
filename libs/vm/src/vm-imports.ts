@@ -94,17 +94,15 @@ export default class VmImports {
 
 			if (gasCostMessageResponse.variant === "Err") {
 				this.callResult = HttpFetchResponse.createRejectedPromise(
-					`${gasCostMessageResponse.error}`,
+					`Failed to get proxy gas cost: ${gasCostMessageResponse.error}`,
 				).toBuffer();
 
 				return this.callResult.length;
 			}
 
-			// We wrap the original out of gas error to make it easier for the requestor to identify what went wrong
-			const gasCost = trySync(() => {
-				this.gasMeter.useGas(BigInt(gasCostMessageResponse.value));
-			});
-			if (gasCost.isErr) {
+			const gasCost = BigInt(gasCostMessageResponse.value);
+			// Ensure we have enough gas to pay for the proxy call should it succeed
+			if (this.gasMeter.pointsRemaining < gasCost) {
 				const remainingPoints = this.gasMeter
 					.getRemainingPoints()
 					.mapOr("0", (t) => t.toString());
@@ -117,15 +115,26 @@ export default class VmImports {
 				);
 			}
 
-			// Now we know for sure we can pay for it. We should now do the actual fetch
-			const proxyCallResponse = this.workerToHost.callActionOnHost(message);
+			// Now we know for sure we can pay for the request
+			const proxyCallResponseRaw = this.workerToHost.callActionOnHost(message);
+
+			const promiseStatus = PromiseStatus.fromBuffer(proxyCallResponseRaw);
+			const proxyCallResponse = HttpFetchResponse.fromPromise(promiseStatus);
+
+			// Only consume the proxy gas if the request was successful
+			if (
+				proxyCallResponse.data.status >= 200 &&
+				proxyCallResponse.data.status < 300
+			) {
+				this.gasMeter.useGas(gasCost);
+			}
 
 			this.gasMeter.applyGasCost(
 				CallType.HttpFetchResponse,
-				BigInt(proxyCallResponse.length),
+				BigInt(proxyCallResponseRaw.length),
 			);
 
-			this.callResult = proxyCallResponse;
+			this.callResult = proxyCallResponseRaw;
 			return this.callResult.length;
 		} catch (error) {
 			// Force the VM to exit and notify in executeVm that we need to re-execute
