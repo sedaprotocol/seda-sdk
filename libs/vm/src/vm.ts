@@ -203,16 +203,14 @@ export class ExecuteVm {
 					errString = `${err}`;
 				}
 
-				// Extract VmError message if present
-				// So we only extract the actual error and not VM wrappers
-				const vmErrorMatch = errString.match(/VmError\(([^)]+)\)/);
-
+				// Extract the error message from VmError(message) format.
+				const vmErrorMatch = errString.match(/VmError\((.*)\)/);
 				if (vmErrorMatch?.[1]) {
-					this.stderr += `\n${vmErrorMatch[1]}`;
+					this.stderr += this.stderr ? `\n${vmErrorMatch[1]}` : vmErrorMatch[1];
 				} else if (!errString.includes(".js:")) {
 					// Prevent stacktraces from being outputted to the explorer
 					// The program should already have outputted the error message to stderr (for example in rust the panic! macro)
-					this.stderr += `\n${errString}`;
+					this.stderr += this.stderr ? `\n${errString}` : errString;
 				}
 			}
 

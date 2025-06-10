@@ -19,6 +19,7 @@ pub struct HttpFetchOptions {
     pub method: HttpFetchMethod,
     pub headers: BTreeMap<String, String>,
     pub body: Option<Bytes>,
+    pub timeout_ms: Option<u32>,
 }
 
 impl Default for HttpFetchOptions {
@@ -27,6 +28,7 @@ impl Default for HttpFetchOptions {
             method: HttpFetchMethod::Get,
             headers: BTreeMap::new(),
             body: None,
+            timeout_ms: Some(2_000),
         }
     }
 }

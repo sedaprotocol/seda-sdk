@@ -15,7 +15,6 @@ import type { VmCallData } from "./vm.js";
 
 interface Options {
 	fetchMock?: typeof fetch;
-	requestTimeout?: number;
 	maxResponseBytes?: number;
 	totalHttpTimeLimit?: number;
 }
@@ -23,7 +22,6 @@ interface Options {
 export default class DataRequestVmAdapter implements VmAdapter {
 	private processId?: string;
 	private fetchFunction = fetch;
-	private requestTimeout = 2_000;
 	private maxResponseBytes = 10 * 1024 * 1024; // 10MB
 	private totalHttpTimeLimit = 20_000;
 	private totalHttpTimeLeft = 20_000;
@@ -31,10 +29,6 @@ export default class DataRequestVmAdapter implements VmAdapter {
 	constructor(private opts?: Options) {
 		if (opts?.fetchMock) {
 			this.fetchFunction = opts.fetchMock;
-		}
-
-		if (opts?.requestTimeout) {
-			this.requestTimeout = opts.requestTimeout;
 		}
 
 		if (opts?.maxResponseBytes) {
@@ -86,35 +80,39 @@ export default class DataRequestVmAdapter implements VmAdapter {
 	async httpFetch(
 		action: HttpFetchAction,
 	): Promise<PromiseStatus<HttpFetchResponse>> {
+		// Set up user and global timeouts.
 		const abortController = new AbortController();
-		const globalTimeoutMessage = `Total HTTP fetch time limit exceeded (${this.totalHttpTimeLimit}ms)`;
-		const httpTimeoutMessage = "HTTP request has timed out";
-		let httpTimeout = false;
-		let httpTimeLimitTimeout = false;
+
+		const userTimeout = action.options.timeout_ms ?? 2_000;
+		const userTimeoutMsg = `HTTP fetch time limit exceeded (${userTimeout}ms)`;
+		const globalTimeoutMsg = `Global HTTP fetch time limit exceeded (${this.totalHttpTimeLimit}ms)`;
 
 		if (this.totalHttpTimeLeft <= 0) {
-			throw new VmError(globalTimeoutMessage, {
+			throw new VmError(globalTimeoutMsg, {
 				type: VmErrorType.HttpFetchGlobalTimeout,
 			});
 		}
 
-		const httpTimeLimitTimeoutId = setTimeout(() => {
-			httpTimeLimitTimeout = true;
+		let hasUserTimeout = false;
+		let hasGlobalTimeout = false;
+
+		const globalTimeoutId = setTimeout(() => {
+			hasGlobalTimeout = true;
 			abortController.abort(
-				new VmError(globalTimeoutMessage, {
+				new VmError(globalTimeoutMsg, {
 					type: VmErrorType.HttpFetchGlobalTimeout,
 				}),
 			);
 		}, this.totalHttpTimeLeft);
 
-		const httpTimeoutId = setTimeout(() => {
-			httpTimeout = true;
+		const userTimeoutId = setTimeout(() => {
+			hasUserTimeout = true;
 			abortController.abort(
-				new VmError(httpTimeoutMessage, {
+				new VmError(userTimeoutMsg, {
 					type: VmErrorType.HttpFetchTimeout,
 				}),
 			);
-		}, this.requestTimeout);
+		}, userTimeout);
 
 		const startTime = Date.now();
 
@@ -126,12 +124,12 @@ export default class DataRequestVmAdapter implements VmAdapter {
 				body: getBody(action),
 			});
 
-			clearTimeout(httpTimeLimitTimeoutId);
-			clearTimeout(httpTimeoutId);
+			// Clear timeouts and update total time left for next request.
+			clearTimeout(globalTimeoutId);
+			clearTimeout(userTimeoutId);
 
 			const endTime = Date.now();
 			const totalTime = endTime - startTime;
-			// Update the remaining time for the next request
 			this.totalHttpTimeLeft = this.totalHttpTimeLeft - totalTime;
 
 			if (!response.body) throw new VmError("HTTP Body was already consumed");
@@ -149,35 +147,34 @@ export default class DataRequestVmAdapter implements VmAdapter {
 
 			return PromiseStatus.fulfilled(httpResponse);
 		} catch (error) {
-			clearTimeout(httpTimeLimitTimeoutId);
-			clearTimeout(httpTimeoutId);
+			// Clear timeouts and update total time left for next request.
+			clearTimeout(globalTimeoutId);
+			clearTimeout(userTimeoutId);
 
 			const endTime = Date.now();
 			const totalTime = endTime - startTime;
-
-			// Update the remaining time for the next request
 			this.totalHttpTimeLeft = this.totalHttpTimeLeft - totalTime;
 
-			// When we are timed out we should use the timeout message
-			// Otherwise we use the error message
-			const stringifiedError = httpTimeout ? httpTimeoutMessage : `${error}`;
-
-			console.error(
-				`[${this.processId}] - @default-vm-adapter: `,
-				stringifiedError,
-			);
-
-			// When the global timeout was reached, we throw a timeout error and abort the VM
-			if (httpTimeLimitTimeout) {
-				throw new VmError(globalTimeoutMessage, {
+			// When a timeout was reached, we throw a timeout error and abort the VM
+			if (hasGlobalTimeout) {
+				throw new VmError(globalTimeoutMsg, {
 					type: VmErrorType.HttpFetchGlobalTimeout,
 				});
 			}
 
+			if (hasUserTimeout) {
+				throw new VmError(userTimeoutMsg, {
+					type: VmErrorType.HttpFetchTimeout,
+				});
+			}
+
+			const errorMsg = `${error}`;
+			console.error(`[${this.processId}] - @default-vm-adapter: `, errorMsg);
+
 			return PromiseStatus.rejected(
 				new HttpFetchResponse({
-					bytes: Array.from(new TextEncoder().encode(stringifiedError)),
-					content_length: stringifiedError.length,
+					bytes: Array.from(new TextEncoder().encode(errorMsg)),
+					content_length: errorMsg.length,
 					headers: {},
 					status: 0,
 					url: "",

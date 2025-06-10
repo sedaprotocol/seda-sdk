@@ -35,6 +35,9 @@ export function testOracleProgramExecution(
 	fetchMock?: typeof fetch,
 	gasLimit?: bigint,
 	sync?: boolean,
+	adapterOptions?: {
+		totalHttpTimeLimit?: number;
+	},
 ) {
 	return callVm(
 		{
@@ -45,7 +48,7 @@ export function testOracleProgramExecution(
 			vmMode: "exec",
 		},
 		undefined,
-		new DataRequestVmAdapter({ fetchMock }),
+		new DataRequestVmAdapter({ fetchMock, ...adapterOptions }),
 		sync,
 	);
 }

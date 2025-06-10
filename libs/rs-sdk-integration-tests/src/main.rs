@@ -7,7 +7,10 @@ mod tally;
 mod vm_tests;
 
 use crypto::{test_keccak256, test_secp256k1_verify_invalid, test_secp256k1_verify_valid};
-use http::{test_http_post_success, test_http_rejection, test_http_success};
+use http::{
+    test_http_post_success, test_http_rejection, test_http_success, test_long_fetch, test_user_http_no_timeout,
+    test_user_http_should_timeout,
+};
 use infinite_loop::{test_infinite_loop, test_infinite_loop_http_fetch};
 use proxy_http::{test_generate_proxy_http_message, test_proxy_http_fetch};
 use random_get::test_random_get;
@@ -38,6 +41,9 @@ fn main() {
         "testPanic" => panic!("test panic"),
         "testTallyHashMap" => test_tally_hashmap(),
         "testTallyDeterministicHashMap" => test_tally_deterministic_hashmap(),
+        "testUserHttpShouldTimeout" => test_user_http_should_timeout(),
+        "testUserHttpNoTimeout" => test_user_http_no_timeout(),
+        "testLongFetch" => test_long_fetch(),
         _ => Process::error(&"No argument given".to_bytes()),
     }
 }

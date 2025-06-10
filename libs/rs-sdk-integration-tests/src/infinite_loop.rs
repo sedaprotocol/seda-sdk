@@ -14,6 +14,6 @@ pub fn test_infinite_loop() {
 
 pub fn test_infinite_loop_http_fetch() {
     loop {
-        let _ = http_fetch("https://fakeresponder.com/?sleep=2400", None);
+        let _ = http_fetch("https://fakeresponder.com/?sleep=1000", None);
     }
 }
