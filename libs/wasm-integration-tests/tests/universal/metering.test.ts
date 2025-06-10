@@ -40,6 +40,6 @@ describe("metering", () => {
 		);
 
 		expect(result.exitCode).toBe(1);
-		expect(result.stderr).toBe("\nRan out of gas");
+		expect(result.stderr).toBe("Ran out of gas");
 	});
 });

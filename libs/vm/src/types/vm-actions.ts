@@ -20,6 +20,7 @@ export interface HttpFetchOptions {
 	method: HttpFetchMethod;
 	headers: { [key: string]: string };
 	body?: Uint8Array;
+	timeout_ms?: number;
 }
 
 export type VmAction =
