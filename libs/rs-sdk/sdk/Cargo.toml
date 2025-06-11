@@ -3,10 +3,15 @@ name = "seda-sdk-rs"
 version = "1.0.0-rc.4"
 edition = "2021"
 
+[features]
+default = ["hide-panic-paths"]
+hide-panic-paths = ["dep:ctor"]
+
 [dependencies]
-anyhow = { workspace = true }
-hex = { workspace = true }
+anyhow.workspace = true
+ctor = { workspace = true, optional = true }
+hex.workspace = true
 serde = { workspace = true, features = ["derive"] }
-serde_json = { workspace = true }
-thiserror = { workspace = true }
+serde_json.workspace = true
+thiserror.workspace = true
 seda-sdk-macros.workspace = true

@@ -14,6 +14,12 @@ The standard Rust logging macros like `println!`, `eprintln!`, and `dbg!` are no
 - `log!` - `println!` alternative. Used for logging to std out
 - `elog!` - `eprintln!` alternative. Used for logging to std err
 
+### Stripped Panic Messages
+
+By default when SDK is imported and used it turns on the `hide-panic-paths` feature. This feature sets a panic hook to remove location details as to not show the filepath of the person who compiled the Oracle Program. It attempts to retain the panic message details, but if it cannot it instead `elogs!("<panic>");`.
+
+If you run into the above and wish to see the full message, note that it will print the path of where the panic occurred(downloaded crates or your oracle program), you can disable this feature. That can be done via your `Cargo.toml` and doing `seda-sdk-rs = { git = "https://github.com/sedaprotocol/seda-sdk", tag/version/branch = "some_qualifier", default-features = false }`.
+
 ### Determinism and the Tally Phase
 
 While the execution phase of an Oracle Program has access to non-deterministic data, the tally phase of an Oracle Program must be deterministic. This means it produces the same output given the same input. When you or a library tries to access randomness the program will halt and exit with an error.
