@@ -14,11 +14,11 @@ describe("rs-sdk:infinite-loop", () => {
 		);
 
 		expect(result.exitCode).toBe(1);
-		expect(result.stderr).toBe("\nRan out of gas");
+		expect(result.stderr).toBe("Ran out of gas");
 		expect(result.gasUsed).toBe(5000000320000n);
 	});
 
-	it("should stop when a program is an infintite loop", async () => {
+	it("should stop when a program is an infinite loop", async () => {
 		const result = await testOracleProgramExecution(
 			oracleProgram,
 			Buffer.from("testInfiniteLoop"),
@@ -30,7 +30,7 @@ describe("rs-sdk:infinite-loop", () => {
 		expect(result.gasUsed).toBeGreaterThanOrEqual(300000000000000n);
 	});
 
-	it("should stop when a program is an infintite loop and has a http fetch", async () => {
+	it("should stop when a program is an infinite loop of http fetches", async () => {
 		const result = await testOracleProgramExecution(
 			oracleProgram,
 			Buffer.from("testInfiniteLoopHttpFetch"),
@@ -40,6 +40,8 @@ describe("rs-sdk:infinite-loop", () => {
 		);
 
 		expect(result.exitCode).toBe(1);
-		expect(result.stderr).toInclude("Total HTTP fetch time limit exceeded");
+		expect(result.stderr).toInclude(
+			"Global HTTP fetch time limit exceeded (20000ms)",
+		);
 	});
 });

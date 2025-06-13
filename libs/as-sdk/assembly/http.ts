@@ -139,6 +139,11 @@ export class HttpFetchOptions {
 	 * Body encoded in bytes to send along in a POST, PATCH, etc.
 	 */
 	body: Bytes | null = null;
+
+	/**
+	 * Timeout in milliseconds
+	 */
+	timeout_ms: number = 2_000;
 }
 
 @json
@@ -146,6 +151,7 @@ export class SerializableHttpFetchOptions {
 	method!: string;
 	headers!: Map<string, string>;
 	body: u8[] = [];
+	timeout_ms!: number;
 }
 
 @json
@@ -160,6 +166,7 @@ export class HttpFetchAction {
 		this.options.method = options.method;
 		this.options.headers = options.headers;
 		this.options.body = bytesToJsonArray(options.body);
+		this.options.timeout_ms = options.timeout_ms;
 	}
 }
 
