@@ -80,13 +80,6 @@ export class HostToWorker {
 			if (actionResult.isErr) {
 				const error = actionResult.error;
 
-				if (
-					error instanceof VmError &&
-					error.type === VmErrorType.HttpFetchGlobalTimeout
-				) {
-					throw error;
-				}
-
 				this.actionResult = HttpFetchResponse.createRejectedPromise(
 					error.message,
 				).toBuffer();

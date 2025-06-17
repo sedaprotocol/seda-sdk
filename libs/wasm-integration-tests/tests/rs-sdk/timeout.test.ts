@@ -45,8 +45,8 @@ describe("rs-sdk:timeout", () => {
 		);
 
 		expect(result.exitCode).toBe(1);
-		expect(result.stderr).toInclude(
-			"Global HTTP fetch time limit exceeded (5000ms)",
+		expect(result.resultAsString).toBe(
+			"Global HTTP fetch time limit exceeded (5000ms)\n---\nGlobal HTTP fetch time limit exceeded (5000ms)",
 		);
 	});
 });

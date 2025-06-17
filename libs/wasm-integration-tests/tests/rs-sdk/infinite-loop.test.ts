@@ -40,8 +40,6 @@ describe("rs-sdk:infinite-loop", () => {
 		);
 
 		expect(result.exitCode).toBe(1);
-		expect(result.stderr).toInclude(
-			"Global HTTP fetch time limit exceeded (20000ms)",
-		);
+		expect(result.stderr).toBe("Ran out of gas");
 	});
 });

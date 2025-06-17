@@ -116,11 +116,21 @@ pub fn test_long_fetch() {
         timeout_ms: Some(20000),
     };
 
-    let response = http_fetch("https://fakeresponder.onrender.com/?sleepMs=10000", Some(options));
-    if response.is_ok() {
+    let first_response = http_fetch("https://fakeresponder.onrender.com/?sleepMs=10000", Some(options));
+    if first_response.is_ok() {
         Process::success(&"success".to_bytes());
         return;
     }
 
-    Process::error(&response.bytes);
+    let second_response = http_fetch("https://fakeresponder.onrender.com/?sleepMs=100", None);
+    if second_response.is_ok() {
+        Process::success(&"success".to_bytes());
+        return;
+    }
+
+    let mut error_bytes = Vec::new();
+    error_bytes.extend(&first_response.bytes);
+    error_bytes.extend(b"\n---\n");
+    error_bytes.extend(&second_response.bytes);
+    Process::error(&error_bytes);
 }

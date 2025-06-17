@@ -87,12 +87,6 @@ export default class DataRequestVmAdapter implements VmAdapter {
 		const userTimeoutMsg = `HTTP fetch time limit exceeded (${userTimeout}ms)`;
 		const globalTimeoutMsg = `Global HTTP fetch time limit exceeded (${this.totalHttpTimeLimit}ms)`;
 
-		if (this.totalHttpTimeLeft <= 0) {
-			throw new VmError(globalTimeoutMsg, {
-				type: VmErrorType.HttpFetchGlobalTimeout,
-			});
-		}
-
 		let hasUserTimeout = false;
 		let hasGlobalTimeout = false;
 
@@ -117,6 +111,13 @@ export default class DataRequestVmAdapter implements VmAdapter {
 		const startTime = Date.now();
 
 		try {
+			if (this.totalHttpTimeLeft <= 0) {
+				hasGlobalTimeout = true;
+				throw new VmError(globalTimeoutMsg, {
+					type: VmErrorType.HttpFetchGlobalTimeout,
+				});
+			}
+
 			const response = await this.fetchFunction(new URL(action.url), {
 				signal: abortController.signal,
 				method: action.options.method.toUpperCase(),
@@ -155,20 +156,16 @@ export default class DataRequestVmAdapter implements VmAdapter {
 			const totalTime = endTime - startTime;
 			this.totalHttpTimeLeft = this.totalHttpTimeLeft - totalTime;
 
-			// When a timeout was reached, we throw a timeout error and abort the VM
+			// Construct an error message.
+			let errorMsg = "";
 			if (hasGlobalTimeout) {
-				throw new VmError(globalTimeoutMsg, {
-					type: VmErrorType.HttpFetchGlobalTimeout,
-				});
+				errorMsg = globalTimeoutMsg;
+			} else if (hasUserTimeout) {
+				errorMsg = userTimeoutMsg;
+			} else {
+				errorMsg = `${error}`;
 			}
 
-			if (hasUserTimeout) {
-				throw new VmError(userTimeoutMsg, {
-					type: VmErrorType.HttpFetchTimeout,
-				});
-			}
-
-			const errorMsg = `${error}`;
 			console.error(`[${this.processId}] - @default-vm-adapter: `, errorMsg);
 
 			return PromiseStatus.rejected(
