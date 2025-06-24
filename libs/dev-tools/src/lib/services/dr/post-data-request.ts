@@ -41,21 +41,20 @@ export async function postDataRequest(
 
 	const { client: sigingClient, address } = sigingClientResult.value;
 
-	const postedDr = createPostedDataRequest(dataRequestInput, drConfig.value);
+	const post_data_request = createPostedDataRequest(
+		dataRequestInput,
+		drConfig.value,
+	);
 
 	const message = {
 		typeUrl: "/cosmwasm.wasm.v1.MsgExecuteContract",
 		value: {
-			funds: [{ amount: calculateDrFunds(postedDr), denom: "aseda" }],
+			funds: [{ amount: calculateDrFunds(post_data_request), denom: "aseda" }],
 			sender: address,
 			contract,
 			msg: Buffer.from(
 				JSON.stringify({
-					post_data_request: {
-						seda_payload: Buffer.from([]).toString("base64"),
-						payback_address: Buffer.from("seda_sdk").toString("base64"),
-						posted_dr: postedDr,
-					},
+					post_data_request,
 				}),
 			),
 		},

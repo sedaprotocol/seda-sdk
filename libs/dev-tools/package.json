@@ -1,7 +1,7 @@
 {
 	"name": "@seda-protocol/dev-tools",
 	"type": "module",
-	"version": "1.0.0-rc.14",
+	"version": "1.0.0-rc.15",
 	"scripts": {
 		"build:cli": "bun build src/cli/index.ts --target node --outdir bin",
 		"build": "bun run build:cli && bun run build:lib",

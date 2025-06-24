@@ -11,6 +11,8 @@ const DEFAULT_EXEC_GAS_LIMIT = 300_000_000_000_000;
 const DEFAULT_TALLY_GAS_LIMIT = 50_000_000_000_000;
 const DEFAULT_GAS_PRICE = 2_000n;
 const DEFAULT_MEMO = new Uint8Array([]);
+const DEFAULT_PAYBACK_ADDRESS = new Uint8Array([]);
+const DEFAULT_SEDA_PAYLOAD = new Uint8Array([]);
 
 const defaultDrConfig: DrConfig = {
 	dr_reveal_size_limit_in_bytes: 24_000,
@@ -78,6 +80,16 @@ export type PostDataRequestInput = {
 	 * Will also be returned to the destination chain.
 	 */
 	memo?: Uint8Array;
+
+	/**
+	 * Payback address for the Data Request
+	 */
+	paybackAddress?: Uint8Array;
+
+	/**
+	 * Seda payload for the Data Request
+	 */
+	sedaPayload?: Uint8Array;
 };
 
 export type DataRequest = ReturnType<typeof createPostedDataRequest>;
@@ -141,18 +153,40 @@ export function createPostedDataRequest(
 	}
 	const memo = base64Encode(input.memo ?? DEFAULT_MEMO);
 
+	if (input.paybackAddress) {
+		assert(
+			input.paybackAddress.length <= drConfig.payback_address_limit_in_bytes,
+			`paybackAddress must be less than ${drConfig.payback_address_limit_in_bytes + 1} bytes, received ${input.paybackAddress.length}`,
+		);
+	}
+	const payback_address = base64Encode(
+		input.paybackAddress ?? DEFAULT_PAYBACK_ADDRESS,
+	);
+
+	if (input.sedaPayload) {
+		assert(
+			input.sedaPayload.length <= drConfig.seda_payload_limit_in_bytes,
+			`sedaPayload must be less than ${drConfig.seda_payload_limit_in_bytes + 1} bytes, received ${input.sedaPayload.length}`,
+		);
+	}
+	const seda_payload = base64Encode(input.sedaPayload ?? DEFAULT_SEDA_PAYLOAD);
+
 	return {
-		version,
-		exec_program_id,
-		exec_inputs,
-		tally_program_id,
-		tally_inputs,
-		replication_factor,
-		consensus_filter,
-		exec_gas_limit,
-		tally_gas_limit,
-		gas_price,
-		memo,
+		payback_address,
+		seda_payload,
+		posted_dr: {
+			version,
+			exec_program_id,
+			exec_inputs,
+			tally_program_id,
+			tally_inputs,
+			replication_factor,
+			consensus_filter,
+			exec_gas_limit,
+			tally_gas_limit,
+			gas_price,
+			memo,
+		},
 	};
 }
 
