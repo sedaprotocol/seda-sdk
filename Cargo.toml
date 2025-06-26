@@ -8,6 +8,9 @@ members = [
 	"libs/rs-sdk/examples",
 ]
 
+[workspace.package]
+rust-version = "1.78.0"
+
 [workspace.dependencies]
 anyhow = "1.0"
 ctor = "0.4"
