@@ -23,6 +23,7 @@
 		"@seda-protocol/vm": "^1.0.12",
 		"big.js": "^6.2.1",
 		"dotenv": "^16.3.1",
+		"fetch-cookie": "^3.1.0",
 		"node-fetch": "^3.3.2",
 		"node-gzip": "^1.1.2",
 		"true-myth": "^7.3.0",
