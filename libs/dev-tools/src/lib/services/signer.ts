@@ -116,9 +116,7 @@ async function resolveCoreContractAddress(config: SigningConfig) {
 	);
 
 	if (response.isErr) {
-		throw Error(
-			"No core contract set on chain. Please provide a SEDA_CORE_CONTRACT address manually.",
-		);
+		throw Error(`Could not fetch core contract from chain: ${response.error}`);
 	}
 
 	return response.value.address;
