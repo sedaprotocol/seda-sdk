@@ -1,8 +1,8 @@
 import { randomFillSync } from "node:crypto";
-import { existsSync } from "node:fs";
-import { readFile, writeFile } from "node:fs/promises";
+import { existsSync, read } from "node:fs";
+import { readFile, writeFile, access, constants } from "node:fs/promises";
 import { resolve } from "node:path";
-import { trySync } from "@seda-protocol/utils";
+import { tryAsync, trySync } from "@seda-protocol/utils";
 // @ts-ignore
 import { meterWasm } from "@seda-protocol/wasm-metering-ts";
 import { Maybe, Result } from "true-myth";
@@ -33,14 +33,24 @@ export async function createWasmModule(
 	const meteredBinary = await Maybe.of(options).match<Promise<Uint8Array>>({
 		Just: async (cacheConfig) => {
 			const cacheFilePath = resolve(cacheConfig.dir, cacheConfig.id);
-			const hasCachedFile = existsSync(cacheFilePath);
 
-			if (hasCachedFile) {
-				return readFile(cacheFilePath);
+			// Check if the file exists
+			const hasCachedFile = trySync(() => existsSync(cacheFilePath));
+
+			if (hasCachedFile.isOk && hasCachedFile.value) {
+				// Even though the file exists, it may not be accessible and could still fail to read
+				const cachedBinary = await tryAsync(readFile(cacheFilePath));
+
+				if (cachedBinary.isOk) {
+					return cachedBinary.value;
+				}
 			}
 
 			const result = meterWasm(Buffer.from(binaryArray), costTable);
-			await writeFile(cacheFilePath, result);
+
+			// It's ok if it fails, then there just won't be caching
+			await tryAsync(writeFile(cacheFilePath, result));
+
 			return result;
 		},
 		Nothing: () =>
