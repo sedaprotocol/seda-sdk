@@ -1,3 +1,5 @@
+//! This module provides raw FFI bindings to the Seda VM.
+
 #[link(wasm_import_module = "seda_v1")]
 extern "C" {
     pub fn execution_result(result: *const u8, result_length: u32);

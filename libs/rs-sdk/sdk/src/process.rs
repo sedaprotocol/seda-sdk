@@ -6,7 +6,7 @@
 //! # Examples
 //!
 //! ```no_run
-//! use seda_sdk::process::Process;
+//! use seda_sdk_rs::process::Process;
 //!
 //! // Handle success case
 //! let result = vec![1, 2, 3];
@@ -35,8 +35,8 @@ impl Process {
     ///
     /// # Examples
     ///
-    /// ```no_run
-    /// use seda_sdk::process::Process;
+    /// ```
+    /// use seda_sdk_rs::process::Process;
     ///
     /// let args = Process::args();
     /// // args[0] is the program name
@@ -50,10 +50,13 @@ impl Process {
     ///
     /// # Examples
     ///
-    /// ```no_run
-    /// use seda_sdk::process::Process;
+    /// ```
+    /// use seda_sdk_rs::process::Process;
+    ///
+    /// std::env::set_var("TEST_VAR", "test_value");
     ///
     /// let env_vars = Process::envs();
+    /// assert!(env_vars.contains_key("TEST_VAR"));
     /// for (key, value) in env_vars {
     ///     println!("{}: {}", key, value);
     /// }
@@ -64,10 +67,16 @@ impl Process {
 
     /// Retrieves and decodes the data request inputs
     ///
+    /// # Panics
+    ///
+    /// This function will panic if:
+    /// - There were no arguments passed to the program.
+    /// - The second argument (index 1) is not a valid hex string.
+    ///
     /// # Examples
     ///
     /// ```no_run
-    /// use seda_sdk::process::Process;
+    /// use seda_sdk_rs::process::Process;
     ///
     /// let input_bytes = Process::get_inputs();
     /// // Process the input bytes...
@@ -81,6 +90,11 @@ impl Process {
     }
 
     /// Gets the VM mode from environment variables.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if the `VM_MODE` environment variable is not set.
+    /// Which should never happen in a properly configured environment.
     fn get_vm_mode() -> String {
         env::var(VM_MODE_ENV_KEY).expect("VM_MODE is not set in environment")
     }
@@ -89,9 +103,10 @@ impl Process {
     ///
     /// # Examples
     ///
-    /// ```no_run
-    /// use seda_sdk::process::Process;
+    /// ```
+    /// use seda_sdk_rs::process::Process;
     ///
+    /// std::env::set_var("VM_MODE", "tally");
     /// if Process::is_tally_vm_mode() {
     ///     // Handle tally mode specific logic
     /// }
@@ -105,7 +120,7 @@ impl Process {
     /// # Examples
     ///
     /// ```no_run
-    /// use seda_sdk::process::Process;
+    /// use seda_sdk_rs::process::Process;
     ///
     /// if Process::is_dr_vm_mode() {
     ///     let replication = Process::replication_factor();
@@ -121,7 +136,7 @@ impl Process {
     /// # Examples
     ///
     /// ```no_run
-    /// use seda_sdk::process::Process;
+    /// use seda_sdk_rs::process::Process;
     ///
     /// let result = vec![0x01, 0x02, 0x03];
     /// Process::success(&result);
@@ -135,7 +150,7 @@ impl Process {
     /// # Examples
     ///
     /// ```no_run
-    /// use seda_sdk::process::Process;
+    /// use seda_sdk_rs::process::Process;
     ///
     /// let error_data = vec![0xFF];
     /// Process::error(&error_data);
@@ -146,10 +161,18 @@ impl Process {
 
     /// Gets the replication factor for the data request
     ///
+    /// # Panics
+    ///
+    /// This function will panic if:
+    /// - The `DR_REPLICATION_FACTOR_ENV_KEY` environment variable is not set.
+    /// - The value of `DR_REPLICATION_FACTOR_ENV_KEY` is not a valid `u16`.
+    ///
+    /// These conditions should never happen in a properly configured environment.
+    ///
     /// # Examples
     ///
     /// ```no_run
-    /// use seda_sdk::process::Process;
+    /// use seda_sdk_rs::process::Process;
     ///
     /// if Process::is_dr_vm_mode() {
     ///     let factor = Process::replication_factor();
@@ -170,7 +193,7 @@ impl Process {
     /// # Examples
     ///
     /// ```no_run
-    /// use seda_sdk::process::Process;
+    /// use seda_sdk_rs::process::Process;
     ///
     /// // Exit with an error message
     /// Process::exit_with_message(1, "Operation failed: invalid input");
@@ -188,7 +211,7 @@ impl Process {
     /// # Examples
     ///
     /// ```no_run
-    /// use seda_sdk::process::Process;
+    /// use seda_sdk_rs::process::Process;
     ///
     /// let result = vec![1, 2, 3, 4];
     /// Process::exit_with_result(0, &result);
@@ -203,7 +226,7 @@ impl Process {
     /// # Examples
     ///
     /// ```no_run
-    /// use seda_sdk::process::Process;
+    /// use seda_sdk_rs::process::Process;
     ///
     /// // Exit successfully with no result
     /// Process::exit(0);

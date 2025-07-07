@@ -1,19 +1,17 @@
+//! Keccak-256 hashing for the `seda_runtime_sdk` for oracle programs.
+//!
+//! This module provides the [`keccak256`] function to compute the Keccak-256 hash of a message
+//! using the VM's FFI interface.
+
+///
 /// Computes the Keccak-256 hash of a message.
 ///
 /// The Keccak-256 hash function is a cryptographic hash function that produces a 32-byte (256-bit) hash value.
 ///
-/// # Arguments
-///
-/// * `message` - The input bytes to hash
-///
-/// # Returns
-///
-/// A 32-byte vector containing the Keccak-256 hash of the input
-///
 /// # Examples
 ///
-/// ```
-/// use seda_sdk::keccak256::keccak256;
+/// ```no_run
+/// use seda_sdk_rs::keccak256::keccak256;
 ///
 /// let message = b"Hello, world!".to_vec();
 /// let hash = keccak256(message);

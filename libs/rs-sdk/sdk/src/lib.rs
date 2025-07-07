@@ -1,3 +1,6 @@
+#![doc = include_str!("../../README.md")]
+#![deny(missing_docs)]
+
 pub mod bytes;
 pub mod errors;
 pub mod hashmap;
@@ -23,7 +26,7 @@ pub use tally::*;
 pub use seda_sdk_macros::oracle_program;
 
 #[cfg(feature = "hide-panic-paths")]
-/// A function run before the main function, via `ctor::ctor`, to set a sanitized panic hook.
+/// A function run before the main function, via [`ctor::ctor`], to set a sanitized panic hook.
 /// This hook takes the `std::panic::PanicInfo` and attempts to downcast the payload to a string.
 /// If unsuccessful, it defaults to printing "<panic>".
 /// It then gracefully aborts the process.

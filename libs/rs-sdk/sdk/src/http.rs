@@ -1,3 +1,8 @@
+//! HTTP fetch action and associated types for the `seda_runtime_sdk`.
+//!
+//! Defines JSON-serializable request and response structs ([`HttpFetchAction`], [`HttpFetchOptions`], [`HttpFetchResponse`])
+//! and provides [`http_fetch`] for executing HTTP requests via VM FFI calls.
+
 use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
@@ -8,17 +13,27 @@ use crate::{
     promise::PromiseStatus,
 };
 
+/// An HTTP fetch action containing the target URL and fetch options.
+/// This action is serialized and sent to the VM for execution.
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct HttpFetchAction {
+    /// The URL to fetch.
     pub url: String,
+    /// The options for the HTTP fetch request.
     pub options: HttpFetchOptions,
 }
 
+/// Options for the HTTP fetch request, including method, headers, body, and timeout.
+/// This struct is serialized and sent to the VM for execution.
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct HttpFetchOptions {
+    /// The HTTP method to use for the request.
     pub method: HttpFetchMethod,
+    /// Headers to include in the request.
     pub headers: BTreeMap<String, String>,
+    /// The body of the request, if any.
     pub body: Option<Bytes>,
+    /// Timeout for the request in milliseconds.
     pub timeout_ms: Option<u32>,
 }
 
@@ -33,7 +48,12 @@ impl Default for HttpFetchOptions {
     }
 }
 
+/// Represents the HTTP methods that can be used in an HTTP fetch request.
+/// This enum is serialized and sent to the VM for execution.
+/// It represents the various [HTTP methods](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods)
+/// that can be used in an HTTP fetch request.
 #[derive(Serialize, Deserialize, Clone, Debug)]
+#[allow(missing_docs)]
 pub enum HttpFetchMethod {
     Options,
     Get,
@@ -47,6 +67,7 @@ pub enum HttpFetchMethod {
 }
 
 impl HttpFetchMethod {
+    /// Returns the string representation, in all caps, of the HTTP method.
     pub fn as_str(&self) -> &str {
         match self {
             HttpFetchMethod::Options => "OPTIONS",
@@ -62,6 +83,8 @@ impl HttpFetchMethod {
     }
 }
 
+/// Represents the response from an HTTP fetch request.
+/// This struct is serialized and the result is returned to the caller.
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct HttpFetchResponse {
     /// HTTP Status code
@@ -81,10 +104,30 @@ pub struct HttpFetchResponse {
 }
 
 impl HttpFetchResponse {
+    /// Returns `true` if the status code is in the 2xx range.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use seda_sdk_rs::http::HttpFetchResponse;
+    /// let response = HttpFetchResponse {
+    ///     status: 200,
+    ///     headers: Default::default(),
+    ///     bytes: Vec::new(),
+    ///     url: "https://api.example.com/data".to_string(),
+    ///     content_length: 0,
+    /// };
+    /// assert!(response.is_ok());
+    /// ```
     pub fn is_ok(&self) -> bool {
         self.status >= 200 && self.status <= 299
     }
 
+    /// Converts a [`PromiseStatus`] into an [`HttpFetchResponse`], treating rejections as errors.
+    ///
+    /// # Errors
+    ///
+    /// Fails if the `PromiseStatus` is not a `Fulfilled` variant or if the deserialization fails.
     pub fn from_promise(promise_status: PromiseStatus) -> Self {
         match promise_status {
             PromiseStatus::Rejected(error) => error.try_into().unwrap(),
@@ -118,16 +161,17 @@ impl TryFrom<Vec<u8>> for HttpFetchResponse {
 }
 
 /// Performs an HTTP fetch request with the given URL and options.
+/// This wraps the unsafe FFI call to the VM's `http_fetch` function.
 ///
-/// # Arguments
+/// # Panics
 ///
-/// * `url` - The URL to fetch, can be any type that implements `ToString`
-/// * `options` - Optional `HttpFetchOptions` to configure the request
+/// Panics if the serialization of the [`HttpFetchAction`] fails or if the deserialization of the response fails.
+/// We expect these to never happen in practice, as the SDK is designed to ensure valid inputs.
 ///
 /// # Examples
 ///
 /// ```no_run
-/// use seda_sdk::http::{http_fetch, HttpFetchOptions, HttpFetchMethod};
+/// use seda_sdk_rs::{bytes::ToBytes, http::{http_fetch, HttpFetchMethod, HttpFetchOptions}};
 /// use std::collections::BTreeMap;
 ///
 /// // Basic GET request
@@ -144,7 +188,8 @@ impl TryFrom<Vec<u8>> for HttpFetchResponse {
 /// let options = HttpFetchOptions {
 ///     method: HttpFetchMethod::Post,
 ///     headers,
-///     body: Some(b"{\"temperature\": 25.5, \"unit\": \"celsius\"}".to_vec()),
+///     body: Some(serde_json::to_vec(&serde_json::json!({"temperature": 25.5, "unit": "celsius"})).unwrap().to_bytes()),
+///     timeout_ms: Some(5_000),
 /// };
 ///
 /// let response = http_fetch("https://weather-api.example.com/update", Some(options));

@@ -1,3 +1,5 @@
+//! Logging and debugging macros for the `seda_runtime_sdk`.
+
 /// A debug macro that prints the expression and its value to stderr.
 ///
 /// This macro is a more gas-efficient alternative to the standard `dbg!` macro.
@@ -7,6 +9,8 @@
 /// # Examples
 ///
 /// ```
+/// use seda_sdk_rs::debug;
+///
 /// let a = 2;
 /// let b = debug!(a * 2) + 1;
 /// // Prints to stderr: [src/main.rs:2:9] a * 2 = 4
@@ -16,6 +20,8 @@
 /// Multiple values can be debugged at once:
 ///
 /// ```
+/// use seda_sdk_rs::debug;
+///
 /// let x = 1;
 /// let y = 2;
 /// debug!(x, y, x + y);
@@ -32,7 +38,9 @@ macro_rules! debug {
             expr => {
                 use std::io::Write;
                 // Format the debug message
-                std::io::stderr().write_all(format!("[{}:{}] {} = {:#?}\n", file!(), line!(), stringify!($expr), &expr).as_bytes())?;
+                if let Err(e) = std::io::stderr().write_all(format!("[{}:{}] {} = {:#?}\n", file!(), line!(), stringify!($expr), &expr).as_bytes()) {
+                    panic!("Failed to write debug message: {e}");
+                }
 
                 expr
             }

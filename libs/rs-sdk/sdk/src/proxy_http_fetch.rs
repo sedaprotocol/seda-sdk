@@ -1,3 +1,10 @@
+//! Proxy HTTP fetch action and associated types for the `seda_runtime_sdk`.
+//! These are used to make HTTP requests through the proxy nodes.
+//!
+//! Defines JSON-serializable request and the struct [`ProxyHttpFetchAction`]
+//! and provides, [`proxy_http_fetch`], [`generate_proxy_http_signing_message`]
+//! for executing proxy HTTP requests, and generating signing messages via VM FFI calls.
+
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -8,20 +15,31 @@ use crate::{
     HttpFetchMethod,
 };
 
+/// An Proxy HTTP fetch action containing the target URL, fetch options, and public key of the proxy.
+/// This action is serialized and sent to the VM for execution.
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ProxyHttpFetchAction {
+    /// The URL to fetch.
     pub url: String,
+    /// The public key of the proxy node that will handle the request.
     pub public_key: Option<String>,
+    /// The options for the HTTP fetch request.
     pub options: HttpFetchOptions,
 }
 
 /// Makes an HTTP request through the proxy service
 ///
+/// # Panics
+///
+/// Panics if the serialization of the [`ProxyHttpFetchAction`] fails or if the deserialization of the response fails.
+/// We expect these to never happen in practice, as the SDK is designed to ensure valid inputs.
+///
 /// # Examples
 ///
 /// ```no_run
-/// use seda_sdk::proxy_http_fetch::proxy_http_fetch;
-/// use seda_sdk::http::{HttpFetchOptions, HttpFetchMethod};
+/// use seda_sdk_rs::bytes::ToBytes;
+/// use seda_sdk_rs::proxy_http_fetch::proxy_http_fetch;
+/// use seda_sdk_rs::http::{HttpFetchOptions, HttpFetchMethod};
 /// use std::collections::BTreeMap;
 ///
 /// // Basic GET request
@@ -38,7 +56,8 @@ pub struct ProxyHttpFetchAction {
 /// let options = HttpFetchOptions {
 ///     method: HttpFetchMethod::Post,
 ///     headers,
-///     body: Some(b"{\"key\": \"value\"}".to_vec()),
+///     body: Some(serde_json::to_vec(&serde_json::json!({"key": "value"})).unwrap().to_bytes()),
+///     timeout_ms: None,
 /// };
 ///
 /// let response = proxy_http_fetch(
@@ -89,21 +108,11 @@ pub fn proxy_http_fetch<URL: ToString>(
 /// the data proxy signature in the tally phase. With this message there is no need to include the entire request
 /// and response data in the execution result.
 ///
-/// # Arguments
-///
-/// * `url` - The URL of the request
-/// * `method` - The HTTP method used for the request
-/// * `request_body` - The body of the request as Bytes
-/// * `response_body` - The body of the response as Bytes
-///
-/// # Returns
-///
-/// Returns the message that the data proxy should have hashed and signed
 ///
 /// # Examples
 ///
 /// ```no_run
-/// use seda_sdk::{
+/// use seda_sdk_rs::{
 ///     bytes::{Bytes, ToBytes},
 ///     http::HttpFetchMethod,
 ///     proxy_http_fetch::{generate_proxy_http_signing_message, proxy_http_fetch},

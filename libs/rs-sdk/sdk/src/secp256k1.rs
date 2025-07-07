@@ -1,24 +1,23 @@
+//! This module provides functions for verifying secp256k1 ECDSA signatures
+//! using the Seda VM's FFI interface.
+
 use super::raw;
 
 /// Verifies a secp256k1 ECDSA signature.
 ///
 /// This function verifies that a signature was created by the holder of the private key
-/// corresponding to the provided public key, for the given message.
+/// corresponding to the provided public key, for the given message. If the signature is valid,
+/// it returns `true`; otherwise, it returns `false`.
 ///
-/// # Arguments
+/// # Panics
 ///
-/// * `message` - The message that was signed, as a byte slice
-/// * `signature` - The signature to verify, as a byte slice. Must be 64 bytes in DER format
-/// * `public_key` - The public key to verify against, as a byte slice. From a SEC1-encoded public key.
-///
-/// # Returns
-///
-/// Returns `true` if the signature is valid for the message and public key, `false` otherwise.
+/// Panics if the result from the VM is not a valid boolean (0 or 1).
+/// This is unexpected and indicates a bug in the VM or the signature verification logic, so it should never be hit.
 ///
 /// # Examples
 ///
 /// ```no_run
-/// use seda_sdk::secp256k1::secp256k1_verify;
+/// use seda_sdk_rs::secp256k1::secp256k1_verify;
 ///
 /// let message = b"Hello, world!";
 /// let signature = vec![/* 64 bytes signature */];

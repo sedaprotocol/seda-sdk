@@ -1,4 +1,5 @@
 # Rust SDK
+[![](https://img.shields.io/crates/v/seda-sdk-rs.svg)](https://crates.io/crates/seda-sdk-rs) [![](https://docs.rs/seda-sdk-rs/badge.svg)](https://docs.rs/seda-sdk-rs)
 
 SDK for creating Oracle Programs on the SEDA chain.
 

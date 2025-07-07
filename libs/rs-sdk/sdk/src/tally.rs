@@ -1,3 +1,10 @@
+//! This module provides functionality to retrieve and process reveals from the command line arguments
+//! of a data request report in the Seda runtime SDK.
+//!
+//! It defines the [`RevealBody`] and [`RevealResult`] structs to represent the reveal data,
+//! and provides functions to retrieve unfiltered reveals and filtered reveals that are in consensus
+//! via the functions [`get_unfiltered_reveals`] and [`get_reveals`], respectively.
+
 use anyhow::{Error, Result};
 use serde::{Deserialize, Serialize};
 
@@ -6,20 +13,52 @@ use crate::Process;
 const REVEALS_ARGUMENT_POSITION: usize = 2;
 const CONSENSUS_ARGUMENT_POSITION: usize = 3;
 
+/// Represents the body of a reveal body of a data request report.
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct RevealBody {
+    /// The block height the data request was posted.
     pub dr_block_height: u64,
+    /// The exit code of the data request's execution VM.
     pub exit_code: u8,
+    /// The gas used by the data request's execution VM.
     pub gas_used: u64,
+    /// The data returned by the data request's execution VM.
     pub reveal: Vec<u8>,
 }
 
+/// Represents a reveal body of a data request report.
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct RevealResult {
+    /// The body of the reveal.
     pub body: RevealBody,
+    /// Whether the reveal is in consensus or not.
     pub in_consensus: bool,
 }
 
+/// Retrieves the unfiltered reveals from the command line arguments.
+///
+/// # Errors
+///
+/// This function will return an error if:
+/// - The expected arguments are not found in the command line arguments.
+/// - The number of reveals does not match the number of consensus reports.
+/// - The JSON deserialization fails for either the reveals or the consensus reports.
+///
+/// # Examples
+///
+/// ```no_run
+/// use seda_sdk_rs::get_unfiltered_reveals;
+/// match get_unfiltered_reveals() {
+///     Ok(reveals) => {
+///        for reveal in reveals {
+///            // Process each reveal
+///        }
+///     },
+///     Err(err) => {
+///         eprintln!("Error retrieving unfiltered reveals: {}", err);
+///     }
+/// }
+/// ```
 pub fn get_unfiltered_reveals() -> Result<Vec<RevealResult>> {
     let args = Process::args();
 
@@ -58,6 +97,26 @@ pub fn get_unfiltered_reveals() -> Result<Vec<RevealResult>> {
     Ok(reveal_results)
 }
 
+/// Retrieves the reveals that are in consensus from the command line arguments.
+///
+/// # Errors
+/// This function will return an error if the unfiltered reveals cannot be retrieved see [`get_unfiltered_reveals`]
+/// for more information.
+///
+/// # Examples
+/// ```no_run
+/// use seda_sdk_rs::get_reveals;
+/// match get_reveals() {
+///    Ok(reveals) => {
+///       for reveal in reveals {
+///           // Process each reveal that is in consensus
+///       }
+///   },
+///   Err(err) => {
+///       eprintln!("Error retrieving reveals: {}", err);
+///   }
+/// }
+/// ```
 pub fn get_reveals() -> Result<Vec<RevealResult>> {
     let unfiltered_reveals = get_unfiltered_reveals()?;
 
