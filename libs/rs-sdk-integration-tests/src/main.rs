@@ -1,3 +1,4 @@
+mod clock;
 mod crypto;
 mod http;
 mod infinite_loop;
@@ -6,6 +7,7 @@ mod random_get;
 mod tally;
 mod vm_tests;
 
+use clock::test_clock_time_get;
 use crypto::{test_keccak256, test_secp256k1_verify_invalid, test_secp256k1_verify_valid};
 use http::{
     test_http_post_success, test_http_rejection, test_http_success, test_long_fetch, test_user_http_no_timeout,
@@ -44,6 +46,7 @@ fn main() {
         "testUserHttpShouldTimeout" => test_user_http_should_timeout(),
         "testUserHttpNoTimeout" => test_user_http_no_timeout(),
         "testLongFetch" => test_long_fetch(),
+        "testClockTimeGet" => test_clock_time_get(),
         _ => Process::error(&"No argument given".to_bytes()),
     }
 }

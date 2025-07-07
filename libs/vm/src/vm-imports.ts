@@ -4,6 +4,7 @@ import { Maybe } from "true-myth";
 import type { ResultJSON } from "true-myth/result";
 import { VmError, VmErrorType } from "./errors.js";
 import { args_get, args_sizes_get } from "./imports/wasi/args_get.js";
+import { clock_time_get } from "./imports/wasi/clock_time_get.js";
 import { environ_get, environ_sizes_get } from "./imports/wasi/environ_get.js";
 import { fd_write } from "./imports/wasi/fd_write.js";
 import { random_get } from "./imports/wasi/random_get.js";
@@ -374,6 +375,12 @@ export default class VmImports {
 						args[1],
 					),
 				proc_exit: wasiImports[wasiNamespace].proc_exit,
+				clock_time_get: (...args: number[]) =>
+					clock_time_get(
+						this.gasMeter,
+						wasiImports[wasiNamespace].clock_time_get,
+						...args,
+					),
 			};
 		}
 
