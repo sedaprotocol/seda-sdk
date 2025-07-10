@@ -2,6 +2,8 @@
 name = "seda-sdk-rs"
 version = "1.0.0"
 edition = "2021"
+description = "Seda SDK providing a framework to create Oracle Programs."
+license = "MIT"
 rust-version.workspace = true
 
 [features]
