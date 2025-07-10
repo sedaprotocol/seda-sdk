@@ -24,7 +24,10 @@ thiserror = "2.0"
 rand = "0.9"
 
 seda-sdk-rs = { path = "./libs/rs-sdk/sdk" }
+# For local development, use the following line:
 seda-sdk-macros = { path = "./libs/rs-sdk/seda-sdk-macros" }
+# For publishing, use the following line:
+# seda-sdk-macros = { version = "1.0.0" }
 
 [profile.release-wasm]
 inherits = "release"

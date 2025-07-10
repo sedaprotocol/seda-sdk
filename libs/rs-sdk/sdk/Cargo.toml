@@ -1,6 +1,6 @@
 [package]
 name = "seda-sdk-rs"
-version = "1.0.0-rc.6"
+version = "1.0.0"
 edition = "2021"
 rust-version.workspace = true
 
