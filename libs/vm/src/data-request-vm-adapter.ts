@@ -12,6 +12,7 @@ import type { VmAdapter } from "./types/vm-adapter.js";
 import { VM_MODE_DR, VM_MODE_ENV_KEY } from "./types/vm-modes.js";
 import { PromiseStatus } from "./types/vm-promise.js";
 import type { VmCallData } from "./vm.js";
+import { trySync } from "@seda-protocol/utils";
 
 interface Options {
 	fetchMock?: typeof fetch;
@@ -81,6 +82,13 @@ export default class DataRequestVmAdapter implements VmAdapter {
 	async httpFetch(
 		action: HttpFetchAction,
 	): Promise<PromiseStatus<HttpFetchResponse>> {
+		const url = trySync(() => new URL(action.url));
+		if (url.isErr) return HttpFetchResponse.createRejectedPromise(`${action.url} is not a valid URL`);
+
+		if (url.value.protocol !== "http:" && url.value.protocol !== "https:") {
+			return HttpFetchResponse.createRejectedPromise(`${action.url} is not http or https`);
+		}
+		
 		// Set up user and global timeouts.
 		const abortController = new AbortController();
 

@@ -134,3 +134,8 @@ pub fn test_long_fetch() {
     error_bytes.extend(&second_response.bytes);
     Process::error(&error_bytes);
 }
+
+pub fn test_http_fetch_access_file() {
+    let response = http_fetch("file:///Users/seda/picture.png", None);
+    Process::success(&response.bytes);
+}
