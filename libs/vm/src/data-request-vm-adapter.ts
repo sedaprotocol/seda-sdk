@@ -1,7 +1,7 @@
 import { Readable, Stream } from "node:stream";
 import { trySync } from "@seda-protocol/utils";
 import fetch from "node-fetch";
-import type { Result } from "true-myth";
+import { Result } from "true-myth";
 import { VmError, VmErrorType } from "./errors.js";
 import { readStream } from "./services/read-stream.js";
 import type {
@@ -16,6 +16,7 @@ import type { VmCallData } from "./vm.js";
 
 interface Options {
 	fetchMock?: typeof fetch;
+	mockProxyGasCost?: bigint;
 	maxResponseBytes?: number;
 	totalHttpTimeLimit?: number;
 }
@@ -30,6 +31,21 @@ export default class DataRequestVmAdapter implements VmAdapter {
 	constructor(private opts?: Options) {
 		if (opts?.fetchMock) {
 			this.fetchFunction = opts.fetchMock;
+		}
+
+		const mockProxyGasCost = opts?.mockProxyGasCost;
+		if (mockProxyGasCost !== undefined && opts?.fetchMock) {
+			this.getProxyHttpFetchGasCost = async (_action: ProxyHttpFetchAction) => {
+				return Result.ok(mockProxyGasCost);
+			};
+			this.proxyHttpFetch = async (action: ProxyHttpFetchAction) => {
+				const base_action: HttpFetchAction = {
+					url: action.url,
+					options: action.options,
+					type: "http-fetch-action",
+				};
+				return this.httpFetch(base_action);
+			};
 		}
 
 		if (opts?.maxResponseBytes) {

@@ -38,6 +38,7 @@ export function testOracleProgramExecution(
 	adapterOptions?: {
 		totalHttpTimeLimit?: number;
 	},
+	mockProxyGasCost: bigint | undefined = undefined,
 ) {
 	return callVm(
 		{
@@ -48,7 +49,11 @@ export function testOracleProgramExecution(
 			vmMode: "exec",
 		},
 		undefined,
-		new DataRequestVmAdapter({ fetchMock, ...adapterOptions }),
+		new DataRequestVmAdapter({
+			fetchMock,
+			mockProxyGasCost,
+			...adapterOptions,
+		}),
 		sync,
 	);
 }

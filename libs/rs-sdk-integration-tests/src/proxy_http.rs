@@ -13,7 +13,7 @@ pub fn test_proxy_http_fetch() {
         return;
     }
 
-    Process::error(&response.bytes);
+    Process::error(&"rejected".to_bytes());
 }
 
 pub fn test_generate_proxy_http_message() {

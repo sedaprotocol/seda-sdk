@@ -14,7 +14,7 @@ export class TestProxyHttpFetch extends OracleProgram {
 			Process.success(response.bytes);
 		}
 
-		Process.error(response.bytes);
+		Process.error(Bytes.fromUtf8String("rejected"));
 	}
 }
 
