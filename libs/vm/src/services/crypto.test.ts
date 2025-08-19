@@ -15,6 +15,6 @@ describe("Crypto", () => {
 		const result = secp256k1Verify(message, signature, publicKey);
 
 		// Check if the result is a Uint8Array and has the value [1]
-		expect(result).toEqual(new Uint8Array([1]));
+		expect(result).toEqual(1);
 	});
 });

@@ -41,7 +41,7 @@ export function secp256k1Verify(
 	const publicKeyPtr = changetype<usize>(publicKeyBuffer);
 
 	// Call secp256k1_verify and get the response length
-	const responseLength = secp256k1_verify(
+	const isVerified = secp256k1_verify(
 		messagePtr,
 		messageBuffer.byteLength,
 		signaturePtr,
@@ -50,17 +50,14 @@ export function secp256k1Verify(
 		publicKeyBuffer.byteLength,
 	);
 
-	// Allocate an ArrayBuffer for the response
-	const responseBuffer = new ArrayBuffer(responseLength);
-	// Get the pointer to the response buffer
-	const responseBufferPtr = changetype<usize>(responseBuffer);
-	// Write the result to the allocated buffer
-	call_result_write(responseBufferPtr, responseLength);
-	// Convert the response buffer into a Uint8Array
-	const responseArray = Uint8Array.wrap(responseBuffer);
-
-	// Return true if the response is [1] (valid)
-	return responseArray[0] === 1;
+	switch (isVerified) {
+		case 1:
+			return true;
+		case 0:
+			return false;
+		default:
+			throw new Error("Unexpected response from secp256k1_verify");
+	}
 }
 
 /**

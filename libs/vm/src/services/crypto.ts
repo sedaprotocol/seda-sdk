@@ -12,7 +12,7 @@ export function secp256k1Verify(
 	message: Buffer,
 	signature: Buffer,
 	publicKey: Buffer,
-): Uint8Array {
+): number {
 	const signedMessage = keccak256(message);
 	const isValidSignature = Secp256k1.verify(
 		signature,
@@ -20,6 +20,6 @@ export function secp256k1Verify(
 		publicKey,
 	);
 
-	// Return 1 as Uint8Array if valid, 0 if not
-	return new Uint8Array([isValidSignature ? 1 : 0]);
+	// Return 1 if valid, 0 if not
+	return isValidSignature ? 1 : 0;
 }

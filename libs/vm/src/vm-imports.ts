@@ -271,12 +271,10 @@ export default class VmImports {
 		);
 
 		if (result.isErr) {
-			this.callResult = new Uint8Array();
 			throw new VmError(result.error.message);
 		}
 
-		this.callResult = result.value;
-		return this.callResult.length;
+		return result.value;
 	}
 
 	callResultWrite(result_data_ptr: number, length: number) {
