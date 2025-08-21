@@ -12,6 +12,7 @@ hide-panic-paths = ["dep:ctor"]
 
 [dependencies]
 anyhow.workspace = true
+const-hex = { workspace = true, features = ["core-error"] }
 ctor = { workspace = true, optional = true }
 hex.workspace = true
 serde = { workspace = true, features = ["derive"] }

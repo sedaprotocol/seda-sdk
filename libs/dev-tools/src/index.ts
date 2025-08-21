@@ -16,6 +16,7 @@ export { postAndAwaitDataRequestBundle } from "@dev-tools/services/dr/post-and-a
 export { postDataRequest } from "@dev-tools/services/dr/post-data-request";
 export { postDataRequestBundle } from "@dev-tools/services/dr/post-data-request-bundle";
 
+export * from "./lib/testing/create-data-proxy-response";
 export * from "./lib/testing/create-mock-reveal";
 export * from "./lib/testing/create-mock-tally-args";
 export * from "./lib/testing/test-oracle-program";

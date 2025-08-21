@@ -3,6 +3,7 @@ use seda_sdk_rs::{
     http::HttpFetchMethod,
     process::Process,
     proxy_http_fetch::{generate_proxy_http_signing_message, proxy_http_fetch},
+    HttpFetchResponse,
 };
 
 pub fn test_proxy_http_fetch() {
@@ -27,4 +28,38 @@ pub fn test_generate_proxy_http_message() {
     );
 
     Process::success(hex::encode(message.to_vec()).as_bytes());
+}
+
+#[derive(serde::Deserialize)]
+struct VerificationTest {
+    response: HttpFetchResponse,
+    method: HttpFetchMethod,
+    request_body: Option<Vec<u8>>,
+}
+
+pub fn test_proxy_http_fetch_verification() {
+    if !Process::is_tally_vm_mode() {
+        Process::error(&"not in tally vm mode".to_bytes());
+    }
+
+    let reveals = seda_sdk_rs::get_unfiltered_reveals().unwrap();
+
+    if reveals.len() != 1 {
+        Process::error(&"not exactly one reveal".to_bytes());
+        return;
+    }
+
+    let test_case: VerificationTest = serde_json::from_slice(&reveals[0].body.reveal).expect("Valid test case");
+
+    let verified = test_case
+        .response
+        .proxy_verification(test_case.method, test_case.request_body)
+        .expect("Proxy verification to not fail");
+
+    if !verified {
+        Process::error(&"verification failed".to_bytes());
+        return;
+    }
+
+    Process::success(&"verification succeeded".to_bytes());
 }

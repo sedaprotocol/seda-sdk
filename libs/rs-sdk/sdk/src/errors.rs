@@ -27,6 +27,22 @@ pub enum SDKError {
     /// Indicates that a value did not meet expected constraints.
     #[error("Invalid value")]
     InvalidValue,
+
+    /// The x-seda-signature header in a proxy http response is missing.
+    #[error("Missing x-seda-signature header")]
+    MissingSignatureHeader,
+
+    /// The x-seda-publickey header in a proxy http response is missing.
+    #[error("Missing x-seda-publickey header")]
+    MissingPublicKeyHeader,
+
+    /// The x-seda-signature header in a proxy http response is invalid.
+    #[error("Invalid x-seda-signature header should be a 64-byte hex string")]
+    InvalidSignatureHeader,
+
+    /// The x-seda-publickey header in a proxy http response is invalid.
+    #[error("Invalid x-seda-publickey header should be a 33-byte hex string")]
+    InvalidPublicKeyHeader,
 }
 
 /// A specialized `Result` type for SDK operations that return `SDKError`.

@@ -13,8 +13,10 @@ rust-version = "1.78.0"
 
 [workspace.dependencies]
 anyhow = "1.0"
+const-hex = { version = "1.15", default-features = false }
 ctor = "0.4"
 hex = "0.4"
+k256 = { version = "0.13", default-features = false }
 proc-macro2 = "1.0"
 quote = "1.0"
 serde = { version = "1.0", features = ["derive"] }
@@ -23,7 +25,7 @@ syn = { version = "2.0", features = ["full"] }
 thiserror = "2.0"
 rand = "0.9"
 
-seda-sdk-rs = { path = "./libs/rs-sdk/sdk" }
+seda-sdk-rs = { path = "./libs/rs-sdk/sdk", default-features = false }
 # For local development, use the following line:
 # seda-sdk-macros = { path = "./libs/rs-sdk/seda-sdk-macros" }
 # For publishing, use the following line:

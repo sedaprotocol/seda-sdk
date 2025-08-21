@@ -1,7 +1,7 @@
 {
 	"name": "@seda-protocol/dev-tools",
 	"type": "module",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"scripts": {
 		"build:cli": "bun build src/cli/index.ts --target node --outdir bin",
 		"build": "bun run build:cli && bun run build:lib",
@@ -26,7 +26,11 @@
 		"fetch-cookie": "^3.1.0",
 		"node-fetch": "^3.3.2",
 		"node-gzip": "^1.1.2",
+		"secp256k1": "^5.0.1",
 		"true-myth": "^7.3.0",
 		"valibot": "^0.42.1"
+	},
+	"devDependencies": {
+		"@types/secp256k1": "^4.0.6"
 	}
 }

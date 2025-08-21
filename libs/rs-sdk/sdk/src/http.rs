@@ -7,7 +7,9 @@ use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
 
-use crate::errors::Result;
+use crate::errors::{Result, SDKError};
+use crate::generate_proxy_http_signing_message;
+use crate::secp256k1_verify;
 use crate::{
     bytes::{Bytes, FromBytes, ToBytes},
     promise::PromiseStatus,
@@ -133,6 +135,57 @@ impl HttpFetchResponse {
             PromiseStatus::Rejected(error) => error.try_into().unwrap(),
             _ => promise_status.parse().unwrap(),
         }
+    }
+
+    /// Returns true if the proxy verification is successful.
+    /// This is only meant to be called on the response to a proxy request and not a normal HTTP request.
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::collections::BTreeMap;
+    /// use seda_sdk_rs::http::{HttpFetchResponse, HttpFetchMethod};
+    /// let response = HttpFetchResponse {
+    ///     status: 200,
+    ///     headers: BTreeMap::from([("x-seda-signature", "signature"), ("x-seda-publickey", "publickey")]),
+    ///     bytes: Vec::new(),
+    ///     url: "https://api.example.com/data".to_string(),
+    ///     content_length: 10,
+    /// };
+    /// response.proxy_verification(HttpFetchMethod::Get, None);
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Fails if the `x-seda-signature` or `x-seda-publickey` headers are missing or invalid.
+    pub fn proxy_verification(
+        &self,
+        http_method: HttpFetchMethod,
+        request_body: Option<Vec<u8>>,
+    ) -> anyhow::Result<bool> {
+        let signature_hex = self
+            .headers
+            .get("x-seda-signature")
+            .ok_or(SDKError::MissingSignatureHeader)?;
+        let public_key_hex = self
+            .headers
+            .get("x-seda-publickey")
+            .ok_or(SDKError::MissingPublicKeyHeader)?;
+
+        let signature: [u8; 64] =
+            const_hex::const_decode_to_array(signature_hex.as_bytes()).map_err(|_| SDKError::InvalidSignatureHeader)?;
+        let public_key: [u8; 33] = const_hex::const_decode_to_array(public_key_hex.as_bytes())
+            .map_err(|_| SDKError::InvalidPublicKeyHeader)?;
+
+        let message = generate_proxy_http_signing_message(
+            self.url.clone(),
+            http_method,
+            request_body.unwrap_or_default().to_bytes(),
+            self.bytes.clone().to_bytes(),
+        )
+        .eject();
+
+        Ok(secp256k1_verify(&message, &signature, &public_key))
     }
 }
 
