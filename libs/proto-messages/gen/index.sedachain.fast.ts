@@ -5,5 +5,4 @@
 
 /* eslint-disable */
 
-export * as api from "./index.google.api";
-export * as protobuf from "./index.google.protobuf";
+export * as v1 from "./index.sedachain.fast.v1";
