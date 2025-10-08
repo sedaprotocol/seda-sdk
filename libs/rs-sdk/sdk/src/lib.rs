@@ -9,7 +9,6 @@ pub mod keccak256;
 pub mod log;
 pub mod process;
 pub mod promise;
-mod promise_actions;
 pub mod proxy_http_fetch;
 mod raw;
 pub mod secp256k1;
