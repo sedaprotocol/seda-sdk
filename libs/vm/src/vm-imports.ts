@@ -17,8 +17,8 @@ import {
 	type ProxyHttpFetchGasCostAction,
 } from "./types/vm-actions.js";
 import type { VmAdapter } from "./types/vm-adapter.js";
+import type { VmCallData } from "./types/vm-call-data.js";
 import { PromiseStatus } from "./types/vm-promise.js";
-import type { VmCallData } from "./vm.js";
 import { VmActionRequest, WorkerToHost } from "./worker-host-communication.js";
 
 export type VmImportsCollection = Record<string, Record<string, unknown>>;

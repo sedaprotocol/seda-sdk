@@ -1,11 +1,11 @@
 import type { Result } from "true-myth";
 import type { VmError } from "../errors";
-import type { VmCallData } from "../vm";
 import type {
 	HttpFetchAction,
 	HttpFetchResponse,
 	ProxyHttpFetchAction,
 } from "./vm-actions";
+import type { VmCallData } from "./vm-call-data.js";
 import type { PromiseStatus } from "./vm-promise.js";
 
 export interface VmAdapter {

@@ -8,25 +8,10 @@ import {
 } from "./services/wasm-module.js";
 import { HttpFetchResponse } from "./types/vm-actions.js";
 import type { VmAdapter } from "./types/vm-adapter.js";
+import type { VmCallData } from "./types/vm-call-data.js";
 import { PromiseStatus } from "./types/vm-promise.js";
 import VmImports from "./vm-imports.js";
 import { HostToWorker, VmActionRequest } from "./worker-host-communication.js";
-
-export interface VmCallData {
-	/** WebAssembly binary to execute */
-	binary: WebAssembly.Module | Uint8Array | number[];
-	/** Command line arguments for the WebAssembly module */
-	args: string[];
-	/** Environment variables for the WebAssembly module */
-	envs: Record<string, string>;
-	/** Gas limit for execution (defaults to MAX_SAFE_INTEGER) */
-	gasLimit?: bigint;
-	allowedImports?: string[];
-	vmMode: "tally" | "exec";
-	cache?: CacheOptions;
-	stdoutLimit?: number;
-	stderrLimit?: number;
-}
 
 export interface VmResult {
 	stdout: string;
@@ -135,21 +120,56 @@ export class ExecuteVm {
 				this.asyncRequests,
 			);
 
-			const wasmModule = this.wasmModule
-				.map((v) => Result.ok(v))
-				.unwrapOr(
-					await createWasmModule(
-						this.callData.binary,
-						this.callData.vmMode,
-						this.callData.cache,
-					),
-				);
+			const cachedWasmModule: Maybe<WebAssembly.Module> = this.wasmModule.match(
+				{
+					Just: (v) => Maybe.just(v),
+					Nothing: () => {
+						if (this.callData.cache?.id) {
+							return (
+								this.callData.wasmModuleCache?.get(
+									this.callData.vmMode,
+									this.callData.cache.id,
+								) ?? Maybe.nothing()
+							);
+						}
+
+						return Maybe.nothing();
+					},
+				},
+			);
+
+			const wasmModule: Result<WebAssembly.Module, Error> =
+				await cachedWasmModule.match({
+					Nothing: async () => {
+						return this.wasmModule
+							.map((v) => Result.ok(v))
+							.unwrapOr(
+								await createWasmModule(
+									this.callData.binary,
+									this.callData.vmMode,
+									this.callData.cache,
+								),
+							);
+					},
+					Just: async (v) => {
+						return Result.ok(v);
+					},
+				});
 
 			if (wasmModule.isErr) {
 				throw new VmError(wasmModule.error.message);
 			}
 
 			this.wasmModule = Maybe.just(wasmModule.value);
+
+			if (this.callData.cache?.id) {
+				this.callData.wasmModuleCache?.set(
+					this.callData.vmMode,
+					this.callData.cache.id,
+					wasmModule.value,
+				);
+			}
+
 			const wasiImports: WebAssembly.Imports = {
 				wasi_snapshot_preview1: wasi.wasiImport,
 			};

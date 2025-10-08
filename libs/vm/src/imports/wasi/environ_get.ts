@@ -1,5 +1,5 @@
 import { CallType, type GasMeter } from "../../metering";
-import type { VmCallData } from "../../vm";
+import type { VmCallData } from "../../types/vm-call-data.js";
 import { extractFunctionFromImportValue } from "../import-utils";
 
 function getEnvBytesLength(env: Record<string, string>) {

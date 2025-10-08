@@ -9,7 +9,7 @@ import { Maybe, Result } from "true-myth";
 import { WASI, useAll } from "uwasi";
 import { VmError } from "../errors.js";
 import { execCostTable, tallyCostTable } from "../metering.js";
-import type { VmCallData } from "../vm.js";
+import type { VmCallData } from "../types/vm-call-data.js";
 
 export type CacheOptions = {
 	dir: string;

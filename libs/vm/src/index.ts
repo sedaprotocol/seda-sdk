@@ -4,12 +4,13 @@ import { tryAsync } from "@seda-protocol/utils";
 import DataRequestVmAdapter from "./data-request-vm-adapter.js";
 import { createProcessId } from "./services/create-process-id.js";
 import type { VmAdapter } from "./types/vm-adapter.js";
+import type { VmCallData } from "./types/vm-call-data.js";
 import {
 	type VmCallWorkerMessage,
 	type WorkerMessage,
 	WorkerMessageType,
 } from "./types/worker-messages.js";
-import { type VmCallData, type VmResult, executeVm } from "./vm.js";
+import { type VmResult, executeVm } from "./vm.js";
 import { HostToWorker } from "./worker-host-communication.js";
 
 export * from "./types/vm-modes.js";
@@ -18,13 +19,15 @@ export { default as TallyVmAdapter } from "./tally-vm-adapter.js";
 export { default as DataRequestVmAdapter } from "./data-request-vm-adapter.js";
 
 export { PromiseStatus } from "./types/vm-promise.js";
-export type { VmCallData, VmResult } from "./vm.js";
+export type { VmResult } from "./vm.js";
+export type { VmCallData } from "./types/vm-call-data.js";
 export { startWorker } from "./worker.js";
 export {
 	createWasmModule,
 	type CacheOptions,
 } from "./services/wasm-module.js";
 export { executeVm } from "./vm.js";
+export { WasmModuleCache } from "./services/wasm-module-cache.js";
 
 export const version = "1.0";
 

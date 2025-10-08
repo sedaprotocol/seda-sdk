@@ -10,9 +10,9 @@ import type {
 } from "./types/vm-actions.js";
 import { HttpFetchResponse } from "./types/vm-actions.js";
 import type { VmAdapter } from "./types/vm-adapter.js";
+import type { VmCallData } from "./types/vm-call-data.js";
 import { VM_MODE_DR, VM_MODE_ENV_KEY } from "./types/vm-modes.js";
 import { PromiseStatus } from "./types/vm-promise.js";
-import type { VmCallData } from "./vm.js";
 
 interface Options {
 	fetchMock?: typeof fetch;
