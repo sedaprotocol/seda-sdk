@@ -117,7 +117,7 @@ export function createPostedDataRequest(
 		input.execInputs.length <= drConfig.exec_input_limit_in_bytes,
 		`execInputs must be less than ${drConfig.exec_input_limit_in_bytes + 1} bytes, received ${input.execInputs.length}`,
 	);
-	const exec_inputs = base64Encode(input.execInputs);
+	const exec_inputs = input.execInputs;
 
 	const tally_program_id = input.tallyProgramId ?? input.execProgramId;
 	assert(
@@ -129,20 +129,21 @@ export function createPostedDataRequest(
 		input.tallyInputs.length <= drConfig.tally_input_limit_in_bytes,
 		`tallyInputs must be less than ${drConfig.tally_input_limit_in_bytes + 1} bytes, received ${input.tallyInputs.length}`,
 	);
-	const tally_inputs = base64Encode(input.tallyInputs);
+	const tally_inputs = input.tallyInputs;
 
 	const replication_factor =
 		input.replicationFactor ?? DEFAULT_REPLICATION_FACTOR;
 
-	const consensFilterBytes = encodeConsensusFilter(input.consensusOptions);
+	const consensus_filter = encodeConsensusFilter(input.consensusOptions);
 	assert(
-		consensFilterBytes.length <= drConfig.consensus_filter_limit_in_bytes,
-		`consensus_filter must be less than ${drConfig.consensus_filter_limit_in_bytes + 1} bytes, received ${consensFilterBytes.length}`,
+		consensus_filter.length <= drConfig.consensus_filter_limit_in_bytes,
+		`consensus_filter must be less than ${drConfig.consensus_filter_limit_in_bytes + 1} bytes, received ${consensus_filter.length}`,
 	);
-	const consensus_filter = base64Encode(consensFilterBytes);
 
-	const exec_gas_limit = input.execGasLimit ?? DEFAULT_EXEC_GAS_LIMIT;
-	const tally_gas_limit = input.tallyGasLimit ?? DEFAULT_TALLY_GAS_LIMIT;
+	const exec_gas_limit = BigInt(input.execGasLimit ?? DEFAULT_EXEC_GAS_LIMIT);
+	const tally_gas_limit = BigInt(
+		input.tallyGasLimit ?? DEFAULT_TALLY_GAS_LIMIT,
+	);
 	const gas_price = (input.gasPrice ?? DEFAULT_GAS_PRICE).toString();
 
 	if (input.memo) {
@@ -151,7 +152,7 @@ export function createPostedDataRequest(
 			`memo must be less than ${drConfig.memo_limit_in_bytes + 1} bytes, received ${input.memo.length}`,
 		);
 	}
-	const memo = base64Encode(input.memo ?? DEFAULT_MEMO);
+	const memo = input.memo ?? DEFAULT_MEMO;
 
 	if (input.paybackAddress) {
 		assert(
@@ -159,9 +160,7 @@ export function createPostedDataRequest(
 			`paybackAddress must be less than ${drConfig.payback_address_limit_in_bytes + 1} bytes, received ${input.paybackAddress.length}`,
 		);
 	}
-	const payback_address = base64Encode(
-		input.paybackAddress ?? DEFAULT_PAYBACK_ADDRESS,
-	);
+	const payback_address = input.paybackAddress ?? DEFAULT_PAYBACK_ADDRESS;
 
 	if (input.sedaPayload) {
 		assert(
@@ -169,7 +168,7 @@ export function createPostedDataRequest(
 			`sedaPayload must be less than ${drConfig.seda_payload_limit_in_bytes + 1} bytes, received ${input.sedaPayload.length}`,
 		);
 	}
-	const seda_payload = base64Encode(input.sedaPayload ?? DEFAULT_SEDA_PAYLOAD);
+	const seda_payload = input.sedaPayload ?? DEFAULT_SEDA_PAYLOAD;
 
 	return {
 		payback_address,
@@ -188,10 +187,6 @@ export function createPostedDataRequest(
 			memo,
 		},
 	};
-}
-
-function base64Encode(value: Uint8Array): string {
-	return Buffer.from(value).toString("base64");
 }
 
 function isHexAddress(address: string): boolean {

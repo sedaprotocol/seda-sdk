@@ -1,6 +1,7 @@
 import { calculateDrFunds } from "@dev-tools/services/dr/calculate-dr-funds";
 import { tryParseSync } from "@seda-protocol/utils";
 import * as v from "valibot";
+import { sedachain } from "../../../../../proto-messages/gen";
 import type { GasOptions } from "../gas-options";
 import { getDrConfig } from "../get-dr-config";
 import { signAndSendTx } from "../sign-and-send-tx";
@@ -36,24 +37,26 @@ export async function postDataRequestBundle(
 	const { client: sigingClient, address } = sigingClientResult.value;
 
 	const messages = dataRequestInputs.map((dataRequestInput) => {
-		const post_data_request = createPostedDataRequest(
-			dataRequestInput,
-			drConfig.value,
-		);
+		const req = createPostedDataRequest(dataRequestInput, drConfig.value);
 		return {
-			typeUrl: "/cosmwasm.wasm.v1.MsgExecuteContract",
-			value: {
+			typeUrl: "/sedachain.core.v1.MsgPostDataRequest",
+			value: sedachain.core.v1.MsgPostDataRequest.fromPartial({
 				sender: address,
-				contract,
-				funds: [
-					{ amount: calculateDrFunds(post_data_request), denom: "aseda" },
-				],
-				msg: Buffer.from(
-					JSON.stringify({
-						post_data_request,
-					}),
-				),
-			},
+				funds: { amount: calculateDrFunds(req), denom: "aseda" },
+				version: req.posted_dr.version,
+				execProgramID: req.posted_dr.exec_program_id,
+				execInputs: req.posted_dr.exec_inputs,
+				execGasLimit: req.posted_dr.exec_gas_limit,
+				tallyProgramID: req.posted_dr.tally_program_id,
+				tallyInputs: req.posted_dr.tally_inputs,
+				tallyGasLimit: req.posted_dr.tally_gas_limit,
+				replicationFactor: req.posted_dr.replication_factor,
+				consensusFilter: req.posted_dr.consensus_filter,
+				gasPrice: req.posted_dr.gas_price,
+				memo: req.posted_dr.memo,
+				sEDAPayload: req.seda_payload,
+				paybackAddress: req.payback_address,
+			}),
 		};
 	});
 
