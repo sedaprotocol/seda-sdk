@@ -23,15 +23,14 @@ export async function postDataRequestBundle(
 	dataRequestInputs: PostDataRequestInput[],
 	gasOptions?: GasOptions,
 ): Promise<{ tx: string; drs: DataRequest[] }> {
+	const drConfig = await getDrConfig(signer);
+	if (drConfig.isErr) {
+		throw drConfig.error;
+	}
+
 	const sigingClientResult = await createSigningClient(signer);
 	if (sigingClientResult.isErr) {
 		throw sigingClientResult.error;
-	}
-
-	const contract = signer.getCoreContractAddress();
-	const drConfig = await getDrConfig(sigingClientResult.value.client, signer);
-	if (drConfig.isErr) {
-		throw drConfig.error;
 	}
 
 	const { client: sigingClient, address } = sigingClientResult.value;

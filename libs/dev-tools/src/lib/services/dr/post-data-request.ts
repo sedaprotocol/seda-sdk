@@ -15,13 +15,10 @@ import { DataRequest } from "./data-request";
 
 export const PostDataRequestResponseSchema = v.pipe(
 	v.object({
-		dr_id: v.string(),
-		height: v.pipe(
-			v.number(),
-			v.transform((val) => BigInt(val)),
-		),
+		drID: v.string(),
+		height: v.bigint(),
 	}),
-	v.transform((val) => new DataRequest(val.dr_id, val.height)),
+	v.transform((val) => new DataRequest(val.drID, val.height)),
 );
 
 export async function postDataRequest(
@@ -29,14 +26,14 @@ export async function postDataRequest(
 	dataRequestInput: PostDataRequestInput,
 	gasOptions?: GasOptions,
 ): Promise<{ tx: string; dr: DataRequest }> {
+	const drConfig = await getDrConfig(signer);
+	if (drConfig.isErr) {
+		throw drConfig.error;
+	}
+
 	const sigingClientResult = await createSigningClient(signer);
 	if (sigingClientResult.isErr) {
 		throw sigingClientResult.error;
-	}
-
-	const drConfig = await getDrConfig(sigingClientResult.value.client, signer);
-	if (drConfig.isErr) {
-		throw drConfig.error;
 	}
 
 	const { client: sigingClient, address } = sigingClientResult.value;
@@ -83,8 +80,7 @@ export async function postDataRequest(
 		response.value.msgResponses[0],
 	);
 
-	const drResponse = JSON.parse(Buffer.from(messageResponse.data).toString());
-	const dr = tryParseSync(PostDataRequestResponseSchema, drResponse);
+	const dr = tryParseSync(PostDataRequestResponseSchema, messageResponse);
 	if (dr.isErr) {
 		throw new Error(`Failed to parse DR response: ${dr.error}`);
 	}
