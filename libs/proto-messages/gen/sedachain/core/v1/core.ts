@@ -609,7 +609,7 @@ export const DataRequest = {
 
   fromJSON(object: any): DataRequest {
     return {
-      iD: isSet(object.iD) ? globalThis.String(object.iD) : "",
+      iD: isSet(object.id) ? globalThis.String(object.id) : "",
       version: isSet(object.version) ? globalThis.String(object.version) : "",
       execProgramID: isSet(object.execProgramID) ? globalThis.String(object.execProgramID) : "",
       execInputs: isSet(object.execInputs) ? bytesFromBase64(object.execInputs) : new Uint8Array(0),
@@ -622,7 +622,7 @@ export const DataRequest = {
       gasPrice: isSet(object.gasPrice) ? globalThis.String(object.gasPrice) : "",
       memo: isSet(object.memo) ? bytesFromBase64(object.memo) : new Uint8Array(0),
       paybackAddress: isSet(object.paybackAddress) ? bytesFromBase64(object.paybackAddress) : new Uint8Array(0),
-      sEDAPayload: isSet(object.sEDAPayload) ? bytesFromBase64(object.sEDAPayload) : new Uint8Array(0),
+      sEDAPayload: isSet(object.seda_payload) ? bytesFromBase64(object.seda_payload) : new Uint8Array(0),
       postedHeight: isSet(object.postedHeight) ? BigInt(object.postedHeight) : 0n,
       postedGasPrice: isSet(object.postedGasPrice) ? globalThis.String(object.postedGasPrice) : "",
       poster: isSet(object.poster) ? globalThis.String(object.poster) : "",
@@ -635,7 +635,7 @@ export const DataRequest = {
   toJSON(message: DataRequest): unknown {
     const obj: any = {};
     if (message.iD !== "") {
-      obj.iD = message.iD;
+      obj.id = message.iD;
     }
     if (message.version !== "") {
       obj.version = message.version;
@@ -674,7 +674,7 @@ export const DataRequest = {
       obj.paybackAddress = base64FromBytes(message.paybackAddress);
     }
     if (message.sEDAPayload.length !== 0) {
-      obj.sEDAPayload = base64FromBytes(message.sEDAPayload);
+      obj.seda_payload = base64FromBytes(message.sEDAPayload);
     }
     if (message.postedHeight !== 0n) {
       obj.postedHeight = message.postedHeight.toString();

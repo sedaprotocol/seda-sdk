@@ -243,7 +243,7 @@ export interface QueryDataRequestsByStatusResponse {
   /** IsPaused is indicates whether the core module is paused. */
   isPaused: boolean;
   /** Total is the total number of data requests under the given status. */
-  total: bigint;
+  total: number;
   /** LastSeenIndex is the index of the last data request retrieved. */
   lastSeenIndex: string[];
 }
@@ -1985,7 +1985,7 @@ export const QueryDataRequestsByStatusRequest = {
 };
 
 function createBaseQueryDataRequestsByStatusResponse(): QueryDataRequestsByStatusResponse {
-  return { dataRequests: [], isPaused: false, total: 0n, lastSeenIndex: [] };
+  return { dataRequests: [], isPaused: false, total: 0, lastSeenIndex: [] };
 }
 
 export const QueryDataRequestsByStatusResponse = {
@@ -1996,11 +1996,8 @@ export const QueryDataRequestsByStatusResponse = {
     if (message.isPaused !== false) {
       writer.uint32(16).bool(message.isPaused);
     }
-    if (message.total !== 0n) {
-      if (BigInt.asUintN(64, message.total) !== message.total) {
-        throw new globalThis.Error("value provided for field message.total of type uint64 too large");
-      }
-      writer.uint32(24).uint64(message.total.toString());
+    if (message.total !== 0) {
+      writer.uint32(24).uint32(message.total);
     }
     for (const v of message.lastSeenIndex) {
       writer.uint32(34).string(v!);
@@ -2034,7 +2031,7 @@ export const QueryDataRequestsByStatusResponse = {
             break;
           }
 
-          message.total = longToBigint(reader.uint64() as Long);
+          message.total = reader.uint32();
           continue;
         case 4:
           if (tag !== 34) {
@@ -2058,7 +2055,7 @@ export const QueryDataRequestsByStatusResponse = {
         ? object.dataRequests.map((e: any) => DataRequestResponse.fromJSON(e))
         : [],
       isPaused: isSet(object.isPaused) ? globalThis.Boolean(object.isPaused) : false,
-      total: isSet(object.total) ? BigInt(object.total) : 0n,
+      total: isSet(object.total) ? globalThis.Number(object.total) : 0,
       lastSeenIndex: globalThis.Array.isArray(object?.lastSeenIndex)
         ? object.lastSeenIndex.map((e: any) => globalThis.String(e))
         : [],
@@ -2073,8 +2070,8 @@ export const QueryDataRequestsByStatusResponse = {
     if (message.isPaused !== false) {
       obj.isPaused = message.isPaused;
     }
-    if (message.total !== 0n) {
-      obj.total = message.total.toString();
+    if (message.total !== 0) {
+      obj.total = Math.round(message.total);
     }
     if (message.lastSeenIndex?.length) {
       obj.lastSeenIndex = message.lastSeenIndex;
@@ -2089,7 +2086,7 @@ export const QueryDataRequestsByStatusResponse = {
     const message = createBaseQueryDataRequestsByStatusResponse();
     message.dataRequests = object.dataRequests?.map((e) => DataRequestResponse.fromPartial(e)) || [];
     message.isPaused = object.isPaused ?? false;
-    message.total = object.total ?? 0n;
+    message.total = object.total ?? 0;
     message.lastSeenIndex = object.lastSeenIndex?.map((e) => e) || [];
     return message;
   },
