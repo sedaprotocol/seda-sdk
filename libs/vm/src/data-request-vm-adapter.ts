@@ -19,6 +19,13 @@ interface Options {
 	mockProxyGasCost?: bigint;
 	maxResponseBytes?: number;
 	totalHttpTimeLimit?: number;
+
+	/**
+	 * The clock time to use for the VM.
+	 * If not provided, the current time will be used.
+	 * This is useful for testing purposes.
+	 */
+	clockTime?: number;
 }
 
 export default class DataRequestVmAdapter implements VmAdapter {
@@ -208,6 +215,19 @@ export default class DataRequestVmAdapter implements VmAdapter {
 				}),
 			);
 		}
+	}
+
+	getClockTime(mode: "monotonic" | "realtime"): number {
+		if (this.opts?.clockTime) {
+			return this.opts.clockTime;
+		}
+
+		if (mode === "monotonic") {
+			return performance.now();
+		}
+
+		// Default to realtime if no mode is provided
+		return Date.now();
 	}
 }
 

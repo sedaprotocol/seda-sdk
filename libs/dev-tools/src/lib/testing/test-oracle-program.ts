@@ -37,6 +37,7 @@ export function testOracleProgramExecution(
 	sync?: boolean,
 	adapterOptions?: {
 		totalHttpTimeLimit?: number;
+		clockTime?: number;
 	},
 	mockProxyGasCost: bigint | undefined = undefined,
 ) {

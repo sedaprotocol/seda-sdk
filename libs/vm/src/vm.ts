@@ -55,7 +55,18 @@ export class ExecuteVm {
 			callData.gasLimit ?? BigInt(Number.MAX_SAFE_INTEGER),
 		);
 
+		const wasi = createWasi(
+			this.callData,
+			(line) => {
+				this.stdout += line;
+			},
+			(line) => {
+				this.stderr += line;
+			},
+		);
+
 		this.vmImports = new VmImports(
+			wasi,
 			this.gasMeter,
 			this.processId,
 			this.callData,
@@ -113,6 +124,7 @@ export class ExecuteVm {
 			);
 
 			this.vmImports = new VmImports(
+				wasi,
 				this.gasMeter,
 				this.processId,
 				this.callData,

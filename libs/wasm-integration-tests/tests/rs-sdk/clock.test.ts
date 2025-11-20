@@ -1,4 +1,4 @@
-import { describe, expect, it, setDefaultTimeout } from "bun:test";
+import { describe, expect, it } from "bun:test";
 import { testOracleProgramExecution } from "@seda/dev-tools";
 import { oracleProgram } from "./oracle-program";
 
@@ -17,5 +17,21 @@ describe("rs-sdk:clock", () => {
 		expect(result.exitCode).toBe(0);
 		// Max drift of 100ms (If it drift more than 100ms, it means that the program is not using the correct clock)
 		expect(Math.abs(timestamp - resultTimestamp)).toBeLessThan(100);
+	});
+
+	it("should get the current time using the clock time option", async () => {
+		const result = await testOracleProgramExecution(
+			oracleProgram,
+			Buffer.from("testClockTimeGet"),
+			undefined,
+			undefined,
+			true,
+			{
+				clockTime: 1000,
+			},
+		);
+
+		expect(result.exitCode).toBe(0);
+		expect(result.resultAsString).toBe("1000");
 	});
 });

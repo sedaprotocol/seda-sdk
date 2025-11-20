@@ -76,4 +76,13 @@ export default class TallyVmAdapter implements VmAdapter {
 			}),
 		);
 	}
+
+	getClockTime(mode: "monotonic" | "realtime"): number {
+		if (mode === "monotonic") {
+			return performance.now();
+		}
+
+		// Default to realtime if no mode is provided
+		return Date.now();
+	}
 }

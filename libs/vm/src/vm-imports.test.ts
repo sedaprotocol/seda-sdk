@@ -1,18 +1,31 @@
 import { describe, expect, it } from "bun:test";
+import DataRequestVmAdapter from "./data-request-vm-adapter";
 import { GasMeter } from "./metering";
+import { createWasi } from "./services/wasm-module";
+import type { VmCallData } from "./types/vm-call-data";
 import VmImports from "./vm-imports";
 
 describe("vm-imports", () => {
 	it("should only add allowed WASI imports", () => {
+		const callData: VmCallData = {
+			args: [],
+			binary: new Uint8Array(),
+			envs: {},
+			allowedImports: ["args_get"],
+			vmMode: "exec",
+		};
+
+		const wasi = createWasi(
+			callData,
+			(line) => {},
+			(line) => {},
+		);
+
 		const vmImports = new VmImports(
+			wasi,
 			new GasMeter(1n),
 			"1",
-			{
-				args: [],
-				binary: new Uint8Array(),
-				envs: {},
-				allowedImports: ["args_get"],
-			},
+			callData,
 			new SharedArrayBuffer(1),
 		);
 
@@ -30,15 +43,25 @@ describe("vm-imports", () => {
 	});
 
 	it("should only add allowed WASI imports even on multiple versions", () => {
+		const callData: VmCallData = {
+			args: [],
+			binary: new Uint8Array(),
+			envs: {},
+			allowedImports: ["args_get"],
+			vmMode: "exec",
+		};
+
+		const wasi = createWasi(
+			callData,
+			(line) => {},
+			(line) => {},
+		);
+
 		const vmImports = new VmImports(
+			wasi,
 			new GasMeter(1n),
 			"1",
-			{
-				args: [],
-				binary: new Uint8Array(),
-				envs: {},
-				allowedImports: ["args_get"],
-			},
+			callData,
 			new SharedArrayBuffer(1),
 		);
 
@@ -65,15 +88,23 @@ describe("vm-imports", () => {
 	});
 
 	it("Empty array should disallow all imports except for the pre-configured WASI imports", () => {
+		const callData: VmCallData = {
+			args: [],
+			binary: new Uint8Array(),
+			envs: {},
+			allowedImports: [],
+			vmMode: "exec",
+		};
+		const wasi = createWasi(
+			callData,
+			(line) => {},
+			(line) => {},
+		);
 		const vmImports = new VmImports(
+			wasi,
 			new GasMeter(1n),
 			"1",
-			{
-				args: [],
-				binary: new Uint8Array(),
-				envs: {},
-				allowedImports: [],
-			},
+			callData,
 			new SharedArrayBuffer(1),
 		);
 
@@ -90,14 +121,22 @@ describe("vm-imports", () => {
 	});
 
 	it("undefined allowedImports should allow all", () => {
+		const callData: VmCallData = {
+			args: [],
+			binary: new Uint8Array(),
+			envs: {},
+			vmMode: "exec",
+		};
+		const wasi = createWasi(
+			callData,
+			(line) => {},
+			(line) => {},
+		);
 		const vmImports = new VmImports(
+			wasi,
 			new GasMeter(1n),
 			"1",
-			{
-				args: [],
-				binary: new Uint8Array(),
-				envs: {},
-			},
+			callData,
 			new SharedArrayBuffer(1),
 		);
 

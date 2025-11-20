@@ -48,4 +48,16 @@ export interface VmAdapter {
 	proxyHttpFetch(
 		action: ProxyHttpFetchAction,
 	): Promise<PromiseStatus<HttpFetchResponse>>;
+
+	/**
+	 * Method to get the current clock time
+	 *
+	 * @param mode
+	 *
+	 * 'monotonic' - The store-wide monotonic clock, which is defined as a clock measuring real time, whose value cannot be adjusted and which cannot have negative clock jumps. The epoch of this clock is undefined. The absolute time value of this clock therefore has no meaning.
+	 * 'realtime' - the time since the Unix epoch (January 1, 1970 00:00:00 UTC)
+	 *
+	 * @returns the current clock time in milliseconds
+	 */
+	getClockTime(mode: "monotonic" | "realtime"): number;
 }

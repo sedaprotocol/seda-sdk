@@ -2,6 +2,7 @@ import * as Secp256k1 from "@noble/secp256k1";
 import { trySync } from "@seda-protocol/utils";
 import { Maybe } from "true-myth";
 import type { ResultJSON } from "true-myth/result";
+import type { WASI } from "uwasi";
 import { VmError, VmErrorType } from "./errors.js";
 import { args_get, args_sizes_get } from "./imports/wasi/args_get.js";
 import { clock_time_get } from "./imports/wasi/clock_time_get.js";
@@ -41,10 +42,11 @@ export default class VmImports {
 	reExecutionRequest?: VmActionRequest;
 
 	constructor(
+		private wasi: WASI,
 		gasMeter: GasMeter,
 		processId: string,
 		callData: VmCallData,
-		notifierBufferOrAdapter: SharedArrayBuffer | VmAdapter,
+		private notifierBufferOrAdapter: SharedArrayBuffer | VmAdapter,
 		asyncRequests: VmActionRequest[] = [],
 	) {
 		this.workerToHost = new WorkerToHost(
@@ -321,6 +323,10 @@ export default class VmImports {
 		}
 
 		const injectedWasi: WebAssembly.Imports = {};
+		const vmAdapter: Maybe<VmAdapter> =
+			this.notifierBufferOrAdapter instanceof SharedArrayBuffer
+				? Maybe.nothing()
+				: Maybe.just(this.notifierBufferOrAdapter);
 
 		for (const wasiNamespace of Object.keys(wasiImports)) {
 			injectedWasi[wasiNamespace] = {
@@ -374,11 +380,7 @@ export default class VmImports {
 					),
 				proc_exit: wasiImports[wasiNamespace].proc_exit,
 				clock_time_get: (...args: number[]) =>
-					clock_time_get(
-						this.gasMeter,
-						wasiImports[wasiNamespace].clock_time_get,
-						...args,
-					),
+					clock_time_get(vmAdapter, this.wasi, this.gasMeter, ...args),
 			};
 		}
 
