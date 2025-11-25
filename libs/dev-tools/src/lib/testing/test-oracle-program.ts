@@ -38,13 +38,17 @@ export function testOracleProgramExecution(
 	adapterOptions?: {
 		totalHttpTimeLimit?: number;
 		clockTime?: number;
+		envs?: Record<string, string>;
 	},
 	mockProxyGasCost: bigint | undefined = undefined,
 ) {
 	return callVm(
 		{
 			args: [inputs.toString("hex")],
-			envs: {},
+			envs: {
+				CHAIN_ID: "seda-1-local",
+				...adapterOptions?.envs,
+			},
 			binary: new Uint8Array(oracleProgram),
 			gasLimit,
 			vmMode: "exec",
