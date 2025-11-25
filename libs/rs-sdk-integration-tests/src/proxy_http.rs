@@ -11,7 +11,6 @@ pub fn test_proxy_http_fetch() {
 
     if response.is_ok() {
         Process::success(&response.bytes);
-        return;
     }
 
     Process::error(&"rejected".to_bytes());
@@ -46,7 +45,6 @@ pub fn test_proxy_http_fetch_verification() {
 
     if reveals.len() != 1 {
         Process::error(&"not exactly one reveal".to_bytes());
-        return;
     }
 
     let test_case: VerificationTest = serde_json::from_slice(&reveals[0].body.reveal).expect("Valid test case");
@@ -58,7 +56,6 @@ pub fn test_proxy_http_fetch_verification() {
 
     if !verified {
         Process::error(&"verification failed".to_bytes());
-        return;
     }
 
     Process::success(&"verification succeeded".to_bytes());

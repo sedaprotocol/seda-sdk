@@ -7,7 +7,6 @@ impl SimplePriceFeed {
 
         if !response.is_ok() {
             Process::error(&"The API call failed".to_bytes());
-            return;
         }
 
         Process::success(&"The API called completed".to_bytes());

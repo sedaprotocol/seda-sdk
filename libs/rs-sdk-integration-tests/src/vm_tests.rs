@@ -13,7 +13,6 @@ pub fn test_tally_vm_http() {
 
     if response.is_ok() {
         Process::error(&"this should not be allowed in tally mode".to_bytes());
-        return;
     }
 
     Process::success(&response.bytes);

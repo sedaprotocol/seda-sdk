@@ -141,7 +141,7 @@ impl Process {
     /// let result = vec![0x01, 0x02, 0x03];
     /// Process::success(&result);
     /// ```
-    pub fn success(result: &[u8]) {
+    pub fn success(result: &[u8]) -> ! {
         Self::exit_with_result(0, result);
     }
 
@@ -155,7 +155,7 @@ impl Process {
     /// let error_data = vec![0xFF];
     /// Process::error(&error_data);
     /// ```
-    pub fn error(result: &[u8]) {
+    pub fn error(result: &[u8]) -> ! {
         Self::exit_with_result(1, result);
     }
 
@@ -201,7 +201,7 @@ impl Process {
     /// // Exit with success message
     /// Process::exit_with_message(0, "Operation completed successfully");
     /// ```
-    pub fn exit_with_message(code: u8, message: &str) {
+    pub fn exit_with_message(code: u8, message: &str) -> ! {
         let message_encoded = message.as_bytes();
         Self::exit_with_result(code, message_encoded);
     }
@@ -216,7 +216,7 @@ impl Process {
     /// let result = vec![1, 2, 3, 4];
     /// Process::exit_with_result(0, &result);
     /// ```
-    pub fn exit_with_result(code: u8, result: &[u8]) {
+    pub fn exit_with_result(code: u8, result: &[u8]) -> ! {
         unsafe { raw::execution_result(result.as_ptr(), result.len() as u32) };
         process::exit(code.into());
     }
@@ -234,7 +234,7 @@ impl Process {
     /// // Exit with error code
     /// Process::exit(1);
     /// ```
-    pub fn exit(code: u8) {
+    pub fn exit(code: u8) -> ! {
         Self::exit_with_result(code, &[]);
     }
 }

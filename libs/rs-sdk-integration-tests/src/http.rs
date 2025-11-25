@@ -8,7 +8,6 @@ pub fn test_http_rejection() {
 
     if !response.is_ok() {
         Process::success(&"rejected".to_bytes());
-        return;
     }
 
     Process::error(&"test failed".to_bytes());
@@ -29,7 +28,6 @@ pub fn test_http_success() {
     if response.is_ok() {
         let data = serde_json::from_slice::<TodoResponse>(&response.bytes).unwrap();
         Process::success(&format!("{}:{}:{}:{}", data.user_id, data.id, data.title, data.completed).to_bytes());
-        return;
     }
 
     Process::error(&response.bytes);
@@ -59,7 +57,6 @@ pub fn test_http_post_success() {
     if response.is_ok() {
         let data = serde_json::from_slice::<PostResponse>(&response.bytes).unwrap();
         Process::success(&format!("{}:{}:{}", data.id, data.title, data.body).to_bytes());
-        return;
     }
 
     Process::error(&response.bytes);
@@ -79,7 +76,6 @@ pub fn test_user_http_should_timeout() {
     let response = http_fetch("https://fakeresponder.onrender.com/?sleepMs=5000", Some(options));
     if response.is_ok() {
         Process::success(&"success".to_bytes());
-        return;
     }
 
     Process::error(&response.bytes);
@@ -99,7 +95,6 @@ pub fn test_user_http_no_timeout() {
     let response = http_fetch("https://fakeresponder.onrender.com/?sleepMs=1000", Some(options));
     if response.is_ok() {
         Process::success(&"success".to_bytes());
-        return;
     }
 
     Process::error(&response.bytes);
@@ -119,13 +114,11 @@ pub fn test_long_fetch() {
     let first_response = http_fetch("https://fakeresponder.onrender.com/?sleepMs=10000", Some(options));
     if first_response.is_ok() {
         Process::success(&"success".to_bytes());
-        return;
     }
 
     let second_response = http_fetch("https://fakeresponder.onrender.com/?sleepMs=100", None);
     if second_response.is_ok() {
         Process::success(&"success".to_bytes());
-        return;
     }
 
     let mut error_bytes = Vec::new();
