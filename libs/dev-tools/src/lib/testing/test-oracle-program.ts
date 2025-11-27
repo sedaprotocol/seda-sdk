@@ -39,14 +39,28 @@ export function testOracleProgramExecution(
 		totalHttpTimeLimit?: number;
 		clockTime?: number;
 		envs?: Record<string, string>;
+		lastResult?: {
+			exitCode: number;
+			result: Buffer;
+			timestamp: number;
+		}
 	},
 	mockProxyGasCost: bigint | undefined = undefined,
 ) {
+	const optionalEnvVars: Record<string, string> = {};
+
+	if (adapterOptions?.lastResult) {
+		optionalEnvVars.LAST_RESULT = adapterOptions.lastResult.result.toString("hex");
+		optionalEnvVars.LAST_RESULT_EXIT_CODE = adapterOptions.lastResult.exitCode.toString();
+		optionalEnvVars.LAST_RESULT_TIMESTAMP = adapterOptions.lastResult.timestamp.toString();
+	}
+
 	return callVm(
 		{
 			args: [inputs.toString("hex")],
 			envs: {
 				CHAIN_ID: "seda-1-local",
+				...optionalEnvVars,
 				...adapterOptions?.envs,
 			},
 			binary: new Uint8Array(oracleProgram),
