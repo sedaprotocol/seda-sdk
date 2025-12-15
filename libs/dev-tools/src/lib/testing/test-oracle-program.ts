@@ -43,16 +43,19 @@ export function testOracleProgramExecution(
 			exitCode: number;
 			result: Buffer;
 			timestamp: number;
-		}
+		};
 	},
 	mockProxyGasCost: bigint | undefined = undefined,
 ) {
 	const optionalEnvVars: Record<string, string> = {};
 
 	if (adapterOptions?.lastResult) {
-		optionalEnvVars.LAST_RESULT = adapterOptions.lastResult.result.toString("hex");
-		optionalEnvVars.LAST_RESULT_EXIT_CODE = adapterOptions.lastResult.exitCode.toString();
-		optionalEnvVars.LAST_RESULT_TIMESTAMP = adapterOptions.lastResult.timestamp.toString();
+		optionalEnvVars.LAST_RESULT =
+			adapterOptions.lastResult.result.toString("hex");
+		optionalEnvVars.LAST_RESULT_EXIT_CODE =
+			adapterOptions.lastResult.exitCode.toString();
+		optionalEnvVars.LAST_RESULT_TIMESTAMP =
+			adapterOptions.lastResult.timestamp.toString();
 	}
 
 	return callVm(

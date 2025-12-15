@@ -13,6 +13,10 @@ export class WasmModuleCache {
 		return `${vmMode}_${cacheId}`;
 	}
 
+	delete(vmMode: VmCallData["vmMode"], cacheId: string) {
+		this.map.delete(WasmModuleCache.createCacheKey(vmMode, cacheId));
+	}
+
 	get(
 		vmMode: VmCallData["vmMode"],
 		cacheId: string,
@@ -26,5 +30,9 @@ export class WasmModuleCache {
 		value: WebAssembly.Module,
 	) {
 		this.map.set(WasmModuleCache.createCacheKey(vmMode, cacheId), value);
+	}
+
+	size() {
+		return this.map.size();
 	}
 }

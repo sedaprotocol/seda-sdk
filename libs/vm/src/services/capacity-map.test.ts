@@ -54,4 +54,53 @@ describe("CapacityMap", () => {
 		const duration = endTime - startTime;
 		expect(duration).toBeLessThan(10);
 	});
+
+	it("should delete items by key", () => {
+		const map = new CapacityMap<string, string>(10);
+		map.set("key1", "value1");
+		map.set("key2", "value2");
+		map.set("key3", "value3");
+
+		expect(map.size()).toEqual(3);
+
+		// Delete existing key
+		const deleted = map.delete("key2");
+		expect(deleted).toBe(true);
+		expect(map.size()).toEqual(2);
+		expect(map.get("key2")).toEqual(Maybe.nothing());
+		expect(map.get("key1")).toEqual(Maybe.just("value1"));
+		expect(map.get("key3")).toEqual(Maybe.just("value3"));
+
+		// Try to delete non-existent key
+		const notDeleted = map.delete("nonexistent");
+		expect(notDeleted).toBe(false);
+		expect(map.size()).toEqual(2);
+	});
+
+	it("should maintain linked list integrity after deletion", () => {
+		const map = new CapacityMap<string, string>(5);
+		map.set("a", "1");
+		map.set("b", "2");
+		map.set("c", "3");
+		map.set("d", "4");
+		map.set("e", "5");
+
+		// Delete middle node
+		map.delete("c");
+		expect(map.size()).toEqual(4);
+		expect(map.get("c")).toEqual(Maybe.nothing());
+
+		// Delete head node
+		map.delete("e");
+		expect(map.size()).toEqual(3);
+		expect(map.get("e")).toEqual(Maybe.nothing());
+		expect(map.get("d")).toEqual(Maybe.just("4"));
+
+		// Delete tail node
+		map.delete("a");
+		expect(map.size()).toEqual(2);
+		expect(map.get("a")).toEqual(Maybe.nothing());
+		expect(map.get("b")).toEqual(Maybe.just("2"));
+		expect(map.get("d")).toEqual(Maybe.just("4"));
+	});
 });

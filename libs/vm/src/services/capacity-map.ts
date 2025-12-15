@@ -73,6 +73,20 @@ export class CapacityMap<K, V> {
 		return Maybe.of(node.value.value);
 	}
 
+	delete(key: K): boolean {
+		const node = Maybe.of(this.map.get(key));
+
+		if (node.isNothing) {
+			return false;
+		}
+
+		// Remove from map and linked list
+		this.map.delete(key);
+		this.removeNode(node.value);
+
+		return true;
+	}
+
 	private addToHead(node: Node<K, V>) {
 		node.prev = Maybe.nothing();
 		node.next = this.head;
