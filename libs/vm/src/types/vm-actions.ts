@@ -26,7 +26,29 @@ export interface HttpFetchOptions {
 export type VmAction =
 	| HttpFetchAction
 	| ProxyHttpFetchAction
-	| ProxyHttpFetchGasCostAction;
+	| ProxyHttpFetchGasCostAction
+	| StorageReadAction
+	| StorageWriteAction
+	| StorageDeleteAction;
+
+export interface StorageReadAction {
+	keys: string[];
+	type: "storage-read-action";
+}
+
+export interface StorageReadResponse {
+	[key: string]: Buffer;
+}
+
+export interface StorageWriteAction {
+	values: { [key: string]: string };
+	type: "storage-write-action";
+}
+
+export interface StorageDeleteAction {
+	keys: string[];
+	type: "storage-delete-action";
+}
 
 export interface HttpFetchAction {
 	url: string;

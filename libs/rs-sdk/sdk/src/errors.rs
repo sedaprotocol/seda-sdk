@@ -28,6 +28,10 @@ pub enum SDKError {
     #[error("Invalid value")]
     InvalidValue,
 
+    /// A host promise was rejected, e.g. a storage key or value exceeded the configured size limit.
+    #[error("Promise rejected: {0}")]
+    PromiseRejected(String),
+
     /// The x-seda-signature header in a proxy http response is missing.
     #[error("Missing x-seda-signature header")]
     MissingSignatureHeader,

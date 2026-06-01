@@ -45,7 +45,7 @@ impl PromiseStatus {
             return value;
         }
 
-        panic!("Promise is not fulfilled: {:?}", &self);
+        panic!("Promise is not fulfilled: {:?}", self);
     }
 
     /// Parses the fulfilled value of the promise into the desired type.

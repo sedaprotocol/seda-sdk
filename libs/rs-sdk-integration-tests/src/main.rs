@@ -4,6 +4,7 @@ mod http;
 mod infinite_loop;
 mod proxy_http;
 mod random_get;
+mod storage;
 mod tally;
 mod vm_tests;
 
@@ -14,6 +15,11 @@ use infinite_loop::{test_infinite_loop, test_infinite_loop_http_fetch};
 use proxy_http::{test_generate_proxy_http_message, test_proxy_http_fetch};
 use random_get::test_random_get;
 use seda_sdk_rs::{bytes::ToBytes, process::Process};
+use storage::{
+    test_storage_delete, test_storage_delete_key_limit, test_storage_delete_persisted, test_storage_read,
+    test_storage_read_key_limit, test_storage_read_persisted, test_storage_write, test_storage_write_key_limit,
+    test_storage_write_value_limit,
+};
 use tally::{
     test_tally_deterministic_hashmap, test_tally_hashmap, test_tally_vm_reveals, test_tally_vm_reveals_filtered,
 };
@@ -48,6 +54,15 @@ fn main() {
         "testLongFetch" => test_long_fetch(),
         "testClockTimeGet" => test_clock_time_get(),
         "testHttpFetchAccessFile" => test_http_fetch_access_file(),
+        "testStorageWrite" => test_storage_write(),
+        "testStorageRead" => test_storage_read(),
+        "testStorageDelete" => test_storage_delete(),
+        "testStorageReadPersisted" => test_storage_read_persisted(),
+        "testStorageDeletePersisted" => test_storage_delete_persisted(),
+        "testStorageWriteValueLimit" => test_storage_write_value_limit(),
+        "testStorageWriteKeyLimit" => test_storage_write_key_limit(),
+        "testStorageReadKeyLimit" => test_storage_read_key_limit(),
+        "testStorageDeleteKeyLimit" => test_storage_delete_key_limit(),
         _ => Process::error(&"No argument given".to_bytes()),
     }
 }

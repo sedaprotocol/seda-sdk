@@ -15,6 +15,8 @@ export interface VmCallData {
 	cache?: CacheOptions;
 	stdoutLimit?: number;
 	stderrLimit?: number;
+	maxStorageKeyBytes?: number;
+	maxStorageValueBytes?: number;
 	wasmModuleCache?: WasmModuleCache;
 }
 

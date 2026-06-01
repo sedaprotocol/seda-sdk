@@ -1,3 +1,5 @@
+import type { ToBuffer } from "./types/vm-promise.js";
+
 export enum VmErrorType {
 	OutOfGas = "OutOfGas",
 	HttpFetchTimeout = "HttpFetchTimeout",
@@ -10,7 +12,7 @@ interface VmErrorOptions extends ErrorOptions {
 	type: VmErrorType;
 }
 
-export class VmError extends Error {
+export class VmError extends Error implements ToBuffer {
 	public type: VmErrorType;
 
 	constructor(message?: string, options?: VmErrorOptions) {
@@ -18,5 +20,9 @@ export class VmError extends Error {
 		super(`VmError(${message})`, options);
 
 		this.type = options?.type ?? VmErrorType.Unknown;
+	}
+
+	toBuffer(): Uint8Array {
+		return new TextEncoder().encode(this.message);
 	}
 }

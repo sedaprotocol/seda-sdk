@@ -7,6 +7,10 @@ import { readStream } from "./services/read-stream.js";
 import type {
 	HttpFetchAction,
 	ProxyHttpFetchAction,
+	StorageDeleteAction,
+	StorageReadAction,
+	StorageReadResponse,
+	StorageWriteAction,
 } from "./types/vm-actions.js";
 import { HttpFetchResponse } from "./types/vm-actions.js";
 import type { VmAdapter } from "./types/vm-adapter.js";
@@ -19,6 +23,9 @@ interface Options {
 	mockProxyGasCost?: bigint;
 	maxResponseBytes?: number;
 	totalHttpTimeLimit?: number;
+
+	maxStorageKeyBytes?: number;
+	maxStorageValueBytes?: number;
 
 	/**
 	 * The clock time to use for the VM.
@@ -34,6 +41,8 @@ export default class DataRequestVmAdapter implements VmAdapter {
 	private maxResponseBytes = 10 * 1024 * 1024; // 10MB
 	private totalHttpTimeLimit = 20_000;
 	private totalHttpTimeLeft = 20_000;
+	private maxStorageKeyBytes = 256;
+	private maxStorageValueBytes = 1024;
 
 	constructor(private opts?: Options) {
 		if (opts?.fetchMock) {
@@ -62,6 +71,14 @@ export default class DataRequestVmAdapter implements VmAdapter {
 		if (opts?.totalHttpTimeLimit) {
 			this.totalHttpTimeLimit = opts.totalHttpTimeLimit;
 			this.totalHttpTimeLeft = opts.totalHttpTimeLimit;
+		}
+
+		if (opts?.maxStorageKeyBytes) {
+			this.maxStorageKeyBytes = opts.maxStorageKeyBytes;
+		}
+
+		if (opts?.maxStorageValueBytes) {
+			this.maxStorageValueBytes = opts.maxStorageValueBytes;
 		}
 	}
 
@@ -228,6 +245,83 @@ export default class DataRequestVmAdapter implements VmAdapter {
 
 		// Default to realtime if no mode is provided
 		return Date.now();
+	}
+
+	async _storageRead(
+		action: StorageReadAction,
+	): Promise<PromiseStatus<StorageReadResponse>> {
+		for (const key of action.keys) {
+			const keyBytes = Buffer.from(key, "hex");
+
+			if (keyBytes.length > this.maxStorageKeyBytes) {
+				return PromiseStatus.rejected(
+					new VmError(
+						`Storage key is too long (got ${keyBytes.length} bytes, max ${this.maxStorageKeyBytes}): ${key}`,
+					),
+				);
+			}
+		}
+
+		return this.storageRead(action);
+	}
+
+	async storageRead(
+		action: StorageReadAction,
+	): Promise<PromiseStatus<StorageReadResponse>> {
+		throw new VmError("Unimplemented");
+	}
+
+	async _storageWrite(
+		action: StorageWriteAction,
+	): Promise<PromiseStatus<void>> {
+		for (const key of Object.keys(action.values)) {
+			const keyBytes = Buffer.from(key, "hex");
+			if (keyBytes.length > this.maxStorageKeyBytes) {
+				return PromiseStatus.rejected(
+					new VmError(
+						`Storage key is too long (got ${keyBytes.length} bytes, max ${this.maxStorageKeyBytes}): ${key}`,
+					),
+				);
+			}
+
+			const valueBytes = Buffer.from(action.values[key], "hex");
+			if (valueBytes.length > this.maxStorageValueBytes) {
+				return PromiseStatus.rejected(
+					new VmError(
+						`Storage value is too long (got ${valueBytes.length} bytes, max ${this.maxStorageValueBytes}): ${action.values[key]}`,
+					),
+				);
+			}
+		}
+
+		return this.storageWrite(action);
+	}
+
+	async storageWrite(action: StorageWriteAction): Promise<PromiseStatus<void>> {
+		throw new VmError("Unimplemented");
+	}
+
+	async _storageDelete(
+		action: StorageDeleteAction,
+	): Promise<PromiseStatus<void>> {
+		for (const key of action.keys) {
+			const keyBytes = Buffer.from(key, "hex");
+			if (keyBytes.length > this.maxStorageKeyBytes) {
+				return PromiseStatus.rejected(
+					new VmError(
+						`Storage key is too long (got ${keyBytes.length} bytes, max ${this.maxStorageKeyBytes}): ${key}`,
+					),
+				);
+			}
+		}
+
+		return this.storageDelete(action);
+	}
+
+	async storageDelete(
+		action: StorageDeleteAction,
+	): Promise<PromiseStatus<void>> {
+		throw new VmError("Unimplemented");
 	}
 }
 

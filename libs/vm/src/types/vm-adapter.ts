@@ -4,6 +4,10 @@ import type {
 	HttpFetchAction,
 	HttpFetchResponse,
 	ProxyHttpFetchAction,
+	StorageDeleteAction,
+	StorageReadAction,
+	StorageReadResponse,
+	StorageWriteAction,
 } from "./vm-actions";
 import type { VmCallData } from "./vm-call-data.js";
 import type { PromiseStatus } from "./vm-promise.js";
@@ -60,4 +64,38 @@ export interface VmAdapter {
 	 * @returns the current clock time in milliseconds
 	 */
 	getClockTime(mode: "monotonic" | "realtime"): number;
+
+	/**
+	 * Method to read the storage (with key validation)
+	 */
+	_storageRead(
+		action: StorageReadAction,
+	): Promise<PromiseStatus<StorageReadResponse>>;
+
+	/**
+	 * Method to read the storage
+	 */
+	storageRead(
+		action: StorageReadAction,
+	): Promise<PromiseStatus<StorageReadResponse>>;
+
+	/**
+	 * Method to write the storage (with key validation)
+	 */
+	_storageWrite(action: StorageWriteAction): Promise<PromiseStatus<void>>;
+
+	/**
+	 * Method to write the storage
+	 */
+	storageWrite(action: StorageWriteAction): Promise<PromiseStatus<void>>;
+
+	/**
+	 * Method to delete the storage (with key validation)
+	 */
+	_storageDelete(action: StorageDeleteAction): Promise<PromiseStatus<void>>;
+
+	/**
+	 * Method to delete the storage
+	 */
+	storageDelete(action: StorageDeleteAction): Promise<PromiseStatus<void>>;
 }

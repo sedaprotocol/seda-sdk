@@ -1,7 +1,12 @@
 import { Result } from "true-myth";
+import { VmError } from "./errors.js";
 import type {
 	HttpFetchAction,
 	ProxyHttpFetchAction,
+	StorageDeleteAction,
+	StorageReadAction,
+	StorageReadResponse,
+	StorageWriteAction,
 } from "./types/vm-actions.js";
 import { HttpFetchResponse } from "./types/vm-actions.js";
 import type { VmAdapter } from "./types/vm-adapter.js";
@@ -84,5 +89,39 @@ export default class TallyVmAdapter implements VmAdapter {
 
 		// Default to realtime if no mode is provided
 		return Date.now();
+	}
+
+	async _storageRead(
+		action: StorageReadAction,
+	): Promise<PromiseStatus<StorageReadResponse>> {
+		return this.storageRead(action);
+	}
+
+	async storageRead(
+		action: StorageReadAction,
+	): Promise<PromiseStatus<StorageReadResponse>> {
+		throw new VmError("unimplemented");
+	}
+
+	async _storageWrite(
+		action: StorageWriteAction,
+	): Promise<PromiseStatus<void>> {
+		return this.storageWrite(action);
+	}
+
+	async storageWrite(action: StorageWriteAction): Promise<PromiseStatus<void>> {
+		throw new VmError("unimplemented");
+	}
+
+	async _storageDelete(
+		action: StorageDeleteAction,
+	): Promise<PromiseStatus<void>> {
+		return this.storageDelete(action);
+	}
+
+	async storageDelete(
+		action: StorageDeleteAction,
+	): Promise<PromiseStatus<void>> {
+		throw new VmError("unimplemented");
 	}
 }

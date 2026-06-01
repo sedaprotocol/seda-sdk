@@ -100,6 +100,30 @@ export class HostToWorker {
 				Err: (error) =>
 					HttpFetchResponse.createRejectedPromise(error.message).toBuffer(),
 			});
+		} else if (action.type === "storage-read-action") {
+			const actionResult = await tryAsync(this.adapter._storageRead(action));
+
+			this.actionResult = actionResult.match({
+				Ok: (value) => value.toBuffer(),
+				Err: (error) =>
+					HttpFetchResponse.createRejectedPromise(error.message).toBuffer(),
+			});
+		} else if (action.type === "storage-write-action") {
+			const actionResult = await tryAsync(this.adapter._storageWrite(action));
+
+			this.actionResult = actionResult.match({
+				Ok: (value) => value.toBuffer(),
+				Err: (error) =>
+					HttpFetchResponse.createRejectedPromise(error.message).toBuffer(),
+			});
+		} else if (action.type === "storage-delete-action") {
+			const actionResult = await tryAsync(this.adapter._storageDelete(action));
+
+			this.actionResult = actionResult.match({
+				Ok: (value) => value.toBuffer(),
+				Err: (error) =>
+					HttpFetchResponse.createRejectedPromise(error.message).toBuffer(),
+			});
 		}
 
 		if (typeof this.actionResult === "undefined") {

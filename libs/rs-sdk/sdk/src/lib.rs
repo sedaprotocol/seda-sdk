@@ -12,6 +12,7 @@ pub mod promise;
 pub mod proxy_http_fetch;
 mod raw;
 pub mod secp256k1;
+pub mod storage;
 mod tally;
 mod vm_modes;
 
@@ -20,6 +21,7 @@ pub use keccak256::keccak256;
 pub use process::Process;
 pub use proxy_http_fetch::{generate_proxy_http_signing_message, proxy_http_fetch};
 pub use secp256k1::secp256k1_verify;
+pub use storage::{storage_delete, storage_read, storage_write};
 pub use tally::*;
 
 pub use seda_sdk_macros::oracle_program;

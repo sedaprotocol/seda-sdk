@@ -9,7 +9,6 @@ import {
 import { HttpFetchResponse } from "./types/vm-actions.js";
 import type { VmAdapter } from "./types/vm-adapter.js";
 import type { VmCallData } from "./types/vm-call-data.js";
-import { PromiseStatus } from "./types/vm-promise.js";
 import VmImports from "./vm-imports.js";
 import { HostToWorker, VmActionRequest } from "./worker-host-communication.js";
 

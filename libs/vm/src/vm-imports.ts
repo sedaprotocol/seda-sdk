@@ -16,6 +16,9 @@ import {
 	HttpFetchResponse,
 	type ProxyHttpFetchAction,
 	type ProxyHttpFetchGasCostAction,
+	type StorageDeleteAction,
+	type StorageReadAction,
+	type StorageWriteAction,
 } from "./types/vm-actions.js";
 import type { VmAdapter } from "./types/vm-adapter.js";
 import type { VmCallData } from "./types/vm-call-data.js";
@@ -199,6 +202,110 @@ export default class VmImports {
 			console.error(`[${this.processId}] - @httpFetch: ${messageRaw}`, error);
 			this.callResult = new Uint8Array();
 
+			return 0;
+		}
+	}
+
+	storageRead(actionPtr: number, actionLength: number) {
+		this.gasMeter.applyGasCost(CallType.StorageRead, BigInt(actionLength));
+
+		const actionRaw = Buffer.from(
+			new Uint8Array(
+				this.memory?.buffer.slice(actionPtr, actionPtr + actionLength) ?? [],
+			),
+		);
+
+		const action: StorageReadAction = {
+			...JSON.parse(actionRaw.toString("utf-8")),
+			type: "storage-read-action",
+		};
+
+		try {
+			this.callResult = this.workerToHost.callActionOnHost(action);
+
+			this.gasMeter.applyGasCost(
+				CallType.StorageReadResponse,
+				BigInt(this.callResult.length),
+			);
+			return this.callResult.length;
+		} catch (error) {
+			if (error instanceof VmActionRequest) {
+				this.reExecutionRequest = error;
+				throw error;
+			}
+
+			if (error instanceof VmError && error.type === VmErrorType.OutOfGas) {
+				throw error;
+			}
+
+			console.error(`[${this.processId}] - @storageRead`, error);
+			this.callResult = new Uint8Array();
+			return 0;
+		}
+	}
+
+	storageWrite(actionPtr: number, actionLength: number) {
+		this.gasMeter.applyGasCost(CallType.StorageWrite, BigInt(actionLength));
+
+		const actionRaw = Buffer.from(
+			new Uint8Array(
+				this.memory?.buffer.slice(actionPtr, actionPtr + actionLength) ?? [],
+			),
+		);
+
+		const action: StorageWriteAction = {
+			...JSON.parse(actionRaw.toString("utf-8")),
+			type: "storage-write-action",
+		};
+
+		try {
+			this.callResult = this.workerToHost.callActionOnHost(action);
+			return this.callResult.length;
+		} catch (error) {
+			if (error instanceof VmActionRequest) {
+				this.reExecutionRequest = error;
+				throw error;
+			}
+
+			if (error instanceof VmError && error.type === VmErrorType.OutOfGas) {
+				throw error;
+			}
+
+			console.error(`[${this.processId}] - @storageWrite`, error);
+			this.callResult = new Uint8Array();
+			return 0;
+		}
+	}
+
+	storageDelete(actionPtr: number, actionLength: number) {
+		this.gasMeter.applyGasCost(CallType.StorageDelete, BigInt(actionLength));
+
+		const actionRaw = Buffer.from(
+			new Uint8Array(
+				this.memory?.buffer.slice(actionPtr, actionPtr + actionLength) ?? [],
+			),
+		);
+
+		const action: StorageDeleteAction = {
+			...JSON.parse(actionRaw.toString("utf-8")),
+			type: "storage-delete-action",
+		};
+
+		try {
+			this.callResult = this.workerToHost.callActionOnHost(action);
+			return this.callResult.length;
+		} catch (error) {
+			if (error instanceof VmActionRequest) {
+				this.reExecutionRequest = error;
+				throw error;
+			}
+
+			if (error instanceof VmError && error.type === VmErrorType.OutOfGas) {
+				throw error;
+			}
+
+			console.error(`[${this.processId}] - @storageDelete`, error);
+			this.callResult = new Uint8Array();
 			return 0;
 		}
 	}
@@ -393,6 +500,9 @@ export default class VmImports {
 				keccak256: this.keccak256.bind(this),
 				call_result_write: this.callResultWrite.bind(this),
 				execution_result: this.executionResult.bind(this),
+				storage_read: this.storageRead.bind(this),
+				storage_write: this.storageWrite.bind(this),
+				storage_delete: this.storageDelete.bind(this),
 			},
 		};
 	}

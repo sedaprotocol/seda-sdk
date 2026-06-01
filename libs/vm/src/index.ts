@@ -39,6 +39,10 @@ export {
 	type ProxyHttpFetchAction,
 	type ProxyHttpFetchGasCostAction,
 	type HttpFetchResponseData,
+	type StorageDeleteAction,
+	type StorageReadAction,
+	type StorageReadResponse,
+	type StorageWriteAction,
 } from "./types/vm-actions.js";
 
 /**

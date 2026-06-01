@@ -21,6 +21,11 @@ const GAS_PER_BYTE_EXECUTION_RESULT = 10_000_000n;
 
 const TERA_GAS = 1_000_000_000_000n;
 
+// Storage Gas
+const GAS_STORAGE_READ_BASE = TERA_GAS;
+const GAS_STORAGE_WRITE_BASE = TERA_GAS * 2n;
+const GAS_STORAGE_DELETE_BASE = TERA_GAS * 2n;
+
 // Makes it so you can do roughly 30 http requests with the current gas calculations.
 const GAS_HTTP_FETCH_BASE = TERA_GAS * 5n;
 
@@ -56,6 +61,10 @@ export enum CallType {
 	FdWrite = 12,
 	RandomGet = 13,
 	ClockTimeGet = 14,
+	StorageRead = 15,
+	StorageReadResponse = 16,
+	StorageWrite = 17,
+	StorageDelete = 18,
 }
 
 export const OUT_OF_GAS_MESSAGE = "Ran out of gas";
@@ -238,6 +247,18 @@ export class GasMeter {
 				break;
 			case CallType.ClockTimeGet:
 				gasCost = GAS_CLOCK_TIME_GET_BASE;
+				break;
+			case CallType.StorageRead:
+				gasCost = GAS_STORAGE_READ_BASE + GAS_PER_BYTE * bytesLength;
+				break;
+			case CallType.StorageReadResponse:
+				gasCost = GAS_PER_BYTE * bytesLength;
+				break;
+			case CallType.StorageWrite:
+				gasCost = GAS_STORAGE_WRITE_BASE + GAS_PER_BYTE * bytesLength;
+				break;
+			case CallType.StorageDelete:
+				gasCost = GAS_STORAGE_DELETE_BASE + GAS_PER_BYTE * bytesLength;
 				break;
 			default:
 				throw new VmError("Unknown call type");
