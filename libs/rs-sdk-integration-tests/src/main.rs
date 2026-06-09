@@ -4,6 +4,7 @@ mod http;
 mod http_batch;
 mod infinite_loop;
 mod proxy_http;
+mod proxy_http_batch;
 mod random_get;
 mod tally;
 mod vm_tests;
@@ -14,6 +15,10 @@ use http::*;
 use http_batch::{test_http_fetch_batch_options, test_http_fetch_batch_partial_failure, test_http_fetch_batch_success};
 use infinite_loop::{test_infinite_loop, test_infinite_loop_http_fetch};
 use proxy_http::{test_generate_proxy_http_message, test_proxy_http_fetch};
+use proxy_http_batch::{
+    test_proxy_http_fetch_batch_options, test_proxy_http_fetch_batch_partial_failure,
+    test_proxy_http_fetch_batch_success,
+};
 use random_get::test_random_get;
 use seda_sdk_rs::{bytes::ToBytes, process::Process};
 use tally::{
@@ -53,6 +58,9 @@ fn main() {
         "testHttpFetchBatchSuccess" => test_http_fetch_batch_success(),
         "testHttpFetchBatchPartialFailure" => test_http_fetch_batch_partial_failure(),
         "testHttpFetchBatchOptions" => test_http_fetch_batch_options(),
+        "testProxyHttpFetchBatchSuccess" => test_proxy_http_fetch_batch_success(),
+        "testProxyHttpFetchBatchPartialFailure" => test_proxy_http_fetch_batch_partial_failure(),
+        "testProxyHttpFetchBatchOptions" => test_proxy_http_fetch_batch_options(),
         _ => Process::error(&"No argument given".to_bytes()),
     }
 }

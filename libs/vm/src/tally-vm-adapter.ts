@@ -3,10 +3,12 @@ import type {
 	HttpFetchAction,
 	HttpFetchBatchAction,
 	ProxyHttpFetchAction,
+	ProxyHttpFetchBatchAction,
 } from "./types/vm-actions.js";
 import {
 	HttpFetchBatchResponse,
 	HttpFetchResponse,
+	ProxyHttpFetchBatchResponse,
 } from "./types/vm-actions.js";
 import type { VmAdapter } from "./types/vm-adapter.js";
 import type { VmCallData } from "./types/vm-call-data.js";
@@ -90,6 +92,22 @@ export default class TallyVmAdapter implements VmAdapter {
 			),
 		);
 		return new HttpFetchBatchResponse(responses);
+	}
+
+	async proxyHttpFetchBatch(
+		action: ProxyHttpFetchBatchAction,
+	): Promise<ProxyHttpFetchBatchResponse> {
+		const responses = await Promise.all(
+			action.requests.map((request) =>
+				this.proxyHttpFetch({
+					url: request.url,
+					options: request.options,
+					public_key: request.public_key,
+					type: "proxy-http-fetch-action",
+				}),
+			),
+		);
+		return new ProxyHttpFetchBatchResponse(responses);
 	}
 
 	getClockTime(mode: "monotonic" | "realtime"): number {

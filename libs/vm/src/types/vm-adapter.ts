@@ -6,6 +6,8 @@ import type {
 	HttpFetchBatchResponse,
 	HttpFetchResponse,
 	ProxyHttpFetchAction,
+	ProxyHttpFetchBatchAction,
+	ProxyHttpFetchBatchResponse,
 } from "./vm-actions";
 import type { VmCallData } from "./vm-call-data.js";
 import type { PromiseStatus } from "./vm-promise.js";
@@ -57,6 +59,15 @@ export interface VmAdapter {
 	proxyHttpFetch(
 		action: ProxyHttpFetchAction,
 	): Promise<PromiseStatus<HttpFetchResponse>>;
+
+	/**
+	 * Method to do a remote proxy http fetch batch call
+	 *
+	 * @param action
+	 */
+	proxyHttpFetchBatch(
+		action: ProxyHttpFetchBatchAction,
+	): Promise<ProxyHttpFetchBatchResponse>;
 
 	/**
 	 * Method to get the current clock time

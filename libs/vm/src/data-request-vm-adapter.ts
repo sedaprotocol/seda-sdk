@@ -8,9 +8,13 @@ import type {
 	HttpFetchAction,
 	HttpFetchBatchAction,
 	ProxyHttpFetchAction,
+	ProxyHttpFetchBatchAction,
 } from "./types/vm-actions.js";
-import { HttpFetchBatchResponse } from "./types/vm-actions.js";
-import { HttpFetchResponse } from "./types/vm-actions.js";
+import {
+	HttpFetchBatchResponse,
+	HttpFetchResponse,
+	ProxyHttpFetchBatchResponse,
+} from "./types/vm-actions.js";
 import type { VmAdapter } from "./types/vm-adapter.js";
 import type { VmCallData } from "./types/vm-call-data.js";
 import { VM_MODE_DR, VM_MODE_ENV_KEY } from "./types/vm-modes.js";
@@ -102,6 +106,22 @@ export default class DataRequestVmAdapter implements VmAdapter {
 		_action: ProxyHttpFetchAction,
 	): Promise<PromiseStatus<HttpFetchResponse>> {
 		throw new VmError("Unimplemented");
+	}
+
+	async proxyHttpFetchBatch(
+		action: ProxyHttpFetchBatchAction,
+	): Promise<ProxyHttpFetchBatchResponse> {
+		const responses = await Promise.all(
+			action.requests.map((request) =>
+				this.proxyHttpFetch({
+					url: request.url,
+					options: request.options,
+					type: "proxy-http-fetch-action",
+				}),
+			),
+		);
+
+		return new ProxyHttpFetchBatchResponse(responses);
 	}
 
 	async httpFetchBatch(

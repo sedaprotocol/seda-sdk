@@ -16,6 +16,7 @@ import {
 	type HttpFetchBatchAction,
 	HttpFetchResponse,
 	type ProxyHttpFetchAction,
+	type ProxyHttpFetchBatchAction,
 	type ProxyHttpFetchGasCostAction,
 } from "./types/vm-actions.js";
 import type { VmAdapter } from "./types/vm-adapter.js";
@@ -214,7 +215,6 @@ export default class VmImports {
 			type: "http-fetch-batch-action",
 		};
 
-		// For each request, we apply the gas cost of the request
 		for (const request of message.requests) {
 			this.gasMeter.applyGasCost(
 				CallType.HttpFetchRequest,
@@ -222,15 +222,79 @@ export default class VmImports {
 			);
 		}
 
-		this.callResult = this.workerToHost.callActionOnHost(message);
+		try {
+			this.callResult = this.workerToHost.callActionOnHost(message);
 
-		// We don't need to do it for each response since we already applied that above, this is simply for the bytes
-		this.gasMeter.applyGasCost(
-			CallType.HttpFetchResponse,
-			BigInt(this.callResult.length),
+			this.gasMeter.applyGasCost(
+				CallType.HttpFetchResponse,
+				BigInt(this.callResult.length),
+			);
+
+			return this.callResult.length;
+		} catch (error) {
+			if (error instanceof VmActionRequest) {
+				this.reExecutionRequest = error;
+				throw error;
+			}
+
+			if (error instanceof VmError && error.type === VmErrorType.OutOfGas) {
+				throw error;
+			}
+
+			console.error(
+				`[${this.processId}] - @httpFetchBatch: ${messageRaw}`,
+				error,
+			);
+			this.callResult = new Uint8Array();
+
+			return 0;
+		}
+	}
+
+	proxyHttpFetchBatch(action: number, actionLength: number): number {
+		const rawAction = new Uint8Array(
+			this.memory?.buffer.slice(action, action + actionLength) ?? [],
 		);
+		const messageRaw = Buffer.from(rawAction).toString("utf-8");
+		const message: ProxyHttpFetchBatchAction = {
+			...JSON.parse(messageRaw),
+			type: "proxy-http-fetch-batch-action",
+		};
 
-		return this.callResult.length;
+		for (const request of message.requests) {
+			this.gasMeter.applyGasCost(
+				CallType.ProxyHttpFetchRequest,
+				BigInt(JSON.stringify(request).length),
+			);
+		}
+
+		try {
+			this.callResult = this.workerToHost.callActionOnHost(message);
+
+			this.gasMeter.applyGasCost(
+				CallType.HttpFetchResponse,
+				BigInt(this.callResult.length),
+			);
+
+			return this.callResult.length;
+		} catch (error) {
+			if (error instanceof VmActionRequest) {
+				this.reExecutionRequest = error;
+				throw error;
+			}
+
+			if (error instanceof VmError && error.type === VmErrorType.OutOfGas) {
+				throw error;
+			}
+
+			console.error(
+				`[${this.processId}] - @proxyHttpFetchBatch: ${messageRaw}`,
+				error,
+			);
+			this.callResult = new Uint8Array();
+
+			return 0;
+		}
 	}
 
 	keccak256(messagePtr: number, messageLength: number) {
@@ -418,6 +482,7 @@ export default class VmImports {
 			...injectedWasi,
 			seda_v1: {
 				proxy_http_fetch: this.proxyHttpFetch.bind(this),
+				proxy_http_fetch_batch: this.proxyHttpFetchBatch.bind(this),
 				http_fetch: this.httpFetch.bind(this),
 				http_fetch_batch: this.httpFetchBatch.bind(this),
 				secp256k1_verify: this.secp256k1Verify.bind(this),
