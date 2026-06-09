@@ -1,9 +1,13 @@
 import { Result } from "true-myth";
 import type {
 	HttpFetchAction,
+	HttpFetchBatchAction,
 	ProxyHttpFetchAction,
 } from "./types/vm-actions.js";
-import { HttpFetchResponse } from "./types/vm-actions.js";
+import {
+	HttpFetchBatchResponse,
+	HttpFetchResponse,
+} from "./types/vm-actions.js";
 import type { VmAdapter } from "./types/vm-adapter.js";
 import type { VmCallData } from "./types/vm-call-data.js";
 import { VM_MODE_ENV_KEY, VM_MODE_TALLY } from "./types/vm-modes.js";
@@ -75,6 +79,17 @@ export default class TallyVmAdapter implements VmAdapter {
 				url: "",
 			}),
 		);
+	}
+
+	async httpFetchBatch(
+		action: HttpFetchBatchAction,
+	): Promise<HttpFetchBatchResponse> {
+		const responses = await Promise.all(
+			action.requests.map((request) =>
+				this.httpFetch({ ...request, type: "http-fetch-action" }),
+			),
+		);
+		return new HttpFetchBatchResponse(responses);
 	}
 
 	getClockTime(mode: "monotonic" | "realtime"): number {

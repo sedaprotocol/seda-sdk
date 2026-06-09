@@ -13,6 +13,7 @@ import { CallType, type GasMeter } from "./metering.js";
 import { keccak256, secp256k1Verify } from "./services/crypto.js";
 import {
 	type HttpFetchAction,
+	type HttpFetchBatchAction,
 	HttpFetchResponse,
 	type ProxyHttpFetchAction,
 	type ProxyHttpFetchGasCostAction,
@@ -203,6 +204,35 @@ export default class VmImports {
 		}
 	}
 
+	httpFetchBatch(action: number, actionLength: number): number {
+		const rawAction = new Uint8Array(
+			this.memory?.buffer.slice(action, action + actionLength) ?? [],
+		);
+		const messageRaw = Buffer.from(rawAction).toString("utf-8");
+		const message: HttpFetchBatchAction = {
+			...JSON.parse(messageRaw),
+			type: "http-fetch-batch-action",
+		};
+
+		// For each request, we apply the gas cost of the request
+		for (const request of message.requests) {
+			this.gasMeter.applyGasCost(
+				CallType.HttpFetchRequest,
+				BigInt(JSON.stringify(request).length),
+			);
+		}
+
+		this.callResult = this.workerToHost.callActionOnHost(message);
+
+		// We don't need to do it for each response since we already applied that above, this is simply for the bytes
+		this.gasMeter.applyGasCost(
+			CallType.HttpFetchResponse,
+			BigInt(this.callResult.length),
+		);
+
+		return this.callResult.length;
+	}
+
 	keccak256(messagePtr: number, messageLength: number) {
 		this.gasMeter.applyGasCost(CallType.Keccak256, BigInt(messageLength));
 
@@ -389,6 +419,7 @@ export default class VmImports {
 			seda_v1: {
 				proxy_http_fetch: this.proxyHttpFetch.bind(this),
 				http_fetch: this.httpFetch.bind(this),
+				http_fetch_batch: this.httpFetchBatch.bind(this),
 				secp256k1_verify: this.secp256k1Verify.bind(this),
 				keccak256: this.keccak256.bind(this),
 				call_result_write: this.callResultWrite.bind(this),

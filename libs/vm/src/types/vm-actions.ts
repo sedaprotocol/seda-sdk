@@ -25,6 +25,7 @@ export interface HttpFetchOptions {
 
 export type VmAction =
 	| HttpFetchAction
+	| HttpFetchBatchAction
 	| ProxyHttpFetchAction
 	| ProxyHttpFetchGasCostAction;
 
@@ -32,6 +33,11 @@ export interface HttpFetchAction {
 	url: string;
 	options: HttpFetchOptions;
 	type: "http-fetch-action";
+}
+
+export interface HttpFetchBatchAction {
+	requests: { url: string; options: HttpFetchOptions }[];
+	type: "http-fetch-batch-action";
 }
 
 export function isHttpFetchAction(action: VmAction): action is HttpFetchAction {
@@ -120,5 +126,15 @@ export class HttpFetchResponse implements ToBuffer {
 			status: 0,
 			url: "",
 		});
+	}
+}
+
+export class HttpFetchBatchResponse implements ToBuffer {
+	constructor(public data: PromiseStatus<HttpFetchResponse>[]) {}
+
+	toBuffer(): Uint8Array {
+		return new TextEncoder().encode(
+			JSON.stringify(this.data.map((response) => response.value)),
+		);
 	}
 }

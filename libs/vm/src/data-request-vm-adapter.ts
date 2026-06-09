@@ -6,8 +6,10 @@ import { VmError, VmErrorType } from "./errors.js";
 import { readStream } from "./services/read-stream.js";
 import type {
 	HttpFetchAction,
+	HttpFetchBatchAction,
 	ProxyHttpFetchAction,
 } from "./types/vm-actions.js";
+import { HttpFetchBatchResponse } from "./types/vm-actions.js";
 import { HttpFetchResponse } from "./types/vm-actions.js";
 import type { VmAdapter } from "./types/vm-adapter.js";
 import type { VmCallData } from "./types/vm-call-data.js";
@@ -100,6 +102,21 @@ export default class DataRequestVmAdapter implements VmAdapter {
 		_action: ProxyHttpFetchAction,
 	): Promise<PromiseStatus<HttpFetchResponse>> {
 		throw new VmError("Unimplemented");
+	}
+
+	async httpFetchBatch(
+		action: HttpFetchBatchAction,
+	): Promise<HttpFetchBatchResponse> {
+		const responses = await Promise.all(
+			action.requests.map((request) =>
+				this.httpFetch({
+					...request,
+					type: "http-fetch-action",
+				}),
+			),
+		);
+
+		return new HttpFetchBatchResponse(responses);
 	}
 
 	async httpFetch(

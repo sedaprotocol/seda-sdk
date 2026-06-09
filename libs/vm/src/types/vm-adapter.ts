@@ -2,6 +2,8 @@ import type { Result } from "true-myth";
 import type { VmError } from "../errors";
 import type {
 	HttpFetchAction,
+	HttpFetchBatchAction,
+	HttpFetchBatchResponse,
 	HttpFetchResponse,
 	ProxyHttpFetchAction,
 } from "./vm-actions";
@@ -30,6 +32,13 @@ export interface VmAdapter {
 	 * @param action
 	 */
 	httpFetch(action: HttpFetchAction): Promise<PromiseStatus<HttpFetchResponse>>;
+
+	/**
+	 * Method to do a remote http fetch batch call
+	 *
+	 * @param action
+	 */
+	httpFetchBatch(action: HttpFetchBatchAction): Promise<HttpFetchBatchResponse>;
 
 	/**
 	 * Method to calculate the gas cost of a proxy http fetch call

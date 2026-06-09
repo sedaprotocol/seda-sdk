@@ -289,3 +289,53 @@ pub fn http_fetch<URL: ToString>(url: URL, options: Option<HttpFetchOptions>) ->
 
     HttpFetchResponse::from_promise(promise_status)
 }
+
+/// Batch HTTP fetch for multiple URLs with their respective options.
+///
+/// This function allows you to execute multiple HTTP fetch actions in one call.
+/// Each entry in the input `Vec` is a tuple of URL and an optional `HttpFetchOptions`.
+/// Returns a vector of `HttpFetchResponse` in the same order.
+///
+/// # Example
+/// ```no_run
+/// use seda_sdk_rs::http::{http_fetch_batch, HttpFetchOptions};
+/// let requests: Vec<(&str, Option<HttpFetchOptions>)> = vec![
+///     ("https://weather.example.com", None),
+///     ("https://news.example.com", None),
+/// ];
+/// let responses = http_fetch_batch(requests);
+/// assert_eq!(responses.len(), 2);
+/// ```
+///
+pub fn http_fetch_batch<URL: ToString>(requests: Vec<(URL, Option<HttpFetchOptions>)>) -> Vec<HttpFetchResponse> {
+    #[derive(Serialize)]
+    struct HttpFetchBatchPayload {
+        requests: Vec<HttpFetchAction>,
+    }
+
+    let payload = HttpFetchBatchPayload {
+        requests: requests
+            .into_iter()
+            .map(|(url, options)| HttpFetchAction {
+                url: url.to_string(),
+                options: options.unwrap_or_default(),
+            })
+            .collect(),
+    };
+
+    let action = serde_json::to_string(&payload).unwrap();
+    let result_length = unsafe { super::raw::http_fetch_batch(action.as_ptr(), action.len() as u32) };
+    let mut result_data_ptr = vec![0; result_length as usize];
+
+    unsafe {
+        super::raw::call_result_write(result_data_ptr.as_mut_ptr(), result_length);
+    }
+
+    let promise_statuses: Vec<PromiseStatus> =
+        serde_json::from_slice(&result_data_ptr).expect("Could not deserialize http_fetch_batch");
+
+    promise_statuses
+        .into_iter()
+        .map(HttpFetchResponse::from_promise)
+        .collect()
+}
