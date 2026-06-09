@@ -2,8 +2,12 @@ import type { Result } from "true-myth";
 import type { VmError } from "../errors";
 import type {
 	HttpFetchAction,
+	HttpFetchBatchAction,
+	HttpFetchBatchResponse,
 	HttpFetchResponse,
 	ProxyHttpFetchAction,
+	ProxyHttpFetchBatchAction,
+	ProxyHttpFetchBatchResponse,
 } from "./vm-actions";
 import type { VmCallData } from "./vm-call-data.js";
 import type { PromiseStatus } from "./vm-promise.js";
@@ -32,6 +36,13 @@ export interface VmAdapter {
 	httpFetch(action: HttpFetchAction): Promise<PromiseStatus<HttpFetchResponse>>;
 
 	/**
+	 * Method to do a remote http fetch batch call
+	 *
+	 * @param action
+	 */
+	httpFetchBatch(action: HttpFetchBatchAction): Promise<HttpFetchBatchResponse>;
+
+	/**
 	 * Method to calculate the gas cost of a proxy http fetch call
 	 *
 	 * @param action
@@ -48,6 +59,15 @@ export interface VmAdapter {
 	proxyHttpFetch(
 		action: ProxyHttpFetchAction,
 	): Promise<PromiseStatus<HttpFetchResponse>>;
+
+	/**
+	 * Method to do a remote proxy http fetch batch call
+	 *
+	 * @param action
+	 */
+	proxyHttpFetchBatch(
+		action: ProxyHttpFetchBatchAction,
+	): Promise<ProxyHttpFetchBatchResponse>;
 
 	/**
 	 * Method to get the current clock time

@@ -86,6 +86,12 @@ export class HostToWorker {
 			} else {
 				this.actionResult = actionResult.value.toBuffer();
 			}
+		} else if (action.type === "http-fetch-batch-action") {
+			const actionResult = await this.adapter.httpFetchBatch(action);
+			this.actionResult = Buffer.from(actionResult.toBuffer());
+		} else if (action.type === "proxy-http-fetch-batch-action") {
+			const actionResult = await this.adapter.proxyHttpFetchBatch(action);
+			this.actionResult = Buffer.from(actionResult.toBuffer());
 		} else if (isProxyHttpFetchGasCostAction(action)) {
 			const actionResult = (
 				await this.adapter.getProxyHttpFetchGasCost(action.fetchAction)

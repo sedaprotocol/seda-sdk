@@ -25,13 +25,20 @@ export interface HttpFetchOptions {
 
 export type VmAction =
 	| HttpFetchAction
+	| HttpFetchBatchAction
 	| ProxyHttpFetchAction
+	| ProxyHttpFetchBatchAction
 	| ProxyHttpFetchGasCostAction;
 
 export interface HttpFetchAction {
 	url: string;
 	options: HttpFetchOptions;
 	type: "http-fetch-action";
+}
+
+export interface HttpFetchBatchAction {
+	requests: { url: string; options: HttpFetchOptions }[];
+	type: "http-fetch-batch-action";
 }
 
 export function isHttpFetchAction(action: VmAction): action is HttpFetchAction {
@@ -47,6 +54,11 @@ export function isProxyHttpFetchAction(
 	action: VmAction,
 ): action is ProxyHttpFetchAction {
 	return action.type === "proxy-http-fetch-action";
+}
+
+export interface ProxyHttpFetchBatchAction {
+	requests: { url: string; options: HttpFetchOptions; public_key?: string }[];
+	type: "proxy-http-fetch-batch-action";
 }
 
 export interface ProxyHttpFetchGasCostAction {
@@ -120,5 +132,25 @@ export class HttpFetchResponse implements ToBuffer {
 			status: 0,
 			url: "",
 		});
+	}
+}
+
+export class HttpFetchBatchResponse implements ToBuffer {
+	constructor(public data: PromiseStatus<HttpFetchResponse>[]) {}
+
+	toBuffer(): Uint8Array {
+		return new TextEncoder().encode(
+			JSON.stringify(this.data.map((response) => response.value)),
+		);
+	}
+}
+
+export class ProxyHttpFetchBatchResponse implements ToBuffer {
+	constructor(public data: PromiseStatus<HttpFetchResponse>[]) {}
+
+	toBuffer(): Uint8Array {
+		return new TextEncoder().encode(
+			JSON.stringify(this.data.map((response) => response.value)),
+		);
 	}
 }

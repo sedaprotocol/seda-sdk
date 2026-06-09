@@ -13,8 +13,10 @@ import { CallType, type GasMeter } from "./metering.js";
 import { keccak256, secp256k1Verify } from "./services/crypto.js";
 import {
 	type HttpFetchAction,
+	type HttpFetchBatchAction,
 	HttpFetchResponse,
 	type ProxyHttpFetchAction,
+	type ProxyHttpFetchBatchAction,
 	type ProxyHttpFetchGasCostAction,
 } from "./types/vm-actions.js";
 import type { VmAdapter } from "./types/vm-adapter.js";
@@ -197,6 +199,98 @@ export default class VmImports {
 			}
 
 			console.error(`[${this.processId}] - @httpFetch: ${messageRaw}`, error);
+			this.callResult = new Uint8Array();
+
+			return 0;
+		}
+	}
+
+	httpFetchBatch(action: number, actionLength: number): number {
+		const rawAction = new Uint8Array(
+			this.memory?.buffer.slice(action, action + actionLength) ?? [],
+		);
+		const messageRaw = Buffer.from(rawAction).toString("utf-8");
+		const message: HttpFetchBatchAction = {
+			...JSON.parse(messageRaw),
+			type: "http-fetch-batch-action",
+		};
+
+		for (const request of message.requests) {
+			this.gasMeter.applyGasCost(
+				CallType.HttpFetchRequest,
+				BigInt(JSON.stringify(request).length),
+			);
+		}
+
+		try {
+			this.callResult = this.workerToHost.callActionOnHost(message);
+
+			this.gasMeter.applyGasCost(
+				CallType.HttpFetchResponse,
+				BigInt(this.callResult.length),
+			);
+
+			return this.callResult.length;
+		} catch (error) {
+			if (error instanceof VmActionRequest) {
+				this.reExecutionRequest = error;
+				throw error;
+			}
+
+			if (error instanceof VmError && error.type === VmErrorType.OutOfGas) {
+				throw error;
+			}
+
+			console.error(
+				`[${this.processId}] - @httpFetchBatch: ${messageRaw}`,
+				error,
+			);
+			this.callResult = new Uint8Array();
+
+			return 0;
+		}
+	}
+
+	proxyHttpFetchBatch(action: number, actionLength: number): number {
+		const rawAction = new Uint8Array(
+			this.memory?.buffer.slice(action, action + actionLength) ?? [],
+		);
+		const messageRaw = Buffer.from(rawAction).toString("utf-8");
+		const message: ProxyHttpFetchBatchAction = {
+			...JSON.parse(messageRaw),
+			type: "proxy-http-fetch-batch-action",
+		};
+
+		for (const request of message.requests) {
+			this.gasMeter.applyGasCost(
+				CallType.ProxyHttpFetchRequest,
+				BigInt(JSON.stringify(request).length),
+			);
+		}
+
+		try {
+			this.callResult = this.workerToHost.callActionOnHost(message);
+
+			this.gasMeter.applyGasCost(
+				CallType.HttpFetchResponse,
+				BigInt(this.callResult.length),
+			);
+
+			return this.callResult.length;
+		} catch (error) {
+			if (error instanceof VmActionRequest) {
+				this.reExecutionRequest = error;
+				throw error;
+			}
+
+			if (error instanceof VmError && error.type === VmErrorType.OutOfGas) {
+				throw error;
+			}
+
+			console.error(
+				`[${this.processId}] - @proxyHttpFetchBatch: ${messageRaw}`,
+				error,
+			);
 			this.callResult = new Uint8Array();
 
 			return 0;
@@ -388,7 +482,9 @@ export default class VmImports {
 			...injectedWasi,
 			seda_v1: {
 				proxy_http_fetch: this.proxyHttpFetch.bind(this),
+				proxy_http_fetch_batch: this.proxyHttpFetchBatch.bind(this),
 				http_fetch: this.httpFetch.bind(this),
+				http_fetch_batch: this.httpFetchBatch.bind(this),
 				secp256k1_verify: this.secp256k1Verify.bind(this),
 				keccak256: this.keccak256.bind(this),
 				call_result_write: this.callResultWrite.bind(this),

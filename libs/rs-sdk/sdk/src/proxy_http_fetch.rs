@@ -104,6 +104,60 @@ pub fn proxy_http_fetch<URL: ToString>(
     HttpFetchResponse::from_promise(promise_status)
 }
 
+/// Batch proxy HTTP fetch for multiple URLs with their respective options.
+///
+/// This function allows you to execute multiple proxy HTTP fetch actions in one call.
+/// Each entry in the input `Vec` is a tuple of URL, optional public key, and optional `HttpFetchOptions`.
+/// Returns a vector of `HttpFetchResponse` in the same order.
+///
+/// # Example
+/// ```no_run
+/// use seda_sdk_rs::proxy_http_fetch::proxy_http_fetch_batch;
+/// use seda_sdk_rs::http::HttpFetchOptions;
+/// let requests: Vec<(&str, Option<String>, Option<HttpFetchOptions>)> = vec![
+///     ("https://proxy1.example.com", None, None),
+///     ("https://proxy2.example.com", None, None),
+/// ];
+/// let responses = proxy_http_fetch_batch(requests);
+/// assert_eq!(responses.len(), 2);
+/// ```
+///
+pub fn proxy_http_fetch_batch<URL: ToString>(
+    requests: Vec<(URL, Option<String>, Option<HttpFetchOptions>)>,
+) -> Vec<HttpFetchResponse> {
+    #[derive(Serialize)]
+    struct ProxyHttpFetchBatchPayload {
+        requests: Vec<ProxyHttpFetchAction>,
+    }
+
+    let payload = ProxyHttpFetchBatchPayload {
+        requests: requests
+            .into_iter()
+            .map(|(url, public_key, options)| ProxyHttpFetchAction {
+                url: url.to_string(),
+                public_key,
+                options: options.unwrap_or_default(),
+            })
+            .collect(),
+    };
+
+    let action = serde_json::to_string(&payload).unwrap();
+    let result_length = unsafe { super::raw::proxy_http_fetch_batch(action.as_ptr(), action.len() as u32) };
+    let mut result_data_ptr = vec![0; result_length as usize];
+
+    unsafe {
+        super::raw::call_result_write(result_data_ptr.as_mut_ptr(), result_length);
+    }
+
+    let promise_statuses: Vec<PromiseStatus> =
+        serde_json::from_slice(&result_data_ptr).expect("Could not deserialize proxy_http_fetch_batch");
+
+    promise_statuses
+        .into_iter()
+        .map(HttpFetchResponse::from_promise)
+        .collect()
+}
+
 /// Generates the message which the data proxy hashed and signed. This can be useful when you need to verify
 /// the data proxy signature in the tally phase. With this message there is no need to include the entire request
 /// and response data in the execution result.
