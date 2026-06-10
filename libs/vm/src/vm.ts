@@ -20,6 +20,12 @@ export interface VmResult {
 	gasUsed: bigint;
 	result?: Uint8Array;
 	resultAsString?: string;
+	/**
+	 * Set when the result was synthesized because the worker thread died
+	 * (error/exit) instead of completing the VM call. Lets pool implementations
+	 * distinguish a crashed worker from a program that exited non-zero.
+	 */
+	crashed?: boolean;
 }
 
 type PropertyWithMessage = {

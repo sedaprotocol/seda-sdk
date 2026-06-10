@@ -52,6 +52,8 @@ export default class VmImports {
 		this.workerToHost = new WorkerToHost(
 			notifierBufferOrAdapter,
 			asyncRequests,
+			processId,
+			callData.hostCallTimeoutMs,
 		);
 		this.processId = processId;
 		this.gasMeter = gasMeter;

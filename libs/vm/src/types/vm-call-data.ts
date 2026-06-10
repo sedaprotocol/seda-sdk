@@ -16,6 +16,12 @@ export interface VmCallData {
 	stdoutLimit?: number;
 	stderrLimit?: number;
 	wasmModuleCache?: WasmModuleCache;
+	/**
+	 * Maximum time (ms) a worker-mode VM blocks waiting for the host to answer
+	 * a single host call before the call fails. Prevents a dead host from
+	 * wedging the VM worker thread forever. Only used in worker (Atomics) mode.
+	 */
+	hostCallTimeoutMs?: number;
 }
 
 export function createCacheKey(processId: string, callData: VmCallData) {
