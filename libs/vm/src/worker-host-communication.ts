@@ -24,7 +24,7 @@ const MAX_I32_VALUE = 2_147_483_647;
 /** Location where the worker thread should listen for changes */
 const NOTIFIER_INDEX = 0;
 
-enum AtomicState {
+export enum AtomicState {
 	Initial = 0,
 	RequestResultLength = 1,
 	ResponseResultLength = 2,
@@ -41,20 +41,30 @@ function resetNotifierState(buffer: Int32Array) {
 	Atomics.store(buffer, NOTIFIER_INDEX, AtomicState.Initial);
 }
 
-function waitForNotifierStateChange(
+/**
+ * Blocks until the host advances the notifier state past `initialState`.
+ *
+ * Only the host writes the state while this runs: the wait loop re-reads the
+ * slot and waits on the value it observed, so a host store landing between
+ * the read and the wait makes `Atomics.wait` return "not-equal" immediately
+ * instead of being lost. Writing `initialState` into the slot here (the
+ * previous implementation) raced the host's store and could overwrite it,
+ * leaving the thread waiting forever for a notify that had already fired.
+ */
+export function waitForNotifierStateChange(
 	buffer: Int32Array,
 	initialState: AtomicState,
 ) {
-	const currentState = Atomics.load(buffer, NOTIFIER_INDEX);
+	while (true) {
+		const currentState = Atomics.load(buffer, NOTIFIER_INDEX);
 
-	// If work has already been executed don't freeze the thread and wait
-	// There is a case where the PostMessage fires and completes before a wait could be called causing a deadlock
-	if (currentState > initialState) {
-		return;
+		if (currentState > initialState) {
+			return;
+		}
+
+		// "ok" and "not-equal" both mean the state may have changed; re-check.
+		Atomics.wait(buffer, NOTIFIER_INDEX, currentState);
 	}
-
-	Atomics.store(buffer, NOTIFIER_INDEX, initialState);
-	Atomics.wait(buffer, NOTIFIER_INDEX, initialState);
 }
 
 /**
