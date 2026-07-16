@@ -15,13 +15,16 @@ const DEFAULT_PAYBACK_ADDRESS = new Uint8Array([]);
 const DEFAULT_SEDA_PAYLOAD = new Uint8Array([]);
 
 const defaultDrConfig: DrConfig = {
-	dr_reveal_size_limit_in_bytes: 24_000,
-	exec_input_limit_in_bytes: 2_048,
-	tally_input_limit_in_bytes: 512,
-	consensus_filter_limit_in_bytes: 512,
-	memo_limit_in_bytes: 512,
-	payback_address_limit_in_bytes: 128,
-	seda_payload_limit_in_bytes: 512,
+	commitTimeoutInBlocks: 50,
+	revealTimeoutInBlocks: 5,
+	backupDelayInBlocks: 5,
+	drRevealSizeLimitInBytes: 24_000,
+	execInputLimitInBytes: 2_048,
+	tallyInputLimitInBytes: 512,
+	consensusFilterLimitInBytes: 512,
+	memoLimitInBytes: 512,
+	paybackAddressLimitInBytes: 128,
+	sEDAPayloadLimitInBytes: 512,
 };
 
 export type PostDataRequestInput = {
@@ -114,10 +117,10 @@ export function createPostedDataRequest(
 	);
 
 	assert(
-		input.execInputs.length <= drConfig.exec_input_limit_in_bytes,
-		`execInputs must be less than ${drConfig.exec_input_limit_in_bytes + 1} bytes, received ${input.execInputs.length}`,
+		input.execInputs.length <= drConfig.execInputLimitInBytes,
+		`execInputs must be less than ${drConfig.execInputLimitInBytes + 1} bytes, received ${input.execInputs.length}`,
 	);
-	const exec_inputs = base64Encode(input.execInputs);
+	const exec_inputs = input.execInputs;
 
 	const tally_program_id = input.tallyProgramId ?? input.execProgramId;
 	assert(
@@ -126,50 +129,49 @@ export function createPostedDataRequest(
 	);
 
 	assert(
-		input.tallyInputs.length <= drConfig.tally_input_limit_in_bytes,
-		`tallyInputs must be less than ${drConfig.tally_input_limit_in_bytes + 1} bytes, received ${input.tallyInputs.length}`,
+		input.tallyInputs.length <= drConfig.tallyInputLimitInBytes,
+		`tallyInputs must be less than ${drConfig.tallyInputLimitInBytes + 1} bytes, received ${input.tallyInputs.length}`,
 	);
-	const tally_inputs = base64Encode(input.tallyInputs);
+	const tally_inputs = input.tallyInputs;
 
 	const replication_factor =
 		input.replicationFactor ?? DEFAULT_REPLICATION_FACTOR;
 
-	const consensFilterBytes = encodeConsensusFilter(input.consensusOptions);
+	const consensus_filter = encodeConsensusFilter(input.consensusOptions);
 	assert(
-		consensFilterBytes.length <= drConfig.consensus_filter_limit_in_bytes,
-		`consensus_filter must be less than ${drConfig.consensus_filter_limit_in_bytes + 1} bytes, received ${consensFilterBytes.length}`,
+		consensus_filter.length <= drConfig.consensusFilterLimitInBytes,
+		`consensus_filter must be less than ${drConfig.consensusFilterLimitInBytes + 1} bytes, received ${consensus_filter.length}`,
 	);
-	const consensus_filter = base64Encode(consensFilterBytes);
 
-	const exec_gas_limit = input.execGasLimit ?? DEFAULT_EXEC_GAS_LIMIT;
-	const tally_gas_limit = input.tallyGasLimit ?? DEFAULT_TALLY_GAS_LIMIT;
+	const exec_gas_limit = BigInt(input.execGasLimit ?? DEFAULT_EXEC_GAS_LIMIT);
+	const tally_gas_limit = BigInt(
+		input.tallyGasLimit ?? DEFAULT_TALLY_GAS_LIMIT,
+	);
 	const gas_price = (input.gasPrice ?? DEFAULT_GAS_PRICE).toString();
 
 	if (input.memo) {
 		assert(
-			input.memo.length <= drConfig.memo_limit_in_bytes,
-			`memo must be less than ${drConfig.memo_limit_in_bytes + 1} bytes, received ${input.memo.length}`,
+			input.memo.length <= drConfig.memoLimitInBytes,
+			`memo must be less than ${drConfig.memoLimitInBytes + 1} bytes, received ${input.memo.length}`,
 		);
 	}
-	const memo = base64Encode(input.memo ?? DEFAULT_MEMO);
+	const memo = input.memo ?? DEFAULT_MEMO;
 
 	if (input.paybackAddress) {
 		assert(
-			input.paybackAddress.length <= drConfig.payback_address_limit_in_bytes,
-			`paybackAddress must be less than ${drConfig.payback_address_limit_in_bytes + 1} bytes, received ${input.paybackAddress.length}`,
+			input.paybackAddress.length <= drConfig.paybackAddressLimitInBytes,
+			`paybackAddress must be less than ${drConfig.paybackAddressLimitInBytes + 1} bytes, received ${input.paybackAddress.length}`,
 		);
 	}
-	const payback_address = base64Encode(
-		input.paybackAddress ?? DEFAULT_PAYBACK_ADDRESS,
-	);
+	const payback_address = input.paybackAddress ?? DEFAULT_PAYBACK_ADDRESS;
 
 	if (input.sedaPayload) {
 		assert(
-			input.sedaPayload.length <= drConfig.seda_payload_limit_in_bytes,
-			`sedaPayload must be less than ${drConfig.seda_payload_limit_in_bytes + 1} bytes, received ${input.sedaPayload.length}`,
+			input.sedaPayload.length <= drConfig.sEDAPayloadLimitInBytes,
+			`sedaPayload must be less than ${drConfig.sEDAPayloadLimitInBytes + 1} bytes, received ${input.sedaPayload.length}`,
 		);
 	}
-	const seda_payload = base64Encode(input.sedaPayload ?? DEFAULT_SEDA_PAYLOAD);
+	const seda_payload = input.sedaPayload ?? DEFAULT_SEDA_PAYLOAD;
 
 	return {
 		payback_address,
@@ -188,10 +190,6 @@ export function createPostedDataRequest(
 			memo,
 		},
 	};
-}
-
-function base64Encode(value: Uint8Array): string {
-	return Buffer.from(value).toString("base64");
 }
 
 function isHexAddress(address: string): boolean {
