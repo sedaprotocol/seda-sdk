@@ -4,6 +4,7 @@ export enum VmErrorType {
 	OutOfGas = "OutOfGas",
 	HttpFetchTimeout = "HttpFetchTimeout",
 	HttpFetchGlobalTimeout = "HttpFetchGlobalTimeout",
+	HostCallTimeout = "HostCallTimeout",
 	InsufficientDataProxyFee = "InsufficientDataProxyFee",
 	Unknown = "Unknown",
 }

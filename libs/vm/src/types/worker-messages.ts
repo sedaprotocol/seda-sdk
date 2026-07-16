@@ -18,16 +18,19 @@ export interface VmCallWorkerMessage {
 
 export interface VmResultWorkerMessage {
 	result: VmResult;
+	processId: string;
 	type: WorkerMessageType.VmResult;
 }
 
 export interface VmActionResultBufferMessage {
 	buffer: SharedArrayBuffer;
+	processId: string;
 	type: WorkerMessageType.VmActionResultBuffer;
 }
 
 export interface VmActionExecuteMessage {
 	action: VmAction;
+	processId: string;
 	type: WorkerMessageType.VmActionExecute;
 }
 

@@ -1,5 +1,6 @@
 {
   "lockfileVersion": 1,
+  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "@org/source",
@@ -88,7 +89,7 @@
 
     "@assemblyscript/loader": ["@assemblyscript/loader@0.25.2", "", {}, "sha512-q2PyrBmepQ0YxlWN99Vb1MmOSL982ePhGRxAscX2XlZZPlzhv5DgH5UAefTUFgBHfQE8FY1CWONBIvPxS7Mjjw=="],
 
-    "@assemblyscript/wasi-shim": ["@assemblyscript/wasi-shim@github:sedaprotocol/wasi-shim#8fda40c", {}, "sedaprotocol-wasi-shim-8fda40c"],
+    "@assemblyscript/wasi-shim": ["@assemblyscript/wasi-shim@github:sedaprotocol/wasi-shim#8fda40c", {}, "sedaprotocol-wasi-shim-8fda40c", "sha512-qbNo0kUd0Maj6Kopn4PxGAQUFxLXw8x2nMscCs4QViWSA1yRWqaewKdPZzvBrcCa3Ck8ypTxwWhj8cr3fg2GDA=="],
 
     "@babel/code-frame": ["@babel/code-frame@7.26.2", "", { "dependencies": { "@babel/helper-validator-identifier": "^7.25.9", "js-tokens": "^4.0.0", "picocolors": "^1.0.0" } }, "sha512-RJlIHRueQgwWitWgF8OdFYGZX328Ax5BCemNGlqHfplnRT9ESi8JkFlvaVYbS+UubVY6dpv87Fs2u5M29iNFVQ=="],
 
