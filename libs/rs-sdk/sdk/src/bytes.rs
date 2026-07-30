@@ -170,19 +170,15 @@ impl FromBytes for String {
 
 impl FromBytes for bool {
     fn from_bytes(bytes: &[u8]) -> Result<Self> {
-        match bytes[0] {
-            0 => Ok(false),
-            1 => Ok(true),
+        match bytes {
+            [0] => Ok(false),
+            [1] => Ok(true),
             _ => Err(errors::SDKError::InvalidValue),
         }
     }
 
     fn from_bytes_vec(bytes: Vec<u8>) -> Result<Self> {
-        if bytes.len() != 1 {
-            Err(errors::SDKError::InvalidValue)
-        } else {
-            Self::from_bytes(bytes.as_slice())
-        }
+        Self::from_bytes(bytes.as_slice())
     }
 }
 
@@ -265,3 +261,36 @@ bytes_impls_le_bytes!(i64, 8);
 bytes_impls_le_bytes!(i128, 16);
 bytes_impls_le_bytes!(f32, 4);
 bytes_impls_le_bytes!(f64, 8);
+
+#[cfg(test)]
+mod tests {
+    use super::FromBytes;
+
+    #[test]
+    fn bool_from_bytes_accepts_exactly_one_byte() {
+        assert!(!bool::from_bytes(&[0]).expect("0 is false"));
+        assert!(bool::from_bytes(&[1]).expect("1 is true"));
+    }
+
+    #[test]
+    fn bool_from_bytes_rejects_other_lengths() {
+        assert!(bool::from_bytes(&[]).is_err());
+        assert!(bool::from_bytes(&[0, 0]).is_err());
+        assert!(bool::from_bytes(&[1, 2, 3]).is_err());
+    }
+
+    #[test]
+    fn bool_from_bytes_rejects_non_boolean_values() {
+        assert!(bool::from_bytes(&[2]).is_err());
+        assert!(bool::from_bytes(&[255]).is_err());
+    }
+
+    #[test]
+    fn bool_from_bytes_vec_matches_from_bytes() {
+        assert!(!bool::from_bytes_vec(vec![0]).expect("0 is false"));
+        assert!(bool::from_bytes_vec(vec![1]).expect("1 is true"));
+        assert!(bool::from_bytes_vec(vec![]).is_err());
+        assert!(bool::from_bytes_vec(vec![2]).is_err());
+        assert!(bool::from_bytes_vec(vec![0, 0]).is_err());
+    }
+}
