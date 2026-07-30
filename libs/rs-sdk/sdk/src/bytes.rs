@@ -42,6 +42,12 @@ impl Deref for Bytes {
     }
 }
 
+impl AsRef<[u8]> for Bytes {
+    fn as_ref(&self) -> &[u8] {
+        self.0.as_slice()
+    }
+}
+
 /// A trait for types that can be converted to the [`Bytes`] type.
 ///
 /// This trait is implemented for various types such as `Vec<u8>`, `String`, `&str`, and primitive types like `u8`, `i32`, etc.

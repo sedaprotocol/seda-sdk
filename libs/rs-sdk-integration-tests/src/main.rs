@@ -16,9 +16,10 @@ use proxy_http::{test_generate_proxy_http_message, test_proxy_http_fetch};
 use random_get::test_random_get;
 use seda_sdk_rs::{bytes::ToBytes, process::Process};
 use storage::{
-    test_storage_delete, test_storage_delete_key_limit, test_storage_delete_persisted, test_storage_read,
-    test_storage_read_key_limit, test_storage_read_persisted, test_storage_write, test_storage_write_key_limit,
-    test_storage_write_value_limit,
+    test_storage_delete, test_storage_delete_key_limit, test_storage_delete_persisted, test_storage_empty_inputs,
+    test_storage_insert_many_duplicate_keys, test_storage_insert_merges, test_storage_insert_overwrites,
+    test_storage_read, test_storage_read_key_limit, test_storage_read_persisted, test_storage_write,
+    test_storage_write_key_limit, test_storage_write_value_limit,
 };
 use tally::{
     test_tally_deterministic_hashmap, test_tally_hashmap, test_tally_vm_reveals, test_tally_vm_reveals_filtered,
@@ -63,6 +64,10 @@ fn main() {
         "testStorageWriteKeyLimit" => test_storage_write_key_limit(),
         "testStorageReadKeyLimit" => test_storage_read_key_limit(),
         "testStorageDeleteKeyLimit" => test_storage_delete_key_limit(),
+        "testStorageInsertMerges" => test_storage_insert_merges(),
+        "testStorageInsertOverwrites" => test_storage_insert_overwrites(),
+        "testStorageInsertManyDuplicateKeys" => test_storage_insert_many_duplicate_keys(),
+        "testStorageEmptyInputs" => test_storage_empty_inputs(),
         _ => Process::error(&"No argument given".to_bytes()),
     }
 }
