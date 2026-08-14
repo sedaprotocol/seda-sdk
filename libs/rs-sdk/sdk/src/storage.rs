@@ -1,5 +1,7 @@
 //! Storage operations for persisting data across oracle program executions.
 
+use serde::Serialize;
+
 use crate::{
     bytes::FromBytes,
     errors::{Result, SDKError},
@@ -7,62 +9,19 @@ use crate::{
     promise::PromiseStatus,
 };
 
-/// Appends `bytes` to `out` as lowercase hex.
-fn push_hex(out: &mut Vec<u8>, bytes: &[u8]) {
-    let start = out.len();
-    out.resize(start + bytes.len() * 2, 0);
-    // Infallible: the destination was sized to exactly twice the input length.
-    const_hex::encode_to_slice(bytes, &mut out[start..]).expect("hex buffer is correctly sized");
+#[derive(Serialize)]
+struct StorageReadAction {
+    keys: Vec<String>,
 }
 
-/// Encodes a `{"keys":[...]}` action payload.
-///
-/// Hex contains no characters that require JSON escaping, so the keys are
-/// concatenated directly rather than routed through a serializer.
-fn encode_keys_action(keys: &[impl AsRef<[u8]>]) -> Vec<u8> {
-    let hex_len: usize = keys.iter().map(|key| key.as_ref().len() * 2).sum();
-    // `{"keys":[]}` plus two quotes and a separating comma per key.
-    let mut action = Vec::with_capacity(hex_len + keys.len() * 3 + 11);
-
-    action.extend_from_slice(b"{\"keys\":[");
-    for (index, key) in keys.iter().enumerate() {
-        if index > 0 {
-            action.push(b',');
-        }
-
-        action.push(b'"');
-        push_hex(&mut action, key.as_ref());
-        action.push(b'"');
-    }
-    action.extend_from_slice(b"]}");
-
-    action
+#[derive(Serialize)]
+struct StorageWriteAction {
+    values: HashMap<String, String>,
 }
 
-/// Encodes a `{"values":{...}}` action payload.
-fn encode_values_action(entries: &[(impl AsRef<[u8]>, impl AsRef<[u8]>)]) -> Vec<u8> {
-    let hex_len: usize = entries
-        .iter()
-        .map(|(key, value)| (key.as_ref().len() + value.as_ref().len()) * 2)
-        .sum();
-    // `{"values":{}}` plus four quotes, a colon and a separating comma per entry.
-    let mut action = Vec::with_capacity(hex_len + entries.len() * 6 + 13);
-
-    action.extend_from_slice(b"{\"values\":{");
-    for (index, (key, value)) in entries.iter().enumerate() {
-        if index > 0 {
-            action.push(b',');
-        }
-
-        action.push(b'"');
-        push_hex(&mut action, key.as_ref());
-        action.extend_from_slice(b"\":\"");
-        push_hex(&mut action, value.as_ref());
-        action.push(b'"');
-    }
-    action.extend_from_slice(b"}}");
-
-    action
+#[derive(Serialize)]
+struct StorageDeleteAction {
+    keys: Vec<String>,
 }
 
 /// Reads back the result of a host call and returns the fulfilled payload.
@@ -86,7 +45,7 @@ fn read_call_result(result_length: u32) -> Result<Option<Vec<u8>>> {
 /// Writes multiple key-value pairs to storage in a single host call.
 ///
 /// Existing keys not named in `entries` are left untouched. If a key appears
-/// more than once the host applies the writes in order, so the last one wins.
+/// more than once only the last value is sent to the host.
 ///
 /// # Errors
 ///
@@ -105,8 +64,15 @@ pub fn insert_many(entries: &[(impl AsRef<[u8]>, impl AsRef<[u8]>)]) -> Result<(
         return Ok(());
     }
 
-    let action = encode_values_action(entries);
-    let result_length = unsafe { super::raw::storage_write(action.as_ptr(), action.len() as u32) };
+    let action = StorageWriteAction {
+        values: entries
+            .iter()
+            .map(|(key, value)| (hex::encode(key), hex::encode(value)))
+            .collect(),
+    };
+    let action_json = serde_json::to_string(&action)?;
+
+    let result_length = unsafe { super::raw::storage_write(action_json.as_ptr(), action_json.len() as u32) };
     read_call_result(result_length)?;
 
     Ok(())
@@ -152,8 +118,12 @@ pub fn remove_many(keys: &[impl AsRef<[u8]>]) -> Result<()> {
         return Ok(());
     }
 
-    let action = encode_keys_action(keys);
-    let result_length = unsafe { super::raw::storage_delete(action.as_ptr(), action.len() as u32) };
+    let action = StorageDeleteAction {
+        keys: keys.iter().map(hex::encode).collect(),
+    };
+    let action_json = serde_json::to_string(&action)?;
+
+    let result_length = unsafe { super::raw::storage_delete(action_json.as_ptr(), action_json.len() as u32) };
     read_call_result(result_length)?;
 
     Ok(())
@@ -200,30 +170,24 @@ pub fn get_many<T: FromBytes>(keys: &[impl AsRef<[u8]>]) -> Result<Vec<Option<T>
         return Ok(Vec::new());
     }
 
-    let action = encode_keys_action(keys);
-    let result_length = unsafe { super::raw::storage_read(action.as_ptr(), action.len() as u32) };
+    let action = StorageReadAction {
+        keys: keys.iter().map(hex::encode).collect(),
+    };
+    let action_json = serde_json::to_string(&action)?;
 
+    let result_length = unsafe { super::raw::storage_read(action_json.as_ptr(), action_json.len() as u32) };
     let payload = read_call_result(result_length)?;
     let Some(payload) = payload.filter(|payload| !payload.is_empty()) else {
         return Ok(keys.iter().map(|_| None).collect());
     };
 
-    // The host keys its response by hex. Deterministic hashing keeps this free of
-    // the randomized seeds that tally oracle programs disallow; the map is only
-    // ever looked up in caller order, never iterated, so it cannot leak an order.
+    // The host keys its response by hex, so look each requested key back up by
+    // its own encoding to rebuild the caller's ordering.
     let entries: HashMap<String, Option<Vec<u8>>> = serde_json::from_slice(&payload)?;
 
     let mut values = Vec::with_capacity(keys.len());
-    let mut hex_key = Vec::new();
     for key in keys {
-        hex_key.clear();
-        push_hex(&mut hex_key, key.as_ref());
-
-        // Hex is always valid UTF-8, so this only fails if the encoder is broken.
-        let stored = entries
-            .get(std::str::from_utf8(&hex_key)?)
-            .and_then(|value| value.as_deref());
-
+        let stored = entries.get(&hex::encode(key)).and_then(|value| value.as_deref());
         values.push(stored.map(T::from_bytes).transpose()?);
     }
 

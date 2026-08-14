@@ -61,7 +61,7 @@ pub fn test_storage_insert_overwrites() {
     Process::success(&"ok".to_bytes());
 }
 
-// A key repeated within one call is sent twice; the host applies them in order.
+// Only the last value for a repeated key is sent to the host.
 pub fn test_storage_insert_many_duplicate_keys() {
     storage::insert_many(&[("dup", "first"), ("dup", "second")]).unwrap();
 

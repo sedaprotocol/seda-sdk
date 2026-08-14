@@ -26,7 +26,7 @@ pub fn test_generate_proxy_http_message() {
         response_body.to_bytes(),
     );
 
-    Process::success(hex::encode(message.to_vec()).as_bytes());
+    Process::success(hex::encode(&message).as_bytes());
 }
 
 #[derive(serde::Deserialize)]
