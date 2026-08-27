@@ -21,6 +21,9 @@ import { WorkerMessageType } from "./types/worker-messages.js";
 
 const MAX_I32_VALUE = 2_147_483_647;
 
+/** Generous default so slow-but-alive hosts are never cut off; override via VmCallData.hostCallTimeoutMs */
+export const DEFAULT_HOST_CALL_TIMEOUT_MS = 300_000;
+
 /** Location where the worker thread should listen for changes */
 const NOTIFIER_INDEX = 0;
 
@@ -44,6 +47,7 @@ function resetNotifierState(buffer: Int32Array) {
 function waitForNotifierStateChange(
 	buffer: Int32Array,
 	initialState: AtomicState,
+	timeoutMs: number,
 ) {
 	const currentState = Atomics.load(buffer, NOTIFIER_INDEX);
 
@@ -54,7 +58,19 @@ function waitForNotifierStateChange(
 	}
 
 	Atomics.store(buffer, NOTIFIER_INDEX, initialState);
-	Atomics.wait(buffer, NOTIFIER_INDEX, initialState);
+	const waitResult = Atomics.wait(
+		buffer,
+		NOTIFIER_INDEX,
+		initialState,
+		timeoutMs,
+	);
+
+	if (waitResult === "timed-out") {
+		throw new VmError(
+			`Host did not answer the VM action within ${timeoutMs}ms`,
+			{ type: VmErrorType.HostCallTimeout },
+		);
+	}
 }
 
 /**
@@ -181,6 +197,8 @@ export class WorkerToHost {
 	constructor(
 		private notifierBufferOrAdapter: SharedArrayBuffer | VmAdapter,
 		private asyncRequests: VmActionRequest[] = [],
+		private processId = "",
+		private hostCallTimeoutMs: number = DEFAULT_HOST_CALL_TIMEOUT_MS,
 	) {}
 
 	callActionSync(action: VmAction): Buffer {
@@ -215,6 +233,7 @@ export class WorkerToHost {
 		const actionMessage: VmActionExecuteMessage = {
 			type: WorkerMessageType.VmActionExecute,
 			action,
+			processId: this.processId,
 		};
 
 		parentPort?.postMessage(actionMessage);
@@ -222,6 +241,7 @@ export class WorkerToHost {
 		waitForNotifierStateChange(
 			notifierBufferi32,
 			AtomicState.RequestResultLength,
+			this.hostCallTimeoutMs,
 		);
 
 		const length = notifierBufferi32[1];
@@ -235,11 +255,16 @@ export class WorkerToHost {
 		const message: VmActionResultBufferMessage = {
 			buffer: valueBuffer,
 			type: WorkerMessageType.VmActionResultBuffer,
+			processId: this.processId,
 		};
 
 		parentPort?.postMessage(message);
 
-		waitForNotifierStateChange(notifierBufferi32, AtomicState.RequestResult);
+		waitForNotifierStateChange(
+			notifierBufferi32,
+			AtomicState.RequestResult,
+			this.hostCallTimeoutMs,
+		);
 
 		return Buffer.from(new Uint8Array(valueBuffer));
 	}
