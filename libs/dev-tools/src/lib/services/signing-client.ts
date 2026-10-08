@@ -5,6 +5,7 @@ import {
 	isJsonRpcErrorResponse,
 	parseJsonRpcResponse,
 } from "@cosmjs/json-rpc";
+import { QueryClient, createProtobufRpcClient } from "@cosmjs/stargate";
 import { Comet38Client, HttpClient } from "@cosmjs/tendermint-rpc";
 import { sedachain } from "@seda-protocol/proto-messages";
 import { tryAsync } from "@seda-protocol/utils";
@@ -32,6 +33,15 @@ export async function createSigningClient(
 	signingClientResult.value.registry.register(
 		"/sedachain.wasm_storage.v1.MsgStoreOracleProgram",
 		sedachain.wasm_storage.v1.MsgStoreOracleProgram,
+	);
+
+	signingClientResult.value.registry.register(
+		"/sedachain.core.v1.MsgPostDataRequest",
+		sedachain.core.v1.MsgPostDataRequest,
+	);
+	signingClientResult.value.registry.register(
+		"/sedachain.core.v1.MsgPostDataRequestResponse",
+		sedachain.core.v1.MsgPostDataRequestResponse,
 	);
 
 	signingClientResult.value.registry.register(

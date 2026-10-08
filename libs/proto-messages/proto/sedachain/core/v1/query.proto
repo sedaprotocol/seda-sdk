@@ -1,0 +1,419 @@
+syntax = "proto3";
+package sedachain.core.v1;
+
+import "cosmos_proto/cosmos.proto";
+import "google/api/annotations.proto";
+import "gogoproto/gogo.proto";
+import "sedachain/core/v1/core.proto";
+
+option go_package = "github.com/sedaprotocol/seda-chain/x/core/types";
+
+// Query defines the gRPC querier service.
+service Query {
+  // Owner returns the owner of the core module.
+  rpc Owner(QueryOwnerRequest) returns (QueryOwnerResponse) {
+    option (google.api.http).get = "/seda-chain/core/owner";
+  }
+
+  // PendingOwner returns the pending owner of the core module.
+  rpc PendingOwner(QueryPendingOwnerRequest)
+      returns (QueryPendingOwnerResponse) {
+    option (google.api.http).get = "/seda-chain/core/pending_owner";
+  }
+
+  // Paused returns whether the core module is paused.
+  rpc Paused(QueryPausedRequest) returns (QueryPausedResponse) {
+    option (google.api.http).get = "/seda-chain/core/paused";
+  }
+
+  // Allowlist returns the allowlist of staker public keys.
+  rpc Allowlist(QueryAllowlistRequest) returns (QueryAllowlistResponse) {
+    option (google.api.http).get = "/seda-chain/core/allowlist";
+  }
+
+  // Staker returns the staker given its public key.
+  rpc Staker(QueryStakerRequest) returns (QueryStakerResponse) {
+    option (google.api.http).get = "/seda-chain/core/staker/{public_key}";
+  }
+
+  // Executors returns stakers that are eligible to execute data requests.
+  rpc Executors(QueryExecutorsRequest) returns (QueryExecutorsResponse) {
+    option (google.api.http).get = "/seda-chain/core/executors";
+  }
+
+  // DataRequest returns the data request given its ID.
+  rpc DataRequest(QueryDataRequestRequest) returns (QueryDataRequestResponse) {
+    option (google.api.http).get = "/seda-chain/core/data_request/{dr_id}";
+  }
+
+  // DataRequestCommitment returns the data request commitment given the data
+  // request ID and executor public key.
+  rpc DataRequestCommitment(QueryDataRequestCommitmentRequest)
+      returns (QueryDataRequestCommitmentResponse) {
+    option (google.api.http).get =
+        "/seda-chain/core/data_request_commitment/{dr_id}/{public_key}";
+  }
+
+  // DataRequestCommitments returns all data request commitments for a given
+  // data request ID.
+  rpc DataRequestCommitments(QueryDataRequestCommitmentsRequest)
+      returns (QueryDataRequestCommitmentsResponse) {
+    option (google.api.http).get =
+        "/seda-chain/core/data_request_commitments/{dr_id}";
+  }
+
+  // DataRequestReveal returns the data request reveal given the data
+  // request ID and executor public key.
+  rpc DataRequestReveal(QueryDataRequestRevealRequest)
+      returns (QueryDataRequestRevealResponse) {
+    option (google.api.http).get =
+        "/seda-chain/core/data_request_reveal/{dr_id}/{public_key}";
+  }
+
+  // DataRequestReveals returns all data request reveals for a given
+  // data request ID.
+  rpc DataRequestReveals(QueryDataRequestRevealsRequest)
+      returns (QueryDataRequestRevealsResponse) {
+    option (google.api.http).get =
+        "/seda-chain/core/data_request_reveals/{dr_id}";
+  }
+
+  // DataRequestsByStatus returns data requests by status.
+  rpc DataRequestsByStatus(QueryDataRequestsByStatusRequest)
+      returns (QueryDataRequestsByStatusResponse) {
+    option (google.api.http).get =
+        "/seda-chain/core/data_requests_by_status/{status}";
+  }
+
+  // AccountSeq returns the account sequence number for a given public key.
+  rpc AccountSeq(QueryAccountSeqRequest) returns (QueryAccountSeqResponse) {
+    option (google.api.http).get = "/seda-chain/core/account_seq/{public_key}";
+  }
+
+  // StakerAndSeq returns the staker and its sequence number.
+  rpc StakerAndSeq(QueryStakerAndSeqRequest)
+      returns (QueryStakerAndSeqResponse) {
+    option (google.api.http).get =
+        "/seda-chain/core/staker_and_seq/{public_key}";
+  }
+
+  // IsStakerExecutor returns whether the staker is a executor.
+  rpc IsStakerExecutor(QueryIsStakerExecutorRequest)
+      returns (QueryIsStakerExecutorResponse) {
+    option (google.api.http).get =
+        "/seda-chain/core/is_staker_executor/{public_key}";
+  }
+
+  // ExecutorEligibility returns the eligibility status of an executor given
+  // the eligibility message data.
+  rpc ExecutorEligibility(QueryExecutorEligibilityRequest)
+      returns (QueryExecutorEligibilityResponse) {
+    option (google.api.http).get =
+        "/seda-chain/core/executor_eligibility/{data}";
+  }
+
+  // LegacyExecutorEligibility returns the eligibility status of an executor
+  // given the eligibility message data where its proof part follows the legacy
+  // format that includes the Core Contract address.
+  rpc LegacyExecutorEligibility(QueryLegacyExecutorEligibilityRequest)
+      returns (QueryLegacyExecutorEligibilityResponse) {
+    option (google.api.http).get =
+        "/seda-chain/core/legacy_executor_eligibility/{data}";
+  }
+
+  // DataRequestStatuses returns the statuses of data requests given their IDs.
+  rpc DataRequestStatuses(QueryDataRequestStatusesRequest)
+      returns (QueryDataRequestStatusesResponse) {
+    option (google.api.http).get =
+        "/seda-chain/core/data_request_statuses/{data_request_ids}";
+  }
+
+  // Params returns the total set of core parameters.
+  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/seda-chain/core/params";
+  }
+
+  // StakingConfig returns the staking parameters of the core module.
+  rpc StakingConfig(QueryStakingConfigRequest)
+      returns (QueryStakingConfigResponse) {
+    option (google.api.http).get = "/seda-chain/core/staking_config";
+  }
+
+  // DataRequestConfig returns the data request parameters of the core module.
+  rpc DataRequestConfig(QueryDataRequestConfigRequest)
+      returns (QueryDataRequestConfigResponse) {
+    option (google.api.http).get = "/seda-chain/core/data_request_config";
+  }
+}
+
+// The request message for Query/Owner RPC method.
+message QueryOwnerRequest {}
+
+// The response message for Query/Owner RPC method.
+message QueryOwnerResponse {
+  // owner is the address of the core module owner.
+  string owner = 1 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+}
+
+// The request message for Query/PendingOwner RPC method.
+message QueryPendingOwnerRequest {}
+
+// The response message for Query/PendingOwner RPC method.
+message QueryPendingOwnerResponse {
+  // pending_owner is the address of the core module pending owner.
+  string pending_owner = 1 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+}
+
+// The request message for Query/Paused RPC method.
+message QueryPausedRequest {}
+
+// The response message for Query/Paused RPC method.
+message QueryPausedResponse {
+  // paused is whether the core module is paused.
+  bool paused = 1;
+}
+
+// The request message for Query/Allowlist RPC method.
+message QueryAllowlistRequest {}
+
+// The response message for Query/Allowlist RPC method.
+message QueryAllowlistResponse {
+  // public_keys is the list of hex-encoded public keys in the allowlist.
+  repeated string public_keys = 1;
+}
+
+// The request message for Query/Staker RPC method.
+message QueryStakerRequest { string public_key = 1; }
+
+// The response message for Query/Staker RPC method.
+message QueryStakerResponse {
+  Staker staker = 1 [ (gogoproto.nullable) = false ];
+}
+
+// The request message for Query/Executors RPC method.
+message QueryExecutorsRequest {
+  uint32 limit = 1;
+  uint32 offset = 2;
+}
+
+// The response message for Query/Executors RPC method.
+message QueryExecutorsResponse {
+  repeated Staker executors = 1 [ (gogoproto.nullable) = false ];
+}
+
+// The request message for Query/DataRequest RPC method.
+message QueryDataRequestRequest { string dr_id = 1; }
+
+// The response message for Query/DataRequest RPC method.
+message QueryDataRequestResponse {
+  DataRequestResponse data_request = 1 [ (gogoproto.nullable) = false ];
+}
+
+// The request message for Query/DataRequestCommitment RPC method.
+message QueryDataRequestCommitmentRequest {
+  string dr_id = 1;
+  string public_key = 2;
+}
+
+// The response message for Query/DataRequestCommitment RPC method.
+message QueryDataRequestCommitmentResponse { string commitment = 1; }
+
+// The request message for Query/DataRequestCommitments RPC method.
+message QueryDataRequestCommitmentsRequest { string dr_id = 1; }
+
+// The response message for Query/DataRequestCommitments RPC method.
+message QueryDataRequestCommitmentsResponse {
+  map<string, string> commitments = 1;
+}
+
+// The request message for Query/DataRequestReveal RPC method.
+message QueryDataRequestRevealRequest {
+  string dr_id = 1;
+  string public_key = 2;
+}
+
+// The response message for Query/DataRequestReveal RPC method.
+message QueryDataRequestRevealResponse { RevealBody reveal = 1; }
+
+// The request message for Query/DataRequestReveals RPC method.
+message QueryDataRequestRevealsRequest { string dr_id = 1; }
+
+// The response message for Query/DataRequestReveals RPC method.
+message QueryDataRequestRevealsResponse { map<string, RevealBody> reveals = 1; }
+
+// The request message for Query/DataRequestsByStatus RPC method.
+message QueryDataRequestsByStatusRequest {
+  // Status specifies the status of the data requests to retrieve.
+  DataRequestStatus status = 1;
+  // Limit specifies the maximum number of data requests to retrieve.
+  uint64 limit = 2;
+  // LastSeenIndex, if specified, sets the starting point (exclusive) of the
+  // query.
+  repeated string last_seen_index = 3
+      [ (gogoproto.moretags) = "minItems:3,maxItems:3" ];
+}
+
+// The response message for Query/DataRequestsByStatus RPC method.
+message QueryDataRequestsByStatusResponse {
+  // DataRequests is the list of data requests under the given status.
+  repeated DataRequestResponse data_requests = 1
+      [ (gogoproto.nullable) = false ];
+  // IsPaused is indicates whether the core module is paused.
+  bool is_paused = 2;
+  // Total is the total number of data requests under the given status.
+  uint32 total = 3;
+  // LastSeenIndex is the index of the last data request retrieved.
+  repeated string last_seen_index = 4;
+}
+
+// The request message for Query/AccountSeq RPC method.
+message QueryAccountSeqRequest {
+  // public_key is the hex-encoded public key of the account.
+  string public_key = 1;
+}
+
+// QueryAccountSeqResponse is the response type for the Query/AccountSeq
+// RPC method.
+message QueryAccountSeqResponse {
+  // account_seq is the account sequence number.
+  uint64 account_seq = 1;
+}
+
+// The request message for Query/StakerAndSeq RPC method.
+message QueryStakerAndSeqRequest { string public_key = 1; }
+
+// The response message for Query/StakerAndSeq RPC method.
+message QueryStakerAndSeqResponse {
+  Staker staker = 1 [ (gogoproto.nullable) = false ];
+  uint64 sequence_num = 2;
+}
+
+// The request message for Query/IsStakerExecutor RPC method.
+message QueryIsStakerExecutorRequest {
+  // public_key is the hex-encoded public key of the account.
+  string public_key = 1;
+}
+
+// QueryIsStakerExecutorResponse is the response type for the
+// Query/IsStakerExecutor RPC method.
+message QueryIsStakerExecutorResponse {
+  // is_staker_executor is whether the staker is a executor.
+  bool is_staker_executor = 1;
+}
+
+// The request message for Query/ExecutorEligibility RPC method.
+message QueryExecutorEligibilityRequest {
+  // Data is the base64 encoded hex data used to determine eligibility.
+  //
+  // 0          66:67            130:131       195 byte
+  // | public_key : data_request_id :   proof   |
+  string data = 1;
+}
+
+// QueryExecutorEligibilityResponse is the response type for the
+// Query/ExecutorEligibility RPC method.
+message QueryExecutorEligibilityResponse {
+  // EligibilityStatus is the eligibility status of the executor with respect
+  // to the data request.
+  EligibilityStatus status = 1;
+  // BlockHeight is the block height when the eligibility was determined.
+  uint64 block_height = 2;
+  // ErrorMessage, if not empty, indicates any error that was intercepted.
+  string error_message = 3;
+}
+
+// The request message for Query/LegacyExecutorEligibility RPC method.
+message QueryLegacyExecutorEligibilityRequest {
+  // Data is the base64-encoded hex data used to determine eligibility.
+  // It must follow the legacy format where the proof includes
+  // the Core Contract address.
+  //
+  // 0          66:67            130:131       195 byte
+  // | public_key : data_request_id :   proof   |
+  string data = 1;
+}
+
+// QueryLegacyExecutorEligibilityResponse is the response type for the
+// Query/LegacyExecutorEligibility RPC method.
+message QueryLegacyExecutorEligibilityResponse {
+  // EligibilityStatus is the eligibility status of the executor with respect
+  // to the data request.
+  EligibilityStatus status = 1;
+  // BlockHeight is the block height when the eligibility was determined.
+  uint64 block_height = 2;
+  // ErrorMessage, if not empty, indicates any error that was intercepted.
+  string error_message = 3;
+}
+
+// ExecutorEligibility is the eligibility status of an executor given
+// the eligibility message data.
+enum EligibilityStatus {
+  option (gogoproto.goproto_enum_prefix) = false;
+
+  // Zero value as required by proto3.
+  ELIGIBILITY_STATUS_UNSPECIFIED = 0;
+  // Executor is eligible for the data request
+  ELIGIBILITY_STATUS_ELLIGIBLE = 1;
+  // Executor is not eligible for the data request
+  ELIGIBILITY_STATUS_NOT_ELIGIBLE = 2;
+  // Data request not found
+  ELIGIBILITY_STATUS_DATA_REQUEST_NOT_FOUND = 3;
+  // Executor is not a staker
+  ELIGIBILITY_STATUS_NOT_STAKER = 4;
+  // Executor has insufficient stake
+  ELIGIBILITY_STATUS_INSUFFICIENT_STAKE = 5;
+  // Executor is not on the allowlist
+  ELIGIBILITY_STATUS_NOT_ALLOWLISTED = 6;
+  // Invalid signature
+  ELIGIBILITY_STATUS_INVALID_SIGNATURE = 7;
+}
+
+// The request message for Query/DataRequestStatuses RPC method.
+message QueryDataRequestStatusesRequest {
+  repeated string data_request_ids = 1 [ (gogoproto.jsontag) = "dr_ids" ];
+}
+
+// MaybeDataRequestStatus is a wrapper that contains either a DataRequestStatus
+// value or a null value.
+message MaybeDataRequestStatus {
+  DataRequestStatus value = 1 [ (gogoproto.nullable) = true ];
+}
+
+// The response message for Query/DataRequestStatuses RPC method.
+message QueryDataRequestStatusesResponse {
+  map<string, MaybeDataRequestStatus> statuses = 1;
+}
+
+// QueryParamsRequest is the request type for the Query/Params RPC method.
+message QueryParamsRequest {}
+
+// QueryParamsResponse is the response type for the Query/Params RPC method.
+message QueryParamsResponse {
+  // Params defines the parameters of the module.
+  Params params = 1 [ (gogoproto.nullable) = false ];
+}
+
+// The request message for Query/StakingConfig RPC method.
+message QueryStakingConfigRequest {}
+
+// The response message for Query/StakingConfig RPC method.
+message QueryStakingConfigResponse {
+  StakingConfig staking_config = 1 [ (gogoproto.nullable) = false ];
+}
+
+// The request message for Query/DataRequestConfig RPC method.
+message QueryDataRequestConfigRequest {}
+
+// The response message for Query/DataRequestConfig RPC method.
+message QueryDataRequestConfigResponse {
+  DataRequestConfig data_request_config = 1 [ (gogoproto.nullable) = false ];
+}
+
+// DataRequest is a query response type that contains a data request object
+// along with its commits and reveals.
+message DataRequestResponse {
+  DataRequest data_request = 1
+      [ (gogoproto.embed) = true, (gogoproto.nullable) = false ];
+  map<string, bytes> commits = 2 [ (gogoproto.jsontag) = "commits" ];
+  map<string, RevealBody> reveals = 3 [ (gogoproto.jsontag) = "reveals" ];
+}

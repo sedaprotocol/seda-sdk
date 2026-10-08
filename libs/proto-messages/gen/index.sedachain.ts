@@ -7,10 +7,9 @@
 
 export * as app from "./index.sedachain.app";
 export * as batching from "./index.sedachain.batching";
+export * as core from "./index.sedachain.core";
 export * as data_proxy from "./index.sedachain.data_proxy";
-export * as fast from "./index.sedachain.fast";
 export * as pubkey from "./index.sedachain.pubkey";
 export * as staking from "./index.sedachain.staking";
-export * as tally from "./index.sedachain.tally";
 export * as vesting from "./index.sedachain.vesting";
 export * as wasm_storage from "./index.sedachain.wasm_storage";

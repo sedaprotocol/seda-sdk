@@ -1,3 +1,4 @@
+import { sedachain } from "@seda-protocol/proto-messages";
 import { tryParseSync } from "@seda-protocol/utils";
 import * as v from "valibot";
 import type { GasOptions } from "../gas-options";
@@ -14,13 +15,10 @@ import { DataRequest } from "./data-request";
 
 export const PostDataRequestResponseSchema = v.pipe(
 	v.object({
-		dr_id: v.string(),
-		height: v.pipe(
-			v.number(),
-			v.transform((val) => BigInt(val)),
-		),
+		drID: v.string(),
+		height: v.bigint(),
 	}),
-	v.transform((val) => new DataRequest(val.dr_id, val.height)),
+	v.transform((val) => new DataRequest(val.drID, val.height)),
 );
 
 export async function postDataRequest(
@@ -28,36 +26,39 @@ export async function postDataRequest(
 	dataRequestInput: PostDataRequestInput,
 	gasOptions?: GasOptions,
 ): Promise<{ tx: string; dr: DataRequest }> {
+	const drConfig = await getDrConfig(signer);
+	if (drConfig.isErr) {
+		throw drConfig.error;
+	}
+
 	const sigingClientResult = await createSigningClient(signer);
 	if (sigingClientResult.isErr) {
 		throw sigingClientResult.error;
 	}
 
-	const contract = signer.getCoreContractAddress();
-	const drConfig = await getDrConfig(sigingClientResult.value.client, signer);
-	if (drConfig.isErr) {
-		throw drConfig.error;
-	}
-
 	const { client: sigingClient, address } = sigingClientResult.value;
 
-	const post_data_request = createPostedDataRequest(
-		dataRequestInput,
-		drConfig.value,
-	);
+	const req = createPostedDataRequest(dataRequestInput, drConfig.value);
 
 	const message = {
-		typeUrl: "/cosmwasm.wasm.v1.MsgExecuteContract",
-		value: {
-			funds: [{ amount: calculateDrFunds(post_data_request), denom: "aseda" }],
+		typeUrl: "/sedachain.core.v1.MsgPostDataRequest",
+		value: sedachain.core.v1.MsgPostDataRequest.fromPartial({
 			sender: address,
-			contract,
-			msg: Buffer.from(
-				JSON.stringify({
-					post_data_request,
-				}),
-			),
-		},
+			funds: { amount: calculateDrFunds(req), denom: "aseda" },
+			version: req.posted_dr.version,
+			execProgramID: req.posted_dr.exec_program_id,
+			execInputs: req.posted_dr.exec_inputs,
+			execGasLimit: req.posted_dr.exec_gas_limit,
+			tallyProgramID: req.posted_dr.tally_program_id,
+			tallyInputs: req.posted_dr.tally_inputs,
+			tallyGasLimit: req.posted_dr.tally_gas_limit,
+			replicationFactor: req.posted_dr.replication_factor,
+			consensusFilter: req.posted_dr.consensus_filter,
+			gasPrice: req.posted_dr.gas_price,
+			memo: req.posted_dr.memo,
+			sEDAPayload: req.seda_payload,
+			paybackAddress: req.payback_address,
+		}),
 	};
 
 	const response = await signAndSendTx(
@@ -79,8 +80,7 @@ export async function postDataRequest(
 		response.value.msgResponses[0],
 	);
 
-	const drResponse = JSON.parse(Buffer.from(messageResponse.data).toString());
-	const dr = tryParseSync(PostDataRequestResponseSchema, drResponse);
+	const dr = tryParseSync(PostDataRequestResponseSchema, messageResponse);
 	if (dr.isErr) {
 		throw new Error(`Failed to parse DR response: ${dr.error}`);
 	}

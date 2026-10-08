@@ -1,0 +1,44 @@
+syntax = "proto3";
+package sedachain.core.v1;
+
+import "cosmos_proto/cosmos.proto";
+import "gogoproto/gogo.proto";
+import "sedachain/core/v1/core.proto";
+
+option go_package = "github.com/sedaprotocol/seda-chain/x/core/types";
+
+// GenesisState defines core module's genesis state.
+message GenesisState {
+  Params params = 1 [ (gogoproto.nullable) = false ];
+  string owner = 2 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+  string pending_owner = 3 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+  bool paused = 4;
+
+  // Staking-related states:
+  repeated string allowlist = 5
+      [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+  repeated Staker stakers = 6 [ (gogoproto.nullable) = false ];
+
+  // Data request-related states:
+  repeated DataRequest data_requests = 7 [ (gogoproto.nullable) = false ];
+  uint64 committing_count = 8;
+  uint64 revealing_count = 9;
+  uint64 tallying_count = 10;
+  repeated GenesisStateCommit commits = 11 [ (gogoproto.nullable) = false ];
+  repeated GenesisStateReveal reveals = 12 [ (gogoproto.nullable) = false ];
+}
+
+// GenesisStateCommit is used to store commits in the genesis state.
+message GenesisStateCommit {
+  string dr_i_d = 1 [ (gogoproto.jsontag) = "dr_id" ];
+  string public_key = 2;
+  bytes commit = 3;
+}
+
+// GenesisStateReveal is used to store revealers and their reveal bodies in the
+// genesis state.
+message GenesisStateReveal {
+  string dr_i_d = 1 [ (gogoproto.jsontag) = "dr_id" ];
+  string public_key = 2;
+  RevealBody reveal_body = 3 [ (gogoproto.nullable) = false ];
+}

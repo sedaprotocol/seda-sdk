@@ -1,6 +1,5 @@
 import { stringToPath } from "@cosmjs/crypto";
 import {
-	AccountData,
 	DirectSecp256k1HdWallet,
 	type OfflineSigner,
 } from "@cosmjs/proto-signing";
@@ -21,7 +20,6 @@ export interface ISigner {
 	getEndpoint: () => string;
 	getSigner: () => OfflineSigner;
 	getAddress: () => string;
-	getCoreContractAddress: () => string;
 }
 
 const DEFAULT_ADDRESS_INDEX = 0;
@@ -31,7 +29,6 @@ export class Signer implements ISigner {
 		private endpoint: string,
 		private signer: DirectSecp256k1HdWallet,
 		private addresses: string[],
-		private coreContractAddress: string,
 		private addressIndex: number,
 	) {}
 
@@ -67,7 +64,7 @@ export class Signer implements ISigner {
 
 		const addresses = accounts.map((account) => account.address);
 
-		return new Signer(config.rpc, wallet, addresses, contract, addressIndex);
+		return new Signer(config.rpc, wallet, addresses, addressIndex);
 	}
 
 	getSigner() {
@@ -80,10 +77,6 @@ export class Signer implements ISigner {
 
 	getEndpoint() {
 		return this.endpoint;
-	}
-
-	getCoreContractAddress() {
-		return this.coreContractAddress;
 	}
 }
 

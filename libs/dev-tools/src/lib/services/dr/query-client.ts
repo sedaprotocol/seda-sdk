@@ -6,3 +6,8 @@ export async function createBatchingQueryClient(config: QueryConfig) {
 	const protoRpcClient = await createProtoQueryClient(config);
 	return new sedachain.batching.v1.QueryClientImpl(protoRpcClient);
 }
+
+export async function createCoreQueryClient(config: QueryConfig) {
+	const protoRpcClient = await createProtoQueryClient(config);
+	return new sedachain.core.v1.QueryClientImpl(protoRpcClient);
+}
