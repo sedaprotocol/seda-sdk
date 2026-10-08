@@ -18,8 +18,8 @@ use seda_sdk_rs::{bytes::ToBytes, process::Process};
 use storage::{
     test_storage_delete, test_storage_delete_key_limit, test_storage_delete_persisted, test_storage_empty_inputs,
     test_storage_insert_many_duplicate_keys, test_storage_insert_merges, test_storage_insert_overwrites,
-    test_storage_read, test_storage_read_key_limit, test_storage_read_persisted, test_storage_write,
-    test_storage_write_key_limit, test_storage_write_value_limit,
+    test_storage_read, test_storage_read_from, test_storage_read_key_limit, test_storage_read_persisted,
+    test_storage_write, test_storage_write_key_limit, test_storage_write_value_limit,
 };
 use tally::{
     test_tally_deterministic_hashmap, test_tally_hashmap, test_tally_vm_reveals, test_tally_vm_reveals_filtered,
@@ -29,6 +29,10 @@ use vm_tests::{test_tally_vm_http, test_tally_vm_mode};
 use crate::proxy_http::test_proxy_http_fetch_verification;
 fn main() {
     let args = String::from_utf8(Process::get_inputs()).unwrap();
+
+    if let Some(target) = args.strip_prefix("testStorageReadFrom:") {
+        return test_storage_read_from(target);
+    }
 
     match args.as_str() {
         "testTallyVmMode" => test_tally_vm_mode(),

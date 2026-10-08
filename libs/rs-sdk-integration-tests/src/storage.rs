@@ -12,7 +12,7 @@ pub fn test_storage_write() {
 pub fn test_storage_read() {
     storage::insert_many(&[("r1", "alpha"), ("r2", "beta")]).unwrap();
 
-    let result: Vec<Option<String>> = storage::get_many(&["r1", "r2", "missing"]).unwrap();
+    let result: Vec<Option<String>> = storage::get_many(&["r1", "r2", "missing"], None::<&str>).unwrap();
 
     if result[0].as_deref() != Some("alpha") {
         Process::error(&"r1 mismatch".to_bytes());
@@ -35,7 +35,7 @@ pub fn test_storage_insert_merges() {
     storage::insert("m1", "one").unwrap();
     storage::insert("m2", "two").unwrap();
 
-    let result: Vec<Option<String>> = storage::get_many(&["m1", "m2"]).unwrap();
+    let result: Vec<Option<String>> = storage::get_many(&["m1", "m2"], None::<&str>).unwrap();
 
     if result[0].as_deref() != Some("one") {
         Process::error(&"m1 should survive a later write to a different key".to_bytes());
@@ -52,7 +52,7 @@ pub fn test_storage_insert_overwrites() {
     storage::insert("o1", "first").unwrap();
     storage::insert("o1", "second").unwrap();
 
-    let value: Option<String> = storage::get("o1").unwrap();
+    let value: Option<String> = storage::get("o1", None::<&str>).unwrap();
 
     if value.as_deref() != Some("second") {
         Process::error(&"o1 should hold the most recent value".to_bytes());
@@ -65,7 +65,7 @@ pub fn test_storage_insert_overwrites() {
 pub fn test_storage_insert_many_duplicate_keys() {
     storage::insert_many(&[("dup", "first"), ("dup", "second")]).unwrap();
 
-    let value: Option<String> = storage::get("dup").unwrap();
+    let value: Option<String> = storage::get("dup", None::<&str>).unwrap();
 
     if value.as_deref() != Some("second") {
         Process::error(&"the last write to a duplicated key should win".to_bytes());
@@ -86,7 +86,7 @@ pub fn test_storage_empty_inputs() {
         Process::error(&"an empty remove_many should succeed".to_bytes());
     }
 
-    let values: Vec<Option<String>> = storage::get_many(&no_keys).unwrap();
+    let values: Vec<Option<String>> = storage::get_many(&no_keys, None::<&str>).unwrap();
     if !values.is_empty() {
         Process::error(&"an empty get_many should return no values".to_bytes());
     }
@@ -98,7 +98,7 @@ pub fn test_storage_delete() {
     storage::insert_many(&[("d1", "one"), ("d2", "two")]).unwrap();
     storage::remove("d1").unwrap();
 
-    let result: Vec<Option<String>> = storage::get_many(&["d1", "d2"]).unwrap();
+    let result: Vec<Option<String>> = storage::get_many(&["d1", "d2"], None::<&str>).unwrap();
 
     if result[0].is_some() {
         Process::error(&"d1 should be None after delete".to_bytes());
@@ -112,7 +112,7 @@ pub fn test_storage_delete() {
 
 // Reads the keys written by `test_storage_write` without writing them first
 pub fn test_storage_read_persisted() {
-    let result: Vec<Option<String>> = storage::get_many(&["key_a", "key_b"]).unwrap();
+    let result: Vec<Option<String>> = storage::get_many(&["key_a", "key_b"], None::<&str>).unwrap();
 
     if result[0].as_deref() != Some("value_a") {
         Process::error(&"key_a not persisted".to_bytes());
@@ -120,6 +120,17 @@ pub fn test_storage_read_persisted() {
 
     if result[1].as_deref() != Some("value_b") {
         Process::error(&"key_b not persisted".to_bytes());
+    }
+
+    Process::success(&"ok".to_bytes());
+}
+
+// Reads `key_a` from the storage of the program named by `from`.
+pub fn test_storage_read_from(from: &str) {
+    let value: Option<String> = storage::get("key_a", Some(from)).unwrap();
+
+    if value.as_deref() != Some("value_a") {
+        Process::error(&"key_a not readable from target".to_bytes());
     }
 
     Process::success(&"ok".to_bytes());
@@ -166,13 +177,13 @@ pub fn test_storage_write_key_limit() {
 pub fn test_storage_read_key_limit() {
     // A key exactly at the limit is accepted.
     let at_limit_key = vec![b'k'; MAX_KEY_BYTES];
-    if storage::get::<Vec<u8>>(&at_limit_key).is_err() {
+    if storage::get::<Vec<u8>>(&at_limit_key, None::<&str>).is_err() {
         Process::error(&"read with a key at the limit should be allowed".to_bytes());
     }
 
     // A key over the limit is rejected.
     let over_limit_key = vec![b'k'; MAX_KEY_BYTES + 1];
-    if storage::get::<Vec<u8>>(&over_limit_key).is_ok() {
+    if storage::get::<Vec<u8>>(&over_limit_key, None::<&str>).is_ok() {
         Process::error(&"read with an over-limit key should be rejected".to_bytes());
     }
 

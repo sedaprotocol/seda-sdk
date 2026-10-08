@@ -21,6 +21,8 @@ const hexKey = (key: string) => Buffer.from(key).toString("hex");
 
 class MockStorageAdapter extends DataRequestVmAdapter {
 	storage = new Map<string, Buffer>();
+	targetStorage = new Map<string, Map<string, Buffer>>();
+	readTargets: (string | undefined)[] = [];
 	// Records every host call so tests can assert that none was made.
 	calls: string[] = [];
 
@@ -36,9 +38,14 @@ class MockStorageAdapter extends DataRequestVmAdapter {
 		action: StorageReadAction,
 	): Promise<PromiseStatus<StorageReadResponse>> {
 		this.calls.push("read");
+		this.readTargets.push(action.target);
+		const storage =
+			action.target === undefined
+				? this.storage
+				: this.targetStorage.get(action.target) ?? new Map();
 		const result: Record<string, number[] | null> = {};
 		for (const key of action.keys) {
-			const value = this.storage.get(key);
+			const value = storage.get(key);
 			result[key] = value ? Array.from(value) : null;
 		}
 		return PromiseStatus.fulfilled(new StorageReadResult(result));
@@ -157,6 +164,33 @@ describe("rs-sdk:storage", () => {
 		);
 		expect(result.exitCode).toBe(0);
 		expect(result.resultAsString).toBe("ok");
+	});
+
+	it("should read another program's storage through a target", async () => {
+		const writer = new MockStorageAdapter();
+		const write = await executeWithMockStorage("testStorageWrite", writer);
+		expect(write.exitCode).toBe(0);
+
+		const reader = new MockStorageAdapter();
+		reader.targetStorage.set("price-feed.myapp", writer.storage);
+
+		const result = await executeWithMockStorage(
+			"testStorageReadFrom:price-feed.myapp",
+			reader,
+		);
+		expect(result.exitCode).toBe(0);
+		expect(result.resultAsString).toBe("ok");
+		expect(reader.readTargets).toEqual(["price-feed.myapp"]);
+	});
+
+	it("should not send a target when reading the program's own storage", async () => {
+		const adapter = new MockStorageAdapter();
+
+		const result = await executeWithMockStorage("testStorageRead", adapter);
+		expect(result.exitCode).toBe(0);
+		expect(adapter.readTargets.every((target) => target === undefined)).toBe(
+			true,
+		);
 	});
 
 	it("should delete a key persisted by a previous execution", async () => {

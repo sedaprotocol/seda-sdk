@@ -10,8 +10,10 @@ use crate::{
 };
 
 #[derive(Serialize)]
-struct StorageReadAction {
+struct StorageReadAction<'a> {
     keys: Vec<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    target: Option<&'a str>,
 }
 
 #[derive(Serialize)]
@@ -148,30 +150,41 @@ pub fn remove(key: impl AsRef<[u8]>) -> Result<()> {
 
 /// Reads multiple keys from storage in a single host call.
 ///
+/// `from` selects whose storage is read. [`None`] reads the executing program.
+/// [`Some`] is a program id or an ONS name; any [`ToString`] value is accepted,
+/// including `&str` and [`String`]. How it is resolved, and which programs may
+/// be read, is decided by the host. Another program's storage is read-only:
+/// there is no way to write or delete it.
+///
 /// The result is positional: index `i` holds the value for `keys[i]`, and is
 /// [`None`] when that key is not present in storage.
 ///
 /// # Errors
 ///
 /// Returns [`SDKError::PromiseRejected`] if the host rejected the read, for
-/// example when a key exceeds the configured size limit. Returns an error from
-/// [`FromBytes::from_bytes`] if a stored value cannot be decoded as `T`, which
-/// is distinct from the key being absent.
+/// example when `from` cannot be resolved or a key exceeds the configured size
+/// limit. Returns an error from [`FromBytes::from_bytes`] if a stored value
+/// cannot be decoded as `T`, which is distinct from the key being absent.
 ///
 /// # Examples
 ///
 /// ```no_run
 /// use seda_sdk_rs::storage;
-/// let values: Vec<Option<String>> = storage::get_many(&["owner", "region"])?;
+/// let values: Vec<Option<String>> = storage::get_many(&["owner", "region"], None::<&str>)?;
+/// let prices: Vec<Option<String>> = storage::get_many(&["btc", "eth"], Some("price-feed.myapp"))?;
+/// let name = String::from("price-feed.myapp");
+/// let again: Vec<Option<String>> = storage::get_many(&["btc", "eth"], Some(name))?;
 /// # Ok::<(), seda_sdk_rs::errors::SDKError>(())
 /// ```
-pub fn get_many<T: FromBytes>(keys: &[impl AsRef<[u8]>]) -> Result<Vec<Option<T>>> {
+pub fn get_many<T: FromBytes>(keys: &[impl AsRef<[u8]>], from: Option<impl ToString>) -> Result<Vec<Option<T>>> {
     if keys.is_empty() {
         return Ok(Vec::new());
     }
 
+    let target = from.as_ref().map(ToString::to_string);
     let action = StorageReadAction {
         keys: keys.iter().map(hex::encode).collect(),
+        target: target.as_deref(),
     };
     let action_json = serde_json::to_string(&action)?;
 
@@ -196,25 +209,28 @@ pub fn get_many<T: FromBytes>(keys: &[impl AsRef<[u8]>]) -> Result<Vec<Option<T>
 
 /// Reads a single key from storage, returning [`None`] if it is not present.
 ///
+/// `from` selects whose storage is read. See [`get_many`] for how it is
+/// interpreted.
+///
 /// Prefer [`get_many`] when reading more than one key. Every host call is
 /// charged base gas and crosses into the host, so a single batched call is
 /// cheaper than the same reads issued one at a time.
 ///
 /// # Errors
 ///
-/// Returns [`SDKError::PromiseRejected`] if the host rejected the read, for
-/// example when the key exceeds the configured size limit. Returns an error
-/// from [`FromBytes::from_bytes`] if the stored value cannot be decoded as `T`,
-/// which is distinct from the key being absent.
+/// Same as [`get_many`].
 ///
 /// # Examples
 ///
 /// ```no_run
 /// use seda_sdk_rs::storage;
-/// let owner: Option<String> = storage::get("owner")?;
-/// let nonce = storage::get::<u64>(b"nonce")?;
+/// let owner: Option<String> = storage::get("owner", None::<&str>)?;
+/// let nonce = storage::get::<u64>(b"nonce", None::<&str>)?;
+/// let price: Option<String> = storage::get("btc", Some("price-feed.myapp"))?;
+/// let name = String::from("price-feed.myapp");
+/// let again: Option<String> = storage::get("btc", Some(name))?;
 /// # Ok::<(), seda_sdk_rs::errors::SDKError>(())
 /// ```
-pub fn get<T: FromBytes>(key: impl AsRef<[u8]>) -> Result<Option<T>> {
-    Ok(get_many(&[key])?.pop().flatten())
+pub fn get<T: FromBytes>(key: impl AsRef<[u8]>, from: Option<impl ToString>) -> Result<Option<T>> {
+    Ok(get_many(&[key], from)?.pop().flatten())
 }

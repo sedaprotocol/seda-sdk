@@ -33,6 +33,8 @@ export type VmAction =
 
 export interface StorageReadAction {
 	keys: string[];
+	/** Program id or ONS name of another program whose storage to read. Absent for the program's own storage. */
+	target?: string;
 	type: "storage-read-action";
 }
 
