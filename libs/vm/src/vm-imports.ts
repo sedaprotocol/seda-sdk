@@ -55,6 +55,8 @@ export default class VmImports {
 		this.workerToHost = new WorkerToHost(
 			notifierBufferOrAdapter,
 			asyncRequests,
+			processId,
+			callData.hostCallTimeoutMs,
 		);
 		this.processId = processId;
 		this.gasMeter = gasMeter;
@@ -88,25 +90,40 @@ export default class VmImports {
 				...JSON.parse(messageRaw),
 				type: "proxy-http-fetch-action",
 			};
-			const gasCostMessage: ProxyHttpFetchGasCostAction = {
-				type: "proxy-http-fetch-gas-cost-action",
-				fetchAction: message,
-			};
+			// Adapters with a flat fee model can answer the gas cost synchronously,
+			// skipping a host action that would otherwise abort and replay the VM
+			// in the in-process mode. Worker (Atomics) mode never aborts, so the
+			// fallback host action is cheap there either way.
+			const adapter =
+				this.notifierBufferOrAdapter instanceof SharedArrayBuffer
+					? undefined
+					: this.notifierBufferOrAdapter;
+			const syncGasCost = adapter?.getProxyHttpFetchGasCostSync?.(message);
 
-			// First we try to fetch the price of the proxy call in gas units
-			const gasCostMessageResponse: ResultJSON<string, Error> = JSON.parse(
-				this.workerToHost.callActionOnHost(gasCostMessage).toString(),
-			);
+			let gasCost: bigint;
+			if (syncGasCost !== undefined) {
+				gasCost = syncGasCost;
+			} else {
+				const gasCostMessage: ProxyHttpFetchGasCostAction = {
+					type: "proxy-http-fetch-gas-cost-action",
+					fetchAction: message,
+				};
 
-			if (gasCostMessageResponse.variant === "Err") {
-				this.callResult = HttpFetchResponse.createRejectedPromise(
-					`Failed to get proxy gas cost: ${gasCostMessageResponse.error}`,
-				).toBuffer();
+				// First we try to fetch the price of the proxy call in gas units
+				const gasCostMessageResponse: ResultJSON<string, Error> = JSON.parse(
+					this.workerToHost.callActionOnHost(gasCostMessage).toString(),
+				);
 
-				return this.callResult.length;
+				if (gasCostMessageResponse.variant === "Err") {
+					this.callResult = HttpFetchResponse.createRejectedPromise(
+						`Failed to get proxy gas cost: ${gasCostMessageResponse.error}`,
+					).toBuffer();
+
+					return this.callResult.length;
+				}
+
+				gasCost = BigInt(gasCostMessageResponse.value);
 			}
-
-			const gasCost = BigInt(gasCostMessageResponse.value);
 			// Ensure we have enough gas to pay for the proxy call should it succeed
 			if (this.gasMeter.pointsRemaining < gasCost) {
 				const remainingPoints = this.gasMeter
@@ -114,7 +131,7 @@ export default class VmImports {
 					.mapOr("0", (t) => t.toString());
 
 				throw new VmError(
-					`Insufficient gas to pay for data proxy. ${gasCostMessageResponse.value} required, only ${remainingPoints} left`,
+					`Insufficient gas to pay for data proxy. ${gasCost} required, only ${remainingPoints} left`,
 					{
 						type: VmErrorType.InsufficientDataProxyFee,
 					},

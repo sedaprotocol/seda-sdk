@@ -45,6 +45,17 @@ export interface VmAdapter {
 	): Promise<Result<bigint, Error>>;
 
 	/**
+	 * Optional synchronous variant of getProxyHttpFetchGasCost for adapters
+	 * with a flat fee model. When implemented and returning a value, the
+	 * in-process (replay) mode answers the gas cost without a host action,
+	 * which saves one full abort-and-replay execution of the wasm. Return
+	 * undefined to fall back to the async host action.
+	 */
+	getProxyHttpFetchGasCostSync?(
+		action: ProxyHttpFetchAction,
+	): bigint | undefined;
+
+	/**
 	 * Method to do a remote proxy http fetch call
 	 *
 	 * @param action
