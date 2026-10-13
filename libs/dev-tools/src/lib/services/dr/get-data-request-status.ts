@@ -1,8 +1,10 @@
 import assert from "node:assert";
+import { tryAsync } from "@seda-protocol/utils";
 import type { ISigner } from "../signer";
 import { createSigningClient } from "../signing-client";
 import type { DataRequest } from "./data-request";
 import { getDataResult } from "./get-data-result";
+import { createCoreQueryClient } from "./query-client";
 
 export type DataRequestStatus =
 	| "pending"
@@ -14,19 +16,20 @@ export async function getDataRequestStatus(
 	signer: ISigner,
 	dr: DataRequest,
 ): Promise<{ status: DataRequestStatus }> {
-	const sigingClientResult = await createSigningClient(signer);
-	if (sigingClientResult.isErr) {
-		throw sigingClientResult.error;
+	const coreQueryClient = await createCoreQueryClient({
+		rpc: signer.getEndpoint(),
+	});
+	const response = await tryAsync(
+		coreQueryClient.DataRequest({
+			drId: dr.id,
+		}),
+	);
+
+	if (response.isErr) {
+		throw response.error;
 	}
 
-	const { client: sigingClient } = sigingClientResult.value;
-	const contract = signer.getCoreContractAddress();
-
-	const contractDr = await sigingClient.queryContractSmart(contract, {
-		get_data_request: { dr_id: dr.id },
-	});
-
-	if (contractDr === null) {
+	if (!response.value.dataRequest) {
 		const drResult = await getDataResult({ rpc: signer.getEndpoint() }, dr);
 
 		if (drResult === null) {
@@ -36,24 +39,30 @@ export async function getDataRequestStatus(
 		return { status: "resolved" };
 	}
 
-	const replicationFactor = contractDr?.replication_factor;
+	const responseDR = response.value.dataRequest;
+	if (!responseDR.dataRequest) {
+		throw new Error("Invalid DR response, no data request.");
+	}
+	if (!responseDR.dataRequest.replicationFactor) {
+		throw new Error("Invalid DR response, no replication factor.");
+	}
 	assert(
-		Number.isInteger(replicationFactor),
-		"Invalid DR response, replication factor is not a number.",
-	);
-	assert(
-		typeof contractDr?.commits === "object",
+		typeof responseDR?.commits === "object",
 		"Invalid DR response, no commits map.",
 	);
 	assert(
-		typeof contractDr?.reveals === "object",
+		typeof responseDR?.reveals === "object",
 		"Invalid DR response, no reveals map.",
 	);
 
-	const commitments = Object.keys(contractDr.commits).length;
-	const reveals = Object.keys(contractDr.reveals).length;
+	const commitments = Object.keys(responseDR.commits).length;
+	const reveals = Object.keys(responseDR.reveals).length;
 
-	const status = getStatus(replicationFactor, commitments, reveals);
+	const status = getStatus(
+		responseDR.dataRequest.replicationFactor,
+		commitments,
+		reveals,
+	);
 
 	return { status };
 }
